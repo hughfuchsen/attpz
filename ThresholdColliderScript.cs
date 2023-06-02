@@ -12,8 +12,13 @@ public class ThresholdColliderScript : MonoBehaviour
     
     public SpriteRenderer closedDoor;
 
+    private bool onTrigger;
+
 
     void OnTriggerEnter2D() {
+
+        onTrigger = true; 
+
         if(!isPlayerCrossingUp()) {
             roomBelow.EnterRoom();
         }
@@ -22,6 +27,9 @@ public class ThresholdColliderScript : MonoBehaviour
     }
 
     void OnTriggerExit2D() {
+
+        onTrigger = false; 
+        
         if(isPlayerCrossingUp()) {
             roomAbove.EnterRoom();
             roomBelow.ExitRoom();            

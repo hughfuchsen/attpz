@@ -79,6 +79,7 @@ public class RoomScript : MonoBehaviour
         for (float t = 0.0f; t < 1; t += Time.deltaTime) {
             float currentAlpha = Mathf.Lerp(sr.color.a, fadeTo, t * fadeSpeed);
             sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, currentAlpha);
+            
             yield return null;
         }
     }

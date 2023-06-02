@@ -396,7 +396,7 @@ public class edgeColliderActions : MonoBehaviour
             Color objectColor = obj[i].color;
             float fadeOutAmount = obj[i].color.a;
 
-              fadeOutAmount = value1;
+            fadeOutAmount = value1;
 
             
             objectColor = new Color(objectColor.r,objectColor.g,objectColor.b,fadeOutAmount);

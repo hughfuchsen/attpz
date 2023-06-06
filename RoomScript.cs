@@ -76,12 +76,12 @@ public class RoomScript : MonoBehaviour
 
     private IEnumerator Fade(SpriteRenderer sr, float fadeTo)
     {
-        for (float t = 0.0f; t < 1; t += Time.deltaTime) {
-            float currentAlpha = Mathf.Lerp(sr.color.a, fadeTo, t * fadeSpeed);
-            sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, currentAlpha);
+        // for (float t = 0.0f; t < 1; t += Time.deltaTime) {
+            // float currentAlpha = Mathf.Lerp(sr.color.a, fadeTo, t * fadeSpeed);
+            sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, fadeTo);
             
             yield return null;
-        }
+        // }
     }
 
     private void ResetDoorsBelowCoros()

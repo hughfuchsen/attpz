@@ -473,7 +473,7 @@ public class edgeColliderActions : MonoBehaviour
         if (isPlayerCrossingUp())
         {
 
-          Debug.Log("entered room "+roomNumAbove);
+          // Debug.Log("entered room "+roomNumAbove);
 
           for (int i = 0; i < displaceOnExitCrossingUp.Count; i++){
             Vector3 targetPosition = displaceOnExitCrossingUpInitialPosition[i] + displaceOnExitCrossingUp[i].displacement;

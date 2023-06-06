@@ -38,10 +38,10 @@ public class PlayerMovement : MonoBehaviour
         change.y = Input.GetAxisRaw("Vertical");
         if(change != Vector3.zero)
         {
-          if(motionDirection == "normal") 
-            {MoveCharacter();} 
-          else if (motionDirection == "inclineLeftAway")
-            {MoveCharacterVerticalInclineLeftAway();} 
+          if(motionDirection == "normal") {
+              MoveCharacter();} 
+          else if (motionDirection == "inclineLeftAway") {
+              MoveCharacterVerticalInclineLeftAway();} 
           else if (motionDirection == "inclineRightAway") 
             {MoveCharacterVerticalInclineRightAway();}
           else if (motionDirection == "inclineLeftToward") 
@@ -65,42 +65,41 @@ public class PlayerMovement : MonoBehaviour
         }
       }
 
-      public void UpdateAnimationAndMoveOnVerticalInclineLeft()
-      {
-        change = Vector3.zero;
-        change.x = Input.GetAxisRaw("Horizontal");
-        change.y = Input.GetAxisRaw("Vertical");
-        if(change != Vector3.zero)
-        {
-          MoveCharacterVerticalInclineLeftAway
-          ();
-          animator.SetFloat("moveX", change.x);
-          animator.SetFloat("moveY", change.y);
-          animator.SetBool("moving", true);
-        }
-        else
-        {
-          animator.SetBool("moving", false);
-        }
-      }
+      // public void UpdateAnimationAndMoveOnVerticalInclineLeft()
+      // {
+      //   change = Vector3.zero;
+      //   change.x = Input.GetAxisRaw("Horizontal");
+      //   change.y = Input.GetAxisRaw("Vertical");
+      //   if(change != Vector3.zero)
+      //   {
+      //     MoveCharacterVerticalInclineLeftAway();
+      //     animator.SetFloat("moveX", change.x);
+      //     animator.SetFloat("moveY", change.y);
+      //     animator.SetBool("moving", true);
+      //   }
+      //   else
+      //   {
+      //     animator.SetBool("moving", false);
+      //   }
+      // }
 
-      public void UpdateAnimationAndMoveOnVerticalInclineRight()
-      {
-        change = Vector3.zero;
-        change.x = Input.GetAxisRaw("Horizontal");
-        change.y = Input.GetAxisRaw("Vertical");
-        if(change != Vector3.zero)
-        {
-          MoveCharacterVerticalInclineRightAway();
-          animator.SetFloat("moveX", change.x);
-          animator.SetFloat("moveY", change.y);
-          animator.SetBool("moving", true);
-        }
-        else
-        {
-          animator.SetBool("moving", false);
-        }
-      }
+      // public void UpdateAnimationAndMoveOnVerticalInclineRight()
+      // {
+      //   change = Vector3.zero;
+      //   change.x = Input.GetAxisRaw("Horizontal");
+      //   change.y = Input.GetAxisRaw("Vertical");
+      //   if(change != Vector3.zero)
+      //   {
+      //     MoveCharacterVerticalInclineRightAway();
+      //     animator.SetFloat("moveX", change.x);
+      //     animator.SetFloat("moveY", change.y);
+      //     animator.SetBool("moving", true);
+      //   }
+      //   else
+      //   {
+      //     animator.SetBool("moving", false);
+      //   }
+      // }
         void MoveCharacterVerticalInclineLeftAway()
     {
       if (change == Vector3.right+Vector3.up)
@@ -328,7 +327,7 @@ public class PlayerMovement : MonoBehaviour
       {
        change = new Vector3(0f,0f,0f);
        myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
-      animator.SetBool("moving", false);       
+       animator.SetBool("moving", false);       
       }
       if (change == Vector3.down)
       {
@@ -339,7 +338,7 @@ public class PlayerMovement : MonoBehaviour
       {
        change = new Vector3(0f,0f,0f);
        myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
-      animator.SetBool("moving", false);       
+       animator.SetBool("moving", false);       
       }
       else
       {
@@ -356,13 +355,15 @@ public class PlayerMovement : MonoBehaviour
       }
       if (change == Vector3.left+Vector3.up)
       {
-       change = new Vector3(-1f,0.5f,0f);
+       change = new Vector3(0f,0f,0f);
        myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
+       animator.SetBool("moving", false);  
       }
       if (change == Vector3.up)
       {
-       change = new Vector3(-1f,0.5f,0f);
+       change = new Vector3(0f,0f,0f);
        myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
+       animator.SetBool("moving", false);  
       }
       if (change == Vector3.right)
       {
@@ -371,8 +372,9 @@ public class PlayerMovement : MonoBehaviour
       }
       if (change == Vector3.right+Vector3.down)
       {
-       change = new Vector3(1f,-0.5f,0f);
+       change = new Vector3(0f,0f,0f);
        myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
+       animator.SetBool("moving", false);  
       }
       if (change == Vector3.left+Vector3.down)
       {
@@ -381,8 +383,9 @@ public class PlayerMovement : MonoBehaviour
       }
       if (change == Vector3.down)
       {
-       change = new Vector3(1f,-0.5f,0f);
+       change = new Vector3(0f,0f,0f);
        myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
+       animator.SetBool("moving", false);  
       }
       if (change == Vector3.left)
       {

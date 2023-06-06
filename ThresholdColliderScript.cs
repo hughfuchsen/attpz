@@ -5,39 +5,80 @@ using UnityEngine;
 public class ThresholdColliderScript : MonoBehaviour
 {
     public RoomScript roomAbove;
-    
     public RoomScript roomBelow;
-
     public SpriteRenderer openDoor;
-    
     public SpriteRenderer closedDoor;
-
     private bool onTrigger;
 
+    PlayerMovement playerMovement;
+    [SerializeField] GameObject Player;
+    public string motionDirection = "normal";
+    public string previousMotionDirection = "normal";
 
-    void OnTriggerEnter2D() {
 
-        onTrigger = true; 
+    void Awake()
+    { 
+       Player = GameObject.FindGameObjectWithTag("Player");
+       playerMovement = Player.GetComponent<PlayerMovement>();     
+    }  
 
-        if(!isPlayerCrossingUp()) {
-            roomBelow.EnterRoom();
+    void Start()
+    {
+        if (openDoor != null)
+        {
+            openDoor.color = new Color(openDoor.color.r, openDoor.color.g, openDoor.color.b, 0);
         }
-        openDoor.color = new Color(openDoor.color.r, openDoor.color.g, openDoor.color.b, 1);
-        closedDoor.color = new Color(closedDoor.color.r, closedDoor.color.g, closedDoor.color.b, 0);
+        if (closedDoor != null)
+        {
+            closedDoor.color = new Color(closedDoor.color.r, closedDoor.color.g, closedDoor.color.b, 1);
+        }
     }
 
-    void OnTriggerExit2D() {
-
-        onTrigger = false; 
+    void OnTriggerEnter2D()
+    {
+        onTrigger = true;
         
-        if(isPlayerCrossingUp()) {
-            roomAbove.EnterRoom();
-            roomBelow.ExitRoom();            
-        } else {
-            roomAbove.ExitRoom();            
+        if (openDoor != null)
+        {
+            openDoor.color = new Color(openDoor.color.r, openDoor.color.g, openDoor.color.b, 1);
         }
-        openDoor.color = new Color(openDoor.color.r, openDoor.color.g, openDoor.color.b, 0);
-        closedDoor.color = new Color(closedDoor.color.r, closedDoor.color.g, closedDoor.color.b, 0.35f);
+        if (closedDoor != null)
+        {
+            closedDoor.color = new Color(closedDoor.color.r, closedDoor.color.g, closedDoor.color.b, 0);
+        }
+
+        if (!isPlayerCrossingUp())
+        {
+            roomBelow.EnterRoom();
+        }
+
+        playerMovement.motionDirection = motionDirection;
+    }
+
+    void OnTriggerExit2D()
+    {
+        onTrigger = false;
+
+        if (openDoor != null)
+        {
+            openDoor.color = new Color(openDoor.color.r, openDoor.color.g, openDoor.color.b, 0);
+        }
+        if (closedDoor != null)
+        {
+            closedDoor.color = new Color(closedDoor.color.r, closedDoor.color.g, closedDoor.color.b, 0.35f);
+        }
+
+        if (isPlayerCrossingUp())
+        {
+            roomAbove.EnterRoom();
+            roomBelow.ExitRoom();
+        }
+        else
+        {
+            roomAbove.ExitRoom();
+        }
+
+        playerMovement.motionDirection = previousMotionDirection;
     }
 
     private bool isPlayerCrossingUp()

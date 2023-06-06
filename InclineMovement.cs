@@ -40,7 +40,6 @@ public class InclineMovement : MonoBehaviour
             {
                 playerMovement.motionDirection = previousMotionDirection;
             }
-
     }
 
     // sortingLayerToAssign is just a variable name, it's given a value in the preceding code somewhere. 

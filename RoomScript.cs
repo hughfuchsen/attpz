@@ -10,7 +10,7 @@ public class RoomScript : MonoBehaviour
     public List<SpriteRenderer> doorsBelow = new List<SpriteRenderer>();
     private List<Coroutine> doorsBelowCoros = new List<Coroutine>();
 
-    public int wallHeight = 31;
+    public int wallHeight = 30;
     public float displaceSpeed = 100;
     public float fadeSpeed = 100;
 

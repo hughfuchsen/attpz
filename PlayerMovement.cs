@@ -12,14 +12,24 @@ public class PlayerMovement : MonoBehaviour
     public Vector3 change;
     public Animator animator;
 
+    IsoSpriteSorting IsoSpriteSorting; 
+    //= new Vector3(8,-28,0);
+
     private bool shouldAnimate;
 
     public bool isPlayerInside;
 
 
+    void Animate() {
+      animator.SetFloat("moveX", change.x);
+      animator.SetFloat("moveY", change.y);
+      animator.SetBool("moving", true);
+    }
+
     // Start is called before the first frame update
     void Start()    
       {
+        IsoSpriteSorting = GetComponent<IsoSpriteSorting>();
         animator = GetComponent<Animator>();
         myRigidbody = GetComponent<Rigidbody2D>();
         shouldAnimate = true;
@@ -39,6 +49,7 @@ public class PlayerMovement : MonoBehaviour
         if(change != Vector3.zero)
         {
           if(motionDirection == "normal") {
+              // IsoSpriteSorting.SorterPositionOffset = new Vector3(8,-28,0);
               MoveCharacter();} 
           else if (motionDirection == "inclineLeftAway") {
               MoveCharacterVerticalInclineLeftAway();} 
@@ -48,16 +59,18 @@ public class PlayerMovement : MonoBehaviour
             {MoveCharacterVerticalInclineLeftToward();}
           else if (motionDirection == "inclineRightToward") 
             {MoveCharacterVerticalInclineRightToward();}
-          else if (motionDirection == "backSlash") 
-            {MoveCharacterBackSlashDirection();}
-          else if (motionDirection == "forwardSlash") 
-            {MoveCharacterForwardSlashDirection();}
+          else if (motionDirection == "backSlash") {
+              // IsoSpriteSorting.SorterPositionOffset = new Vector3(12,-28,0);
+              MoveCharacterBackSlashDirection();}
+          else if (motionDirection == "forwardSlash") {
+              // IsoSpriteSorting.SorterPositionOffset = new Vector3(4,-28,0);
+              MoveCharacterForwardSlashDirection();}
 
-          if(shouldAnimate) {
-          animator.SetFloat("moveX", change.x);
-          animator.SetFloat("moveY", change.y);
-          animator.SetBool("moving", true);
-          }
+          // if(shouldAnimate) {
+          // animator.SetFloat("moveX", change.x);
+          // animator.SetFloat("moveY", change.y);
+          // animator.SetBool("moving", true);
+          // }
         }
         else
         {
@@ -306,11 +319,13 @@ public class PlayerMovement : MonoBehaviour
       {
        change = new Vector3(-1f,0.5f,0f);
        myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
+       Animate();
       }
       if (change == Vector3.up)
       {
        change = new Vector3(-1f,0.5f,0f);
        myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
+       Animate();
       }
       if (change == Vector3.right)
       {
@@ -322,6 +337,7 @@ public class PlayerMovement : MonoBehaviour
       {
        change = new Vector3(1f,-0.5f,0f);
        myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
+       Animate();
       }
       if (change == Vector3.left+Vector3.down)
       {
@@ -333,6 +349,7 @@ public class PlayerMovement : MonoBehaviour
       {
        change = new Vector3(1f,-0.5f,0f);
        myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
+       Animate();
       }
       if (change == Vector3.left)
       {
@@ -352,6 +369,7 @@ public class PlayerMovement : MonoBehaviour
       {
        change = new Vector3(1f,0.5f,0f);
        myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
+       Animate();
       }
       if (change == Vector3.left+Vector3.up)
       {
@@ -369,6 +387,7 @@ public class PlayerMovement : MonoBehaviour
       {
        change = new Vector3(1f,0.5f,0f);
        myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
+       Animate(); 
       }
       if (change == Vector3.right+Vector3.down)
       {
@@ -380,6 +399,7 @@ public class PlayerMovement : MonoBehaviour
       {
        change = new Vector3(-1f,-0.5f,0f);
        myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
+       Animate();
       }
       if (change == Vector3.down)
       {
@@ -391,6 +411,7 @@ public class PlayerMovement : MonoBehaviour
       {
        change = new Vector3(-1f,-0.5f,0f);
        myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
+       Animate();
       }
       else
       {
@@ -404,41 +425,49 @@ public class PlayerMovement : MonoBehaviour
       {
        change = new Vector3(1f,0.5f,0f);
        myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
+       Animate();
       }
       if (change == Vector3.left+Vector3.up)
       {
        change = new Vector3(-1f,0.5f,0f);
        myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
+       Animate();
       }
       if (change == Vector3.up)
       {
        change = new Vector3(-1f,0.5f,0f);
        myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
+       Animate();
       }
       if (change == Vector3.right)
       {
        change = new Vector3(1f,0.5f,0f);
        myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
+       Animate();
       }
       if (change == Vector3.right+Vector3.down)
       {
        change = new Vector3(1f,-0.5f,0f);
        myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
+       Animate();
       }
       if (change == Vector3.left+Vector3.down)
       {
        change = new Vector3(-1f,-0.5f,0f);
        myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
+       Animate();
       }
       if (change == Vector3.down)
       {
        change = new Vector3(1f,-0.5f,0f);
        myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
+       Animate();
       }
       if (change == Vector3.left)
       {
        change = new Vector3(-1f,-0.5f,0f);
        myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
+       Animate();
       }
       else
       {

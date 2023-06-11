@@ -10,12 +10,8 @@ public class ThresholdColliderScript : MonoBehaviour
     public SpriteRenderer closedDoor;
 
     public float currentAlpha = 1;
-    private bool onTrigger;
 
     PlayerMovement playerMovement;
-    IsoSpriteSorting isoSpriteSorting; 
-    private Vector3 originalSpriteSorterPos;
-
     [SerializeField] GameObject Player;
     public string motionDirection = "normal";
     public string previousMotionDirection = "normal";
@@ -25,10 +21,6 @@ public class ThresholdColliderScript : MonoBehaviour
     { 
         Player = GameObject.FindGameObjectWithTag("Player");
         playerMovement = Player.GetComponent<PlayerMovement>(); 
-        isoSpriteSorting = Player.GetComponent<IsoSpriteSorting>();
-        originalSpriteSorterPos = isoSpriteSorting.SorterPositionOffset;
-        isoSpriteSorting.SorterPositionOffset2 = originalSpriteSorterPos;
-        isoSpriteSorting.sortType = IsoSpriteSorting.SortType.Point;
     }  
 
     void Start()
@@ -46,8 +38,8 @@ public class ThresholdColliderScript : MonoBehaviour
 
     void OnTriggerEnter2D()
     {
-        onTrigger = true;
-        
+        playerMovement.motionDirection = motionDirection;
+                
         if (openDoor != null)
         {
             openDoor.color = new Color(openDoor.color.r, openDoor.color.g, openDoor.color.b, currentAlpha);
@@ -57,47 +49,18 @@ public class ThresholdColliderScript : MonoBehaviour
             closedDoor.color = new Color(closedDoor.color.r, closedDoor.color.g, closedDoor.color.b, 0);
         }
 
-        if (isPlayerCrossingUp())
-        {
-            // if(isPlayerCrossingLeft())
-            // {
-            //     isoSpriteSorting.sortType = IsoSpriteSorting.SortType.Line;
-            //     isoSpriteSorting.SorterPositionOffset = isoSpriteSorting.SorterPositionOffset + new Vector3(-1,1,0);
-            //     isoSpriteSorting.SorterPositionOffset2 = isoSpriteSorting.SorterPositionOffset2 + new Vector3(1,0,0);
-            // }
-            // else
-            // {
-            //     isoSpriteSorting.sortType = IsoSpriteSorting.SortType.Line;
-            //     isoSpriteSorting.SorterPositionOffset = isoSpriteSorting.SorterPositionOffset + new Vector3(1,1,0);
-            //     isoSpriteSorting.SorterPositionOffset2 = isoSpriteSorting.SorterPositionOffset2 + new Vector3(-1,0,0);            
-            // }        
-        }
-        else
+        if (!isPlayerCrossingUp())
         {
             if (roomBelow != null)
             {
                 roomBelow.EnterRoom();
             }
-            
-            // if(isPlayerCrossingLeft())
-            // {
-            //     isoSpriteSorting.sortType = IsoSpriteSorting.SortType.Line;
-            //     isoSpriteSorting.SorterPositionOffset = isoSpriteSorting.SorterPositionOffset + new Vector3(1,1,0);
-            //     isoSpriteSorting.SorterPositionOffset2 = isoSpriteSorting.SorterPositionOffset2 + new Vector3(-1,0,0);             }
-            // else
-            // {
-            //     isoSpriteSorting.sortType = IsoSpriteSorting.SortType.Line;
-            //     isoSpriteSorting.SorterPositionOffset = isoSpriteSorting.SorterPositionOffset + new Vector3(-1,1,0);
-            //     isoSpriteSorting.SorterPositionOffset2 = isoSpriteSorting.SorterPositionOffset2 + new Vector3(1,0,0);             
-            // }
         }
-
-        playerMovement.motionDirection = motionDirection;
     }
 
     void OnTriggerExit2D()
     {
-        onTrigger = false;
+        playerMovement.motionDirection = previousMotionDirection;
 
         if (openDoor != null)
         {
@@ -126,10 +89,6 @@ public class ThresholdColliderScript : MonoBehaviour
                 roomAbove.ExitRoom();
             }
         }
-
-        playerMovement.motionDirection = previousMotionDirection;
-        isoSpriteSorting.SorterPositionOffset = originalSpriteSorterPos;
-        isoSpriteSorting.SorterPositionOffset2 = originalSpriteSorterPos;
     }
     private bool isPlayerCrossingUp()
     {

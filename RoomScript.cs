@@ -113,7 +113,7 @@ public class RoomScript : MonoBehaviour
         // Move the parent object down
         currentMotionCoroutine = StartCoroutine(Displace(this.gameObject, downPosition));
 
-        // Move the child colliders back to their original local positions
+        // Move the child colliders in the opposite direction to the parent objects; i.e. keep the child colliders stationary
         currentColliderMotionCoroutine = StartCoroutine(MoveChildColliders(childColliders, initialChildPositions, 1));
     }
 

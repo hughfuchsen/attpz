@@ -44,7 +44,7 @@ public class RoomScript : MonoBehaviour
                 if (child.CompareTag("Collider"))
                 {
                     childColliders.Add(child);
-                    childColliderInitialPositions.Add(child.localPosition); // Store the initial local position
+                    childColliderInitialPositions.Add(child.position); // Store the initial local position
                 }
                 stack.Push(child);
             }
@@ -85,15 +85,15 @@ public class RoomScript : MonoBehaviour
             StopCoroutine(currentMotionCoroutine);
         }
 
-        if (currentColliderMotionCoroutine != null)
-        {
-            StopCoroutine(currentColliderMotionCoroutine);
-        }
+        //if (currentColliderMotionCoroutine != null)
+        //{
+        //    StopCoroutine(currentColliderMotionCoroutine);
+        //}
 
         currentMotionCoroutine = StartCoroutine(Displace(this.gameObject, initialPosition));
 
         // Move the child colliders back to their original local positions
-        currentColliderMotionCoroutine = StartCoroutine(MoveChildColliders(0));
+        //currentColliderMotionCoroutine = StartCoroutine(MoveChildColliders(0));
     }
     
     private void MoveDown()
@@ -103,86 +103,58 @@ public class RoomScript : MonoBehaviour
             StopCoroutine(currentMotionCoroutine);
         }
 
-        if (currentColliderMotionCoroutine != null)
-        {
-            StopCoroutine(currentColliderMotionCoroutine);
-        }
+        //if (currentColliderMotionCoroutine != null)
+        //{
+        //    StopCoroutine(currentColliderMotionCoroutine);
+        //}
 
-        Vector3 downPosition = initialPosition + new Vector3(0, -wallHeight, 0);
+        //Vector3 downPosition = initialPosition + new Vector3(0, -wallHeight, 0);
 
         // Move the parent object down
-        currentMotionCoroutine = StartCoroutine(Displace(this.gameObject, downPosition));
+        currentMotionCoroutine = StartCoroutine(Displace(this.gameObject, initialPosition + new Vector3(0, -wallHeight, 0)));//, 1));
 
         // Move the child colliders in the opposite direction to the parent objects; i.e. keep the child colliders stationary
-        currentColliderMotionCoroutine = StartCoroutine(MoveChildColliders(1));
+        //currentColliderMotionCoroutine = StartCoroutine(MoveChildColliders(1));
     }
 
-    private IEnumerator MoveChildColliders(int direction)
+    private IEnumerator Displace(GameObject obj, Vector3 targetPosition)
     {
-        float timeToReachTarget = wallHeight / displaceSpeed;
+        Vector3 currentPosition = obj.transform.position;
 
-        List<Vector3> currentPositions = new List<Vector3>();
-
-        List<Vector3> targetPositions = new List<Vector3>();
-
-        for (int i = 0; i < childColliders.Count; i++)
-        {
-            currentPositions.Add(childColliders[i].localPosition);
-
-            targetPositions.Add(childColliderInitialPositions[i] + new Vector3(0, direction * wallHeight, 0));
-        }
-        
-
-        float elapsedTime = 0f;
-        while (elapsedTime < timeToReachTarget)
-        {
-            elapsedTime += Time.deltaTime;
-
-            float t = Mathf.Clamp01(elapsedTime / timeToReachTarget);
-
-            for (int i = 0; i < childColliders.Count; i++)
-            {
-                // Rearranged LERP:
-                // displacements = target - initial
-                // initial + displacements * t
-                // initial + (target - initial) * t
-                // initial + target * t - initial * t
-                // initial * (1 - t) + target * t
-                childColliders[i].localPosition = currentPositions[i] * (1 - t) + targetPositions[i] * t;
-            }
-            yield return null;
-        }
-
-        for (int i = 0; i < childColliders.Count; i++)
-        {
-            childColliders[i].localPosition = targetPositions[i]; // Ensure the object reaches the exact target position
-        }
-    }
-
-    private IEnumerator Displace(GameObject obj, Vector3 objTargetPosition)
-    {
-        Vector3 initialPosition = obj.transform.position;
-
-        Vector3 displacement = objTargetPosition - initialPosition;
-        
-        float distance = displacement.magnitude;
+        float distance = (currentPosition - targetPosition).magnitude;
 
         float timeToReachTarget = distance / displaceSpeed;
 
         float elapsedTime = 0f;
-
+        
         while (elapsedTime < timeToReachTarget)
         {
             elapsedTime += Time.deltaTime;
 
             float t = Mathf.Clamp01(elapsedTime / timeToReachTarget);
 
-            obj.transform.position = initialPosition + displacement * t;
+            // Rearranged LERP:
+            // displacements = target - initial
+            // initial + displacements * t
+            // initial + (target - initial) * t
+            // initial + target * t - initial * t
+            // initial * (1 - t) + target * t
+            obj.transform.position = currentPosition * (1 - t) + targetPosition * t;
+
+            for (int i = 0; i < childColliders.Count; i++)
+            {
+                childColliders[i].position = childColliderInitialPositions[i];
+            }
 
             yield return null;
         }
 
-        obj.transform.position = objTargetPosition; // Ensure the object reaches the exact target position
+        obj.transform.position = targetPosition; // Ensure the object reaches the exact target position
+
+        for (int i = 0; i < childColliders.Count; i++)
+        {
+            childColliders[i].position = childColliderInitialPositions[i]; // Ensure the object reaches the exact target position
+        }
     }
 
     private IEnumerator Fade(SpriteRenderer sr, float fadeTo)

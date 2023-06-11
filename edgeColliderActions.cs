@@ -133,8 +133,6 @@ public class edgeColliderActions : MonoBehaviour
 
     PlayerMovement playerMovement;
     [SerializeField] GameObject Player;
-    public string motionDirection = "normal";
-    public string previousMotionDirection = "normal";
     public string sortingLayerToAssign = "Default";
 
     public float fadeSpeed = 10f; // Time it takes to fade out the sprites
@@ -148,8 +146,6 @@ public class edgeColliderActions : MonoBehaviour
  
 
     [SerializeField] bool itsAnEntrnceOrExt;
-    [SerializeField] int roomNumAbove;
-    [SerializeField] int roomNumBelow;
     [SerializeField] bool itsStairs;
     public GameObject building;
 
@@ -187,6 +183,11 @@ public class edgeColliderActions : MonoBehaviour
 
     void Start()
     {
+      // if (multiFdObjInside != null) 
+      // {
+      //   StartCoroutine(treeFade(multiFdObjInside, 1f, 0f, fadeSpeed)); 
+      // }
+      
       for (int i = 0; i < openedDoor.Count; i++)
         {
           Color objectColorIn = openedDoor[i].color;
@@ -466,14 +467,9 @@ public class edgeColliderActions : MonoBehaviour
       reinstateEnter = false;
 
       onCollider = false;
-                
-      playerMovement.motionDirection = previousMotionDirection;
-
 
         if (isPlayerCrossingUp())
         {
-
-          // Debug.Log("entered room "+roomNumAbove);
 
           for (int i = 0; i < displaceOnExitCrossingUp.Count; i++){
             Vector3 targetPosition = displaceOnExitCrossingUpInitialPosition[i] + displaceOnExitCrossingUp[i].displacement;
@@ -495,7 +491,7 @@ public class edgeColliderActions : MonoBehaviour
             fadeCoroutine = StartCoroutine(treeFade(transpFdOutOnExtCrsngUp[i], 1f, 0.35f, fadeSpeed));      
           }
 
-          // CROSSING UP
+          //ON EXIT CROSSING UP
           if(itsAnEntrnceOrExt) {
             if (fadeCoroutine != null) {
               StopCoroutine(fadeCoroutine);
@@ -537,9 +533,6 @@ public class edgeColliderActions : MonoBehaviour
         // onTriggerExit crossing down
         else
         {
-
-          Debug.Log("entered room "+roomNumBelow);
-
           for (int i = 0; i < displaceOnExitCrossingDown.Count; i++){
             Vector3 targetPosition = displaceOnExitCrossingDownInitialPosition[i] + displaceOnExitCrossingDown[i].displacement;
             // TODO keep coroutines in a list so they can all be stopped
@@ -639,9 +632,14 @@ public class edgeColliderActions : MonoBehaviour
   {
     if(collision.gameObject.tag =="Player"){
 
-      if(itsAnEntrnceOrExt) {
-          multiFdObjInside.tag = "excludeChild";
-      }      
+      if(itsAnEntrnceOrExt) 
+      {
+        if (multiFdObjInside != null) 
+        {
+          StartCoroutine(treeFade(multiFdObjInside, 0f, 1f, fadeSpeed)); 
+        }      
+      }
+
       if (fadeCoroutine != null) {
         StopCoroutine(fadeCoroutine);
       }
@@ -662,9 +660,6 @@ public class edgeColliderActions : MonoBehaviour
 
       doorSwitcher(openedDoor, 1f);
       doorSwitcher(closedDoor, 0f);
-
-      previousMotionDirection = playerMovement.motionDirection;
-      playerMovement.motionDirection = motionDirection;
 
       // StartCoroutine(multiActivate(multiDeActivate));
 

@@ -8,8 +8,7 @@ public class RoomScript : MonoBehaviour
     public List<RoomScript> roomsBelow = new List<RoomScript>();
 
     private List<Transform> childColliders = new List<Transform>(); // Separate list for child colliders
-    private List<Vector3> initialChildPositions = new List<Vector3>();
-
+    
     public List<SpriteRenderer> doorsBelow = new List<SpriteRenderer>();
     private List<Coroutine> doorsBelowCoros = new List<Coroutine>();
 
@@ -42,9 +41,9 @@ public class RoomScript : MonoBehaviour
             {
                 if (child.CompareTag("Collider"))
                 {
-                    Vector3 localPosition = child.localPosition;
+                    // colliderInitialPositions.Add(child.localPosition);
                     childColliders.Add(child);
-                    initialChildPositions.Add(localPosition); // Store the initial local position
+                    // initialChildPositions.Add(localPosition); // Store the initial local position
                 }
                 stack.Push(child);
             }
@@ -56,11 +55,11 @@ public class RoomScript : MonoBehaviour
     {
         for (int i = 0; i < roomsSameOrAbove.Count; i++)
         {
-            roomsSameOrAbove[i].MoveUp(childColliders, initialChildPositions);
+            roomsSameOrAbove[i].MoveUp(childColliders);
         }
         for (int i = 0; i < roomsBelow.Count; i++)
         {
-            roomsBelow[i].MoveDown(childColliders, initialChildPositions);
+            roomsBelow[i].MoveDown(childColliders);
         }
         ResetDoorsBelowCoros();
         for (int i = 0; i < doorsBelow.Count; i++)
@@ -78,7 +77,7 @@ public class RoomScript : MonoBehaviour
         }
     }
 
-    public void MoveUp(List<Transform> childColliders, List<Vector3> initialChildPositions)
+    private void MoveUp(List<Transform> childColliders)
     {
         if (currentMotionCoroutine != null)
         {
@@ -93,10 +92,10 @@ public class RoomScript : MonoBehaviour
         currentMotionCoroutine = StartCoroutine(Displace(this.gameObject, initialPosition));
 
         // Move the child colliders back to their original local positions
-        currentColliderMotionCoroutine = StartCoroutine(MoveChildColliders(childColliders, initialChildPositions, -1));
+        currentColliderMotionCoroutine = StartCoroutine(MoveChildColliders(childColliders, 1));
     }
     
-    public void MoveDown(List<Transform> childColliders, List<Vector3> initialChildPositions)
+    private void MoveDown(List<Transform> childColliders)
     {
         if (currentMotionCoroutine != null)
         {
@@ -114,39 +113,49 @@ public class RoomScript : MonoBehaviour
         currentMotionCoroutine = StartCoroutine(Displace(this.gameObject, downPosition));
 
         // Move the child colliders in the opposite direction to the parent objects; i.e. keep the child colliders stationary
-        currentColliderMotionCoroutine = StartCoroutine(MoveChildColliders(childColliders, initialChildPositions, 1));
+        currentColliderMotionCoroutine = StartCoroutine(MoveChildColliders(childColliders, -1));
     }
 
-    private IEnumerator MoveChildColliders(List<Transform> childColliders, List<Vector3> initialChildPositions, int direction)
+    private IEnumerator MoveChildColliders(List<Transform> childColliders, int direction)
     {
         float timeToReachTarget = wallHeight / displaceSpeed;
 
         for (int i = 0; i < childColliders.Count; i++)
         {
+            
             Transform childCollider = childColliders[i];
 
-            Vector3 initialPosition = initialChildPositions[i];
+            Vector3 initialPosition = childCollider.localPosition;
+
             Vector3 targetPosition = initialPosition + new Vector3(0, direction * wallHeight, 0);
+
+            Vector3 displacement = targetPosition - initialPosition;
+
 
             float elapsedTime = 0f;
             while (elapsedTime < timeToReachTarget)
             {
                 elapsedTime += Time.deltaTime;
+
                 float t = Mathf.Clamp01(elapsedTime / timeToReachTarget);
 
-                childCollider.localPosition = Vector3.Lerp(initialPosition, targetPosition, t);
+                childCollider.localPosition = initialPosition - displacement * t;
+
                 yield return null;
             }
 
-            childCollider.localPosition = targetPosition; // Ensure the object reaches the exact target position
+            childCollider.localPosition = initialPosition - displacement; // Ensure the object reaches the exact target position
         }
     }
 
     private IEnumerator Displace(GameObject obj, Vector3 objTargetPosition)
     {
-        Vector3 startingPosition = obj.transform.position;
-        Vector3 displacement = objTargetPosition - startingPosition;
+        Vector3 initialPosition = obj.transform.position;
+
+        Vector3 displacement = objTargetPosition - initialPosition;
+        
         float distance = displacement.magnitude;
+
         float timeToReachTarget = distance / displaceSpeed;
 
         float elapsedTime = 0f;
@@ -154,8 +163,11 @@ public class RoomScript : MonoBehaviour
         while (elapsedTime < timeToReachTarget)
         {
             elapsedTime += Time.deltaTime;
+
             float t = Mathf.Clamp01(elapsedTime / timeToReachTarget);
-            obj.transform.position = startingPosition + displacement * t;
+
+            obj.transform.position = initialPosition + displacement * t;
+
             yield return null;
         }
 

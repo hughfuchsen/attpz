@@ -126,8 +126,9 @@ public class edgeColliderActions : MonoBehaviour
     public List<GameObject> spritesToAppearCrossingUp = new List<GameObject>();
     public List<SpriteRenderer> spritesToDisappear = new List<SpriteRenderer>();
     public List<SpriteRenderer> spritesToAppear = new List<SpriteRenderer>();
-    public List<SpriteRenderer> closedDoor = new List<SpriteRenderer>();
-    public List<SpriteRenderer> openedDoor = new List<SpriteRenderer>();
+
+    // public List<SpriteRenderer> closedDoor = new List<SpriteRenderer>();
+    // public List<SpriteRenderer> openedDoor = new List<SpriteRenderer>();
 
     private bool onCollider, belowCollider, aboveCollider;
 
@@ -154,26 +155,7 @@ public class edgeColliderActions : MonoBehaviour
     void Awake()
     { 
        Player = GameObject.FindGameObjectWithTag("Player");
-       playerMovement = Player.GetComponent<PlayerMovement>();
-
-
-      // if (GameObject.FindWithTag("Player").GetComponent<PlayerMovement>().isPlayerInside && entranceo) {
-
-
-      //               StartCoroutine(timedSpriteFadeFromInside(1f, multiFdObjInside, 0f, 1f, multiFdObjOutside, 1f, 0f));
-
-      //               // StartCoroutine(multiFadeOutside(multiFdObjOutside, 0f, 0.35f));
-      //               // StartCoroutine(multiFade(multiFdObjInside, 1f, 0f));
-
-      //             } else {
-
-
-      //               StartCoroutine(timedSpriteFadeFromOutside(1f, multiFdObjInside, 1f, 0f, multiFdObjOutside, 0f, 1f));
-
-
-      //               // StartCoroutine(multiFadeOutside(multiFdObjOutside, 1f, 0f));  
-      //               // StartCoroutine(multiFade(multiFdObjInside, 0f, 1f));
-      //             }       
+       playerMovement = Player.GetComponent<PlayerMovement>();  
     }    
 
     private bool isPlayerCrossingUp()
@@ -182,25 +164,7 @@ public class edgeColliderActions : MonoBehaviour
     }
 
     void Start()
-    {
-      // if (multiFdObjInside != null) 
-      // {
-      //   StartCoroutine(treeFade(multiFdObjInside, 1f, 0f, fadeSpeed)); 
-      // }
-      
-      for (int i = 0; i < openedDoor.Count; i++)
-        {
-          Color objectColorIn = openedDoor[i].color;
-          float fadeInAmount = openedDoor[i].color.a;
-
-          
-            fadeInAmount = 0f;
-          
-          
-          objectColorIn = new Color(objectColorIn.r,objectColorIn.g,objectColorIn.b,fadeInAmount);
-          openedDoor[i].color = objectColorIn;
-        };   
-
+    {   
       if (multiFdObjInside != null && multiFdObjOutside != null) {
         if (GameObject.FindWithTag("Player").GetComponent<PlayerMovement>().isPlayerInside) {
           fadeCoroutine = StartCoroutine(treeFadeSequence(waitBetween, multiFdObjInside, 1f, 0f, multiFdObjOutside, 0f, 1f, fadeSpeed));  
@@ -281,7 +245,7 @@ public class edgeColliderActions : MonoBehaviour
           float fadeOutAmount = spritesToDisappear[i].color.a;
         
       
-            fadeOutAmount = 0;
+          fadeOutAmount = 0;
           
 
           objectColorIn = new Color(objectColorIn.r,objectColorIn.g,objectColorIn.b,fadeOutAmount);
@@ -294,7 +258,7 @@ public class edgeColliderActions : MonoBehaviour
           float fadeInAmount = spritesToAppear[i].color.a;
         
       
-            fadeInAmount = 1;
+          fadeInAmount = 1;
           
 
           objectColorIn = new Color(objectColorIn.r,objectColorIn.g,objectColorIn.b,fadeInAmount);
@@ -390,20 +354,20 @@ public class edgeColliderActions : MonoBehaviour
     //         openedDoor[i].color = objectColorIn;
     //     }; 
     // }
-    void doorSwitcher(List<SpriteRenderer> obj, float value1)
-    {
-        for (int i = 0; i < obj.Count; i++)
-        {
-            Color objectColor = obj[i].color;
-            float fadeOutAmount = obj[i].color.a;
+    // void doorSwitcher(List<SpriteRenderer> obj, float value1)
+    // {
+    //     for (int i = 0; i < obj.Count; i++)
+    //     {
+    //         Color objectColor = obj[i].color;
+    //         float fadeOutAmount = obj[i].color.a;
 
-            fadeOutAmount = value1;
+    //         fadeOutAmount = value1;
 
             
-            objectColor = new Color(objectColor.r,objectColor.g,objectColor.b,fadeOutAmount);
-            obj[i].color = objectColor;
-        };
-    }
+    //         objectColor = new Color(objectColor.r,objectColor.g,objectColor.b,fadeOutAmount);
+    //         obj[i].color = objectColor;
+    //     };
+    // }
     // void doorSwitchReverse(float value1, float value2)
     // {
         
@@ -434,20 +398,20 @@ public class edgeColliderActions : MonoBehaviour
     //     }; 
     // }
 
-    IEnumerator closeTheDoor()
-    {
-        // int wait_time = Random.Range (2, 5);
-        yield return new WaitForSeconds(Random.Range(1.0f, 2.9f));
-        if(onCollider){
-        fadeCoroutine = StartCoroutine(closeTheDoor());
-        } else if (!aboveCollider) {
-        doorSwitcher(openedDoor, 0f);
-        doorSwitcher(closedDoor, 1f);
-        } else if (aboveCollider) {
-        doorSwitcher(openedDoor, 0f); 
-        doorSwitcher(closedDoor, 0.35f); 
-        }
-    }
+    // IEnumerator closeTheDoor()
+    // {
+    //     // int wait_time = Random.Range (2, 5);
+    //     yield return new WaitForSeconds(Random.Range(1.0f, 2.9f));
+    //     if(onCollider){
+    //     fadeCoroutine = StartCoroutine(closeTheDoor());
+    //     } else if (!aboveCollider) {
+    //     doorSwitcher(openedDoor, 0f);
+    //     doorSwitcher(closedDoor, 1f);
+    //     } else if (aboveCollider) {
+    //     doorSwitcher(openedDoor, 0f); 
+    //     doorSwitcher(closedDoor, 0.35f); 
+    //     }
+    // }
 
 
 // fadeOutCrossingUp, fadeInCrossingUp, fadeOutCrossingDown, fadeInCrossingDown;
@@ -617,7 +581,7 @@ public class edgeColliderActions : MonoBehaviour
             // } 
         }
       
-      StartCoroutine(closeTheDoor());
+      // StartCoroutine(closeTheDoor());
 
     }
   }
@@ -656,10 +620,8 @@ public class edgeColliderActions : MonoBehaviour
         fadeCoroutine = StartCoroutine(treeFade(spritesToFadeIn[i], 0f, 1f, fadeSpeed));      
       }
 
-      onCollider = true;
-
-      doorSwitcher(openedDoor, 1f);
-      doorSwitcher(closedDoor, 0f);
+      // doorSwitcher(openedDoor, 1f);
+      // doorSwitcher(closedDoor, 0f);
 
       // StartCoroutine(multiActivate(multiDeActivate));
 
@@ -747,10 +709,6 @@ public class edgeColliderActions : MonoBehaviour
         aboveCollider = true;   
       
       }
-
-      
-
-
     }
   }
 

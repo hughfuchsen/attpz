@@ -65,7 +65,7 @@ public class RoomScript : MonoBehaviour
         ResetDoorsBelowCoros();
         for (int i = 0; i < doorsBelow.Count; i++)
         {
-            doorsBelowCoros.Add(StartCoroutine(Fade(doorsBelow[i], 0.35f)));
+            doorsBelowCoros.Add(StartCoroutine(Fade(doorsBelow[i], 0.15f)));
         }
     }
     

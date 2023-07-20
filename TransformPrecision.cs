@@ -55,7 +55,7 @@ public class TransformPrecision {
 
         foreach (Transform transform in selectedTransforms)
         {
-            if (transform.GetComponent<SpriteRenderer>() != null)
+            if (transform.GetComponent<SpriteRenderer>() != null || transform.GetComponent<BoxCollider2D>() == null)
             {
                 Undo.RecordObject(transform, "Round Off " + transform.name);
 

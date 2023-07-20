@@ -13,7 +13,6 @@ public class PlayerMovement : MonoBehaviour
     public Animator animator;
 
     IsoSpriteSorting IsoSpriteSorting; 
-    //= new Vector3(8,-28,0);
 
     private bool shouldAnimate;
 

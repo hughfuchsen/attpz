@@ -21,6 +21,7 @@ public class TriggerButtonPress : MonoBehaviour
 
     void Start()
     {
+
         for (int i = 0; i < treeObjects.Count; i++)
         {
             FilterObjects(treeObjects[i], sprites);
@@ -93,12 +94,12 @@ public class TriggerButtonPress : MonoBehaviour
         {
             for (int i = 0; i < sprites.Count; i++)
             {
-            SetAlpha(sprites[i], 0);
+                SetAlpha(sprites[i], 0);
             }
 
             for (int i = 0; i < childColliders.Count; i++)
             {
-            childColliders[i].SetActive(false);
+                childColliders[i].SetActive(false);
             }
             
             for (int i = 0; i < vSprites.Count; i++)
@@ -167,20 +168,7 @@ public class TriggerButtonPress : MonoBehaviour
         Color newColor = Color.HSVToRGB(h, s, v + vValue);
 
         sr.color = newColor;
-    }    
-    // void SetVValue(GameObject treeNode, float vValue)
-    // {
-    //     SpriteRenderer sr = treeNode.GetComponent<SpriteRenderer>();
-
-    //     Color.RGBToHSV(sr.color, out float h, out float s, out float v);
-
-    //     // Calculate the new v value relative to the current v value
-    //     float newV = v;
-
-    //     Color newColor = Color.HSVToRGB(h, s, newV);
-
-    //     sr.color = newColor;
-    // }    
+    }     
     private void SetColor(GameObject treeNode, Color color) 
     {
         SpriteRenderer sr = treeNode.GetComponent<SpriteRenderer>();

@@ -7,19 +7,15 @@ public class RoomScript : MonoBehaviour
 {
     public List<RoomScript> roomsSameOrAbove = new List<RoomScript>();
     public List<RoomScript> roomsBelow = new List<RoomScript>();
-
     private List<Transform> childColliders = new List<Transform>(); // Separate list for child colliders
-    
     public List<SpriteRenderer> doorsBelow = new List<SpriteRenderer>();
     private List<Coroutine> doorsBelowCoros = new List<Coroutine>();
-
+    private float doorBelowAlpha = 0.15f;
     public int wallHeight = 30;
     public float displaceSpeed = 100;
-    public float fadeSpeed = 100;
-
+    public float fadeSpeed = 100f;
     private Vector3 initialPosition;
     private List<Vector3> childColliderInitialPositions = new List<Vector3>();
-
     private Coroutine currentMotionCoroutine;
     private Coroutine currentColliderMotionCoroutine;
 
@@ -41,7 +37,7 @@ public class RoomScript : MonoBehaviour
 
             foreach (Transform child in current)
             {
-                if (child.CompareTag("Collider"))
+                if (child.CompareTag("Collider") || child.CompareTag("Trigger"))
                 {
                     childColliders.Add(child);
                     childColliderInitialPositions.Add(child.position); // Store the initial local position
@@ -58,20 +54,24 @@ public class RoomScript : MonoBehaviour
         {
             roomsSameOrAbove[i].MoveUp();
         }
+
         for (int i = 0; i < roomsBelow.Count; i++)
         {
             roomsBelow[i].MoveDown();
         }
+
         ResetDoorsBelowCoros();
+
         for (int i = 0; i < doorsBelow.Count; i++)
         {
-            doorsBelowCoros.Add(StartCoroutine(Fade(doorsBelow[i], 0.15f)));
+            doorsBelowCoros.Add(StartCoroutine(Fade(doorsBelow[i], doorBelowAlpha)));
         }
     }
     
     public void ExitRoom()
     {
         ResetDoorsBelowCoros();
+
         for (int i = 0; i < doorsBelow.Count; i++)
         {
             doorsBelowCoros.Add(StartCoroutine(Fade(doorsBelow[i], 1)));
@@ -85,15 +85,7 @@ public class RoomScript : MonoBehaviour
             StopCoroutine(currentMotionCoroutine);
         }
 
-        //if (currentColliderMotionCoroutine != null)
-        //{
-        //    StopCoroutine(currentColliderMotionCoroutine);
-        //}
-
         currentMotionCoroutine = StartCoroutine(Displace(this.gameObject, initialPosition));
-
-        // Move the child colliders back to their original local positions
-        //currentColliderMotionCoroutine = StartCoroutine(MoveChildColliders(0));
     }
     
     private void MoveDown()
@@ -103,18 +95,8 @@ public class RoomScript : MonoBehaviour
             StopCoroutine(currentMotionCoroutine);
         }
 
-        //if (currentColliderMotionCoroutine != null)
-        //{
-        //    StopCoroutine(currentColliderMotionCoroutine);
-        //}
-
-        //Vector3 downPosition = initialPosition + new Vector3(0, -wallHeight, 0);
-
         // Move the parent object down
         currentMotionCoroutine = StartCoroutine(Displace(this.gameObject, initialPosition + new Vector3(0, -wallHeight, 0)));//, 1));
-
-        // Move the child colliders in the opposite direction to the parent objects; i.e. keep the child colliders stationary
-        //currentColliderMotionCoroutine = StartCoroutine(MoveChildColliders(1));
     }
 
     private IEnumerator Displace(GameObject obj, Vector3 targetPosition)
@@ -159,8 +141,13 @@ public class RoomScript : MonoBehaviour
 
     private IEnumerator Fade(SpriteRenderer sr, float fadeTo)
     {
+        for (float t = 0.0f; t < 1; t += Time.deltaTime) 
+        {
+            float currentAlpha = Mathf.Lerp(sr.color.a, fadeTo, t * fadeSpeed);
+            sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, fadeTo);
+            yield return null;
+        }
         sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, fadeTo);
-        yield return null;
     }
 
     private void ResetDoorsBelowCoros()

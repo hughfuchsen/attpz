@@ -5,7 +5,7 @@
  using UnityEngine;
  using UnityEditor;
  
- public class ButtonShorcuts : EditorWindow {
+ public class ParentSelectorShortcut : EditorWindow {
  
      [MenuItem("Edit/Select parent &c")]
         static void SelectParentOfObject() {

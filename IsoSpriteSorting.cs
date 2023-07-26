@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEditor;
 
 public class IsoSpriteSorting : MonoBehaviour
 {
@@ -151,7 +152,8 @@ public class IsoSpriteSorting : MonoBehaviour
     }
 
 #if UNITY_EDITOR
-    public void SortScene()
+	[MenuItem( "Tools/Sort Scene &z" )]
+    public static void SortScene()
     {
         IsoSpriteSorting[] isoSorters = FindObjectsOfType(typeof(IsoSpriteSorting)) as IsoSpriteSorting[];
         for (int i = 0; i < isoSorters.Length; i++)

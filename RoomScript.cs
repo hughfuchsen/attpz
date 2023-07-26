@@ -2,13 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-
 public class RoomScript : MonoBehaviour
 {
     public List<RoomScript> roomsSameOrAbove = new List<RoomScript>();
     public List<RoomScript> roomsBelow = new List<RoomScript>();
     private List<Transform> childColliders = new List<Transform>(); // Separate list for child colliders
-    public List<SpriteRenderer> doorsBelow = new List<SpriteRenderer>();
+    public List<ThresholdColliderScript> doorsBelow = new List<ThresholdColliderScript>();
     private List<Coroutine> doorsBelowCoros = new List<Coroutine>();
     private float doorBelowAlpha = 0.15f;
     public int wallHeight = 30;
@@ -60,21 +59,29 @@ public class RoomScript : MonoBehaviour
             roomsBelow[i].MoveDown();
         }
 
-        ResetDoorsBelowCoros();
-
         for (int i = 0; i < doorsBelow.Count; i++)
         {
-            doorsBelowCoros.Add(StartCoroutine(Fade(doorsBelow[i], doorBelowAlpha)));
+            doorsBelow[i].SetPlayerIsInRoomAbove(true);
         }
     }
     
     public void ExitRoom()
     {
-        ResetDoorsBelowCoros();
-
         for (int i = 0; i < doorsBelow.Count; i++)
         {
-            doorsBelowCoros.Add(StartCoroutine(Fade(doorsBelow[i], 1)));
+            doorsBelow[i].SetPlayerIsInRoomAbove(false);
+        }
+    }
+    public void ExitBuilding()
+    {
+        for (int i = 0; i < roomsSameOrAbove.Count; i++)
+        {
+            roomsSameOrAbove[i].MoveUp();
+        }
+
+        for (int i = 0; i < roomsBelow.Count; i++)
+        {
+            roomsBelow[i].MoveUp();
         }
     }
 

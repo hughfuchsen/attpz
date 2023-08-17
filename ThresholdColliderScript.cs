@@ -84,7 +84,8 @@ public class ThresholdColliderScript : MonoBehaviour
         playerMovement.motionDirection = previousMotionDirection;
 
        // Bug avoidance: in case the player is inside and isPlayerInside is false etc. (need to optimise)
-        if (!itsAnEntrnceOrExt && !GameObject.FindWithTag("Player").GetComponent<PlayerMovement>().isPlayerInside)
+        if (!itsAnEntrnceOrExt && !GameObject.FindWithTag("Player").GetComponent<PlayerMovement>().isPlayerInside
+            && multiFdObjInside != null && multiFdObjOutside != null)
         {
             setTreeAlpha(multiFdObjInside, 1, tagsToExludeEntExt);
             setTreeAlpha(multiFdObjOutside, 0);

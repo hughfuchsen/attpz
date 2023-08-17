@@ -148,7 +148,6 @@ public class edgeColliderActions : MonoBehaviour
 
     [SerializeField] bool itsAnEntrnceOrExt;
     [SerializeField] bool itsStairs;
-    public GameObject building;
 
     private Coroutine fadeCoroutine; // Coroutine handle for stopping previous fade actions
 

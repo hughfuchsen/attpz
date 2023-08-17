@@ -7,29 +7,65 @@ public class InclineMovement : MonoBehaviour
     PlayerMovement playerMovement;
     [SerializeField] GameObject Player;
     public string motionDirection;
-    public string previousMotionDirection;
-    public string sortingLayerToAssign;
+    public string lowerSortingLayerToAssign;
+    public string higherSortingLayerToAssign;
+    public string lowerColliderLayerName; // The name of the layer you want to switch to
+    public string higherColliderLayerName; // The name of the layer you want to switch to
+    // public LayerMask lowerColliderLayerName; // The name of the layer you want to switch to
+    // public LayerMask higherColliderLayerName; // The name of the layer you want to switch to
+    public bool topOfStairCase;
     
     // Start is called before the first frame update
     void Awake()
     {
         playerMovement = Player.GetComponent<PlayerMovement>();
+        Player = GameObject.FindGameObjectWithTag("Player");
     }
 
-    // Update is called once per frame
-    void Update()
+    void OnTriggerEnter2D(Collider2D collision)
     {
-        
-    }
-
-        void OnTriggerEnter2D(Collider2D collision)
-    {
-      if(collision.gameObject.tag =="Player")
+        if (collision.gameObject.tag == "Player")
+        {
+            if(collision.gameObject.tag =="Player")
             {
-                previousMotionDirection = playerMovement.motionDirection;
-                playerMovement.motionDirection = motionDirection;
-                InclineMovement.SetSortingLayer(collision.gameObject, sortingLayerToAssign);
+                if((isPlayerCrossingUp() && playerMovement.motionDirection == "normal" && !topOfStairCase) 
+                    || (!isPlayerCrossingUp() && playerMovement.motionDirection == "normal" && topOfStairCase))
+                {
+                  playerMovement.motionDirection = motionDirection;  
+                }
+                else if((isPlayerCrossingUp() && playerMovement.motionDirection != "normal" && topOfStairCase) 
+                    || (!isPlayerCrossingUp() && playerMovement.motionDirection != "normal" && !topOfStairCase))
+                {
+                  playerMovement.motionDirection = "normal";  
+                }
+
+                if(isPlayerCrossingUp() && topOfStairCase)
+                {
+                    gameObject.layer = LayerMask.NameToLayer(higherColliderLayerName);
+                    SetCollisionLayer(higherColliderLayerName);
+                    SetSortingLayer(collision.gameObject, higherSortingLayerToAssign);
+                }
+                else if(isPlayerCrossingUp() && !topOfStairCase)
+                {
+                    gameObject.layer = LayerMask.NameToLayer(higherColliderLayerName);
+                    SetCollisionLayer(higherColliderLayerName);
+                    SetSortingLayer(collision.gameObject, higherSortingLayerToAssign);
+                }                       
+                else if(!isPlayerCrossingUp() && topOfStairCase)
+                {
+                    gameObject.layer = LayerMask.NameToLayer(lowerColliderLayerName);
+                    SetCollisionLayer(lowerColliderLayerName);
+                    SetSortingLayer(collision.gameObject, lowerSortingLayerToAssign);
+                } 
+                else if(!isPlayerCrossingUp() && !topOfStairCase)
+                {
+                    gameObject.layer = LayerMask.NameToLayer(higherColliderLayerName);
+                    SetCollisionLayer(higherColliderLayerName);
+                    SetSortingLayer(collision.gameObject, higherSortingLayerToAssign);
+                } 
             }
+
+        }
     }
 
 
@@ -38,7 +74,35 @@ public class InclineMovement : MonoBehaviour
     {
             if(collision.gameObject.tag =="Player")
             {
-                playerMovement.motionDirection = previousMotionDirection;
+                if((isPlayerCrossingUp() && playerMovement.motionDirection == "normal" && !topOfStairCase) 
+                    || (!isPlayerCrossingUp() && playerMovement.motionDirection == "normal" && topOfStairCase))
+                {
+                  playerMovement.motionDirection = motionDirection;  
+                }
+                else if((isPlayerCrossingUp() && playerMovement.motionDirection != "normal" && topOfStairCase) 
+                    || (!isPlayerCrossingUp() && playerMovement.motionDirection != "normal" && !topOfStairCase))
+                {
+                  playerMovement.motionDirection = "normal";  
+                }
+
+                if(isPlayerCrossingUp() && topOfStairCase)
+                {
+                    gameObject.layer = LayerMask.NameToLayer(higherColliderLayerName);
+                    SetCollisionLayer(higherColliderLayerName);
+                    SetSortingLayer(collision.gameObject, higherSortingLayerToAssign);
+                }            
+                else if(!isPlayerCrossingUp() && !topOfStairCase)
+                {
+                    gameObject.layer = LayerMask.NameToLayer(lowerColliderLayerName);
+                    SetCollisionLayer(lowerColliderLayerName);
+                    SetSortingLayer(collision.gameObject, lowerSortingLayerToAssign);
+                }
+                else if(!isPlayerCrossingUp() && topOfStairCase)
+                {
+                    gameObject.layer = LayerMask.NameToLayer(lowerColliderLayerName);
+                    SetCollisionLayer(lowerColliderLayerName);
+                    SetSortingLayer(collision.gameObject, lowerSortingLayerToAssign);
+                }
             }
     }
 
@@ -58,4 +122,28 @@ public class InclineMovement : MonoBehaviour
         }
 
     }
+
+    private bool isPlayerCrossingUp()
+    {
+        return GameObject.FindWithTag("Player").GetComponent<PlayerMovement>().change.y > 0;
+    }
+    private bool isPlayerCrossingLeft()
+    {
+        return GameObject.FindWithTag("Player").GetComponent<PlayerMovement>().change.x < 0;
+    }
+    public void SetCollisionLayer(string targetLayerName)
+    {
+        int targetLayerIndex = LayerMask.NameToLayer(targetLayerName);
+
+        // Disable collisions with all layers
+        for (int i = 0; i < 32; i++)
+        {
+                Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Player"), i, true);
+        }
+
+        // Re-enable collision with the target layer
+        Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Player"), targetLayerIndex, false);
+    }
+    
 }
+

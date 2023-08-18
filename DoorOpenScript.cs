@@ -31,27 +31,27 @@ public class DoorOpenScript : MonoBehaviour
         }
         return null;
     }
-private void SetTreeAlpha(GameObject root, float alpha)
-{
-    Stack<GameObject> stack = new Stack<GameObject>();
-    stack.Push(root);
-
-    while (stack.Count > 0)
+    private void SetTreeAlpha(GameObject root, float alpha)
     {
-        GameObject currentNode = stack.Pop();
-        SpriteRenderer sr = currentNode.GetComponent<SpriteRenderer>();
+        Stack<GameObject> stack = new Stack<GameObject>();
+        stack.Push(root);
 
-        if (sr != null)
+        while (stack.Count > 0)
         {
-            sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, alpha);
-        }
+            GameObject currentNode = stack.Pop();
+            SpriteRenderer sr = currentNode.GetComponent<SpriteRenderer>();
 
-        foreach (Transform child in currentNode.transform)
-        {
-            stack.Push(child.gameObject);
+            if (sr != null)
+            {
+                sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, alpha);
+            }
+
+            foreach (Transform child in currentNode.transform)
+            {
+                stack.Push(child.gameObject);
+            }
         }
     }
-}
 
     private void OnTriggerEnter2D(Collider2D collision)
     {

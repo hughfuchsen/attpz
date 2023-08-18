@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class DoorOpenScript : MonoBehaviour
 {
+    private float openDoorAlpha;
+    private float closedDoorAlpha;
         void Awake()
     {
         Color initialColorOpen = this.FindSiblingWithTag("OpenDoor").GetComponent<SpriteRenderer>().color;

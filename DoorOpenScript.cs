@@ -4,12 +4,7 @@ using UnityEngine;
 
 public class DoorOpenScript : MonoBehaviour
 {
-    public GameObject openDoor;
-    public GameObject closedDoor;
-    public float openDoorAlpha;
-    public float closedDoorAlpha;
-
-    void Awake()
+        void Awake()
     {
         Color initialColorOpen = this.FindSiblingWithTag("OpenDoor").GetComponent<SpriteRenderer>().color;
         initialColorOpen.a = openDoorAlpha;
@@ -31,7 +26,6 @@ public class DoorOpenScript : MonoBehaviour
             {
                 return child.gameObject;
             }
-            else return null;
         }
         return null;
     }

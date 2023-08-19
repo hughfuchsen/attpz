@@ -7,7 +7,7 @@
  
  public class ParentSelectorShortcut : EditorWindow {
  
-     [MenuItem("Edit/Select parent &c")]
+     [MenuItem("Tools/Select parent &x")]
         static void SelectParentOfObject() {
             Selection.activeGameObject = Selection.activeGameObject.transform.parent.gameObject;
         }

@@ -14,7 +14,9 @@ public class InclineMovement : MonoBehaviour
     // public LayerMask lowerColliderLayerName; // The name of the layer you want to switch to
     // public LayerMask higherColliderLayerName; // The name of the layer you want to switch to
     public bool topOfStairCase;
-    
+
+    public bool middleOfStairCase;
+
     // Start is called before the first frame update
     void Awake()
     {
@@ -26,45 +28,54 @@ public class InclineMovement : MonoBehaviour
     {
         if (collision.gameObject.tag == "Player")
         {
-            if(collision.gameObject.tag =="Player")
+            if(!middleOfStairCase)
             {
-                if((isPlayerCrossingUp() && playerMovement.motionDirection == "normal" && !topOfStairCase) 
-                    || (!isPlayerCrossingUp() && playerMovement.motionDirection == "normal" && topOfStairCase))
+                if((isPlayerCrossingUp() && isPlayerCrossingLeft()) 
+                    || !isPlayerCrossingUp() && !isPlayerCrossingLeft())
                 {
-                  playerMovement.motionDirection = motionDirection;  
+                    playerMovement.fixedDirectionLeft = true;
                 }
-                else if((isPlayerCrossingUp() && playerMovement.motionDirection != "normal" && topOfStairCase) 
-                    || (!isPlayerCrossingUp() && playerMovement.motionDirection != "normal" && !topOfStairCase))
+                else
                 {
-                  playerMovement.motionDirection = "normal";  
+                    playerMovement.fixedDirectionRight = true;
                 }
-
-                if(isPlayerCrossingUp() && topOfStairCase)
-                {
-                    gameObject.layer = LayerMask.NameToLayer(higherColliderLayerName);
-                    SetCollisionLayer(higherColliderLayerName);
-                    SetSortingLayer(collision.gameObject, higherSortingLayerToAssign);
-                }
-                else if(isPlayerCrossingUp() && !topOfStairCase)
-                {
-                    gameObject.layer = LayerMask.NameToLayer(higherColliderLayerName);
-                    SetCollisionLayer(higherColliderLayerName);
-                    SetSortingLayer(collision.gameObject, higherSortingLayerToAssign);
-                }                       
-                else if(!isPlayerCrossingUp() && topOfStairCase)
-                {
-                    gameObject.layer = LayerMask.NameToLayer(lowerColliderLayerName);
-                    SetCollisionLayer(lowerColliderLayerName);
-                    SetSortingLayer(collision.gameObject, lowerSortingLayerToAssign);
-                } 
-                else if(!isPlayerCrossingUp() && !topOfStairCase)
-                {
-                    gameObject.layer = LayerMask.NameToLayer(higherColliderLayerName);
-                    SetCollisionLayer(higherColliderLayerName);
-                    SetSortingLayer(collision.gameObject, higherSortingLayerToAssign);
-                } 
             }
 
+            if((isPlayerCrossingUp() && playerMovement.motionDirection == "normal" && !topOfStairCase) 
+                || (!isPlayerCrossingUp() && playerMovement.motionDirection == "normal" && topOfStairCase))
+            {
+                playerMovement.motionDirection = motionDirection;  
+            }
+            else if((isPlayerCrossingUp() && playerMovement.motionDirection != "normal" && topOfStairCase) 
+                || (!isPlayerCrossingUp() && playerMovement.motionDirection != "normal" && !topOfStairCase))
+            {
+                playerMovement.motionDirection = "normal";  
+            }
+
+            if(isPlayerCrossingUp() && topOfStairCase)
+            {
+                gameObject.layer = LayerMask.NameToLayer(higherColliderLayerName);
+                SetCollisionLayer(higherColliderLayerName);
+                SetSortingLayer(collision.gameObject, higherSortingLayerToAssign);
+            }
+            else if(isPlayerCrossingUp() && !topOfStairCase)
+            {
+                gameObject.layer = LayerMask.NameToLayer(higherColliderLayerName);
+                SetCollisionLayer(higherColliderLayerName);
+                SetSortingLayer(collision.gameObject, higherSortingLayerToAssign);
+            }                       
+            else if(!isPlayerCrossingUp() && topOfStairCase)
+            {
+                gameObject.layer = LayerMask.NameToLayer(lowerColliderLayerName);
+                SetCollisionLayer(lowerColliderLayerName);
+                SetSortingLayer(collision.gameObject, lowerSortingLayerToAssign);
+            } 
+            else if(!isPlayerCrossingUp() && !topOfStairCase)
+            {
+                gameObject.layer = LayerMask.NameToLayer(higherColliderLayerName);
+                SetCollisionLayer(higherColliderLayerName);
+                SetSortingLayer(collision.gameObject, higherSortingLayerToAssign);
+            } 
         }
     }
 
@@ -74,6 +85,10 @@ public class InclineMovement : MonoBehaviour
     {
             if(collision.gameObject.tag =="Player")
             {
+                playerMovement.fixedDirectionLeft = false;
+                playerMovement.fixedDirectionRight = false;
+
+
                 if((isPlayerCrossingUp() && playerMovement.motionDirection == "normal" && !topOfStairCase) 
                     || (!isPlayerCrossingUp() && playerMovement.motionDirection == "normal" && topOfStairCase))
                 {

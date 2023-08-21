@@ -18,7 +18,6 @@ public class ThresholdColliderScript : MonoBehaviour
     PlayerMovement playerMovement;
     [SerializeField] GameObject Player;
     public string motionDirection = "normal";
-    public string previousMotionDirection = "normal";
     [SerializeField] bool itsAnEntrnceOrExt;
     public GameObject multiFdObjInside;
     public GameObject multiFdObjOutside;
@@ -66,8 +65,19 @@ public class ThresholdColliderScript : MonoBehaviour
             StopCoroutine(thresholdSortingSequenceCoro);
             SetSortingLayer(Player, "Default");
         }
-
+        
         playerMovement.motionDirection = motionDirection;
+
+        if((isPlayerCrossingUp() && isPlayerCrossingLeft()) 
+            || !isPlayerCrossingUp() && !isPlayerCrossingLeft())
+        {
+            playerMovement.fixedDirectionLeft = true;
+        }
+        else
+        {
+            playerMovement.fixedDirectionRight = true;
+        }
+
 
         if (isPlayerCrossingUp())
         {
@@ -83,7 +93,10 @@ public class ThresholdColliderScript : MonoBehaviour
 
     void OnTriggerExit2D()
     {
-        playerMovement.motionDirection = previousMotionDirection;
+        // playerMovement.motionDirection = previousMotionDirection;
+
+            playerMovement.fixedDirectionLeft = false;
+            playerMovement.fixedDirectionRight = false;
 
        // Bug avoidance: in case the player is inside and isPlayerInside is false etc. (need to optimise)
         if (!itsAnEntrnceOrExt && !GameObject.FindWithTag("Player").GetComponent<PlayerMovement>().isPlayerInside

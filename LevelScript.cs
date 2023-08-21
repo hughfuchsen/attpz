@@ -2,10 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RoomScript : MonoBehaviour
+public class LevelScript : MonoBehaviour
 {
-    public List<RoomScript> roomsSameOrAbove = new List<RoomScript>();
-    public List<RoomScript> roomsBelow = new List<RoomScript>();
+    public List<LevelScript> roomsSameOrAbove = new List<LevelScript>();
+    public List<LevelScript> roomsBelow = new List<LevelScript>();
     private List<Transform> childColliders = new List<Transform>(); // Separate list for child colliders
     public List<ThresholdColliderScript> doorsBelow = new List<ThresholdColliderScript>();
     private List<Coroutine> doorsBelowCoros = new List<Coroutine>();

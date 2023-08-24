@@ -4,13 +4,12 @@ using UnityEngine;
 
 public class LevelScript : MonoBehaviour
 {
-    public List<LevelScript> roomsSameOrAbove = new List<LevelScript>();
-    public List<LevelScript> roomsBelow = new List<LevelScript>();
+    private float perspectiveAngle = Mathf.Atan(0.5f);
+    public List<LevelScript> levelAbove = new List<LevelScript>();
+    public List<LevelScript> levelBelow = new List<LevelScript>();
     private List<Transform> childColliders = new List<Transform>(); // Separate list for child colliders
     public List<ThresholdColliderScript> doorsBelow = new List<ThresholdColliderScript>();
-    private List<Coroutine> doorsBelowCoros = new List<Coroutine>();
-    private float doorBelowAlpha = 0.15f;
-    public int wallHeight = 30;
+    public int roomWidthX = 30;
     public float displaceSpeed = 100;
     public float fadeSpeed = 100f;
     private Vector3 initialPosition;
@@ -23,6 +22,8 @@ public class LevelScript : MonoBehaviour
         initialPosition = this.gameObject.transform.position;
 
         FindColliderObjects(transform);
+
+        this.MoveOut();
     }
 
     private void FindColliderObjects(Transform transform)
@@ -47,45 +48,38 @@ public class LevelScript : MonoBehaviour
     }
 
 
-    public void EnterRoom()
+    public void EnterLevel()
     {
-        for (int i = 0; i < roomsSameOrAbove.Count; i++)
-        {
-            roomsSameOrAbove[i].MoveUp();
-        }
+        this.MoveIn();
+        // for (int i = 0; i < levelAbove.Count; i++)
+        // {
+        //     levelAbove[i].MoveIn();
+        // }
 
-        for (int i = 0; i < roomsBelow.Count; i++)
-        {
-            roomsBelow[i].MoveDown();
-        }
-
-        for (int i = 0; i < doorsBelow.Count; i++)
-        {
-            doorsBelow[i].SetPlayerIsInRoomAbove(true);
-        }
+        // for (int i = 0; i < levelBelow.Count; i++)
+        // {
+        //     levelBelow[i].MoveOut();
+        // }
     }
     
-    public void ExitRoom()
+    public void ExitLevel()
     {
-        for (int i = 0; i < doorsBelow.Count; i++)
-        {
-            doorsBelow[i].SetPlayerIsInRoomAbove(false);
-        }
+        this.MoveOut();
     }
     public void ExitBuilding()
     {
-        for (int i = 0; i < roomsSameOrAbove.Count; i++)
-        {
-            roomsSameOrAbove[i].MoveUp();
-        }
+        // for (int i = 0; i < levelAbove.Count; i++)
+        // {
+        //     levelAbove[i].MoveIn();
+        // }
 
-        for (int i = 0; i < roomsBelow.Count; i++)
-        {
-            roomsBelow[i].MoveUp();
-        }
+        // for (int i = 0; i < levelBelow.Count; i++)
+        // {
+        //     levelBelow[i].MoveIn();
+        // }
     }
 
-    private void MoveUp()
+    private void MoveIn()
     {
         if (currentMotionCoroutine != null)
         {
@@ -95,7 +89,7 @@ public class LevelScript : MonoBehaviour
         currentMotionCoroutine = StartCoroutine(Displace(this.gameObject, initialPosition));
     }
     
-    private void MoveDown()
+    private void MoveOut()
     {
         if (currentMotionCoroutine != null)
         {
@@ -103,7 +97,7 @@ public class LevelScript : MonoBehaviour
         }
 
         // Move the parent object down
-        currentMotionCoroutine = StartCoroutine(Displace(this.gameObject, initialPosition + new Vector3(0, -wallHeight, 0)));//, 1));
+        currentMotionCoroutine = StartCoroutine(Displace(this.gameObject, initialPosition + new Vector3(roomWidthX, roomWidthX/Mathf.Cos(perspectiveAngle)*Mathf.Sin(perspectiveAngle), 0)));//, 1));
     }
 
     private IEnumerator Displace(GameObject obj, Vector3 targetPosition)
@@ -156,14 +150,6 @@ public class LevelScript : MonoBehaviour
         }
         sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, fadeTo);
     }
-
-    private void ResetDoorsBelowCoros()
-    {
-        for (int i = 0; i < doorsBelowCoros.Count; i++)
-        {
-            StopCoroutine(doorsBelowCoros[i]);
-        }
-        doorsBelowCoros = new List<Coroutine>();
-    }
 }
+
 

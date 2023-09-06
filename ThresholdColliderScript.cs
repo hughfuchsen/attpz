@@ -14,7 +14,7 @@ public class ThresholdColliderScript : MonoBehaviour
 {
     public RoomScript roomAbove;
     public RoomScript roomBelow;
-
+    LevelColliderScript levelColliderScript;
     PlayerMovement playerMovement;
     [SerializeField] GameObject Player;
     public string motionDirection = "normal";
@@ -27,7 +27,16 @@ public class ThresholdColliderScript : MonoBehaviour
     private float buildingFadeSpeed = 7f; // Time it takes to fade out the sprites
     private bool aboveCollider;
     private Coroutine fadeCoroutine;
+
+    private List<float> openDoorAlpha = new List<float>();
+    private List<float> closedDoorAlpha = new List<float>();
+    private List<GameObject> openDoorSpriteList = new List<GameObject>();
+    private List<GameObject> closedDoorSpriteList = new List<GameObject>();
+
+    private Coroutine closedDoorFadeCoroutine;
+    private Coroutine openDoorFadeCoroutine;
     private Coroutine thresholdSortingSequenceCoro;
+    private string initialSortingLayer;
 
     private bool playerIsInDoorway = false;
     private bool playerIsInRoomAbove = false;
@@ -48,13 +57,42 @@ public class ThresholdColliderScript : MonoBehaviour
         {
             // Call the function to access and tag child game objects with the specified tag
             TagChildrenOfTaggedParents(multiFdObjInside.transform, "AlphaZeroEntExt");
+            TagChildrenOfTaggedParents(multiFdObjInside.transform, "OpenDoor");
         }
+
+        // get the sprites and add them to the corresponding lists
+        GetSprites(FindSiblingWithTag("OpenDoor"), openDoorSpriteList);
+        GetSprites(FindSiblingWithTag("ClosedDoor"), closedDoorSpriteList);
+
+        for (int i = 0; i < openDoorSpriteList.Count; i++)
+        {
+            Color initialColorOpen = openDoorSpriteList[i].GetComponent<SpriteRenderer>().color;
+            openDoorAlpha.Add(initialColorOpen.a);
+        }
+
+        for (int i = 0; i < closedDoorSpriteList.Count; i++)
+        {
+            Color initialColorClosed = closedDoorSpriteList[i].GetComponent<SpriteRenderer>().color;
+            closedDoorAlpha.Add(initialColorClosed.a);
+        }
+
+        for (int i = 0; i < openDoorSpriteList.Count; i++)
+        {
+            SetTreeAlpha(openDoorSpriteList[i], 0);
+        }        
+        for (int i = 0; i < closedDoorSpriteList.Count; i++)
+        {
+            SetTreeAlpha(closedDoorSpriteList[i], closedDoorAlpha[i]);
+        }    
+
 
         SetDoorState(false, false);
     }
 
     void OnTriggerEnter2D()
     {
+        initialSortingLayer = Player.GetComponent<SpriteRenderer>().sortingLayerName;
+
         if (fadeCoroutine != null)
         {
             StopCoroutine(fadeCoroutine);
@@ -63,7 +101,7 @@ public class ThresholdColliderScript : MonoBehaviour
         if (thresholdSortingSequenceCoro != null)
         {
             StopCoroutine(thresholdSortingSequenceCoro);
-            SetSortingLayer(Player, "Default");
+            SetSortingLayer(Player, initialSortingLayer);
         }
         
         playerMovement.motionDirection = motionDirection;
@@ -117,7 +155,7 @@ public class ThresholdColliderScript : MonoBehaviour
         if (thresholdSortingSequenceCoro != null)
         {
             StopCoroutine(thresholdSortingSequenceCoro);
-            SetSortingLayer(Player, "Default");
+            SetSortingLayer(Player, initialSortingLayer);
         }
 
         // if (openDoor != null)
@@ -183,7 +221,7 @@ public class ThresholdColliderScript : MonoBehaviour
 
                 if (aboveCollider && GameObject.FindWithTag("Player").GetComponent<PlayerMovement>().isPlayerInside)
                 {
-                    thresholdSortingSequenceCoro = StartCoroutine(ThresholdLayerSortingSequence((float)roomBelow.wallHeight/100, Player, "Default", "ThresholdSequence"));
+                    thresholdSortingSequenceCoro = StartCoroutine(ThresholdLayerSortingSequence((float)roomBelow.wallHeight/100, Player, "ThresholdSequence"));
                 }
             } 
             
@@ -256,19 +294,27 @@ public class ThresholdColliderScript : MonoBehaviour
             }
         }
 
-    IEnumerator treeFade(
-      GameObject obj,
-      float fadeFrom, 
-      float fadeTo,
-      float buildingFadeSpeed) 
-    {
-        for (float t = 0.0f; t < 1; t += Time.deltaTime) 
-        {
-            float currentAlpha = Mathf.Lerp(fadeFrom, fadeTo, t * buildingFadeSpeed);
-            SetTreeAlpha(obj, currentAlpha);
-            yield return null;
-        }
-    }
+    // private void SetTreeAlpha(GameObject root, float alpha, string[] tagsToExclude = null)
+    // {
+    //     Stack<GameObject> stack = new Stack<GameObject>();
+    //     stack.Push(root);
+
+    //     while (stack.Count > 0)
+    //     {
+    //         GameObject currentNode = stack.Pop();
+    //         SpriteRenderer sr = currentNode.GetComponent<SpriteRenderer>();
+
+    //         if (sr != null && (tagsToExclude == null || !Array.Exists(tagsToExclude, element => element == root.tag)))
+    //         {
+    //             sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, alpha);
+    //         }
+
+    //         foreach (Transform child in currentNode.transform)
+    //         {
+    //             stack.Push(child.gameObject);
+    //         }
+    //     }
+    // }
 
     void SetTreeAlpha(GameObject treeNode, float alpha, string[] tagsToExclude = null) 
     {
@@ -286,6 +332,20 @@ public class ThresholdColliderScript : MonoBehaviour
         }
     }  
 
+    IEnumerator treeFade(
+      GameObject obj,
+      float fadeTo,
+      float fadeSpeed) 
+    {
+        float fadeFrom = obj.GetComponent<SpriteRenderer>().color.a;
+
+        for (float t = 0.0f; t < 1; t += Time.deltaTime) 
+        {
+            float currentAlpha = Mathf.Lerp(fadeFrom, fadeTo, t * fadeSpeed);
+            SetTreeAlpha(obj, currentAlpha);
+            yield return null;
+        }
+    }
     private void TagChildrenOfTaggedParents(Transform parent, string tag)
     {
         Stack<Transform> stack = new Stack<Transform>();
@@ -331,9 +391,10 @@ public class ThresholdColliderScript : MonoBehaviour
     IEnumerator ThresholdLayerSortingSequence(
     float waitTime,
     GameObject gameObject,
-    string initialSortingLayer,
     string newSortingLayer) 
     {
+        initialSortingLayer = FindSiblingWithTag("ClosedDoor").GetComponent<SpriteRenderer>().sortingLayerName;
+
         SetSortingLayer(gameObject, newSortingLayer);
 
         yield return new WaitForSeconds(waitTime);
@@ -403,27 +464,108 @@ public class ThresholdColliderScript : MonoBehaviour
         }       
     }
 
-    public void SetDoorState(bool playerIsInDoorway, bool playerIsInRoomAbove) 
+    private void GetSprites(GameObject root, List<GameObject> spriteList)
+    {
+        if(root != null)
+        {
+            Stack<GameObject> stack = new Stack<GameObject>();
+            stack.Push(root);
+
+            while (stack.Count > 0)
+            {
+                GameObject currentNode = stack.Pop();
+                SpriteRenderer sr = currentNode.GetComponent<SpriteRenderer>();
+
+                if (sr != null)
+                {
+                    spriteList.Add(currentNode);
+                }
+
+                foreach (Transform child in currentNode.transform)
+                {
+                    stack.Push(child.gameObject);
+                }
+            }
+        }
+    }
+
+    public void SetDoorState(bool playerIsInDoorway, bool playerIsInRoomAbove, bool fade=false) 
     {
         this.playerIsInDoorway = playerIsInDoorway;
         this.playerIsInRoomAbove = playerIsInRoomAbove;
 
-        if (playerIsInDoorway) {
-            SetTreeAlpha(this.FindSiblingWithTag("ClosedDoor"), 0);
-            SetTreeAlpha(this.FindSiblingWithTag("OpenDoor"), 1);
+        if (fade) {
+            if(this.closedDoorFadeCoroutine != null)
+            {
+                StopCoroutine(this.closedDoorFadeCoroutine);
+            }
+
+            if(this.openDoorFadeCoroutine != null)
+            {
+                StopCoroutine(this.openDoorFadeCoroutine);
+            }
+
+            if (playerIsInDoorway) {
+                this.closedDoorFadeCoroutine = StartCoroutine(treeFade(this.FindSiblingWithTag("ClosedDoor"), 0, 3f));
+                this.openDoorFadeCoroutine = StartCoroutine(treeFade(this.FindSiblingWithTag("OpenDoor"), 1, 3f));
+            }
+            else if (playerIsInRoomAbove) {
+                this.closedDoorFadeCoroutine = StartCoroutine(treeFade(this.FindSiblingWithTag("ClosedDoor"), 0.15f, 3f));
+                this.openDoorFadeCoroutine = StartCoroutine(treeFade(this.FindSiblingWithTag("OpenDoor"), 0, 3f));
+            }
+            else if (!GameObject.FindWithTag("Player").GetComponent<PlayerMovement>().isPlayerInside) {
+                ClosedDoorExternalVisibility();            
+                this.openDoorFadeCoroutine = StartCoroutine(treeFade(this.FindSiblingWithTag("OpenDoor"), 0, 3f));
+            }
+            else {
+                this.closedDoorFadeCoroutine = StartCoroutine(treeFade(this.FindSiblingWithTag("ClosedDoor"), 1, 3f));
+                this.openDoorFadeCoroutine = StartCoroutine(treeFade(this.FindSiblingWithTag("OpenDoor"), 0, 3f));
+            }
+        } else {
+            if (playerIsInDoorway) {
+                for (int i = 0; i < closedDoorSpriteList.Count; i++)
+                {
+                    SetTreeAlpha(closedDoorSpriteList[i], 0);
+                }                    
+                
+                for (int i = 0; i < openDoorSpriteList.Count; i++)
+                {
+                    SetTreeAlpha(openDoorSpriteList[i], openDoorAlpha[i]);
+                }                    
+            }
+            else if (playerIsInRoomAbove) {
+                for (int i = 0; i < closedDoorSpriteList.Count; i++)
+                {
+                    SetTreeAlpha(closedDoorSpriteList[i], closedDoorAlpha[i] - ((closedDoorAlpha[i]/100)*85));
+                }                           
+                
+                for (int i = 0; i < openDoorSpriteList.Count; i++)
+                {
+                    SetTreeAlpha(openDoorSpriteList[i], 0);
+                }               
+            }
+            else if (!GameObject.FindWithTag("Player").GetComponent<PlayerMovement>().isPlayerInside) {
+                ClosedDoorExternalVisibility(); 
+
+                for (int i = 0; i < openDoorSpriteList.Count; i++)
+                {
+                    SetTreeAlpha(openDoorSpriteList[i], 0);
+                }       
+            }
+            else {
+                for (int i = 0; i < closedDoorSpriteList.Count; i++)
+                {
+                    SetTreeAlpha(closedDoorSpriteList[i], closedDoorAlpha[i]);
+                }         
+
+                for (int i = 0; i < openDoorSpriteList.Count; i++)
+                {
+                    SetTreeAlpha(openDoorSpriteList[i], 0);
+                }     
+            }
         }
-        else if (playerIsInRoomAbove) {
-            SetTreeAlpha(this.FindSiblingWithTag("ClosedDoor"), 0.15f);
-            SetTreeAlpha(this.FindSiblingWithTag("OpenDoor"), 0);
-        }
-        else if (!GameObject.FindWithTag("Player").GetComponent<PlayerMovement>().isPlayerInside) {
-            ClosedDoorExternalVisibility();            
-            SetTreeAlpha(this.FindSiblingWithTag("OpenDoor"), 0);
-        }
-        else {
-            SetTreeAlpha(this.FindSiblingWithTag("ClosedDoor"), 1);
-            SetTreeAlpha(this.FindSiblingWithTag("OpenDoor"), 0);
-        }
+
+
     }
 
     public void SetPlayerIsInDoorway(bool playerIsInDoorway) 
@@ -435,9 +577,13 @@ public class ThresholdColliderScript : MonoBehaviour
     public void SetPlayerIsInRoomAbove(bool playerIsInRoomAbove) 
     {
         this.playerIsInRoomAbove = playerIsInRoomAbove;
-        SetDoorState(playerIsInDoorway, playerIsInRoomAbove);
+        //SetDoorState(playerIsInDoorway, playerIsInRoomAbove, true);
+        SetDoorState(playerIsInDoorway, playerIsInRoomAbove, false);
     }
 }
+
+
+
 
 
 
@@ -451,11 +597,10 @@ public class ThresholdColliderScript : MonoBehaviour
 // {
 //     public RoomScript roomAbove;
 //     public RoomScript roomBelow;
-
+//     LevelColliderScript levelColliderScript;
 //     PlayerMovement playerMovement;
 //     [SerializeField] GameObject Player;
 //     public string motionDirection = "normal";
-//     public string previousMotionDirection = "normal";
 //     [SerializeField] bool itsAnEntrnceOrExt;
 //     public GameObject multiFdObjInside;
 //     public GameObject multiFdObjOutside;
@@ -465,17 +610,17 @@ public class ThresholdColliderScript : MonoBehaviour
 //     private float buildingFadeSpeed = 7f; // Time it takes to fade out the sprites
 //     private bool aboveCollider;
 //     private Coroutine fadeCoroutine;
+
+//     private Coroutine closedDoorFadeCoroutine;
+//     private Coroutine openDoorFadeCoroutine;
 //     private Coroutine thresholdSortingSequenceCoro;
+//     private string initialSortingLayer;
 
 //     private bool playerIsInDoorway = false;
 //     private bool playerIsInRoomAbove = false;
 
 //     private string[] tagsToExludeEntExt = { "OpenDoor", "AlphaZeroEntExt" };
-
-//     private List<float> openDoorAlpha = new List<float>();
-//     private List<float> closedDoorAlpha = new List<float>();
-//     private List<GameObject> openDoorSprites = new List<GameObject>();
-//     private List<GameObject> closedDoorSprites = new List<GameObject>();
+    
 
 
 //     void Awake()
@@ -491,27 +636,14 @@ public class ThresholdColliderScript : MonoBehaviour
 //             // Call the function to access and tag child game objects with the specified tag
 //             TagChildrenOfTaggedParents(multiFdObjInside.transform, "AlphaZeroEntExt");
 //         }
-        
-//         GetSprites(FindSiblingWithTag("OpenDoor"), openDoorSprites);
-//         GetSprites(FindSiblingWithTag("ClosedDoor"), closedDoorSprites);
-
-//         for (int i = 0; i < openDoorSprites.Count; i++)
-//         {
-//             Color initialColorOpen = openDoorSprites[i].GetComponent<SpriteRenderer>().color;
-//             openDoorAlpha.Add(initialColorOpen.a);
-//         }
-
-//         for (int i = 0; i < closedDoorSprites.Count; i++)
-//         {
-//             Color initialColorClosed = closedDoorSprites[i].GetComponent<SpriteRenderer>().color;
-//             closedDoorAlpha.Add(initialColorClosed.a);
-//         }
 
 //         SetDoorState(false, false);
 //     }
 
 //     void OnTriggerEnter2D()
 //     {
+//         initialSortingLayer = Player.GetComponent<SpriteRenderer>().sortingLayerName;
+
 //         if (fadeCoroutine != null)
 //         {
 //             StopCoroutine(fadeCoroutine);
@@ -520,10 +652,21 @@ public class ThresholdColliderScript : MonoBehaviour
 //         if (thresholdSortingSequenceCoro != null)
 //         {
 //             StopCoroutine(thresholdSortingSequenceCoro);
-//             SetSortingLayer(Player, "Default");
+//             SetSortingLayer(Player, initialSortingLayer);
+//         }
+        
+//         playerMovement.motionDirection = motionDirection;
+
+//         if((isPlayerCrossingUp() && isPlayerCrossingLeft()) 
+//             || !isPlayerCrossingUp() && !isPlayerCrossingLeft())
+//         {
+//             playerMovement.fixedDirectionLeft = true;
+//         }
+//         else
+//         {
+//             playerMovement.fixedDirectionRight = true;
 //         }
 
-//         playerMovement.motionDirection = motionDirection;
 
 //         if (isPlayerCrossingUp())
 //         {
@@ -539,7 +682,10 @@ public class ThresholdColliderScript : MonoBehaviour
 
 //     void OnTriggerExit2D()
 //     {
-//         playerMovement.motionDirection = previousMotionDirection;
+//         // playerMovement.motionDirection = previousMotionDirection;
+
+//             playerMovement.fixedDirectionLeft = false;
+//             playerMovement.fixedDirectionRight = false;
 
 //        // Bug avoidance: in case the player is inside and isPlayerInside is false etc. (need to optimise)
 //         if (!itsAnEntrnceOrExt && !GameObject.FindWithTag("Player").GetComponent<PlayerMovement>().isPlayerInside
@@ -560,7 +706,7 @@ public class ThresholdColliderScript : MonoBehaviour
 //         if (thresholdSortingSequenceCoro != null)
 //         {
 //             StopCoroutine(thresholdSortingSequenceCoro);
-//             SetSortingLayer(Player, "Default");
+//             SetSortingLayer(Player, initialSortingLayer);
 //         }
 
 //         // if (openDoor != null)
@@ -626,7 +772,7 @@ public class ThresholdColliderScript : MonoBehaviour
 
 //                 if (aboveCollider && GameObject.FindWithTag("Player").GetComponent<PlayerMovement>().isPlayerInside)
 //                 {
-//                     thresholdSortingSequenceCoro = StartCoroutine(ThresholdLayerSortingSequence((float)roomBelow.wallHeight/100, Player, "Default", "ThresholdSequence"));
+//                     thresholdSortingSequenceCoro = StartCoroutine(ThresholdLayerSortingSequence((float)roomBelow.wallHeight/100, Player, "ThresholdSequence"));
 //                 }
 //             } 
             
@@ -699,20 +845,6 @@ public class ThresholdColliderScript : MonoBehaviour
 //             }
 //         }
 
-//     IEnumerator treeFade(
-//       GameObject obj,
-//       float fadeFrom, 
-//       float fadeTo,
-//       float buildingFadeSpeed) 
-//     {
-//         for (float t = 0.0f; t < 1; t += Time.deltaTime) 
-//         {
-//             float currentAlpha = Mathf.Lerp(fadeFrom, fadeTo, t * buildingFadeSpeed);
-//             SetTreeAlpha(obj, currentAlpha);
-//             yield return null;
-//         }
-//     }
-
 //     void SetTreeAlpha(GameObject treeNode, float alpha, string[] tagsToExclude = null) 
 //     {
 //         if (treeNode == null) {
@@ -729,6 +861,20 @@ public class ThresholdColliderScript : MonoBehaviour
 //         }
 //     }  
 
+//     IEnumerator treeFade(
+//       GameObject obj,
+//       float fadeTo,
+//       float fadeSpeed) 
+//     {
+//         float fadeFrom = obj.GetComponent<SpriteRenderer>().color.a;
+
+//         for (float t = 0.0f; t < 1; t += Time.deltaTime) 
+//         {
+//             float currentAlpha = Mathf.Lerp(fadeFrom, fadeTo, t * fadeSpeed);
+//             SetTreeAlpha(obj, currentAlpha);
+//             yield return null;
+//         }
+//     }
 //     private void TagChildrenOfTaggedParents(Transform parent, string tag)
 //     {
 //         Stack<Transform> stack = new Stack<Transform>();
@@ -774,9 +920,10 @@ public class ThresholdColliderScript : MonoBehaviour
 //     IEnumerator ThresholdLayerSortingSequence(
 //     float waitTime,
 //     GameObject gameObject,
-//     string initialSortingLayer,
 //     string newSortingLayer) 
 //     {
+//         initialSortingLayer = FindSiblingWithTag("ClosedDoor").GetComponent<SpriteRenderer>().sortingLayerName;
+
 //         SetSortingLayer(gameObject, newSortingLayer);
 
 //         yield return new WaitForSeconds(waitTime);
@@ -846,62 +993,58 @@ public class ThresholdColliderScript : MonoBehaviour
 //         }       
 //     }
 
-//     public void SetDoorState(bool playerIsInDoorway, bool playerIsInRoomAbove) 
+//     public void SetDoorState(bool playerIsInDoorway, bool playerIsInRoomAbove, bool fade=false) 
 //     {
 //         this.playerIsInDoorway = playerIsInDoorway;
 //         this.playerIsInRoomAbove = playerIsInRoomAbove;
 
-//         if (playerIsInDoorway) {
-//             // SetTreeAlpha(this.FindSiblingWithTag("ClosedDoor"), 0);
-//             // SetTreeAlpha(this.FindSiblingWithTag("OpenDoor"), 1);
-
-//             for (int i = 0; i < openDoorSprites.Count; i++)
+//         if (fade) {
+//             if(this.closedDoorFadeCoroutine != null)
 //             {
-//                 SetTreeAlpha(openDoorSprites[i], openDoorAlpha[i]);
-//             }        
-//             for (int i = 0; i < closedDoorSprites.Count; i++)
-//             {
-//                 SetTreeAlpha(closedDoorSprites[i], 0);
-//             }      
+//                 StopCoroutine(this.closedDoorFadeCoroutine);
+//             }
 
+//             if(this.openDoorFadeCoroutine != null)
+//             {
+//                 StopCoroutine(this.openDoorFadeCoroutine);
+//             }
+
+//             if (playerIsInDoorway) {
+//                 this.closedDoorFadeCoroutine = StartCoroutine(treeFade(this.FindSiblingWithTag("ClosedDoor"), 0, 3f));
+//                 this.openDoorFadeCoroutine = StartCoroutine(treeFade(this.FindSiblingWithTag("OpenDoor"), 1, 3f));
+//             }
+//             else if (playerIsInRoomAbove) {
+//                 this.closedDoorFadeCoroutine = StartCoroutine(treeFade(this.FindSiblingWithTag("ClosedDoor"), 0.15f, 3f));
+//                 this.openDoorFadeCoroutine = StartCoroutine(treeFade(this.FindSiblingWithTag("OpenDoor"), 0, 3f));
+//             }
+//             else if (!GameObject.FindWithTag("Player").GetComponent<PlayerMovement>().isPlayerInside) {
+//                 ClosedDoorExternalVisibility();            
+//                 this.openDoorFadeCoroutine = StartCoroutine(treeFade(this.FindSiblingWithTag("OpenDoor"), 0, 3f));
+//             }
+//             else {
+//                 this.closedDoorFadeCoroutine = StartCoroutine(treeFade(this.FindSiblingWithTag("ClosedDoor"), 1, 3f));
+//                 this.openDoorFadeCoroutine = StartCoroutine(treeFade(this.FindSiblingWithTag("OpenDoor"), 0, 3f));
+//             }
+//         } else {
+//             if (playerIsInDoorway) {
+//                 SetTreeAlpha(this.FindSiblingWithTag("ClosedDoor"), 0);
+//                 SetTreeAlpha(this.FindSiblingWithTag("OpenDoor"), 1);
+//             }
+//             else if (playerIsInRoomAbove) {
+//                 SetTreeAlpha(this.FindSiblingWithTag("ClosedDoor"), 0.15f);
+//                 SetTreeAlpha(this.FindSiblingWithTag("OpenDoor"), 0);
+//             }
+//             else if (!GameObject.FindWithTag("Player").GetComponent<PlayerMovement>().isPlayerInside) {
+//                 ClosedDoorExternalVisibility();            
+//                 SetTreeAlpha(this.FindSiblingWithTag("OpenDoor"), 0);
+//             }
+//             else {
+//                 SetTreeAlpha(this.FindSiblingWithTag("ClosedDoor"), 1);
+//                 SetTreeAlpha(this.FindSiblingWithTag("OpenDoor"), 0);
+//             }
 //         }
-//         else if (playerIsInRoomAbove) {
-//             // SetTreeAlpha(this.FindSiblingWithTag("ClosedDoor"), 0.15f);
-//             // SetTreeAlpha(this.FindSiblingWithTag("OpenDoor"), 0);
 
-//             for (int i = 0; i < openDoorSprites.Count; i++)
-//             {
-//                 SetTreeAlpha(openDoorSprites[i], 0);
-//             }        
-//             for (int i = 0; i < closedDoorSprites.Count; i++)
-//             {
-//                 SetTreeAlpha(closedDoorSprites[i], 0.15f);
-//             }      
 
-//         }
-//         else if (!GameObject.FindWithTag("Player").GetComponent<PlayerMovement>().isPlayerInside) {
-//             ClosedDoorExternalVisibility();            
-//             // SetTreeAlpha(this.FindSiblingWithTag("OpenDoor"), 0);
-
-//             for (int i = 0; i < openDoorSprites.Count; i++)
-//             {
-//                 SetTreeAlpha(openDoorSprites[i], 0);
-//             }        
-//         }
-//         else {
-
-//         for (int i = 0; i < openDoorSprites.Count; i++)
-//         {
-//             SetTreeAlpha(openDoorSprites[i], 0);
-//         }        
-//         for (int i = 0; i < closedDoorSprites.Count; i++)
-//         {
-//             SetTreeAlpha(closedDoorSprites[i], closedDoorAlpha[i]);
-//         }    
-
-//             // SetTreeAlpha(this.FindSiblingWithTag("ClosedDoor"), 1);
-//             // SetTreeAlpha(this.FindSiblingWithTag("OpenDoor"), 0);
-//         }
 //     }
 
 //     public void SetPlayerIsInDoorway(bool playerIsInDoorway) 
@@ -913,51 +1056,11 @@ public class ThresholdColliderScript : MonoBehaviour
 //     public void SetPlayerIsInRoomAbove(bool playerIsInRoomAbove) 
 //     {
 //         this.playerIsInRoomAbove = playerIsInRoomAbove;
-//         SetDoorState(playerIsInDoorway, playerIsInRoomAbove);
+//         //SetDoorState(playerIsInDoorway, playerIsInRoomAbove, true);
+//         SetDoorState(playerIsInDoorway, playerIsInRoomAbove, false);
 //     }
-
-//     // private void GetSprites(GameObject root, List<GameObject> spriteList)
-//     // {
-//     //     Stack<GameObject> stack = new Stack<GameObject>();
-//     //     stack.Push(root);
-
-//     //     while (stack.Count > 0)
-//     //     {
-//     //         GameObject currentNode = stack.Pop();
-//     //         SpriteRenderer sr = currentNode.GetComponent<SpriteRenderer>();
-
-//     //         if (sr != null)
-//     //         {
-//     //             spriteList.Add(currentNode);
-//     //         }
-
-//     //         foreach (Transform child in currentNode.transform)
-//     //         {
-//     //             stack.Push(child.gameObject);
-//     //         }
-//     //     }
-//     // }
-
-//     private void GetSprites(GameObject root, List<GameObject> spriteList)
-//     {
-//         Stack<GameObject> stack = new Stack<GameObject>();
-//         stack.Push(root);
-
-//         while (stack.Count > 0)
-//         {
-//             GameObject currentNode = stack.Pop();
-//             SpriteRenderer sr = currentNode.GetComponent<SpriteRenderer>();
-
-//             if (sr != null)
-//             {
-//                 spriteList.Add(currentNode);
-//             }
-
-//             foreach (Transform child in currentNode.transform)
-//             {
-//                 stack.Push(child.gameObject);
-//             }
-//         }
-//     }
-
 // }
+
+
+
+

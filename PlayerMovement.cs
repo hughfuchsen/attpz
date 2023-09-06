@@ -38,8 +38,6 @@ public class PlayerMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
       {
-        Debug.Log(fixedDirectionLeft);
-        Debug.Log(fixedDirectionRight);
         UpdateAnimationAndMove();
       }
 

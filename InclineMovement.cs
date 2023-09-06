@@ -18,6 +18,22 @@ public class InclineMovement : MonoBehaviour
     public bool middleOfStairCase;
 
     // Start is called before the first frame update
+
+    void Start()
+    {
+        // SetCollisionLayer("Default");
+        // for (int i = 0; i < 32; i++)
+        // {
+        //     for (int j = 0; j < 32; j++)
+        //     {
+        //         Physics2D.IgnoreLayerCollision(i, j, true);
+        //     }
+        // }
+        // Debug.Log(LayerMask.NameToLayer("Default"));
+        // Debug.Log(LayerMask.NameToLayer("Player"));
+        // Debug.Log(LayerMask.NameToLayer("Level1"));
+        // Debug.Log(LayerMask.NameToLayer("Stairs1"));
+    }
     void Awake()
     {
         playerMovement = Player.GetComponent<PlayerMovement>();
@@ -146,6 +162,11 @@ public class InclineMovement : MonoBehaviour
     {
         return GameObject.FindWithTag("Player").GetComponent<PlayerMovement>().change.x < 0;
     }
+    // public void SetCollisionLayer(string targetLayerName)
+    // {
+    //     GameObject.FindWithTag("Player").layer = LayerMask.NameToLayer(targetLayerName);
+    // }
+    
     public void SetCollisionLayer(string targetLayerName)
     {
         int targetLayerIndex = LayerMask.NameToLayer(targetLayerName);

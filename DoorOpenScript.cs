@@ -6,33 +6,34 @@ public class DoorOpenScript : MonoBehaviour
 {
     private List<float> openDoorAlpha = new List<float>();
     private List<float> closedDoorAlpha = new List<float>();
-    private List<GameObject> openDoorSprites = new List<GameObject>();
-    private List<GameObject> closedDoorSprites = new List<GameObject>();
+    private List<GameObject> openDoorSpriteList = new List<GameObject>();
+    private List<GameObject> closedDoorSpriteList = new List<GameObject>();
 
     void Start()
     {
-        GetSprites(FindSiblingWithTag("OpenDoor"), openDoorSprites);
-        GetSprites(FindSiblingWithTag("ClosedDoor"), closedDoorSprites);
+        // get the sprites and add them to the corresponding lists
+        GetSprites(FindSiblingWithTag("OpenDoor"), openDoorSpriteList);
+        GetSprites(FindSiblingWithTag("ClosedDoor"), closedDoorSpriteList);
 
-        for (int i = 0; i < openDoorSprites.Count; i++)
+        for (int i = 0; i < openDoorSpriteList.Count; i++)
         {
-            Color initialColorOpen = openDoorSprites[i].GetComponent<SpriteRenderer>().color;
+            Color initialColorOpen = openDoorSpriteList[i].GetComponent<SpriteRenderer>().color;
             openDoorAlpha.Add(initialColorOpen.a);
         }
 
-        for (int i = 0; i < closedDoorSprites.Count; i++)
+        for (int i = 0; i < closedDoorSpriteList.Count; i++)
         {
-            Color initialColorClosed = closedDoorSprites[i].GetComponent<SpriteRenderer>().color;
+            Color initialColorClosed = closedDoorSpriteList[i].GetComponent<SpriteRenderer>().color;
             closedDoorAlpha.Add(initialColorClosed.a);
         }
 
-        for (int i = 0; i < openDoorSprites.Count; i++)
+        for (int i = 0; i < openDoorSpriteList.Count; i++)
         {
-            SetTreeAlpha(openDoorSprites[i], 0);
+            SetTreeAlpha(openDoorSpriteList[i], 0);
         }        
-        for (int i = 0; i < closedDoorSprites.Count; i++)
+        for (int i = 0; i < closedDoorSpriteList.Count; i++)
         {
-            SetTreeAlpha(closedDoorSprites[i], closedDoorAlpha[i]);
+            SetTreeAlpha(closedDoorSpriteList[i], closedDoorAlpha[i]);
         }    
 
     }
@@ -40,13 +41,13 @@ public class DoorOpenScript : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Player"))
         {
-            for (int i = 0; i < openDoorSprites.Count; i++)
+            for (int i = 0; i < openDoorSpriteList.Count; i++)
             {
-                SetTreeAlpha(openDoorSprites[i], openDoorAlpha[i]);
+                SetTreeAlpha(openDoorSpriteList[i], openDoorAlpha[i]);
             }        
-            for (int i = 0; i < closedDoorSprites.Count; i++)
+            for (int i = 0; i < closedDoorSpriteList.Count; i++)
             {
-                SetTreeAlpha(closedDoorSprites[i], 0);
+                SetTreeAlpha(closedDoorSpriteList[i], 0);
             }            
         }
     }
@@ -54,13 +55,13 @@ public class DoorOpenScript : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Player"))
         {
-            for (int i = 0; i < openDoorSprites.Count; i++)
+            for (int i = 0; i < openDoorSpriteList.Count; i++)
             {
-                SetTreeAlpha(openDoorSprites[i], 0);
+                SetTreeAlpha(openDoorSpriteList[i], 0);
             }        
-            for (int i = 0; i < closedDoorSprites.Count; i++)
+            for (int i = 0; i < closedDoorSpriteList.Count; i++)
             {
-                SetTreeAlpha(closedDoorSprites[i], closedDoorAlpha[i]);
+                SetTreeAlpha(closedDoorSpriteList[i], closedDoorAlpha[i]);
             }        
         }
     }

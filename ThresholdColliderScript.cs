@@ -12,13 +12,14 @@ using UnityEngine;
 
 public class ThresholdColliderScript : MonoBehaviour
 {
+    public BuildingScript building;
     public RoomScript roomAbove;
     public RoomScript roomBelow;
     LevelColliderScript levelColliderScript;
     PlayerMovement playerMovement;
     [SerializeField] GameObject Player;
     public string motionDirection = "normal";
-    [SerializeField] bool itsAnEntrnceOrExt;
+    public bool itsAnEntrnceOrExt;
     public GameObject multiFdObjInside;
     public GameObject multiFdObjOutside;
 
@@ -221,7 +222,7 @@ public class ThresholdColliderScript : MonoBehaviour
 
                 if (aboveCollider && GameObject.FindWithTag("Player").GetComponent<PlayerMovement>().isPlayerInside)
                 {
-                    thresholdSortingSequenceCoro = StartCoroutine(ThresholdLayerSortingSequence((float)roomBelow.wallHeight/100, Player, "ThresholdSequence"));
+                    thresholdSortingSequenceCoro = StartCoroutine(ThresholdLayerSortingSequence(0.5f, Player, "ThresholdSequence"));
                 }
             } 
             
@@ -422,7 +423,7 @@ public class ThresholdColliderScript : MonoBehaviour
         }
 
     // NOTE: The parent of the threshold collider must be the door parent
-    private GameObject FindSiblingWithTag(string tag) 
+    public GameObject FindSiblingWithTag(string tag) 
     {
         foreach (Transform child in this.gameObject.transform.parent)
         {

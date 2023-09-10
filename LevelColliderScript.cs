@@ -11,6 +11,7 @@ public class LevelColliderScript : MonoBehaviour
     public LevelScript levelBelow;
     public bool levelAboveMove;
     public bool levelThreshold;
+    private bool aboveCollider;
     
     // Start is called before the first frame update
     void Start()
@@ -22,38 +23,27 @@ public class LevelColliderScript : MonoBehaviour
 
     private void OnTriggerEnter2D()
     {
-        // levelAbove.EnterLevel();
-
-        // if(isPlayerCrossingUp() && levelAboveMove)
-        // {
-        // // levelAbove.EnterLevel();
-        // }
-        // else if(isPlayerCrossingUp() && !levelAboveMove)
-        // {
-
-        // }                       
-        // else if(!isPlayerCrossingUp() && levelAboveMove)
-        // {
-        //     gameObject.layer = LayerMask.NameToLayer(lowerColliderLayerName);
-        //     SetCollisionLayer(lowerColliderLayerName);
-        //     SetSortingLayer(collision.gameObject, lowerSortingLayerToAssign);
-        // } 
-        // else if(!isPlayerCrossingUp() && !levelAboveMove)
-        // {
-        //     gameObject.layer = LayerMask.NameToLayer(higherColliderLayerName);
-        //     SetCollisionLayer(higherColliderLayerName);
-        //     SetSortingLayer(collision.gameObject, higherSortingLayerToAssign);
-        // }     
+        if(isPlayerCrossingUp())
+        {
+            aboveCollider = false;
         }
+        else
+        {
+            aboveCollider = true;
+        }
+    }
     private void OnTriggerExit2D()
     {
-        if(isPlayerCrossingUp() && levelAboveMove)
+
+        if(isPlayerCrossingUp() && levelAboveMove && !aboveCollider)
         {
             levelAbove.EnterLevel();
+            aboveCollider = true;
         }            
-        else if(!isPlayerCrossingUp() && levelAboveMove)
+        else if(!isPlayerCrossingUp() && levelAboveMove && aboveCollider)
         {
             levelAbove.ExitLevel();
+            aboveCollider = false;
         }   
 
         if(isPlayerCrossingUp() && levelThreshold)
@@ -63,7 +53,8 @@ public class LevelColliderScript : MonoBehaviour
         else if(!isPlayerCrossingUp() && levelThreshold)
         {
             levelBelow.MoveUp();
-        }    
+        }  
+
     }
 
     private bool isPlayerCrossingUp()

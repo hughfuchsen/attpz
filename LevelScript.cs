@@ -14,6 +14,7 @@ public class LevelScript : MonoBehaviour
     public float fadeSpeed = 100f;
     private float saturationAmount = 0.2f;
     public bool oppositeMovement;
+    public bool isPlayerOnLevel = false;
     private Vector3 initialPosition;
     private List<Vector3> childColliderInitialPositions = new List<Vector3>();
     private List<GameObject> spriteList = new List<GameObject>();
@@ -79,6 +80,8 @@ public class LevelScript : MonoBehaviour
         {
             this.MoveOut();
         }
+
+        isPlayerOnLevel = true;
         // for (int i = 0; i < levelAbove.Count; i++)
         // {
         //     levelAbove[i].MoveIn();
@@ -100,6 +103,8 @@ public class LevelScript : MonoBehaviour
         {
             this.MoveIn();
         }    
+
+        isPlayerOnLevel = false;
     }
     public void ExitBuilding()
     {
@@ -162,7 +167,7 @@ public class LevelScript : MonoBehaviour
 
         float distance = (currentPosition - targetPosition).magnitude;
 
-        float timeToReachTarget = distance / displaceSpeed;
+        float timeToReachTarget = 0.5f;
 
         float elapsedTime = 0f;
 
@@ -198,13 +203,45 @@ public class LevelScript : MonoBehaviour
         if(movingOut)
         {
             SetSaturation(spriteList);
-            
+
+            for (int i = 0; i < spriteList.Count; i++)
+            {
+                if (spriteList[i].CompareTag("OpenDoor") || spriteList[i].CompareTag("AlphaZeroEntExt"))
+                {
+                    SpriteRenderer sr = spriteList[i].GetComponent<SpriteRenderer>();
+                    if (sr != null)
+                    {
+                        Color newColor = sr.color; // Get the current color
+                        newColor.a = 0; // Set the alpha component
+
+                        sr.color = newColor; // Assign the modified color
+                    }
+                }
+
+            }            
             yield return null;
         }
 
         if(!movingOut)
         {
-            SetInitialColor(spriteList);            
+            SetInitialColor(spriteList);  
+
+            for (int i = 0; i < spriteList.Count; i++)
+            {
+                if (spriteList[i].CompareTag("OpenDoor") || spriteList[i].CompareTag("AlphaZeroEntExt"))
+                {
+                    SpriteRenderer sr = spriteList[i].GetComponent<SpriteRenderer>();
+                    if (sr != null)
+                    {
+                        Color newColor = sr.color; // Get the current color
+                        newColor.a = 0; // Set the alpha component
+
+                        sr.color = newColor; // Assign the modified color
+                    }
+                }
+
+            }   
+
             yield return null;
         }
     }
@@ -282,6 +319,16 @@ public class LevelScript : MonoBehaviour
             sr.color = color;
         }
     }
+    // void SetAlpha(List<GameObject> spriteList)
+    // {
+    //     for (int i = 0; i < spriteList.Count; i++)
+    //     {
+    //         SpriteRenderer sr = spriteList[i].GetComponent<SpriteRenderer>();
+
+    //         Color color = sr.color;
+
+    //         sr.color
+    // }
     void SetInitialColor(List<GameObject> spriteList)
     {
         for (int i = 0; i < spriteList.Count; i++)

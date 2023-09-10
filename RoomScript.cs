@@ -112,7 +112,7 @@ public class RoomScript : MonoBehaviour
 
         float distance = (currentPosition - targetPosition).magnitude;
 
-        float timeToReachTarget = distance / displaceSpeed;
+        float timeToReachTarget = 0.5f;
 
         float elapsedTime = 0f;
         

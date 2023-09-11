@@ -11,6 +11,7 @@ public class LevelColliderScript : MonoBehaviour
     public LevelScript levelBelow;
     public bool levelAboveMove;
     public bool levelThreshold;
+    public bool enteringLevelFromAbove;
     private bool aboveCollider;
     
     // Start is called before the first frame update
@@ -34,26 +35,67 @@ public class LevelColliderScript : MonoBehaviour
     }
     private void OnTriggerExit2D()
     {
+        if(!enteringLevelFromAbove)
+        {
+            if(isPlayerCrossingUp() && levelAboveMove && !aboveCollider)
+            {
+                levelAbove.EnterLevel();
+                aboveCollider = true;
+            }            
+            else if(!isPlayerCrossingUp() && levelAboveMove && aboveCollider)
+            {
+                levelAbove.ExitLevel();
+                aboveCollider = false;
+            }   
 
-        if(isPlayerCrossingUp() && levelAboveMove && !aboveCollider)
-        {
-            levelAbove.EnterLevel();
-            aboveCollider = true;
-        }            
-        else if(!isPlayerCrossingUp() && levelAboveMove && aboveCollider)
-        {
-            levelAbove.ExitLevel();
-            aboveCollider = false;
-        }   
+            if(isPlayerCrossingUp() && levelThreshold)
+            {
+                levelBelow.MoveDown();
+            }            
+            else if(!isPlayerCrossingUp() && levelThreshold)
+            {
+                levelBelow.MoveUp();
+            }
 
-        if(isPlayerCrossingUp() && levelThreshold)
+            if(isPlayerCrossingUp())
+            {
+                if(this.transform.parent.GetComponentInChildren<BuildingThreshColliderScript>() != null && !aboveCollider)
+                {
+                    if(levelAbove != null)
+                    {
+                        levelAbove.ExitBuilding();
+                    }
+                    else if(levelBelow != null)
+                    {
+                        levelBelow.ExitBuilding();
+                    }
+                }
+
+                aboveCollider = true;   
+            }
+        }
+        else
         {
-            levelBelow.MoveDown();
-        }            
-        else if(!isPlayerCrossingUp() && levelThreshold)
-        {
-            levelBelow.MoveUp();
-        }  
+            if(isPlayerCrossingUp() && levelAboveMove && !aboveCollider)
+            {
+                levelAbove.ExitLevel();
+                aboveCollider = true;
+            }            
+            else if(!isPlayerCrossingUp() && levelAboveMove && aboveCollider)
+            {
+                levelAbove.EnterLevel();
+                aboveCollider = false;
+            }   
+
+            if(isPlayerCrossingUp() && levelThreshold)
+            {
+                levelBelow.MoveUp();
+            }            
+            else if(!isPlayerCrossingUp() && levelThreshold)
+            {
+                levelBelow.MoveDown();
+            }          
+        }
 
     }
 

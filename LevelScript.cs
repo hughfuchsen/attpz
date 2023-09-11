@@ -14,7 +14,8 @@ public class LevelScript : MonoBehaviour
     public float fadeSpeed = 100f;
     private float saturationAmount = 0.2f;
     public bool oppositeMovement;
-    public bool isPlayerOnLevel = false;
+    public bool groundFloor;
+    private bool displaced;
     private Vector3 initialPosition;
     private List<Vector3> childColliderInitialPositions = new List<Vector3>();
     private List<GameObject> spriteList = new List<GameObject>();
@@ -30,8 +31,14 @@ public class LevelScript : MonoBehaviour
         
         for (int i = 0; i < spriteList.Count; i++)
         {
-            Color initialColor = spriteList[i].GetComponent<SpriteRenderer>().color;
-            initialColorList.Add(initialColor);
+            SpriteRenderer sr = spriteList[i].GetComponent<SpriteRenderer>();
+
+            if(spriteList != null)
+            {
+                Color initialColor = sr.color;
+                initialColorList.Add(initialColor);
+            }
+
         }
 
         initialPosition = this.gameObject.transform.position;
@@ -69,28 +76,32 @@ public class LevelScript : MonoBehaviour
         }
     }
 
-
     public void EnterLevel()
     {
         if(!oppositeMovement)
         {
             this.MoveIn();
+            for (int i = 0; i < levelAbove.Count; i++)
+            {           
+                levelAbove[i].MoveIn();
+            }
+            for (int i = 0; i < levelBelow.Count; i++)
+            {           
+                levelBelow[i].MoveIn();
+            }
         }
         else
         {
             this.MoveOut();
+            for (int i = 0; i < levelAbove.Count; i++)
+            {           
+                levelAbove[i].MoveOut();
+            }        
+            for (int i = 0; i < levelBelow.Count; i++)
+            {           
+                levelBelow[i].MoveOut();
+            }        
         }
-
-        isPlayerOnLevel = true;
-        // for (int i = 0; i < levelAbove.Count; i++)
-        // {
-        //     levelAbove[i].MoveIn();
-        // }
-
-        // for (int i = 0; i < levelBelow.Count; i++)
-        // {
-        //     levelBelow[i].MoveOut();
-        // }
     }
     
     public void ExitLevel()
@@ -98,38 +109,53 @@ public class LevelScript : MonoBehaviour
         if(!oppositeMovement)
         {
             this.MoveOut();
+            for (int i = 0; i < levelAbove.Count; i++)
+            {           
+                levelAbove[i].MoveIn();
+            }        
+            for (int i = 0; i < levelBelow.Count; i++)
+            {           
+                levelBelow[i].MoveIn();
+            }        
         }
         else
         {
             this.MoveIn();
+            for (int i = 0; i < levelAbove.Count; i++)
+            {           
+                levelAbove[i].MoveOut();
+            }        
+            for (int i = 0; i < levelBelow.Count; i++)
+            {           
+                levelBelow[i].MoveOut();
+            }        
         }    
-
-        isPlayerOnLevel = false;
     }
-    public void ExitBuilding()
+
+    public void ExitBuilding() //move levels to initial positions
     {
-        // for (int i = 0; i < levelAbove.Count; i++)
-        // {
-        //     levelAbove[i].MoveIn();
-        // }
+        for (int i = 0; i < levelAbove.Count; i++)
+        {
+            levelAbove[i].MoveUp();
+            levelAbove[i].MoveIn();
+        }
 
-        // for (int i = 0; i < levelBelow.Count; i++)
-        // {
-        //     levelBelow[i].MoveIn();
-        // }
+        for (int i = 0; i < levelAbove.Count; i++)
+        {
+            levelBelow[i].MoveUp();
+            levelBelow[i].MoveIn();
+        }
     }
-
-    private void MoveIn()
+    public void MoveIn()
     {
         if (currentMotionCoroutine != null)
         {
             StopCoroutine(currentMotionCoroutine);
         }
 
-        currentMotionCoroutine = StartCoroutine(Displace(false, this.gameObject, initialPosition));
+        currentMotionCoroutine = StartCoroutine(DisplaceAndDeSaturate(false, this.gameObject, initialPosition));
     }
-    
-    private void MoveOut()
+    public void MoveOut()
     {
         if (currentMotionCoroutine != null)
         {
@@ -137,7 +163,7 @@ public class LevelScript : MonoBehaviour
         }
 
         // Move the parent object down
-        currentMotionCoroutine = StartCoroutine(Displace(true, this.gameObject, initialPosition + new Vector3(roomWidthX, roomWidthX/Mathf.Cos(perspectiveAngle)*Mathf.Sin(perspectiveAngle), 0)));//, 1));
+        currentMotionCoroutine = StartCoroutine(DisplaceAndDeSaturate(true, this.gameObject, initialPosition + new Vector3(roomWidthX, roomWidthX/Mathf.Cos(perspectiveAngle)*Mathf.Sin(perspectiveAngle), 0)));
     }
 
     public void MoveUp()
@@ -147,7 +173,7 @@ public class LevelScript : MonoBehaviour
             StopCoroutine(currentMotionCoroutine);
         }
 
-        currentMotionCoroutine = StartCoroutine(Displace(false, this.gameObject, initialPosition));
+        currentMotionCoroutine = StartCoroutine(DisplaceAndDeSaturate(false, this.gameObject, initialPosition));
     }
     
     public void MoveDown()
@@ -158,14 +184,14 @@ public class LevelScript : MonoBehaviour
         }
 
         // Move the parent object down
-        currentMotionCoroutine = StartCoroutine(Displace(true, this.gameObject, initialPosition + new Vector3(0, -wallHeight, 0)));//, 1));
+        currentMotionCoroutine = StartCoroutine(DisplaceAndDeSaturate(true, this.gameObject, initialPosition + new Vector3(0, -wallHeight, 0)));
     }
 
-    private IEnumerator Displace(bool movingOut, GameObject obj, Vector3 targetPosition)
+    private IEnumerator DisplaceAndDeSaturate(bool movingOut, GameObject obj, Vector3 targetPosition)
     {
         Vector3 currentPosition = obj.transform.position;
 
-        float distance = (currentPosition - targetPosition).magnitude;
+        float displaceDistace = (currentPosition - targetPosition).magnitude;
 
         float timeToReachTarget = 0.5f;
 
@@ -200,9 +226,9 @@ public class LevelScript : MonoBehaviour
         {
             childColliders[i].position = childColliderInitialPositions[i]; // Ensure the object reaches the exact target position
         }
-        if(movingOut)
+        if(movingOut && displaceDistace != 0)
         {
-            SetSaturation(spriteList);
+            SetSaturationAndValue(spriteList);
 
             for (int i = 0; i < spriteList.Count; i++)
             {
@@ -218,7 +244,8 @@ public class LevelScript : MonoBehaviour
                     }
                 }
 
-            }            
+            }     
+            displaced = true;       
             yield return null;
         }
 
@@ -241,7 +268,7 @@ public class LevelScript : MonoBehaviour
                 }
 
             }   
-
+            displaced = false;
             yield return null;
         }
     }
@@ -298,19 +325,29 @@ public class LevelScript : MonoBehaviour
     //         SetTreeSaturation(child.gameObject, saturationAmount);
     //     }
     // }
-    void SetSaturation(List<GameObject> spriteList)
+    void SetSaturationAndValue(List<GameObject> spriteList)
     {
+        // Iterate through the list of GameObjects
         for (int i = 0; i < spriteList.Count; i++)
         {
             SpriteRenderer sr = spriteList[i].GetComponent<SpriteRenderer>();
 
+            // Get the current color
             Color color = sr.color;
 
-            // Convert the color to HSB
+            // Convert the current color to HSV
             Color.RGBToHSV(color, out float h, out float s, out float v);
 
-            s -= 0.5f;
-            v -= 0.5f;
+            // Check if saturation and value haven't been decreased yet
+            if (s > 0.5f)
+            {
+                s -= 0.5f;
+            }
+
+            if (v > 0.5f)
+            {
+                v -= 0.5f;
+            }
 
             // Convert back to RGB
             color = Color.HSVToRGB(h, s, v);
@@ -319,6 +356,7 @@ public class LevelScript : MonoBehaviour
             sr.color = color;
         }
     }
+
     // void SetAlpha(List<GameObject> spriteList)
     // {
     //     for (int i = 0; i < spriteList.Count; i++)

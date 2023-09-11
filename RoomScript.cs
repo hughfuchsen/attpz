@@ -7,7 +7,7 @@ public class RoomScript : MonoBehaviour
     public List<RoomScript> roomsSameOrAbove = new List<RoomScript>();
     public List<RoomScript> roomsBelow = new List<RoomScript>();
     private List<Transform> childColliders = new List<Transform>(); // Separate list for child colliders
-    public List<ThresholdColliderScript> doorsBelow = new List<ThresholdColliderScript>();
+    public List<RoomThresholdColliderScript> doorsBelow = new List<RoomThresholdColliderScript>();
     private List<Coroutine> doorsBelowCoros = new List<Coroutine>();
     private float doorBelowAlpha = 0.15f;
     public int wallHeight = 30;
@@ -72,7 +72,8 @@ public class RoomScript : MonoBehaviour
             doorsBelow[i].SetPlayerIsInRoomAbove(false);
         }
     }
-    public void ExitBuilding()
+    
+    public void ExitBuilding() //move rooms to initial positions
     {
         for (int i = 0; i < roomsSameOrAbove.Count; i++)
         {

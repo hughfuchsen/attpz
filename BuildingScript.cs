@@ -1,107 +1,141 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class BuildingScript : MonoBehaviour
 {
-    private List<GameObject> spriteList = new List<GameObject>();
-    private List<Color> initialColorList = new List<Color>();
-    private List<float> initialAlphaList = new List<float>();
+    public GameObject innerBuilding;
+    public GameObject outerBuilding;
+    private List<GameObject> innerBuildingSpriteList = new List<GameObject>();
+    private List<GameObject> outerBuildingSpriteList = new List<GameObject>();
+    private List<Color> innerBuildingInitialColorList = new List<Color>();
+    private List<Color> outerBuildingInitialColorList = new List<Color>();
+    private Coroutine innerBuildingFadeCoroutine;
+    private Coroutine outerBuildingFadeCoroutine;
+    private string[] tagsToExludeEntExt = { "OpenDoor", "AlphaZeroEntExt" };
 
 
-
+    
 
 
 
     // Start is called before the first frame update
     void Start()
     {
-        GetSprites(this.gameObject, spriteList, initialColorList, initialAlphaList);
+        innerBuilding.SetActive(true);
+        outerBuilding.SetActive(true);
+        GetSpritesAndAddToLists(innerBuilding, innerBuildingSpriteList, innerBuildingInitialColorList);
+        GetSpritesAndAddToLists(outerBuilding, outerBuildingSpriteList, outerBuildingInitialColorList);
+        TagChildrenOfTaggedParents("OpenDoor");
+        TagChildrenOfTaggedParents("ClosedDoor");
+        TagChildrenOfTaggedParents("AlphaZeroEntExt");
+        ExitBuilding();
     }
 
-    IEnumerator treeFadeSequence(
-        float waitTime,
-        GameObject objFirst,
-        float fadeFromFirst, 
-        float fadeToFirst,
-        GameObject objSecond,
-        float fadeFromSecond,
-        float fadeToSecond,
-        float buildingFadeSpeed,
-        string[] tagsToExclude = null) 
-        {
-            for (float t = 0.0f; t < 1; t += Time.deltaTime) 
-            {
-                float currentAlpha = Mathf.Lerp(fadeFromFirst, fadeToFirst, t * buildingFadeSpeed);
-                SetTreeAlpha(objFirst, currentAlpha, tagsToExclude);
-                // yield return null;
-            }
-
-            yield return new WaitForSeconds(waitTime);
-
-            for (float t = 0.0f; t < 1; t += Time.deltaTime) 
-            {
-                float currentAlpha = Mathf.Lerp(fadeFromSecond, fadeToSecond, t * buildingFadeSpeed);
-                SetTreeAlpha(objSecond, currentAlpha, tagsToExclude);
-                yield return null; 
-            }
-        }
-
-    // private void SetTreeAlpha(GameObject root, float alpha, string[] tagsToExclude = null)
-    // {
-    //     Stack<GameObject> stack = new Stack<GameObject>();
-    //     stack.Push(root);
-
-    //     while (stack.Count > 0)
-    //     {
-    //         GameObject currentNode = stack.Pop();
-    //         SpriteRenderer sr = currentNode.GetComponent<SpriteRenderer>();
-
-    //         if (sr != null && (tagsToExclude == null || !Array.Exists(tagsToExclude, element => element == root.tag)))
-    //         {
-    //             sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, alpha);
-    //         }
-
-    //         foreach (Transform child in currentNode.transform)
-    //         {
-    //             stack.Push(child.gameObject);
-    //         }
-    //     }
-    // }
-
-    void SetTreeAlpha(GameObject treeNode, float alpha, string[] tagsToExclude = null) 
+    public void EnterBuilding()
     {
-        if (treeNode == null) {
-            return; // TODO: remove this
-        }
-        SpriteRenderer sr = treeNode.GetComponent<SpriteRenderer>();
-        if (sr != null)
+        if(this.innerBuildingFadeCoroutine != null)
         {
-            sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, alpha);
+            StopCoroutine(this.innerBuildingFadeCoroutine);
         }
-        foreach (Transform child in treeNode.transform) 
+        if(this.outerBuildingFadeCoroutine != null)
         {
-            SetTreeAlpha(child.gameObject, alpha, tagsToExclude);
+            StopCoroutine(this.outerBuildingFadeCoroutine);
         }
-    } 
+        innerBuildingFadeCoroutine = StartCoroutine(Fade(false, innerBuildingSpriteList, innerBuildingInitialColorList, null, tagsToExludeEntExt));
+        outerBuildingFadeCoroutine = StartCoroutine(Fade(false, outerBuildingSpriteList, null, 0f));
+    }
+    public void ExitBuilding()
+    {
+        if(this.innerBuildingFadeCoroutine != null)
+        {
+            StopCoroutine(this.innerBuildingFadeCoroutine);
+        }
+        if(this.outerBuildingFadeCoroutine != null)
+        {
+            StopCoroutine(this.outerBuildingFadeCoroutine);
+        }
+        innerBuildingFadeCoroutine = StartCoroutine(Fade(false, innerBuildingSpriteList, null, 0f));
+        outerBuildingFadeCoroutine = StartCoroutine(Fade(false, outerBuildingSpriteList, outerBuildingInitialColorList, null, tagsToExludeEntExt));
+    }
+    public void GoBehindBuilding()
+    {
+        if(this.innerBuildingFadeCoroutine != null)
+        {
+            StopCoroutine(this.innerBuildingFadeCoroutine);
+        }
+        if(this.outerBuildingFadeCoroutine != null)
+        {
+            StopCoroutine(this.outerBuildingFadeCoroutine);
+        }
+        innerBuildingFadeCoroutine = StartCoroutine(Fade(true, innerBuildingSpriteList, null, 0f));
+        outerBuildingFadeCoroutine = StartCoroutine(Fade(false, outerBuildingSpriteList, null, 0.35f, tagsToExludeEntExt));
+    }
 
-    private void GetSprites(GameObject root, List<GameObject> spriteList, List<Color> colorList, List<float> floatList)
+
+
+
+    // coroutine for fading things in a sequence
+    public IEnumerator Fade(bool behindBuilding, List<GameObject> spriteList, List<Color> colorList, float? alpha, string[] tagsToExclude = null)
+    {
+        for (float t = 0.0f; t < 1; t += Time.deltaTime) 
+        {        
+            for (int i = 0; i < spriteList.Count; i++)
+            {
+                SpriteRenderer sr = spriteList[i].GetComponent<SpriteRenderer>();
+                Transform tr = spriteList[i].transform;
+                // Transform parentTransform = tr.parent;
+
+                if (sr != null && (tagsToExclude == null || !Array.Exists(tagsToExclude, element => element == spriteList[i].tag)))        
+                {
+                    if(colorList == null)
+                    {
+                        if(behindBuilding && sr.CompareTag("ClosedDoor") && tr.parent.GetComponentInChildren<BuildingThreshColliderScript>() != null)
+                        {
+                            float nextAlpha = Mathf.Lerp(sr.color.a, 0.35f, t * 7f);
+                            sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, nextAlpha);
+                        }
+                        else
+                        {
+                            float nextAlpha = Mathf.Lerp(sr.color.a, alpha.Value, t * 7f);
+                            sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, nextAlpha);
+                        }
+                    }
+                    else
+                    {
+                        float nextAlpha = Mathf.Lerp(sr.color.a, colorList[i].a, t * 7f);
+                        sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, nextAlpha);
+                        // sr.color = colorList[i];
+                    }    
+                }  
+            }   
+            yield return null;    
+        }
+
+    }
+
+
+
+
+
+
+
+    private void GetSpritesAndAddToLists(GameObject obj, List<GameObject> spriteList, List<Color> colorList)
     {
         Stack<GameObject> stack = new Stack<GameObject>();
-        stack.Push(root);
+        stack.Push(obj);
 
         while (stack.Count > 0)
         {
             GameObject currentNode = stack.Pop();
             SpriteRenderer sr = currentNode.GetComponent<SpriteRenderer>();
-            Color col = sr.color;
-            float alph = col.a;
 
             if (sr != null)
             {
+                Color col = sr.color;
                 spriteList.Add(currentNode);
                 colorList.Add(col);
-                floatList.Add(alph);
             }
 
             foreach (Transform child in currentNode.transform)
@@ -144,12 +178,6 @@ public class BuildingScript : MonoBehaviour
    
     }
 
-    bool CompareLayer(GameObject gameObject, string layerName)
-    {
-        int layerMask = LayerMask.GetMask(layerName);
-        return (gameObject.layer & layerMask) != 0;
-    }
-
     private GameObject FindSiblingWithTag(string tag) 
     {
         foreach (Transform child in this.gameObject.transform.parent)
@@ -160,6 +188,44 @@ public class BuildingScript : MonoBehaviour
             }
         }
         return null;
+    }
+
+    private void TagChildrenOfTaggedParents(string tag)
+    {
+        // for (int i = 0; i < spriteList.Count; i++)
+        // {
+            Transform tr = this.gameObject.transform;
+
+            Stack<Transform> stack = new Stack<Transform>();
+            stack.Push(tr);
+
+
+
+            while (stack.Count > 0)
+            {
+                Transform current = stack.Pop();
+
+                // Check if the current parent game object has the specified tag
+                if (current.CompareTag(tag))
+                {
+                    // Tag the children of the current parent game object with the specified tag
+                    foreach (Transform child in current)
+                    {
+                        if (child.gameObject.CompareTag("Untagged") || child.GetComponent<SpriteRenderer>() != null)
+                        {
+                            child.gameObject.tag = tag;
+                        }
+                    }
+                }
+
+                // Push the children of the current parent game object to the stack
+                for (int j = 0; j < current.childCount; j++)
+                {
+                    stack.Push(current.GetChild(j));
+                }
+            }              
+              
+        // }   
     }
 
 }

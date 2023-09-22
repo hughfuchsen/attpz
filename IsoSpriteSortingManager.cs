@@ -124,6 +124,10 @@ public class IsoSpriteSortingManager : Singleton<IsoSpriteSortingManager>
         for (int i = 0; i < moveableCount; i++)
         {
             IsoSpriteSorting moveSprite1 = moveableList[i];
+            if(moveSprite1.dontSort)
+            {
+                continue;
+            }
             //Add Moving Dependencies to static sprites
             for (int j = 0; j < staticCount; j++)
             {
@@ -144,15 +148,19 @@ public class IsoSpriteSortingManager : Singleton<IsoSpriteSortingManager>
             //Add Moving Dependencies to Moving Sprites
             for (int j = 0; j < moveableCount; j++)
             {
-                IsoSpriteSorting moveSprite2 = moveableList[j];
-                if (CalculateBoundsIntersection(moveSprite1, moveSprite2))
-                {
-                    int compareResult = IsoSpriteSorting.CompareIsoSorters(moveSprite1, moveSprite2);
-                    if (compareResult == -1)
+                    IsoSpriteSorting moveSprite2 = moveableList[j];
+                    if(moveSprite2.dontSort)
                     {
-                        moveSprite2.movingDependencies.Add(moveSprite1);
+                        continue;
                     }
-                }
+                    if (CalculateBoundsIntersection(moveSprite1, moveSprite2))
+                    {
+                        int compareResult = IsoSpriteSorting.CompareIsoSorters(moveSprite1, moveSprite2);
+                        if (compareResult == -1)
+                        {
+                            moveSprite2.movingDependencies.Add(moveSprite1);
+                        }
+                    }
             }
         }
     }

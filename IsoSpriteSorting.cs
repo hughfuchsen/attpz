@@ -9,6 +9,7 @@ public class IsoSpriteSorting : MonoBehaviour
     public bool isMovable;
     public bool renderBelowAll;
 
+
     [NonSerialized]
     public bool registered = false;
     [NonSerialized]
@@ -22,6 +23,8 @@ public class IsoSpriteSorting : MonoBehaviour
     public readonly List<IsoSpriteSorting> movingDependencies = new List<IsoSpriteSorting>(8);
 
     private readonly List<IsoSpriteSorting> visibleStaticDependencies = new List<IsoSpriteSorting>(16);
+
+    public bool dontSort;
 
     private int visibleStaticLastRefreshFrame = 0;
     public List<IsoSpriteSorting> VisibleStaticDependencies

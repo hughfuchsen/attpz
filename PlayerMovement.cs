@@ -16,7 +16,7 @@ public class PlayerMovement : MonoBehaviour
     public bool fixedDirectionLeft;
     public bool fixedDirectionRight;
     
-    public bool isPlayerInside;
+    public bool isPlayerInside = false;
 
 
     void Animate() {

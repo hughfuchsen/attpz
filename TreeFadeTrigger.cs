@@ -5,14 +5,14 @@ using UnityEngine;
 public class TreeFadeTrigger : MonoBehaviour
 
 {
-  public GameObject gameObject;
+  public GameObject obj;
   public float fadeSpeed = 10;
   public float alpha = 0.15f;
   private Coroutine fadeCoro;
 
   void Start()
   {
-    if (gameObject != null)
+    if (obj != null)
     {
       setTreeAlpha(gameObject, 1);
     }
@@ -25,7 +25,7 @@ public class TreeFadeTrigger : MonoBehaviour
         StopCoroutine(fadeCoro);
     }   
 
-    fadeCoro = StartCoroutine(treeFade(gameObject, 1, alpha, fadeSpeed));
+    fadeCoro = StartCoroutine(treeFade(obj, 1, alpha, fadeSpeed));
   }
   void OnTriggerExit2D()
   {
@@ -34,7 +34,7 @@ public class TreeFadeTrigger : MonoBehaviour
         StopCoroutine(fadeCoro);
     }   
 
-    fadeCoro = StartCoroutine(treeFade(gameObject, alpha, 1, fadeSpeed));
+    fadeCoro = StartCoroutine(treeFade(obj, alpha, 1, fadeSpeed));
   }
 
 

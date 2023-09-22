@@ -5,8 +5,8 @@ using UnityEngine;
 public class LevelScript : MonoBehaviour
 {
     private float perspectiveAngle = Mathf.Atan(0.5f);
-    public List<LevelScript> levelAbove = new List<LevelScript>();
-    public List<LevelScript> levelBelow = new List<LevelScript>();
+    public List<LevelScript> levelsAbove = new List<LevelScript>();
+    public List<LevelScript> levelsBelow = new List<LevelScript>();
     private List<Transform> childColliders = new List<Transform>(); // Separate list for child colliders
     public int roomWidthX = 30;
     public int wallHeight = 31;
@@ -76,95 +76,106 @@ public class LevelScript : MonoBehaviour
         }
     }
 
-    public void EnterLevel()
+    public void EnterLevel(bool shouldMoveDown)
     {
-        if(!oppositeMovement)
-        {
-            this.MoveIn();
-            for (int i = 0; i < levelAbove.Count; i++)
-            {           
-                levelAbove[i].MoveIn();
+            this.MoveIn(false, null);
+            if(levelsAbove != null)
+            {
+                for (int i = 0; i < levelsAbove.Count; i++)
+                {           
+                    levelsAbove[i].MoveOut(true, 1f);
+                }
             }
-            for (int i = 0; i < levelBelow.Count; i++)
-            {           
-                levelBelow[i].MoveIn();
+            if(levelsBelow != null)
+            {      
+                if(shouldMoveDown)
+                {      
+                    for (int i = 0; i < levelsBelow.Count; i++)
+                    {           
+                        levelsBelow[i].MoveDown(true, 1f);
+                    }
+                }
             }
-        }
-        else
-        {
-            this.MoveOut();
-            for (int i = 0; i < levelAbove.Count; i++)
-            {           
-                levelAbove[i].MoveOut();
-            }        
-            for (int i = 0; i < levelBelow.Count; i++)
-            {           
-                levelBelow[i].MoveOut();
-            }        
-        }
     }
     
-    public void ExitLevel()
-    {
-        if(!oppositeMovement)
-        {
-            this.MoveOut();
-            for (int i = 0; i < levelAbove.Count; i++)
-            {           
-                levelAbove[i].MoveIn();
-            }        
-            for (int i = 0; i < levelBelow.Count; i++)
-            {           
-                levelBelow[i].MoveIn();
-            }        
-        }
-        else
-        {
-            this.MoveIn();
-            for (int i = 0; i < levelAbove.Count; i++)
-            {           
-                levelAbove[i].MoveOut();
-            }        
-            for (int i = 0; i < levelBelow.Count; i++)
-            {           
-                levelBelow[i].MoveOut();
-            }        
-        }    
-    }
+    // public void ExitLevel()
+    // {
+    //     if(!groundFloor)
+    //     {
+    //         this.MoveOut();       
+    //     }
+    //     else
+    //     // else
+    //     // {
+    //     //     this.MoveIn();
+    //     //     for (int i = 0; i < levelsAbove.Count; i++)
+    //     //     {           
+    //     //         levelsAbove[i].MoveOut();
+    //     //     }        
+    //     //     for (int i = 0; i < levelsBelow.Count; i++)
+    //     //     {           
+    //     //         levelsBelow[i].MoveOut();
+    //     //     }        
+    //     // }    
+    // }
 
     public void ExitBuilding() //move levels to initial positions
     {
-        for (int i = 0; i < levelAbove.Count; i++)
+
+        if(levelsAbove != null)
         {
-            levelAbove[i].MoveUp();
-            levelAbove[i].MoveIn();
+            for (int i = 0; i < levelsAbove.Count; i++)
+            {           
+                levelsAbove[i].MoveUp();
+                levelsAbove[i].MoveIn(false, null);
+            }
+        }
+        if(levelsBelow != null)
+        {            
+            for (int i = 0; i < levelsBelow.Count; i++)
+            {           
+                levelsBelow[i].MoveUp();
+                levelsBelow[i].MoveIn(false, null);            
+            }
         }
 
-        for (int i = 0; i < levelAbove.Count; i++)
-        {
-            levelBelow[i].MoveUp();
-            levelBelow[i].MoveIn();
-        }
+        this.MoveUp();
+        this.MoveIn(false, null);
     }
-    public void MoveIn()
+    public void MoveIn(bool shouldWait, float? waitTime)
     {
         if (currentMotionCoroutine != null)
         {
             StopCoroutine(currentMotionCoroutine);
         }
 
-        currentMotionCoroutine = StartCoroutine(DisplaceAndDeSaturate(false, this.gameObject, initialPosition));
+        if (waitTime.HasValue) // Check if waitTime has a value
+        {
+            currentMotionCoroutine = StartCoroutine(DisplaceAndDeSaturate(shouldWait, waitTime.Value, false, this.gameObject, initialPosition));
+        }
+        else
+        {
+            currentMotionCoroutine = StartCoroutine(DisplaceAndDeSaturate(shouldWait, 0f, false, this.gameObject, initialPosition)); // Default to 0 if waitTime is not specified
+        }
     }
-    public void MoveOut()
+
+    public void MoveOut(bool shouldWait, float? waitTime)
     {
         if (currentMotionCoroutine != null)
         {
             StopCoroutine(currentMotionCoroutine);
         }
 
-        // Move the parent object down
-        currentMotionCoroutine = StartCoroutine(DisplaceAndDeSaturate(true, this.gameObject, initialPosition + new Vector3(roomWidthX, roomWidthX/Mathf.Cos(perspectiveAngle)*Mathf.Sin(perspectiveAngle), 0)));
+        if (waitTime.HasValue) // Check if waitTime has a value
+        {
+            currentMotionCoroutine = StartCoroutine(DisplaceAndDeSaturate(shouldWait, waitTime.Value, true, this.gameObject, initialPosition + new Vector3(roomWidthX, roomWidthX/Mathf.Cos(perspectiveAngle)*Mathf.Sin(perspectiveAngle), 0)));
+        }
+        else
+        {
+            currentMotionCoroutine = StartCoroutine(DisplaceAndDeSaturate(shouldWait, 0f, true, this.gameObject, initialPosition + new Vector3(roomWidthX, roomWidthX/Mathf.Cos(perspectiveAngle)*Mathf.Sin(perspectiveAngle), 0))); // Default to 0 if waitTime is not specified
+        }
     }
+
 
     public void MoveUp()
     {
@@ -173,21 +184,27 @@ public class LevelScript : MonoBehaviour
             StopCoroutine(currentMotionCoroutine);
         }
 
-        currentMotionCoroutine = StartCoroutine(DisplaceAndDeSaturate(false, this.gameObject, initialPosition));
+        currentMotionCoroutine = StartCoroutine(DisplaceAndDeSaturate(false, null, false, this.gameObject, initialPosition));
     }
     
-    public void MoveDown()
+    public void MoveDown(bool shouldWait, float? waitTime)
     {
         if (currentMotionCoroutine != null)
         {
             StopCoroutine(currentMotionCoroutine);
         }
-
+        if (waitTime.HasValue) // Check if waitTime has a value
+        {
+            currentMotionCoroutine = StartCoroutine(DisplaceAndDeSaturate(shouldWait, waitTime.Value, true, this.gameObject, initialPosition + new Vector3(0, -wallHeight, 0)));
+        }
+        else
+        {
+            currentMotionCoroutine = StartCoroutine(DisplaceAndDeSaturate(false, 0f, true, this.gameObject, initialPosition + new Vector3(0, -wallHeight, 0)));
+        }
         // Move the parent object down
-        currentMotionCoroutine = StartCoroutine(DisplaceAndDeSaturate(true, this.gameObject, initialPosition + new Vector3(0, -wallHeight, 0)));
     }
 
-    private IEnumerator DisplaceAndDeSaturate(bool movingOut, GameObject obj, Vector3 targetPosition)
+    private IEnumerator DisplaceAndDeSaturate(bool shouldWait, float? waitTime, bool movingOut, GameObject obj, Vector3 targetPosition)
     {
         Vector3 currentPosition = obj.transform.position;
 
@@ -197,7 +214,11 @@ public class LevelScript : MonoBehaviour
 
         float elapsedTime = 0f;
 
-        
+        if(shouldWait)
+        {
+            yield return new WaitForSeconds(waitTime.Value);
+        }
+
         while (elapsedTime < timeToReachTarget)
         {
             elapsedTime += Time.deltaTime;
@@ -339,15 +360,17 @@ public class LevelScript : MonoBehaviour
             Color.RGBToHSV(color, out float h, out float s, out float v);
 
             // Check if saturation and value haven't been decreased yet
-            if (s > 0.5f)
+            h = 60f/360f;
+            if (s > s/1.5f)
             {
-                s -= 0.5f;
+                s -= s/1.5f;
             }
 
-            if (v > 0.5f)
+            if (v > v/1.5f)
             {
-                v -= 0.5f;
+                v -= v/1.5f;
             }
+    
 
             // Convert back to RGB
             color = Color.HSVToRGB(h, s, v);

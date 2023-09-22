@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class BuildingThreshColliderScript : MonoBehaviour
 {
-    public BuildingScript bulding;
+    public BuildingScript building;
     PlayerMovement playerMovement;
     [SerializeField] GameObject Player;
     private bool aboveCollider;
@@ -33,13 +33,13 @@ public class BuildingThreshColliderScript : MonoBehaviour
         {
             if (playerMovement.isPlayerInside && !aboveCollider)
                 {
-                    bulding.GoBehindBuilding();
-                   
+                    building.GoBehindBuilding();
+                    
                     playerMovement.isPlayerInside = false;
                 }
                 else if (!aboveCollider)
                 {
-                    bulding.EnterBuilding();
+                    building.EnterBuilding();
 
                     playerMovement.isPlayerInside = true;
                 }
@@ -49,13 +49,13 @@ public class BuildingThreshColliderScript : MonoBehaviour
         {
                 if (playerMovement.isPlayerInside && aboveCollider)
                 {                    
-                    bulding.ExitBuilding();
+                    building.ExitBuilding();
 
                     playerMovement.isPlayerInside = false;          
                 }
                 else if (aboveCollider)
                 {
-                    bulding.EnterBuilding();
+                    building.EnterBuilding();
 
                     playerMovement.isPlayerInside = true;
                 }

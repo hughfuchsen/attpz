@@ -45,9 +45,22 @@ public class RoomScript : MonoBehaviour
             }
         }
     }
+// public void EnterRoom(bool shouldWait, float? waitTime)
+// {
+//     // ...
+//     if (waitTime.HasValue)
+//     {
+//         roomsBelow[i].MoveDown(shouldWait, waitTime.Value);
+//     }
+//     else
+//     {
+//         // Handle the case where waitTime is null
+//         // You might want to add some default behavior or log an error here.
+//     }
+//     // ...
+// }
 
-
-    public void EnterRoom()
+    public void EnterRoom(bool shouldWait, float? waitTime)
     {
         for (int i = 0; i < roomsSameOrAbove.Count; i++)
         {
@@ -56,7 +69,15 @@ public class RoomScript : MonoBehaviour
 
         for (int i = 0; i < roomsBelow.Count; i++)
         {
-            roomsBelow[i].MoveDown();
+            if (waitTime.HasValue)
+            {
+                roomsBelow[i].MoveDown(shouldWait, waitTime.Value);
+            }
+            else
+            {
+                roomsBelow[i].MoveDown(false, 0f);
+                Debug.Log("baddy");
+            }        
         }
 
         for (int i = 0; i < doorsBelow.Count; i++)
@@ -93,21 +114,30 @@ public class RoomScript : MonoBehaviour
             StopCoroutine(currentMotionCoroutine);
         }
 
-        currentMotionCoroutine = StartCoroutine(Displace(this.gameObject, initialPosition));
+        currentMotionCoroutine = StartCoroutine(Displace(false, null, this.gameObject, initialPosition));
     }
     
-    private void MoveDown()
+    public void MoveDown(bool shouldWait, float? waitTime)
     {
         if (currentMotionCoroutine != null)
         {
             StopCoroutine(currentMotionCoroutine);
         }
 
-        // Move the parent object down
-        currentMotionCoroutine = StartCoroutine(Displace(this.gameObject, initialPosition + new Vector3(0, -wallHeight, 0)));//, 1));
+        if (waitTime.HasValue)
+        {
+            // Move the parent object down
+            currentMotionCoroutine = StartCoroutine(Displace(shouldWait, waitTime.Value, this.gameObject, initialPosition + new Vector3(0, -wallHeight, 0)));//, 1));
+        }
+        else
+        {
+            // Handle the case where waitTime is null (optional)
+            // Debug.LogError("waitTime is null. You should handle this case appropriately.");
+        }
     }
 
-    private IEnumerator Displace(GameObject obj, Vector3 targetPosition)
+
+    IEnumerator Displace(bool shouldWait, float? waitTime, GameObject obj, Vector3 targetPosition)
     {
         Vector3 currentPosition = obj.transform.position;
 
@@ -116,6 +146,11 @@ public class RoomScript : MonoBehaviour
         float timeToReachTarget = 0.5f;
 
         float elapsedTime = 0f;
+
+        if(shouldWait)
+        {
+            yield return new WaitForSeconds(waitTime.Value);
+        }
         
         while (elapsedTime < timeToReachTarget)
         {

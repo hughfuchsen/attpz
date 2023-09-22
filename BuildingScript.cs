@@ -11,6 +11,9 @@ public class BuildingScript : MonoBehaviour
     private List<GameObject> outerBuildingSpriteList = new List<GameObject>();
     private List<Color> innerBuildingInitialColorList = new List<Color>();
     private List<Color> outerBuildingInitialColorList = new List<Color>();
+    private List<IsoSpriteSorting> innerSpriteSortingScriptObj = new List<IsoSpriteSorting>();
+    private List<IsoSpriteSorting> outerSpriteSortingScriptObj = new List<IsoSpriteSorting>();
+
     private Coroutine innerBuildingFadeCoroutine;
     private Coroutine outerBuildingFadeCoroutine;
     private string[] tagsToExludeEntExt = { "OpenDoor", "AlphaZeroEntExt" };
@@ -27,6 +30,8 @@ public class BuildingScript : MonoBehaviour
         outerBuilding.SetActive(true);
         GetSpritesAndAddToLists(innerBuilding, innerBuildingSpriteList, innerBuildingInitialColorList);
         GetSpritesAndAddToLists(outerBuilding, outerBuildingSpriteList, outerBuildingInitialColorList);
+        GetIsoSpriteSortComponentsAndAddToLists(innerBuilding, innerSpriteSortingScriptObj);
+        GetIsoSpriteSortComponentsAndAddToLists(outerBuilding, outerSpriteSortingScriptObj);
         TagChildrenOfTaggedParents("OpenDoor");
         TagChildrenOfTaggedParents("ClosedDoor");
         TagChildrenOfTaggedParents("AlphaZeroEntExt");
@@ -43,8 +48,12 @@ public class BuildingScript : MonoBehaviour
         {
             StopCoroutine(this.outerBuildingFadeCoroutine);
         }
-        innerBuildingFadeCoroutine = StartCoroutine(Fade(false, innerBuildingSpriteList, innerBuildingInitialColorList, null, tagsToExludeEntExt));
-        outerBuildingFadeCoroutine = StartCoroutine(Fade(false, outerBuildingSpriteList, null, 0f));
+        // innerBuildingFadeCoroutine = StartCoroutine(FadeThenSetDontSort(innerSpriteSortingScriptObj, false, false, 0f, false, innerBuildingSpriteList, innerBuildingInitialColorList, null, tagsToExludeEntExt));
+        // outerBuildingFadeCoroutine = StartCoroutine(FadeThenSetDontSort(outerSpriteSortingScriptObj, true, false, 0f, false, outerBuildingSpriteList, null, 0f));
+        innerBuildingFadeCoroutine = StartCoroutine(Fade(false, null, false, innerBuildingSpriteList, innerBuildingInitialColorList, null, tagsToExludeEntExt));
+        outerBuildingFadeCoroutine = StartCoroutine(Fade(false, null, false, outerBuildingSpriteList, null, 0f));
+        // SetDontSort(innerSpriteSortingScriptObj, false);
+        // SetDontSort(outerSpriteSortingScriptObj, true);
     }
     public void ExitBuilding()
     {
@@ -56,8 +65,12 @@ public class BuildingScript : MonoBehaviour
         {
             StopCoroutine(this.outerBuildingFadeCoroutine);
         }
-        innerBuildingFadeCoroutine = StartCoroutine(Fade(false, innerBuildingSpriteList, null, 0f));
-        outerBuildingFadeCoroutine = StartCoroutine(Fade(false, outerBuildingSpriteList, outerBuildingInitialColorList, null, tagsToExludeEntExt));
+        // innerBuildingFadeCoroutine = StartCoroutine(FadeThenSetDontSort(innerSpriteSortingScriptObj, true, true, 1f, false, innerBuildingSpriteList, null, 0f));
+        // outerBuildingFadeCoroutine = StartCoroutine(FadeThenSetDontSort(outerSpriteSortingScriptObj, false, true, 1f, false, outerBuildingSpriteList, outerBuildingInitialColorList, null, tagsToExludeEntExt));
+        innerBuildingFadeCoroutine = StartCoroutine(Fade(true, 1f, false, innerBuildingSpriteList, null, 0f));
+        outerBuildingFadeCoroutine = StartCoroutine(Fade(true, 1f, false, outerBuildingSpriteList, outerBuildingInitialColorList, null, tagsToExludeEntExt));
+        // SetDontSort(innerSpriteSortingScriptObj, true);
+        // SetDontSort(outerSpriteSortingScriptObj, false);
     }
     public void GoBehindBuilding()
     {
@@ -69,16 +82,22 @@ public class BuildingScript : MonoBehaviour
         {
             StopCoroutine(this.outerBuildingFadeCoroutine);
         }
-        innerBuildingFadeCoroutine = StartCoroutine(Fade(true, innerBuildingSpriteList, null, 0f));
-        outerBuildingFadeCoroutine = StartCoroutine(Fade(false, outerBuildingSpriteList, null, 0.35f, tagsToExludeEntExt));
+        innerBuildingFadeCoroutine = StartCoroutine(Fade(true, 1f, true, innerBuildingSpriteList, null, 0f));
+        outerBuildingFadeCoroutine = StartCoroutine(Fade(true, 1f, false, outerBuildingSpriteList, null, 0.35f, tagsToExludeEntExt));
+        
     }
 
 
 
 
     // coroutine for fading things in a sequence
-    public IEnumerator Fade(bool behindBuilding, List<GameObject> spriteList, List<Color> colorList, float? alpha, string[] tagsToExclude = null)
+    public IEnumerator Fade(bool shouldWait, float? waitTime, bool behindBuilding, List<GameObject> spriteList, List<Color> colorList, float? alpha, string[] tagsToExclude = null)
     {
+        if (shouldWait && waitTime.HasValue) // Check if waitTime has a value
+        {
+            yield return new WaitForSeconds(waitTime.Value);
+        }
+
         for (float t = 0.0f; t < 1; t += Time.deltaTime) 
         {        
             for (int i = 0; i < spriteList.Count; i++)
@@ -98,8 +117,11 @@ public class BuildingScript : MonoBehaviour
                         }
                         else
                         {
-                            float nextAlpha = Mathf.Lerp(sr.color.a, alpha.Value, t * 7f);
-                            sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, nextAlpha);
+                            if (alpha.HasValue)
+                            {
+                                float nextAlpha = Mathf.Lerp(sr.color.a, alpha.Value, t * 7f);
+                                sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, nextAlpha);
+                            }
                         }
                     }
                     else
@@ -114,6 +136,24 @@ public class BuildingScript : MonoBehaviour
         }
 
     }
+
+
+    // private IEnumerator FadeThenSetDontSort
+    //                                         ( 
+    //                                         List<IsoSpriteSorting> issList, 
+    //                                         bool setDontSort, bool shouldWait, 
+    //                                         float? waitTime, 
+    //                                         bool behindBuilding, 
+    //                                         List<GameObject> spriteList, 
+    //                                         List<Color> colorList, 
+    //                                         float? alpha, 
+    //                                         string[] tagsToExclude = null
+    //                                         )
+    // {
+    //     Fade(shouldWait, waitTime.Value, behindBuilding, spriteList, colorList, alpha, tagsToExclude);
+    //     SetDontSort(issList, setDontSort);
+    //     yield return null;
+    // }
 
 
 
@@ -144,6 +184,38 @@ public class BuildingScript : MonoBehaviour
             }
         }
     }
+    private void GetIsoSpriteSortComponentsAndAddToLists(GameObject obj, List<IsoSpriteSorting> objList)
+    {
+        Stack<GameObject> stack = new Stack<GameObject>();
+        stack.Push(obj);
+
+        while (stack.Count > 0)
+        {
+            GameObject currentNode = stack.Pop();
+            IsoSpriteSorting iss = currentNode.GetComponent<IsoSpriteSorting>();
+
+            if (iss != null)
+            {
+                objList.Add(iss);
+            }
+
+            foreach (Transform child in currentNode.transform)
+            {
+                stack.Push(child.gameObject);
+            }
+        }
+    }
+
+    private void SetDontSort(List<IsoSpriteSorting> objList, bool dontSort)
+    {
+        for (int i = 0; i < objList.Count; i++)
+        {
+            objList[i].dontSort = dontSort;
+        }
+    }
+
+
+
 
     private void ClosedDoorExternalVisibility()
     {

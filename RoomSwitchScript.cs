@@ -9,12 +9,12 @@ public class RoomSwitchScript : MonoBehaviour
 
     void OnTriggerEnter2D()
     {
-        roomAbove.EnterRoom();
+        roomAbove.EnterRoom(false, 0f);
         roomBelow.ExitRoom();
     }
     void OnTriggerExit2D()
     {
         roomAbove.ExitRoom();
-        roomBelow.EnterRoom();
+        roomBelow.EnterRoom(false, 0f);
     }
 }

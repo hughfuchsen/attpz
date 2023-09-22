@@ -75,7 +75,7 @@ public class RoomThresholdColliderScript : MonoBehaviour
 
     void OnTriggerEnter2D()
     {
-        initialSortingLayer = Player.GetComponent<SpriteRenderer>().sortingLayerName;
+        // initialSortingLayer = Player.GetComponent<SpriteRenderer>().sortingLayerName;
 
 
         if (thresholdSortingSequenceCoro != null)
@@ -111,6 +111,8 @@ public class RoomThresholdColliderScript : MonoBehaviour
 
     void OnTriggerExit2D()
     {
+            // initialSortingLayer = Player.GetComponent<SpriteRenderer>().sortingLayerName;
+
             playerMovement.fixedDirectionLeft = false;
             playerMovement.fixedDirectionRight = false;
 
@@ -140,12 +142,12 @@ public class RoomThresholdColliderScript : MonoBehaviour
             }
             if (roomAbove != null)
             {
-                roomAbove.EnterRoom();
+                roomAbove.EnterRoom(false, 0f);
             }
 
-            if (building != null)
+            if (this.transform.parent.GetComponentInChildren<BuildingThreshColliderScript>() != null)
             {
-                if (playerMovement.isPlayerInside && !aboveCollider)
+                if (!playerMovement.isPlayerInside && !aboveCollider)
                 {
                     //need to make exit building 0.35f here - for back of the building
                     // building.ExitBuilding();
@@ -171,24 +173,18 @@ public class RoomThresholdColliderScript : MonoBehaviour
             //ON EXIT CROSSING DOWN
         else
         {
+            // initialSortingLayer = Player.GetComponent<SpriteRenderer>().sortingLayerName;
+
             if (roomAbove != null)
             {
                 roomAbove.ExitRoom();
             }
 
-            if (roomBelow != null)
-            {
-                roomBelow.EnterRoom();
 
-                if (aboveCollider && playerMovement.isPlayerInside)
-                {
-                    thresholdSortingSequenceCoro = StartCoroutine(ThresholdLayerSortingSequence(0.5f, Player, "ThresholdSequence"));
-                }
-            } 
             
-            if (building != null)
+            if (this.transform.parent.GetComponentInChildren<BuildingThreshColliderScript>() != null)
             {
-                if (playerMovement.isPlayerInside && aboveCollider)
+                if (!playerMovement.isPlayerInside && aboveCollider)
                 {                    
                     // building.ExitBuilding();
 
@@ -200,14 +196,25 @@ public class RoomThresholdColliderScript : MonoBehaviour
                         roomBelow.ExitBuilding();
                     }                
                 }
-                else if (aboveCollider)
+                else if (playerMovement.isPlayerInside && aboveCollider)
                 {
-                    // building.EnterBuilding();
-
-                    // playerMovement.isPlayerInside = true;
+                    if (roomBelow != null)
+                    {
+                        roomBelow.EnterRoom(true, 1f);
+                    }     
                 }
             }
-            
+            else if (roomBelow != null)
+            {
+                roomBelow.EnterRoom(false, 0f);
+
+                if (aboveCollider && playerMovement.isPlayerInside)
+                {
+                    initialSortingLayer = Player.GetComponent<SpriteRenderer>().sortingLayerName;
+
+                    thresholdSortingSequenceCoro = StartCoroutine(ThresholdLayerSortingSequence(0.5f, Player, "ThresholdSequence"));
+                }
+            }             
             aboveCollider = false;
 
         }

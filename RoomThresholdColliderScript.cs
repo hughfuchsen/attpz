@@ -15,7 +15,7 @@ public class RoomThresholdColliderScript : MonoBehaviour
     public BuildingScript building;
     public RoomScript roomAbove;
     public RoomScript roomBelow;
-    LevelColliderScript levelColliderScript;
+    LevelThreshColliderScript levelThreshColliderScript;
     PlayerMovement playerMovement;
     [SerializeField] GameObject Player;
     private bool aboveCollider;
@@ -157,7 +157,7 @@ public class RoomThresholdColliderScript : MonoBehaviour
                     //need to optimise
                     if (roomBelow != null || roomAbove == null)
                     {
-                        roomBelow.ExitBuilding();
+                        roomBelow.ExitRooms();
                     }  
                 }
                 else if (!aboveCollider)
@@ -182,7 +182,8 @@ public class RoomThresholdColliderScript : MonoBehaviour
 
 
             
-            if (this.transform.parent.GetComponentInChildren<BuildingThreshColliderScript>() != null)
+            if ((this.transform.parent.GetComponentInChildren<BuildingThreshColliderScript>() != null)
+                || this.transform.parent.GetComponentInChildren<LevelThreshColliderScript>() !=null)
             {
                 if (!playerMovement.isPlayerInside && aboveCollider)
                 {                    
@@ -193,7 +194,7 @@ public class RoomThresholdColliderScript : MonoBehaviour
                     //need to optimise
                     if (roomBelow != null)
                     {
-                        roomBelow.ExitBuilding();
+                        roomBelow.ExitRooms();
                     }                
                 }
                 else if (playerMovement.isPlayerInside && aboveCollider)

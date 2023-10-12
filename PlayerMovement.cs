@@ -434,58 +434,16 @@ public class PlayerMovement : MonoBehaviour
     { 
       if(!fixedDirectionLeft && !fixedDirectionRight)
       {
-        if (change == Vector3.right+Vector3.up)
-        {
-        change = new Vector3(1f,0.5f,0f);
+        if (change == Vector3.right+Vector3.up)   { change = new Vector3(1f,0.5f,0f); }
+        if (change == Vector3.left+Vector3.up)    { change = new Vector3(-1f,0.5f,0f); }
+        if (change == Vector3.up)                 { change = new Vector3(-1f,0.5f,0f); }
+        if (change == Vector3.right)              { change = new Vector3(1f,0.5f,0f); }
+        if (change == Vector3.right+Vector3.down) { change = new Vector3(1f,-0.5f,0f); }
+        if (change == Vector3.left+Vector3.down)  { change = new Vector3(-1f,-0.5f,0f); }
+        if (change == Vector3.down)               { change = new Vector3(1f,-0.5f,0f); }
+        if (change == Vector3.left)               { change = new Vector3(-1f,-0.5f,0f); }
         myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
         Animate();
-        }
-        if (change == Vector3.left+Vector3.up)
-        {
-        change = new Vector3(-1f,0.5f,0f);
-        myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
-        Animate();
-        }
-        if (change == Vector3.up)
-        {
-        change = new Vector3(-1f,0.5f,0f);
-        myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
-        Animate();
-        }
-        if (change == Vector3.right)
-        {
-        change = new Vector3(1f,0.5f,0f);
-        myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
-        Animate();
-        }
-        if (change == Vector3.right+Vector3.down)
-        {
-        change = new Vector3(1f,-0.5f,0f);
-        myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
-        Animate();
-        }
-        if (change == Vector3.left+Vector3.down)
-        {
-        change = new Vector3(-1f,-0.5f,0f);
-        myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
-        Animate();
-        }
-        if (change == Vector3.down)
-        {
-        change = new Vector3(1f,-0.5f,0f);
-        myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
-        Animate();
-        }
-        if (change == Vector3.left)
-        {
-        change = new Vector3(-1f,-0.5f,0f);
-        myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
-        Animate();
-        }
-        else
-        {
-        myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
-        }
       }
       else if(fixedDirectionLeft)
       {

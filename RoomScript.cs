@@ -94,7 +94,7 @@ public class RoomScript : MonoBehaviour
         }
     }
     
-    public void ExitBuilding() //move rooms to initial positions
+    public void ExitRooms() //move rooms to initial positions
     {
         for (int i = 0; i < roomsSameOrAbove.Count; i++)
         {

@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LevelColliderScript : MonoBehaviour
+public class LevelThreshColliderScript : MonoBehaviour
 {
     PlayerMovement playerMovement;
     [SerializeField] GameObject Player;
@@ -12,6 +12,7 @@ public class LevelColliderScript : MonoBehaviour
     public LevelScript levelBelow;
     public bool levelAboveMove;
     public bool levelThreshold;
+    public bool fixedMovement;
     private bool aboveCollider;
     
     // Start is called before the first frame update
@@ -32,9 +33,22 @@ public class LevelColliderScript : MonoBehaviour
         {
             aboveCollider = true;
         }
+
+        if((isPlayerCrossingUp() && isPlayerCrossingLeft()) 
+        || !isPlayerCrossingUp() && !isPlayerCrossingLeft())
+        {
+            playerMovement.fixedDirectionLeft = true;
+        }
+        else
+        {
+            playerMovement.fixedDirectionRight = true;
+        }
     }
     private void OnTriggerExit2D()
     {
+        playerMovement.fixedDirectionLeft = false;
+        playerMovement.fixedDirectionRight = false;        
+        
         if(isPlayerCrossingUp())
         {
             if(this.transform.parent.GetComponentInChildren<BuildingThreshColliderScript>() != null && !aboveCollider && !playerMovement.isPlayerInside)
@@ -55,7 +69,6 @@ public class LevelColliderScript : MonoBehaviour
             }
             else if(this.transform.parent.GetComponentInChildren<BuildingThreshColliderScript>() != null && !aboveCollider && playerMovement.isPlayerInside)
             {
-                Debug.Log("player baby");
                 // insert only the level you are entering my dog!
                 if(levelAbove != null)
                 {

@@ -44,15 +44,6 @@ public class LevelScript : MonoBehaviour
         initialPosition = this.gameObject.transform.position;
 
         FindColliderObjects(transform);
-
-        // if(!oppositeMovement)
-        // {
-        //     this.MoveOut();
-        // }
-        // else
-        // {
-        //     this.MoveIn();
-        // }        
     }
 
     private void FindColliderObjects(Transform transform)
@@ -83,7 +74,7 @@ public class LevelScript : MonoBehaviour
             {
                 for (int i = 0; i < levelsAbove.Count; i++)
                 {           
-                    levelsAbove[i].MoveOut(true, 1f);
+                    levelsAbove[i].MoveOut(false, 1f);
                 }
             }
             if(levelsBelow != null)
@@ -161,6 +152,12 @@ public class LevelScript : MonoBehaviour
 
     public void MoveOut(bool shouldWait, float? waitTime)
     {
+        if (oppositeMovement)
+        {
+            perspectiveAngle = Mathf.Atan(-0.5f);
+            roomWidthX = Mathf.Abs(roomWidthX) * -1;        
+        }
+
         if (currentMotionCoroutine != null)
         {
             StopCoroutine(currentMotionCoroutine);

@@ -7,6 +7,9 @@ public class BuildingScript : MonoBehaviour
 {
     public GameObject innerBuilding;
     public GameObject outerBuilding;
+    public List<GameObject> indoorGameObjectsToShowOutside = new List<GameObject>();
+    private List<GameObject> indoorGameObjectsToShowOutsideSpriteList = new List<GameObject>();
+    private List<Color> indoorGameObjectsToShowOutsideColorList = new List<Color>();
     private List<GameObject> innerBuildingSpriteList = new List<GameObject>();
     private List<GameObject> outerBuildingSpriteList = new List<GameObject>();
     private List<Color> innerBuildingInitialColorList = new List<Color>();
@@ -28,10 +31,14 @@ public class BuildingScript : MonoBehaviour
     {
         innerBuilding.SetActive(true);
         outerBuilding.SetActive(true);
-        GetSpritesAndAddToLists(innerBuilding, innerBuildingSpriteList, innerBuildingInitialColorList);
-        GetSpritesAndAddToLists(outerBuilding, outerBuildingSpriteList, outerBuildingInitialColorList);
-        GetIsoSpriteSortComponentsAndAddToLists(innerBuilding, innerSpriteSortingScriptObj);
-        GetIsoSpriteSortComponentsAndAddToLists(outerBuilding, outerSpriteSortingScriptObj);
+        GetSpritesAndAddToLists(innerBuilding, innerBuildingSpriteList, indoorGameObjectsToShowOutside, innerBuildingInitialColorList);
+        GetSpritesAndAddToLists(outerBuilding, outerBuildingSpriteList, new List<GameObject>(), outerBuildingInitialColorList);
+        foreach(GameObject obj in indoorGameObjectsToShowOutside) {
+            GetSpritesAndAddToLists(obj, indoorGameObjectsToShowOutsideSpriteList, new List<GameObject>(), indoorGameObjectsToShowOutsideColorList);
+        }
+
+        GetIsoSpriteSortComponentsAndAddToLists(innerBuilding, innerSpriteSortingScriptObj, indoorGameObjectsToShowOutside);
+        GetIsoSpriteSortComponentsAndAddToLists(outerBuilding, outerSpriteSortingScriptObj, new List<GameObject>());
         TagChildrenOfTaggedParents("OpenDoor");
         TagChildrenOfTaggedParents("ClosedDoor");
         TagChildrenOfTaggedParents("AlphaZeroEntExt");
@@ -110,19 +117,24 @@ public class BuildingScript : MonoBehaviour
                 {
                     if(colorList == null)
                     {
-                        if(behindBuilding && sr.CompareTag("ClosedDoor") && tr.parent.GetComponentInChildren<BuildingThreshColliderScript>() != null)
-                        {
-                            float nextAlpha = Mathf.Lerp(sr.color.a, 0.35f, t * 7f);
-                            sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, nextAlpha);
-                        }
-                        else
-                        {
+                        // if(behindBuilding && sr.CompareTag("ClosedDoor") && tr.parent.GetComponentInChildren<BuildingThreshColliderScript>() != null)
+                        // {
+                        //     float nextAlpha = Mathf.Lerp(sr.color.a, 0.35f, t * 7f);
+                        //     sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, nextAlpha);
+                        // }
+                        // else if(sr.CompareTag("ClosedDoor") && tr.parent.GetComponentInChildren<BuildingThreshColliderScript>() != null)
+                        // {
+                        //     float nextAlpha = Mathf.Lerp(sr.color.a, 1f, t * 7f);
+                        //     sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, nextAlpha);
+                        // }
+                        // else
+                        // {
                             if (alpha.HasValue)
                             {
                                 float nextAlpha = Mathf.Lerp(sr.color.a, alpha.Value, t * 7f);
                                 sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, nextAlpha);
                             }
-                        }
+                        // }
                     }
                     else
                     {
@@ -132,6 +144,18 @@ public class BuildingScript : MonoBehaviour
                     }    
                 }  
             }   
+            for (int i = 0; i < indoorGameObjectsToShowOutsideSpriteList.Count; i++)
+            {
+                SpriteRenderer sr = indoorGameObjectsToShowOutsideSpriteList[i].GetComponent<SpriteRenderer>();
+
+                if(behindBuilding)
+                {
+                    float nextAlpha = Mathf.Lerp(sr.color.a, 0.35f, t * 7f);
+                    sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, nextAlpha);
+                }         
+            }
+
+
             yield return null;    
         }
 
@@ -169,7 +193,7 @@ public class BuildingScript : MonoBehaviour
 
 
 
-    private void GetSpritesAndAddToLists(GameObject obj, List<GameObject> spriteList, List<Color> colorList)
+    private void GetSpritesAndAddToLists(GameObject obj, List<GameObject> spriteList, List<GameObject> excludeList, List<Color> colorList)
     {
         Stack<GameObject> stack = new Stack<GameObject>();
         stack.Push(obj);
@@ -188,11 +212,13 @@ public class BuildingScript : MonoBehaviour
 
             foreach (Transform child in currentNode.transform)
             {
-                stack.Push(child.gameObject);
+                if (!excludeList.Contains(child.gameObject)) {
+                    stack.Push(child.gameObject);
+                }
             }
         }
     }
-    private void GetIsoSpriteSortComponentsAndAddToLists(GameObject obj, List<IsoSpriteSorting> objList)
+    private void GetIsoSpriteSortComponentsAndAddToLists(GameObject obj, List<IsoSpriteSorting> objList, List<GameObject> excludeList)
     {
         Stack<GameObject> stack = new Stack<GameObject>();
         stack.Push(obj);
@@ -209,7 +235,9 @@ public class BuildingScript : MonoBehaviour
 
             foreach (Transform child in currentNode.transform)
             {
-                stack.Push(child.gameObject);
+                if(!excludeList.Contains(child.gameObject)) {
+                    stack.Push(child.gameObject);
+                }
             }
         }
     }

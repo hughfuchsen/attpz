@@ -6,13 +6,17 @@ public class LevelThreshColliderScript : MonoBehaviour
 {
     PlayerMovement playerMovement;
     [SerializeField] GameObject Player;
+
     // public string initialSortingLayerUponEntry;
-    public LevelScript levelAbove;
-    public LevelScript levelEntering;
-    public LevelScript levelBelow;
-    public bool levelAboveMove;
-    public bool levelThreshold;
-    public bool fixedMovement;
+
+    public List<LevelScript> levelsEntering = new List<LevelScript>();
+
+    public List<LevelScript> levelsBelowToMove = new List<LevelScript>();
+
+    public List<LevelScript> levelsEnteringToMove = new List<LevelScript>();
+
+    public bool moveLevelsAbove;
+    public bool moveLevelsBelow;
     private bool aboveCollider;
     
     // Start is called before the first frame update
@@ -54,59 +58,90 @@ public class LevelThreshColliderScript : MonoBehaviour
             if(this.transform.parent.GetComponentInChildren<BuildingThreshColliderScript>() != null && !aboveCollider && !playerMovement.isPlayerInside)
             {
                 // insert only the level you are entering my dog!
-                if(levelAbove != null)
+                if(levelsEntering != null)
                 {
-                    levelAbove.ExitBuilding();
+                    for (int i = 0; i < levelsEntering.Count; i++)
+                    {                       
+                        levelsEntering[i].ExitBuilding();
+                    }    
                 }
-                else if(levelBelow != null)
+                else if(levelsBelowToMove != null)
                 {
-                    levelBelow.ExitBuilding();
+                    for (int i = 0; i < levelsBelowToMove.Count; i++)
+                    {                        
+                        levelsBelowToMove[i].ExitBuilding();
+                    }
                 }
-                else if(levelEntering != null)
+                else if(levelsEnteringToMove != null)
                 {
-                    levelEntering.ExitBuilding();
+                    for (int i = 0; i < levelsEnteringToMove.Count; i++)
+                    {     
+                        levelsEnteringToMove[i].ExitBuilding();
+                    }
                 }  
             }
             else if(this.transform.parent.GetComponentInChildren<BuildingThreshColliderScript>() != null && !aboveCollider && playerMovement.isPlayerInside)
             {
                 // insert only the level you are entering my dog!
-                if(levelAbove != null)
+                if(levelsEntering != null)
                 {
-                    levelAbove.EnterLevel(true);
+                    for (int i = 0; i < levelsEntering.Count; i++)
+                    {                      
+                        levelsEntering[i].EnterLevel(true);
+                    }
                 }
-                else if(levelBelow != null)
+                else if(levelsBelowToMove != null)
                 {
-                    levelBelow.EnterLevel(true);
+                    for (int i = 0; i < levelsBelowToMove.Count; i++)
+                    {                          
+                        levelsBelowToMove[i].EnterLevel(true);
+                    }
                 }
-                else if(levelEntering != null)
+                else if(levelsEnteringToMove != null)
                 {
-                    levelEntering.EnterLevel(true);
-                    // if(levelBelow != null)
-                    // {
-                    //     levelBelow.MoveDown(false, null);
-                    // }  
+                    for (int i = 0; i < levelsEnteringToMove.Count; i++)
+                    {   
+                        levelsEnteringToMove[i].EnterLevel(true);
+                    }
+
+                    if(levelsBelowToMove != null)
+                    {
+                        for (int i = 0; i < levelsBelowToMove.Count; i++)
+                        {                              
+                            levelsBelowToMove[i].MoveDown(false, null);
+                        }
+                    }  
                 }   
             }
-            else if(levelAboveMove && !aboveCollider)
+            else if(moveLevelsAbove && !aboveCollider)
             {
-                if(levelAbove != null)
+                if(levelsEntering != null)
                 {
-                    levelAbove.EnterLevel(false);
+                    for (int i = 0; i < levelsEntering.Count; i++)
+                    {                      
+                        levelsEntering[i].EnterLevel(false);
+                    }
                 }  
             }
             else if(!aboveCollider)
             {
-                if(levelEntering != null)
+                if(levelsEnteringToMove != null)
                 {
-                    levelEntering.EnterLevel(false);
+                    for (int i = 0; i < levelsEnteringToMove.Count; i++)
+                    {                       
+                        levelsEnteringToMove[i].EnterLevel(false);
+                    }
                 }  
             }
 
-            if(levelThreshold)
+            if(moveLevelsBelow)
             {
-                if(levelBelow != null)
+                if(levelsBelowToMove != null)
                 {
-                    levelBelow.MoveDown(false, null);
+                    for (int i = 0; i < levelsBelowToMove.Count; i++)
+                    {                          
+                        levelsBelowToMove[i].MoveDown(false, null);
+                    }
                 }  
             }  
 
@@ -117,55 +152,82 @@ public class LevelThreshColliderScript : MonoBehaviour
             if(this.transform.parent.GetComponentInChildren<BuildingThreshColliderScript>() != null && aboveCollider && !playerMovement.isPlayerInside) 
             {
                 // insert only the level you are going through my dog!
-                if(levelBelow != null)
+                if(levelsBelowToMove != null)
                 {
-                    levelBelow.ExitBuilding();
+                    for (int i = 0; i < levelsBelowToMove.Count; i++)
+                    {      
+                        levelsBelowToMove[i].ExitBuilding();
+                    }
                 }        
-                else if(levelAbove != null)
+                if(levelsEntering != null)
                 {
-                    levelAbove.ExitBuilding();
+                    for (int i = 0; i < levelsEntering.Count; i++)
+                    {  
+                        levelsEntering[i].ExitBuilding();
+                    }
                 }   
-                else if(levelEntering != null)
+                if(levelsEnteringToMove != null)
                 {
-                    levelEntering.ExitBuilding();
+                    for (int i = 0; i < levelsEnteringToMove.Count; i++)
+                    {                       
+                        levelsEnteringToMove[i].ExitBuilding();
+                    }
                 } 
             }
             else if(this.transform.parent.GetComponentInChildren<BuildingThreshColliderScript>() != null && aboveCollider && playerMovement.isPlayerInside) 
             {
                 // insert only the level you are going through my dog!
-                if(levelBelow != null)
+                if(levelsBelowToMove != null)
                 {
-                    levelBelow.EnterLevel(true);
+                    for (int i = 0; i < levelsBelowToMove.Count; i++)
+                    {                          
+                        levelsBelowToMove[i].EnterLevel(true);
+                    }
                 }        
-                else if(levelAbove != null)
+                else if(levelsEntering != null)
                 {
-                    levelAbove.EnterLevel(true);
+                    for (int i = 0; i < levelsEntering.Count; i++)
+                    {                      
+                        levelsEntering[i].EnterLevel(true);
+                    }
                 }   
-                else if(levelEntering != null)
+                else if(levelsEnteringToMove != null)
                 {
-                    levelEntering.EnterLevel(true);
+                    for (int i = 0; i < levelsEnteringToMove.Count; i++)
+                    {                       
+                        levelsEnteringToMove[i].EnterLevel(true);
+                    }
                 } 
             }
-            else if(levelAboveMove && aboveCollider)
+            else if(moveLevelsAbove && aboveCollider)
             {
-                if(levelBelow != null)
+                if(levelsBelowToMove != null)
                 {
-                    levelBelow.EnterLevel(false);
+                    for (int i = 0; i < levelsBelowToMove.Count; i++)
+                    {                          
+                        levelsBelowToMove[i].EnterLevel(false);
+                    }
                 }       
             }
             else if(aboveCollider)
             {
-                if(levelEntering != null)
+                if(levelsEnteringToMove != null)
                 {
-                    levelEntering.EnterLevel(false);
+                    for (int i = 0; i < levelsEnteringToMove.Count; i++)
+                    {                       
+                        levelsEnteringToMove[i].EnterLevel(false);
+                    }
                 }  
             }
 
-            if(levelThreshold)
+            if(moveLevelsBelow)
             {
-                if(levelBelow != null)
+                if(levelsBelowToMove != null)
                 {
-                    levelBelow.MoveUp();
+                    for (int i = 0; i < levelsBelowToMove.Count; i++)
+                    {                          
+                        levelsBelowToMove[i].MoveUp();
+                    }
                 } 
             }
 
@@ -177,12 +239,12 @@ public class LevelThreshColliderScript : MonoBehaviour
 
         // if(!enteringLevelFromAbove) // entering level from below
         // {
-        //     if(isPlayerCrossingUp() && levelEntering != null && levelAboveMove && !aboveCollider)
+        //     if(isPlayerCrossingUp() && levelEntering != null && moveLevelsAbove && !aboveCollider)
         //     {
         //         levelEntering.EnterLevel();
         //         aboveCollider = true;
         //     }    
-        //     else if(isPlayerCrossingUp() && levelAboveMove && !aboveCollider)
+        //     else if(isPlayerCrossingUp() && moveLevelsAbove && !aboveCollider)
         //     {
         //         if(levelAbove != null)
         //         {
@@ -205,7 +267,7 @@ public class LevelThreshColliderScript : MonoBehaviour
 
         //         aboveCollider = false;   
         //     }
-        //     else if(!isPlayerCrossingUp() && levelAboveMove && aboveCollider)
+        //     else if(!isPlayerCrossingUp() && moveLevelsAbove && aboveCollider)
         //     {
         //         if(levelBelow != null)
         //         {
@@ -215,14 +277,14 @@ public class LevelThreshColliderScript : MonoBehaviour
         //     }   
 
 
-        //     if(isPlayerCrossingUp() && levelThreshold)
+        //     if(isPlayerCrossingUp() && moveLevelsBelow)
         //     {
         //         if(levelBelow != null)
         //         {
         //             levelBelow.MoveDown();
         //         }  
         //     }            
-       //     else if(!isPlayerCrossingUp() && levelThreshold)
+       //     else if(!isPlayerCrossingUp() && moveLevelsBelow)
         //     {
         //         if(levelBelow != null)
         //         {
@@ -232,7 +294,7 @@ public class LevelThreshColliderScript : MonoBehaviour
         // }
         // else // entering the LEvel (not collider) from above collider
         // {
-        //     // if(!isPlayerCrossingUp() && levelAboveMove && !aboveCollider)
+        //     // if(!isPlayerCrossingUp() && moveLevelsAbove && !aboveCollider)
         //     // {
         //     //     if(levelBelow != null)
         //     //     {
@@ -240,13 +302,13 @@ public class LevelThreshColliderScript : MonoBehaviour
         //     //     }    
         //     //     aboveCollider = true;
         //     // }
-        //     if(!isPlayerCrossingUp() && levelEntering != null && levelAboveMove && aboveCollider)
+        //     if(!isPlayerCrossingUp() && levelEntering != null && moveLevelsAbove && aboveCollider)
         //     {
         //         levelEntering.EnterLevel();
         //         enteringLevelFromAbove = false;
         //         aboveCollider = false;
         //     }            
-        //     // else if(!isPlayerCrossingUp() && levelAboveMove && aboveCollider)
+        //     // else if(!isPlayerCrossingUp() && moveLevelsAbove && aboveCollider)
         //     // {
         //     //     if(levelBelow != null)
         //     //     {
@@ -270,11 +332,11 @@ public class LevelThreshColliderScript : MonoBehaviour
         //     }
 
 
-        //     if(isPlayerCrossingUp() && levelThreshold)
+        //     if(isPlayerCrossingUp() && moveLevelsBelow)
         //     {
         //         levelBelow.MoveUp();
         //     }            
-        //     else if(!isPlayerCrossingUp() && levelThreshold)
+        //     else if(!isPlayerCrossingUp() && moveLevelsBelow)
         //     {
         //         levelBelow.MoveDown();
         //     }          

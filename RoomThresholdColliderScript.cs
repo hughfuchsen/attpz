@@ -154,14 +154,14 @@ public class RoomThresholdColliderScript : MonoBehaviour
                    
                     // GameObject.FindWithTag("Player").GetComponent<PlayerMovement>().isPlayerInside = false;
 
-                    //need to optimise
+
+                }
+                else if (!aboveCollider)
+                {
                     if (roomBelow != null || roomAbove == null)
                     {
                         roomBelow.ExitRooms();
                     }  
-                }
-                else if (!aboveCollider)
-                {
                     // building.EnterBuilding();
                     
                     // playerMovement.isPlayerInside = true;
@@ -194,7 +194,7 @@ public class RoomThresholdColliderScript : MonoBehaviour
                     //need to optimise
                     if (roomBelow != null)
                     {
-                        roomBelow.ExitRooms();
+                        roomBelow.EnterRoom(true, 1f);
                     }                
                 }
                 else if (playerMovement.isPlayerInside && aboveCollider)
@@ -278,7 +278,8 @@ public class RoomThresholdColliderScript : MonoBehaviour
     float waitTime,
     GameObject gameObject,
     string newSortingLayer) 
-    {
+    {   
+
         initialSortingLayer = FindSiblingWithTag("ClosedDoor").GetComponent<SpriteRenderer>().sortingLayerName;
 
         SetTreeSortingLater(gameObject, newSortingLayer);

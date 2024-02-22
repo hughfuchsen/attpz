@@ -207,7 +207,7 @@ public class LevelScript : MonoBehaviour
 
         float displaceDistace = (currentPosition - targetPosition).magnitude;
 
-        float timeToReachTarget = 0.5f;
+        float timeToReachTarget = 0.3f;
 
         float elapsedTime = 0f;
 

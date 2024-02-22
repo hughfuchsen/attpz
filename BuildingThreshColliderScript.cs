@@ -7,7 +7,7 @@ public class BuildingThreshColliderScript : MonoBehaviour
     public BuildingScript building;
     PlayerMovement playerMovement;
     [SerializeField] GameObject Player;
-    private bool aboveCollider;
+    public bool backOfBuilding;
 
 
     // Start is called before the first frame update
@@ -16,53 +16,39 @@ public class BuildingThreshColliderScript : MonoBehaviour
         Player = GameObject.FindGameObjectWithTag("Player");
         playerMovement = Player.GetComponent<PlayerMovement>(); 
     }
-    void OnTriggerEnter2D()
-    {
-        if (isPlayerCrossingUp())
-        {
-            aboveCollider = false;
-        }    
-        else 
-        {
-            aboveCollider = true; 
-        }
-    }
+
+
     void OnTriggerExit2D()
     {
         if(isPlayerCrossingUp())
         {
-            if (playerMovement.isPlayerInside && !aboveCollider)
+            if (backOfBuilding)
                 {
                     building.GoBehindBuilding();
-                    
                     playerMovement.isPlayerInside = false;
                 }
-                else if (!aboveCollider)
+                else
                 {
                     building.EnterBuilding();
-
                     playerMovement.isPlayerInside = true;
                 }
-            aboveCollider = true;   
         }
-        else
+        else //if player crossing down
         {
-                if (playerMovement.isPlayerInside && aboveCollider)
-                {                    
-                    building.ExitBuilding();
-
-                    playerMovement.isPlayerInside = false;          
-                }
-                else if (aboveCollider)
-                {
+                if (backOfBuilding)
+                {         
                     building.EnterBuilding();
-
                     playerMovement.isPlayerInside = true;
+                }
+                else
+                {
+                    building.ExitBuilding();
+                    playerMovement.isPlayerInside = false;
                 }
             
-            aboveCollider = false;    
         }
     }
+    
     private bool isPlayerCrossingUp()
     {
         return playerMovement.change.y > 0;

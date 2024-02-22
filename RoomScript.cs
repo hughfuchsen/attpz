@@ -96,6 +96,7 @@ public class RoomScript : MonoBehaviour
     
     public void ExitRooms() //move rooms to initial positions
     {
+        Debug.Log("zing");
         for (int i = 0; i < roomsSameOrAbove.Count; i++)
         {
             roomsSameOrAbove[i].MoveUp();
@@ -143,7 +144,7 @@ public class RoomScript : MonoBehaviour
 
         float distance = (currentPosition - targetPosition).magnitude;
 
-        float timeToReachTarget = 0.5f;
+        float timeToReachTarget = 0.3f;
 
         float elapsedTime = 0f;
 

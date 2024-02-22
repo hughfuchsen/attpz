@@ -121,6 +121,11 @@ public class TriggerButtonPress : MonoBehaviour
             GameObject current = stack.Pop();
             Transform currentTransform = current.transform;
 
+            // if (current.GetComponent<SpriteRenderer>() != null)
+            // {
+            //     spriteList.Add(current);
+            // }
+
             int childCount = currentTransform.childCount;
             for (int i = 0; i < childCount; i++)
             {

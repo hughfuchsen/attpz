@@ -5,6 +5,7 @@ using UnityEngine;
 public class RoomSwitchScript : MonoBehaviour
 {
     public RoomScript room;
+    public bool disableExitTrigger;
     public List<GameObject> doorsBelow = new List<GameObject>(); 
 
     void OnTriggerEnter2D()
@@ -14,7 +15,10 @@ public class RoomSwitchScript : MonoBehaviour
     }
     void OnTriggerExit2D()
     {
-        room.ExitRoom();
+        if (!disableExitTrigger)
+        {
+            room.ExitRoom();
+        }
         // roomBelow.EnterRoom(false, 0f);s
     }
 

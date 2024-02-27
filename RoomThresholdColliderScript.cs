@@ -18,7 +18,7 @@ public class RoomThresholdColliderScript : MonoBehaviour
     LevelThreshColliderScript levelThreshColliderScript;
     PlayerMovement playerMovement;
     [SerializeField] GameObject Player;
-    private bool aboveCollider;
+    public bool aboveCollider;
     private List<float> initialOpenDoorAlpha = new List<float>();
     private List<float> initialClosedDoorAlpha = new List<float>();
     private List<GameObject> openDoorSpriteList = new List<GameObject>();
@@ -28,7 +28,6 @@ public class RoomThresholdColliderScript : MonoBehaviour
     private Coroutine openDoorFadeCoroutine;
     private Coroutine thresholdSortingSequenceCoro;
     private string initialSortingLayer;
-
     private bool playerIsInDoorway = false;
     private bool playerIsInRoomAbove = false;
 
@@ -147,18 +146,19 @@ public class RoomThresholdColliderScript : MonoBehaviour
 
             if (this.transform.parent.GetComponentInChildren<BuildingThreshColliderScript>() != null)
             {
-                if (!playerMovement.isPlayerInside && !aboveCollider)
-                {
-                    //need to make exit building 0.35f here - for back of the building
-                    // building.ExitBuilding();
+                // if (playerMovement.isPlayerInside && !aboveCollider)
+                // {
+                //     //need to make exit building 0.35f here - for back of the building
+                //     // building.ExitBuilding();
                    
-                    // GameObject.FindWithTag("Player").GetComponent<PlayerMovement>().isPlayerInside = false;
+                //     // GameObject.FindWithTag("Player").GetComponent<PlayerMovement>().isPlayerInside = false;
 
 
-                }
-                else if (!aboveCollider)
+                // }
+                // else 
+                if (!aboveCollider)
                 {
-                    if (roomBelow != null || roomAbove == null)
+                    if (roomBelow != null && roomAbove == null)
                     {
                         roomBelow.ExitRooms();
                     }  
@@ -185,8 +185,8 @@ public class RoomThresholdColliderScript : MonoBehaviour
             if ((this.transform.parent.GetComponentInChildren<BuildingThreshColliderScript>() != null)
                 || this.transform.parent.GetComponentInChildren<LevelThreshColliderScript>() !=null)
             {
-                if (!playerMovement.isPlayerInside && aboveCollider)
-                {                    
+                if (playerMovement.isPlayerInside && aboveCollider) // if the player is NOT inside bulding and ABOVE collider prior to collider exit
+                {                                                    // i.e is the player is outside the building, behind the building
                     // building.ExitBuilding();
 
                     // playerMovement.isPlayerInside = false;
@@ -197,15 +197,19 @@ public class RoomThresholdColliderScript : MonoBehaviour
                         roomBelow.EnterRoom(true, 1f);
                     }                
                 }
-                else if (playerMovement.isPlayerInside && aboveCollider)
-                {
-                    if (roomBelow != null)
+                else if (!playerMovement.isPlayerInside && aboveCollider) // if the player IS inside bulding and ABOVE collider prior to collider exit
+                {   
+                    if (roomBelow != null) 
                     {
                         roomBelow.EnterRoom(true, 1f);
-                    }     
+                    } 
+                    else if (roomBelow == null && roomAbove != null) // exiting building going down
+                    {
+                        roomAbove.ExitRooms();
+                    }                  
                 }
             }
-            else if (roomBelow != null)
+            else if (roomBelow != null) // entering a room going down while inside building
             {
                 roomBelow.EnterRoom(false, 0f);
 
@@ -213,9 +217,10 @@ public class RoomThresholdColliderScript : MonoBehaviour
                 {
                     initialSortingLayer = Player.GetComponent<SpriteRenderer>().sortingLayerName;
 
-                    thresholdSortingSequenceCoro = StartCoroutine(ThresholdLayerSortingSequence(0.5f, Player, "ThresholdSequence"));
+                    thresholdSortingSequenceCoro = StartCoroutine(ThresholdLayerSortingSequence(0.3f, Player, "ThresholdSequence"));
                 }
-            }             
+            }
+                         
             aboveCollider = false;
 
         }
@@ -275,12 +280,11 @@ public class RoomThresholdColliderScript : MonoBehaviour
     }  
 
     IEnumerator ThresholdLayerSortingSequence(
-    float waitTime,
-    GameObject gameObject,
-    string newSortingLayer) 
+        float waitTime,
+        GameObject gameObject,
+        string newSortingLayer) 
     {   
-
-        initialSortingLayer = FindSiblingWithTag("ClosedDoor").GetComponent<SpriteRenderer>().sortingLayerName;
+        initialSortingLayer = LayerMask.LayerToName(this.gameObject.layer);
 
         SetTreeSortingLater(gameObject, newSortingLayer);
 
@@ -290,15 +294,62 @@ public class RoomThresholdColliderScript : MonoBehaviour
 
         yield return null;
     }
+
+    // IEnumerator ThresholdLayerSortingSequence(
+    // float waitTime,
+    // GameObject gameObject,
+    // string newSortingLayer) 
+    // {   
+    //     initialSortingLayer = FindSiblingWithTag("ClosedDoor", null).GetComponent<SpriteRenderer>().sortingLayerName;
+
+    //     SetTreeSortingLater(gameObject, newSortingLayer);
+
+    //     yield return new WaitForSeconds(waitTime);
+
+    //     SetTreeSortingLater(gameObject, initialSortingLayer);
+
+    //     yield return null;
+    // }
     
     // NOTE: The parent of the threshold collider must be the door parent
-    public GameObject FindSiblingWithTag(string tag) 
+
+    public GameObject FindSiblingWithTag(string tag, Transform transform = null) 
     {
-        foreach (Transform child in this.gameObject.transform.parent)
+        if (transform == null)
         {
-            if (child.CompareTag(tag))
+            foreach (Transform child in this.gameObject.transform.parent)
             {
-                return child.gameObject;
+                if (child.CompareTag(tag))
+                {
+                    return child.gameObject; 
+                } 
+                else
+                {
+                    FindSiblingWithTag(tag, child);
+                }       
+            }
+        }
+        else 
+        {
+            foreach (Transform child in transform)
+            {
+                if (child.CompareTag(tag))
+                {
+                    return child.gameObject; //this returns the first sibling that has the corresponding tag
+                                            // then, if this group of siblings doesn's contain the tag, the next bit checks their descendants 
+                                            //and so on
+                }
+                else
+                {
+                    Transform descendant = child.gameObject.transform;
+                    if (descendant != null)
+                    {
+                        foreach (Transform child2 in descendant)
+                        {
+                            FindSiblingWithTag(tag, child2);
+                        }
+                    }
+                }
             }
         }
         return null;

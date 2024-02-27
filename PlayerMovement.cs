@@ -116,13 +116,13 @@ public class PlayerMovement : MonoBehaviour
         }
         if (change == Vector3.left+Vector3.up)
         {
-        change = new Vector3(-0.8f,1f,0f);
+        change = new Vector3(-0.7f,1f,0f);
         myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
         Animate();
         }
         if (change == Vector3.up)
         {
-        change = new Vector3(-0.8f,1f,0f);
+        change = new Vector3(-0.7f,1f,0f);
         myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
         Animate();
         }
@@ -134,7 +134,7 @@ public class PlayerMovement : MonoBehaviour
         }
         if (change == Vector3.right+Vector3.down)
         {
-        change = new Vector3(0.8f,-1f,0f);
+        change = new Vector3(0.7f,-1f,0f);
         myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
         Animate();
         }
@@ -146,7 +146,7 @@ public class PlayerMovement : MonoBehaviour
         }
         if (change == Vector3.down)
         {
-        change = new Vector3(0.8f,-1f,0f);
+        change = new Vector3(0.7f,-1f,0f);
         myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
         Animate();
         }
@@ -167,49 +167,49 @@ public class PlayerMovement : MonoBehaviour
       {
         if (change == Vector3.right+Vector3.up)
           {
-          change = new Vector3(0f,0f,0f);
+          change = new Vector3(-1f,0.5f,0f);
           myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
           animator.SetBool("moving", false); 
           }
           if (change == Vector3.left+Vector3.up)
           {
-          change = new Vector3(-0.8f,1f,0f);
+          change = new Vector3(-0.7f,1f,0f);
           myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
           Animate();
           }
           if (change == Vector3.up)
           {
-          change = new Vector3(-0.8f,1f,0f);
+          change = new Vector3(-0.7f,1f,0f);
           myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
           Animate();
           }
           if (change == Vector3.right)
           {
-          change = new Vector3(0f,0f,0f);
+          change = new Vector3(-1f,0.5f,0f);
           myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
           animator.SetBool("moving", false); 
           }
           if (change == Vector3.right+Vector3.down)
           {
-          change = new Vector3(0.8f,-1f,0f);
+          change = new Vector3(0.7f,-1f,0f);
           myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
           Animate();
           }
           if (change == Vector3.left+Vector3.down)
           {
-          change = new Vector3(0f,0f,0f);
+          change = new Vector3(1f,-0.5f,0f);
           myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
           animator.SetBool("moving", false); 
           }
           if (change == Vector3.down)
           {
-          change = new Vector3(0.8f,-1f,0f);
+          change = new Vector3(0.7f,-1f,0f);
           myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
           Animate();
           }
           if (change == Vector3.left)
           {
-          change = new Vector3(0f,0f,0f);
+          change = new Vector3(1f,-0.5f,0f);
           myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
           animator.SetBool("moving", false); 
           }
@@ -228,7 +228,7 @@ public class PlayerMovement : MonoBehaviour
       {
         if (change == Vector3.right+Vector3.up)
         {
-        change = new Vector3(0.8f,1f,0f);
+        change = new Vector3(0.7f,1f,0f);
         myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
         Animate();
         }
@@ -240,25 +240,25 @@ public class PlayerMovement : MonoBehaviour
         }
         if (change == Vector3.up)
         {
-        change = new Vector3(-0.8f,0.5f,0f);
+        change = new Vector3(-0.7f,0.5f,0f);
         myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
         Animate();
         }
         if (change == Vector3.right)
         {
-        change = new Vector3(0.8f,1f,0f);
+        change = new Vector3(0.7f,1f,0f);
         myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
         Animate();
         }
         if (change == Vector3.right+Vector3.down)
         {
-        change = new Vector3(0.8f,-1f,0f);
+        change = new Vector3(0.7f,-1f,0f);
         myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
         Animate();
         }
         if (change == Vector3.left+Vector3.down)
         {
-        change = new Vector3(-0.8f,-1f,0f);
+        change = new Vector3(-0.7f,-1f,0f);
         myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
         Animate();
         }
@@ -270,7 +270,7 @@ public class PlayerMovement : MonoBehaviour
         }
         if (change == Vector3.left)
         {
-        change = new Vector3(-0.8f,-1,0f);
+        change = new Vector3(-0.7f,-1,0f);
         myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
         Animate();
         }
@@ -283,7 +283,7 @@ public class PlayerMovement : MonoBehaviour
       {
         if (change == Vector3.right+Vector3.up)
         {
-        change = new Vector3(0.8f,1f,0f);
+        change = new Vector3(0.7f,1f,0f);
         myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
         Animate();
         }
@@ -301,7 +301,7 @@ public class PlayerMovement : MonoBehaviour
         }
         if (change == Vector3.right)
         {
-        change = new Vector3(0.8f,1f,0f);
+        change = new Vector3(0.7f,1f,0f);
         myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
         Animate();
         }
@@ -313,7 +313,7 @@ public class PlayerMovement : MonoBehaviour
         }
         if (change == Vector3.left+Vector3.down)
         {
-        change = new Vector3(-0.8f,-1f,0f);
+        change = new Vector3(-0.7f,-1f,0f);
         myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
         Animate();
         }
@@ -325,7 +325,7 @@ public class PlayerMovement : MonoBehaviour
         }
         if (change == Vector3.left)
         {
-        change = new Vector3(-0.8f,-1,0f);
+        change = new Vector3(-0.7f,-1,0f);
         myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
         Animate();
         }
@@ -449,7 +449,7 @@ public class PlayerMovement : MonoBehaviour
       {
         if (change == Vector3.right+Vector3.up)
         {
-        change = new Vector3(0f,0f,0f);
+        change = new Vector3(-1f,0.5f,0f);
         myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
         animator.SetBool("moving", false);       
         }
@@ -467,7 +467,7 @@ public class PlayerMovement : MonoBehaviour
         }
         if (change == Vector3.right)
         {
-        change = new Vector3(0f,0f,0f);
+        change = new Vector3(-1f,0.5f,0f);
         myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
         animator.SetBool("moving", false);
         }
@@ -479,7 +479,7 @@ public class PlayerMovement : MonoBehaviour
         }
         if (change == Vector3.left+Vector3.down)
         {
-        change = new Vector3(0f,0f,0f);
+        change = new Vector3(1f,-0.5f,0f);
         myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
         animator.SetBool("moving", false);       
         }
@@ -491,7 +491,7 @@ public class PlayerMovement : MonoBehaviour
         }
         if (change == Vector3.left)
         {
-        change = new Vector3(0f,0f,0f);
+        change = new Vector3(1f,-0.5f,0f);
         myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
         animator.SetBool("moving", false);       
         }
@@ -510,13 +510,13 @@ public class PlayerMovement : MonoBehaviour
         }
         if (change == Vector3.left+Vector3.up)
         {
-        change = new Vector3(0f,0f,0f);
+        change = new Vector3(1f,0.5f,0f);
         myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
         animator.SetBool("moving", false);  
         }
         if (change == Vector3.up)
         {
-        change = new Vector3(0f,0f,0f);
+        change = new Vector3(1f,0.5f,0f);
         myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
         animator.SetBool("moving", false);  
         }
@@ -528,7 +528,7 @@ public class PlayerMovement : MonoBehaviour
         }
         if (change == Vector3.right+Vector3.down)
         {
-        change = new Vector3(0f,0f,0f);
+        change = new Vector3(-1f,-0.5f,0f);
         myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
         animator.SetBool("moving", false);  
         }
@@ -540,7 +540,7 @@ public class PlayerMovement : MonoBehaviour
         }
         if (change == Vector3.down)
         {
-        change = new Vector3(0f,0f,0f);
+        change = new Vector3(-1f,-0.5f,0f);
         myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
         animator.SetBool("moving", false);  
         }

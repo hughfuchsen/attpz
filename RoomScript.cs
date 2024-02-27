@@ -76,7 +76,6 @@ public class RoomScript : MonoBehaviour
             else
             {
                 roomsBelow[i].MoveDown(false, 0f);
-                Debug.Log("baddy");
             }        
         }
 
@@ -96,7 +95,7 @@ public class RoomScript : MonoBehaviour
     
     public void ExitRooms() //move rooms to initial positions
     {
-        Debug.Log("zing");
+
         for (int i = 0; i < roomsSameOrAbove.Count; i++)
         {
             roomsSameOrAbove[i].MoveUp();

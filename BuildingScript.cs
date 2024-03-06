@@ -7,9 +7,9 @@ public class BuildingScript : MonoBehaviour
 {
     public GameObject innerBuilding;
     public GameObject outerBuilding;
-    public List<GameObject> indoorGameObjectsToShowOutside = new List<GameObject>();
-    private List<GameObject> indoorGameObjectsToShowOutsideSpriteList = new List<GameObject>();
-    private List<Color> indoorGameObjectsToShowOutsideColorList = new List<Color>();
+    public List<GameObject> gameObjectsToShowOutside = new List<GameObject>();
+    private List<GameObject> gameObjectsToShowOutsideSpriteList = new List<GameObject>();
+    private List<Color> gameObjectsToShowOutsideColorList = new List<Color>();
     private List<GameObject> innerBuildingSpriteList = new List<GameObject>();
     private List<GameObject> outerBuildingSpriteList = new List<GameObject>();
     private List<Color> innerBuildingInitialColorList = new List<Color>();
@@ -31,18 +31,18 @@ public class BuildingScript : MonoBehaviour
     {
         innerBuilding.SetActive(true);
         outerBuilding.SetActive(true);
-        GetSpritesAndAddToLists(innerBuilding, innerBuildingSpriteList, indoorGameObjectsToShowOutside, innerBuildingInitialColorList);
+        GetSpritesAndAddToLists(innerBuilding, innerBuildingSpriteList, gameObjectsToShowOutside, innerBuildingInitialColorList);
         GetSpritesAndAddToLists(outerBuilding, outerBuildingSpriteList, new List<GameObject>(), outerBuildingInitialColorList);
-        foreach(GameObject obj in indoorGameObjectsToShowOutside) {
-            GetSpritesAndAddToLists(obj, indoorGameObjectsToShowOutsideSpriteList, new List<GameObject>(), indoorGameObjectsToShowOutsideColorList);
+        foreach(GameObject obj in gameObjectsToShowOutside) {
+            GetSpritesAndAddToLists(obj, gameObjectsToShowOutsideSpriteList, new List<GameObject>(), gameObjectsToShowOutsideColorList);
         }
 
-        GetIsoSpriteSortComponentsAndAddToLists(innerBuilding, innerSpriteSortingScriptObj, indoorGameObjectsToShowOutside);
+        GetIsoSpriteSortComponentsAndAddToLists(innerBuilding, innerSpriteSortingScriptObj, gameObjectsToShowOutside);
         GetIsoSpriteSortComponentsAndAddToLists(outerBuilding, outerSpriteSortingScriptObj, new List<GameObject>());
         TagChildrenOfTaggedParents("OpenDoor");
         TagChildrenOfTaggedParents("ClosedDoor");
         TagChildrenOfTaggedParents("AlphaZeroEntExt");
-        this.ExitBuilding();
+        this.ExitBuilding(0f, 0f);
     }
 
     public void EnterBuilding()
@@ -57,12 +57,8 @@ public class BuildingScript : MonoBehaviour
         }
         innerBuildingFadeCoroutine = StartCoroutine(FadeThenSetDontSort(false, innerSpriteSortingScriptObj, false, false, 0f, false, innerBuildingSpriteList, innerBuildingInitialColorList, null, tagsToExludeEntExt));
         outerBuildingFadeCoroutine = StartCoroutine(FadeThenSetDontSort(true, outerSpriteSortingScriptObj, true, false, 0f, false, outerBuildingSpriteList, null, 0f));
-        // innerBuildingFadeCoroutine = StartCoroutine(Fade(false, null, false, innerBuildingSpriteList, innerBuildingInitialColorList, null, tagsToExludeEntExt));
-        // outerBuildingFadeCoroutine = StartCoroutine(Fade(false, null, false, outerBuildingSpriteList, null, 0f));
-        // SetDontSort(innerSpriteSortingScriptObj, false);
-        // SetDontSort(outerSpriteSortingScriptObj, true);
     }
-    public void ExitBuilding()
+    public void ExitBuilding(float waitTimeInside, float waitTimeOutside)
     {
         if(this.innerBuildingFadeCoroutine != null)
         {
@@ -72,12 +68,8 @@ public class BuildingScript : MonoBehaviour
         {
             StopCoroutine(this.outerBuildingFadeCoroutine);
         }
-        innerBuildingFadeCoroutine = StartCoroutine(FadeThenSetDontSort(true, innerSpriteSortingScriptObj, true, true, 1f, false, innerBuildingSpriteList, null, 0f));
-        outerBuildingFadeCoroutine = StartCoroutine(FadeThenSetDontSort(false, outerSpriteSortingScriptObj, false, true, 1f, false, outerBuildingSpriteList, outerBuildingInitialColorList, null, tagsToExludeEntExt));
-        // innerBuildingFadeCoroutine = StartCoroutine(Fade(true, 1f, false, innerBuildingSpriteList, null, 0f));
-        // outerBuildingFadeCoroutine = StartCoroutine(Fade(true, 1f, false, outerBuildingSpriteList, outerBuildingInitialColorList, null, tagsToExludeEntExt));
-        // SetDontSort(innerSpriteSortingScriptObj, true);
-        // SetDontSort(outerSpriteSortingScriptObj, false);
+        innerBuildingFadeCoroutine = StartCoroutine(FadeThenSetDontSort(true, innerSpriteSortingScriptObj, true, true, waitTimeInside, false, innerBuildingSpriteList, null, 0f));
+        outerBuildingFadeCoroutine = StartCoroutine(FadeThenSetDontSort(false, outerSpriteSortingScriptObj, false, true, waitTimeOutside, false, outerBuildingSpriteList, outerBuildingInitialColorList, null, tagsToExludeEntExt));
     }
     public void GoBehindBuilding()
     {
@@ -89,9 +81,8 @@ public class BuildingScript : MonoBehaviour
         {
             StopCoroutine(this.outerBuildingFadeCoroutine);
         }
-        innerBuildingFadeCoroutine = StartCoroutine(Fade(true, 1f, true, innerBuildingSpriteList, null, 0f));
-        outerBuildingFadeCoroutine = StartCoroutine(Fade(true, 1f, false, outerBuildingSpriteList, null, 0.35f, tagsToExludeEntExt));
-        
+        innerBuildingFadeCoroutine = StartCoroutine(Fade(true, 0.3f, true, innerBuildingSpriteList, null, 0f));
+        outerBuildingFadeCoroutine = StartCoroutine(Fade(true, 0.3f, true, outerBuildingSpriteList, null, 0.35f, tagsToExludeEntExt));
     }
 
 
@@ -144,15 +135,19 @@ public class BuildingScript : MonoBehaviour
                     }    
                 }  
             }   
-            for (int i = 0; i < indoorGameObjectsToShowOutsideSpriteList.Count; i++)
+            for (int i = 0; i < gameObjectsToShowOutsideSpriteList.Count; i++)
             {
-                SpriteRenderer sr = indoorGameObjectsToShowOutsideSpriteList[i].GetComponent<SpriteRenderer>();
+                SpriteRenderer sr = gameObjectsToShowOutsideSpriteList[i].GetComponent<SpriteRenderer>();
 
-                if(behindBuilding)
+                if (behindBuilding)
                 {
-                    float nextAlpha = Mathf.Lerp(sr.color.a, 0.35f, t * 7f);
-                    sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, nextAlpha);
-                }         
+                    float nextAlpha = Mathf.Lerp(sr.color.a, 1f, t * 7f);
+                    sr.color = gameObjectsToShowOutsideColorList[i];
+                }
+                // else
+                // {
+                //     sr.color = gameObjectsToShowOutsideColorList[i];
+                // }        
             }
 
 

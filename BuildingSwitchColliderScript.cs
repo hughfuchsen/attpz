@@ -17,6 +17,6 @@ public class BuildingSwitchColliderScript : MonoBehaviour
     }
     void OnTriggerExit2D()
     {
-        bulding.ExitBuilding();
+        bulding.ExitBuilding(1f, 1f);
     }
 }

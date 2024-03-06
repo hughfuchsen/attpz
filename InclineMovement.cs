@@ -11,29 +11,10 @@ public class InclineMovement : MonoBehaviour
     public string higherSortingLayerToAssign;
     public string lowerColliderLayerName; // The name of the layer you want to switch to
     public string higherColliderLayerName; // The name of the layer you want to switch to
-    // public LayerMask lowerColliderLayerName; // The name of the layer you want to switch to
-    // public LayerMask higherColliderLayerName; // The name of the layer you want to switch to
     public bool topOfStairCase;
-
     public bool middleOfStairCase;
 
     // Start is called before the first frame update
-
-    void Start()
-    {
-        // SetCollisionLayer("Default");
-        // for (int i = 0; i < 32; i++)
-        // {
-        //     for (int j = 0; j < 32; j++)
-        //     {
-        //         Physics2D.IgnoreLayerCollision(i, j, true);
-        //     }
-        // }
-        // Debug.Log(LayerMask.NameToLayer("Default"));
-        // Debug.Log(LayerMask.NameToLayer("Player"));
-        // Debug.Log(LayerMask.NameToLayer("Level1"));
-        // Debug.Log(LayerMask.NameToLayer("Stairs1"));
-    }
     void Awake()
     {
         playerMovement = Player.GetComponent<PlayerMovement>();
@@ -44,7 +25,7 @@ public class InclineMovement : MonoBehaviour
     {
         if (collision.gameObject.tag == "Player")
         {
-            if(!middleOfStairCase)
+            if(!middleOfStairCase) // turn off fixed direction
             {
                 if((isPlayerCrossingUp() && isPlayerCrossingLeft()) 
                     || !isPlayerCrossingUp() && !isPlayerCrossingLeft())
@@ -57,6 +38,7 @@ public class InclineMovement : MonoBehaviour
                 }
             }
 
+            //alter the motion direction
             if((isPlayerCrossingUp() && playerMovement.motionDirection == "normal" && !topOfStairCase) 
                 || (!isPlayerCrossingUp() && playerMovement.motionDirection == "normal" && topOfStairCase))
             {
@@ -68,6 +50,7 @@ public class InclineMovement : MonoBehaviour
                 playerMovement.motionDirection = "normal";  
             }
 
+            // alter the collider layer and sprite sorting layer that is active with the player
             if(isPlayerCrossingUp() && topOfStairCase)
             {
                 gameObject.layer = LayerMask.NameToLayer(higherColliderLayerName);

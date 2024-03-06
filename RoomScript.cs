@@ -20,7 +20,7 @@ public class RoomScript : MonoBehaviour
 
     void Start()
     {
-        initialPosition = this.gameObject.transform.position;
+        initialPosition = this.gameObject.transform.localPosition;
 
         FindColliderObjects(transform);
     }
@@ -82,18 +82,20 @@ public class RoomScript : MonoBehaviour
         for (int i = 0; i < doorsBelow.Count; i++)
         {
             doorsBelow[i].SetPlayerIsInRoomAbove(true);
+            doorsBelow[i].SetPlayerIsInDoorway(false);
         }
     }
     
-    public void ExitRoom()
+    public void ExitRoom() 
     {
         for (int i = 0; i < doorsBelow.Count; i++)
         {
             doorsBelow[i].SetPlayerIsInRoomAbove(false);
+            doorsBelow[i].SetPlayerIsInDoorway(false);
         }
     }
     
-    public void ExitRooms() //move rooms to initial positions
+    public void ResetRooms() //move rooms to initial positions
     {
 
         for (int i = 0; i < roomsSameOrAbove.Count; i++)
@@ -139,7 +141,7 @@ public class RoomScript : MonoBehaviour
 
     IEnumerator Displace(bool shouldWait, float? waitTime, GameObject obj, Vector3 targetPosition)
     {
-        Vector3 currentPosition = obj.transform.position;
+        Vector3 currentPosition = obj.transform.localPosition;
 
         float distance = (currentPosition - targetPosition).magnitude;
 
@@ -164,7 +166,7 @@ public class RoomScript : MonoBehaviour
             // initial + (target - initial) * t
             // initial + target * t - initial * t
             // initial * (1 - t) + target * t
-            obj.transform.position = currentPosition * (1 - t) + targetPosition * t;
+            obj.transform.localPosition = currentPosition * (1 - t) + targetPosition * t;
 
             for (int i = 0; i < childColliders.Count; i++)
             {
@@ -174,7 +176,7 @@ public class RoomScript : MonoBehaviour
             yield return null;
         }
 
-        obj.transform.position = targetPosition; // Ensure the object reaches the exact target position
+        obj.transform.localPosition = targetPosition; // Ensure the object reaches the exact target position
 
         for (int i = 0; i < childColliders.Count; i++)
         {

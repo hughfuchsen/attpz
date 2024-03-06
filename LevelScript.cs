@@ -10,7 +10,6 @@ public class LevelScript : MonoBehaviour
     private List<Transform> childColliders = new List<Transform>(); // Separate list for child colliders
     public int roomWidthX = 30;
     public int wallHeight = 31;
-    public float displaceSpeed = 100;
     public float fadeSpeed = 100f;
     private float saturationAmount = 0.2f;
     public bool oppositeMovement;
@@ -21,7 +20,7 @@ public class LevelScript : MonoBehaviour
     private List<GameObject> spriteList = new List<GameObject>();
     private List<Color> initialColorList = new List<Color>();
     private Coroutine currentMotionCoroutine;
-    private Coroutine currentColliderMotionCoroutine;
+    private Coroutine currentColliderMotionCoroutine; 
 
 
 
@@ -41,7 +40,7 @@ public class LevelScript : MonoBehaviour
 
         }
 
-        initialPosition = this.gameObject.transform.position;
+        initialPosition = this.gameObject.transform.localPosition;
 
         FindColliderObjects(transform);
     }
@@ -67,14 +66,14 @@ public class LevelScript : MonoBehaviour
         }
     }
 
-    public void EnterLevel(bool shouldMoveDown)
+    public void EnterLevel(bool shouldWait, bool shouldMoveDown)
     {
             this.MoveIn(false, null);
             if(levelsAbove != null)
             {
                 for (int i = 0; i < levelsAbove.Count; i++)
                 {           
-                    levelsAbove[i].MoveOut(false, 1f);
+                    levelsAbove[i].MoveOut(shouldWait, 0.3f);
                 }
             }
             if(levelsBelow != null)
@@ -83,7 +82,7 @@ public class LevelScript : MonoBehaviour
                 {      
                     for (int i = 0; i < levelsBelow.Count; i++)
                     {           
-                        levelsBelow[i].MoveDown(true, 1f);
+                        levelsBelow[i].MoveDown(shouldWait, 1f);
                     }
                 }
             }
@@ -165,11 +164,11 @@ public class LevelScript : MonoBehaviour
 
         if (waitTime.HasValue) // Check if waitTime has a value
         {
-            currentMotionCoroutine = StartCoroutine(DisplaceAndDeSaturate(shouldWait, waitTime.Value, true, this.gameObject, initialPosition + new Vector3(roomWidthX, roomWidthX/Mathf.Cos(perspectiveAngle)*Mathf.Sin(perspectiveAngle), 0)));
+            currentMotionCoroutine = StartCoroutine(DisplaceAndDeSaturate(shouldWait, waitTime.Value, true, this.gameObject, initialPosition + new Vector3(roomWidthX, roomWidthX/Mathf.Cos(perspectiveAngle)*Mathf.Sin(perspectiveAngle)+1, 0)));
         }
         else
         {
-            currentMotionCoroutine = StartCoroutine(DisplaceAndDeSaturate(shouldWait, 0f, true, this.gameObject, initialPosition + new Vector3(roomWidthX, roomWidthX/Mathf.Cos(perspectiveAngle)*Mathf.Sin(perspectiveAngle), 0))); // Default to 0 if waitTime is not specified
+            currentMotionCoroutine = StartCoroutine(DisplaceAndDeSaturate(shouldWait, 0f, true, this.gameObject, initialPosition + new Vector3(roomWidthX, roomWidthX/Mathf.Cos(perspectiveAngle)*Mathf.Sin(perspectiveAngle)+1, 0))); // Default to 0 if waitTime is not specified
         }
     }
 
@@ -201,9 +200,11 @@ public class LevelScript : MonoBehaviour
         // Move the parent object down
     }
 
+
     private IEnumerator DisplaceAndDeSaturate(bool shouldWait, float? waitTime, bool movingOut, GameObject obj, Vector3 targetPosition)
     {
-        Vector3 currentPosition = obj.transform.position;
+        Vector3 currentPosition = obj.transform.localPosition;
+        // Vector3 currentPosition = initialPosition;
 
         float displaceDistace = (currentPosition - targetPosition).magnitude;
 
@@ -228,7 +229,7 @@ public class LevelScript : MonoBehaviour
             // initial + (target - initial) * t
             // initial + target * t - initial * t
             // initial * (1 - t) + target * t
-            obj.transform.position = currentPosition * (1 - t) + targetPosition * t;
+            obj.transform.localPosition = currentPosition * (1 - t) + targetPosition * t;
 
             for (int i = 0; i < childColliders.Count; i++)
             {
@@ -238,7 +239,7 @@ public class LevelScript : MonoBehaviour
             yield return null;
         }
 
-        obj.transform.position = targetPosition; // Ensure the object reaches the exact target position
+        obj.transform.localPosition = targetPosition; // Ensure the object reaches the exact target position
 
         for (int i = 0; i < childColliders.Count; i++)
         {
@@ -351,7 +352,7 @@ public class LevelScript : MonoBehaviour
             SpriteRenderer sr = spriteList[i].GetComponent<SpriteRenderer>();
 
             // Get the current color
-            Color color = sr.color;
+            Color color = initialColorList[i];
 
             // Convert the current color to HSV
             Color.RGBToHSV(color, out float h, out float s, out float v);

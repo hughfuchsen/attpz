@@ -19,7 +19,7 @@ public class BehindBuildingSwitchColliderScript : MonoBehaviour
     {
         if(building != null)
         {
-            building.ExitBuilding();
+            building.ExitBuilding(0.3f, 0.3f);
         }        
     }
 }

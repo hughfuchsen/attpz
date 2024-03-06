@@ -9,8 +9,6 @@ public class BuildingThreshColliderScript : MonoBehaviour
     [SerializeField] GameObject Player;
     public bool backOfBuilding;
 
-
-    // Start is called before the first frame update
     void Start()
     {
         Player = GameObject.FindGameObjectWithTag("Player");
@@ -20,30 +18,37 @@ public class BuildingThreshColliderScript : MonoBehaviour
 
     void OnTriggerExit2D()
     {
-        if(isPlayerCrossingUp())
+        if(isPlayerCrossingUp()) //if player crossing up
         {
             if (backOfBuilding)
-                {
-                    building.GoBehindBuilding();
-                    playerMovement.isPlayerInside = false;
-                }
-                else
-                {
-                    building.EnterBuilding();
-                    playerMovement.isPlayerInside = true;
-                }
+            {
+                building.GoBehindBuilding(); // go outside behind the buildinng
+                playerMovement.isPlayerOutside = true;
+            }
+            else
+            {
+                building.EnterBuilding();
+                playerMovement.isPlayerOutside = false;
+            }
         }
         else //if player crossing down
         {
-                if (backOfBuilding)
+                if (backOfBuilding)   // entering the building from the back
                 {         
                     building.EnterBuilding();
-                    playerMovement.isPlayerInside = true;
+                    playerMovement.isPlayerOutside = false;
                 }
-                else
+                else // entering the building fro the front
                 {
-                    building.ExitBuilding();
-                    playerMovement.isPlayerInside = false;
+                    if (LayerMask.LayerToName(this.gameObject.layer) != "Default") // if player is not exiting building on the ground level
+                    {
+                        building.ExitBuilding(0.3f, 0.3f);
+                    }
+                    else      // if player is exiting building on the ground level
+                    {
+                        building.ExitBuilding(1f, 1f); //
+                    }
+                    playerMovement.isPlayerOutside = true;
                 }
             
         }

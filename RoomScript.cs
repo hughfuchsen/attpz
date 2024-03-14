@@ -97,7 +97,7 @@ public class RoomScript : MonoBehaviour
     
     public void ResetRooms() //move rooms to initial positions
     {
-
+        Debug.Log("YESSY");
         for (int i = 0; i < roomsSameOrAbove.Count; i++)
         {
             roomsSameOrAbove[i].MoveUp();

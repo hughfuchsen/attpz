@@ -17,9 +17,16 @@ public class PlayerMovement : MonoBehaviour
   public bool fixedDirectionLeft;
   public bool fixedDirectionRight;
   
-  public bool isPlayerOutside = false;
+  public bool playerIsOutside = false;
 
-
+  public bool playerIsInside()
+  {
+    if (!playerIsOutside)
+    {
+      return true;
+    }
+    return false;
+  }
   void Animate() {
     animator.SetFloat("moveX", change.x);
     animator.SetFloat("moveY", change.y);
@@ -34,6 +41,7 @@ public class PlayerMovement : MonoBehaviour
       myRigidbody = GetComponent<Rigidbody2D>();
       fixedDirectionLeft = false;
       fixedDirectionRight = false;
+      playerIsOutside = true;
     }
 
   // Update is called once per frame

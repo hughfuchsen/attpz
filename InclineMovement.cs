@@ -13,6 +13,7 @@ public class InclineMovement : MonoBehaviour
     public string higherColliderLayerName; // The name of the layer you want to switch to
     public bool topOfStairCase;
     public bool middleOfStairCase;
+    public Coroutine thresholdSortingSequenceCoro;
 
     // Start is called before the first frame update
     void Awake()
@@ -55,26 +56,41 @@ public class InclineMovement : MonoBehaviour
             {
                 gameObject.layer = LayerMask.NameToLayer(higherColliderLayerName);
                 SetCollisionLayer(higherColliderLayerName);
-                SetSortingLayer(collision.gameObject, higherSortingLayerToAssign);
+                SetTreeSortingLayer(collision.gameObject, higherSortingLayerToAssign);
             }
             else if(isPlayerCrossingUp() && !topOfStairCase)
             {
                 gameObject.layer = LayerMask.NameToLayer(higherColliderLayerName);
                 SetCollisionLayer(higherColliderLayerName);
-                SetSortingLayer(collision.gameObject, higherSortingLayerToAssign);
+                SetTreeSortingLayer(collision.gameObject, higherSortingLayerToAssign);
             }                       
             else if(!isPlayerCrossingUp() && topOfStairCase)
             {
                 gameObject.layer = LayerMask.NameToLayer(lowerColliderLayerName);
                 SetCollisionLayer(lowerColliderLayerName);
-                SetSortingLayer(collision.gameObject, lowerSortingLayerToAssign);
+                SetTreeSortingLayer(collision.gameObject, lowerSortingLayerToAssign);
             } 
             else if(!isPlayerCrossingUp() && !topOfStairCase)
             {
                 gameObject.layer = LayerMask.NameToLayer(higherColliderLayerName);
                 SetCollisionLayer(higherColliderLayerName);
-                SetSortingLayer(collision.gameObject, higherSortingLayerToAssign);
+                SetTreeSortingLayer(collision.gameObject, higherSortingLayerToAssign);
             } 
+
+
+                // if (Player.GetComponent<SpriteRenderer>().sortingLayerName == "ThresholdSequence")                
+                // {
+                //     if (this.gameObject.layer == LayerMask.NameToLayer("Default"))
+                //     {
+                //         SetTreeSortingLayer(Player, "Level0");
+                //     }
+                //     else
+                //     {
+                //         SetTreeSortingLayer(Player, LayerMask.LayerToName(this.gameObject.layer));
+                //     }
+                // }
+
+            
         }
     }
 
@@ -103,38 +119,37 @@ public class InclineMovement : MonoBehaviour
                 {
                     gameObject.layer = LayerMask.NameToLayer(higherColliderLayerName);
                     SetCollisionLayer(higherColliderLayerName);
-                    SetSortingLayer(collision.gameObject, higherSortingLayerToAssign);
+                    SetTreeSortingLayer(collision.gameObject, higherSortingLayerToAssign);
                 }            
                 else if(!isPlayerCrossingUp() && !topOfStairCase)
                 {
                     gameObject.layer = LayerMask.NameToLayer(lowerColliderLayerName);
                     SetCollisionLayer(lowerColliderLayerName);
-                    SetSortingLayer(collision.gameObject, lowerSortingLayerToAssign);
+                    SetTreeSortingLayer(collision.gameObject, lowerSortingLayerToAssign);
                 }
                 else if(!isPlayerCrossingUp() && topOfStairCase)
                 {
                     gameObject.layer = LayerMask.NameToLayer(lowerColliderLayerName);
                     SetCollisionLayer(lowerColliderLayerName);
-                    SetSortingLayer(collision.gameObject, lowerSortingLayerToAssign);
+                    SetTreeSortingLayer(collision.gameObject, lowerSortingLayerToAssign);
                 }
             }
     }
 
     // sortingLayerToAssign is just a variable name, it's given a value in the preceding code somewhere. 
-    //In the SetSortingLayer function the second parameter is given the name sortingLayerName, 
+    //In the SetTreeSortingLayer function the second parameter is given the name sortingLayerName, 
     //but this name is local to the function definition. It works because when the function is called, 
     //the sortingLayerName variable inside the function is given the value of sortingLayerToAssign. 
 
-    static void SetSortingLayer(GameObject gameObject, string sortingLayerName)
+    static void SetTreeSortingLayer(GameObject gameObject, string sortingLayerName)
     {
         if(gameObject.GetComponent<SpriteRenderer>() != null) {
           gameObject.GetComponent<SpriteRenderer>().sortingLayerName = sortingLayerName;
         }
         foreach (Transform child in gameObject.transform)
         {
-            InclineMovement.SetSortingLayer(child.gameObject, sortingLayerName);
+            InclineMovement.SetTreeSortingLayer(child.gameObject, sortingLayerName);
         }
-
     }
 
     private bool isPlayerCrossingUp()

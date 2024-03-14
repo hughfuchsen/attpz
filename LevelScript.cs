@@ -19,6 +19,7 @@ public class LevelScript : MonoBehaviour
     private List<Vector3> childColliderInitialPositions = new List<Vector3>();
     private List<GameObject> spriteList = new List<GameObject>();
     private List<Color> initialColorList = new List<Color>();
+    private List<Color> initialColorListToBeChangedWithLevelMovements = new List<Color>();
     private Coroutine currentMotionCoroutine;
     private Coroutine currentColliderMotionCoroutine; 
 
@@ -36,9 +37,32 @@ public class LevelScript : MonoBehaviour
             {
                 Color initialColor = sr.color;
                 initialColorList.Add(initialColor);
+                initialColorListToBeChangedWithLevelMovements.Add(initialColor);
             }
 
         }
+        // for (int i = 0; i < levelsAbove.Count; i++)
+        // {  
+        //     levelsAbove[i].gameObject.SetActive(true);
+        // }
+        // for (int i = 0; i < levelsBelow.Count; i++)
+        // {  
+        //     levelsBelow[i].gameObject.SetActive(true);
+        // }
+
+        // // Activate levels above
+        // foreach (LevelScript level in levelsAbove)
+        // {
+        //     if (level != null)
+        //         level.gameObject.SetActive(true);
+        // }
+
+        // // Activate levels below
+        // foreach (LevelScript level in levelsBelow)
+        // {
+        //     if (level != null)
+        //         level.gameObject.SetActive(true);
+        // }
 
         initialPosition = this.gameObject.transform.localPosition;
 
@@ -87,29 +111,8 @@ public class LevelScript : MonoBehaviour
                 }
             }
     }
-    
-    // public void ExitLevel()
-    // {
-    //     if(!groundFloor)
-    //     {
-    //         this.MoveOut();       
-    //     }
-    //     else
-    //     // else
-    //     // {
-    //     //     this.MoveIn();
-    //     //     for (int i = 0; i < levelsAbove.Count; i++)
-    //     //     {           
-    //     //         levelsAbove[i].MoveOut();
-    //     //     }        
-    //     //     for (int i = 0; i < levelsBelow.Count; i++)
-    //     //     {           
-    //     //         levelsBelow[i].MoveOut();
-    //     //     }        
-    //     // }    
-    // }
 
-    public void ExitBuilding() //move levels to initial positions
+    public void ResetLevels() //move levels to initial positions
     {
 
         if(levelsAbove != null)
@@ -204,14 +207,9 @@ public class LevelScript : MonoBehaviour
     private IEnumerator DisplaceAndDeSaturate(bool shouldWait, float? waitTime, bool movingOut, GameObject obj, Vector3 targetPosition)
     {
         Vector3 currentPosition = obj.transform.localPosition;
-        // Vector3 currentPosition = initialPosition;
-
         float displaceDistace = (currentPosition - targetPosition).magnitude;
-
         float timeToReachTarget = 0.3f;
-
         float elapsedTime = 0f;
-
         if(shouldWait)
         {
             yield return new WaitForSeconds(waitTime.Value);
@@ -235,7 +233,6 @@ public class LevelScript : MonoBehaviour
             {
                 childColliders[i].position = childColliderInitialPositions[i];
             }
-
             yield return null;
         }
 
@@ -258,7 +255,6 @@ public class LevelScript : MonoBehaviour
                     {
                         Color newColor = sr.color; // Get the current color
                         newColor.a = 0; // Set the alpha component
-
                         sr.color = newColor; // Assign the modified color
                     }
                 }
@@ -270,7 +266,7 @@ public class LevelScript : MonoBehaviour
 
         if(!movingOut)
         {
-            SetInitialColor(spriteList);  
+            SetInitialColorToBeChangedWithLevelMovements(spriteList);  
 
             for (int i = 0; i < spriteList.Count; i++)
             {
@@ -281,7 +277,6 @@ public class LevelScript : MonoBehaviour
                     {
                         Color newColor = sr.color; // Get the current color
                         newColor.a = 0; // Set the alpha component
-
                         sr.color = newColor; // Assign the modified color
                     }
                 }
@@ -303,47 +298,6 @@ public class LevelScript : MonoBehaviour
         sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, fadeTo);
     }
 
-    // IEnumerator TreeFade(GameObject obj) 
-    // {
-    //     // for (float t = 0.0f; t < 1; t += Time.deltaTime) 
-    //     // {
-    //         // float currentAlpha = Mathf.Lerp(fadeFrom, fadeTo, t * fadeSpeed);
-    //         SetTreeSaturation(obj);
-    //         yield return null;
-    //     // }
-    // }
-
-    // void SetTreeSaturation(List<GameObject> spriteList)
-    // {
-    //     if (treeNode == null)
-    //     {
-    //         Debug.Log("return3d");
-    //         return;
-    //     }
-
-    //     SpriteRenderer sr = treeNode.GetComponent<SpriteRenderer>();
-
-    //     if (sr != null)
-    //     {
-    //         Color color = sr.color;
-
-    //         // Convert the color to HSB
-    //         Color.RGBToHSV(color, out float h, out float s, out float v);
-
-    //         s -= 0.2f;
-
-    //         // Convert back to RGB
-    //         color = Color.HSVToRGB(h, s, v);
-
-    //         // Apply the modified color back to the SpriteRenderer
-    //         sr.color = color;
-    //     }
-
-    //     foreach (Transform child in treeNode.transform)
-    //     {
-    //         SetTreeSaturation(child.gameObject, saturationAmount);
-    //     }
-    // }
     void SetSaturationAndValue(List<GameObject> spriteList)
     {
         // Iterate through the list of GameObjects
@@ -352,7 +306,7 @@ public class LevelScript : MonoBehaviour
             SpriteRenderer sr = spriteList[i].GetComponent<SpriteRenderer>();
 
             // Get the current color
-            Color color = initialColorList[i];
+            Color color = initialColorListToBeChangedWithLevelMovements[i];
 
             // Convert the current color to HSV
             Color.RGBToHSV(color, out float h, out float s, out float v);
@@ -377,25 +331,18 @@ public class LevelScript : MonoBehaviour
             sr.color = color;
         }
     }
-
-    // void SetAlpha(List<GameObject> spriteList)
-    // {
-    //     for (int i = 0; i < spriteList.Count; i++)
-    //     {
-    //         SpriteRenderer sr = spriteList[i].GetComponent<SpriteRenderer>();
-
-    //         Color color = sr.color;
-
-    //         sr.color
-    // }
-    void SetInitialColor(List<GameObject> spriteList)
+    void SetInitialColorToBeChangedWithLevelMovements(List<GameObject> spriteList)
     {
         for (int i = 0; i < spriteList.Count; i++)
         {
             SpriteRenderer sr = spriteList[i].GetComponent<SpriteRenderer>();
-            if (sr != null)
+            if (sr != null && sr.color.a != 0f)
             {
-                sr.color = initialColorList[i];
+                sr.color = initialColorListToBeChangedWithLevelMovements[i];
+            }
+            else if (sr.color.a == 0f)
+            {
+                sr.color = new Color(initialColorList[i].r, initialColorList[i].g, initialColorList[i].b, 0f);
             }
         }
     }

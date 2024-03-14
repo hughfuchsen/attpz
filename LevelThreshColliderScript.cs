@@ -52,25 +52,25 @@ public class LevelThreshColliderScript : MonoBehaviour
         
         if(isPlayerCrossingUp()) //crossing up bro
         {
-            if(this.transform.parent.GetComponentInChildren<BuildingThreshColliderScript>() != null && !aboveCollider && playerMovement.isPlayerOutside)
+            if(this.transform.parent.GetComponentInChildren<BuildingThreshColliderScript>() != null && playerMovement.playerIsOutside)
             {
                 if(levelAboveOrEntering != null)
                 {
                     for (int i = 0; i < levelAboveOrEntering.Count; i++)
                     {                       
-                        levelAboveOrEntering[i].ExitBuilding();
+                        levelAboveOrEntering[i].ResetLevels();
                     }    
                 }
                 else if(levelBelowOrEntering != null)
                 {
                     for (int i = 0; i < levelBelowOrEntering.Count; i++)
                     {                        
-                        levelBelowOrEntering[i].ExitBuilding();
+                        levelBelowOrEntering[i].ResetLevels();
                     }
                 }
 
             }
-            else if(this.transform.parent.GetComponentInChildren<BuildingThreshColliderScript>() != null && !aboveCollider && !playerMovement.isPlayerOutside)
+            else if(this.transform.parent.GetComponentInChildren<BuildingThreshColliderScript>() != null && playerMovement.playerIsInside())
             {
                 if(levelAboveOrEntering != null)
                 {
@@ -111,25 +111,25 @@ public class LevelThreshColliderScript : MonoBehaviour
         }
         else    // if player crossing down
         {
-            if(this.transform.parent.GetComponentInChildren<BuildingThreshColliderScript>() != null && aboveCollider && playerMovement.isPlayerOutside) 
+            if(this.transform.parent.GetComponentInChildren<BuildingThreshColliderScript>() != null && aboveCollider && playerMovement.playerIsOutside) 
             {
                 // insert only the level you are going through my dog!
                 if(levelBelowOrEntering != null)
                 {
                     for (int i = 0; i < levelBelowOrEntering.Count; i++)
                     {      
-                        levelBelowOrEntering[i].ExitBuilding();
+                        levelBelowOrEntering[i].ResetLevels();
                     }
                 }        
                 if(levelAboveOrEntering != null)
                 {
                     for (int i = 0; i < levelAboveOrEntering.Count; i++)
                     {  
-                        levelAboveOrEntering[i].ExitBuilding();
+                        levelAboveOrEntering[i].ResetLevels();
                     }
                 }   
             }
-            else if(this.transform.parent.GetComponentInChildren<BuildingThreshColliderScript>() != null && aboveCollider && !playerMovement.isPlayerOutside) 
+            else if(this.transform.parent.GetComponentInChildren<BuildingThreshColliderScript>() != null && aboveCollider && playerMovement.playerIsInside()) 
             {
                 if(levelAboveOrEntering != null)
                 {

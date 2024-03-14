@@ -22,13 +22,16 @@ public class BuildingThreshColliderScript : MonoBehaviour
         {
             if (backOfBuilding)
             {
-                building.GoBehindBuilding(); // go outside behind the buildinng
-                playerMovement.isPlayerOutside = true;
+                if (playerMovement.playerIsInside())
+                {                
+                    building.GoBehindBuilding(); // go outside behind the buildinng
+                }
+                playerMovement.playerIsOutside = true;
             }
             else
             {
                 building.EnterBuilding();
-                playerMovement.isPlayerOutside = false;
+                playerMovement.playerIsOutside = false;            
             }
         }
         else //if player crossing down
@@ -36,7 +39,7 @@ public class BuildingThreshColliderScript : MonoBehaviour
                 if (backOfBuilding)   // entering the building from the back
                 {         
                     building.EnterBuilding();
-                    playerMovement.isPlayerOutside = false;
+                    playerMovement.playerIsOutside = false;            
                 }
                 else // entering the building fro the front
                 {
@@ -48,7 +51,7 @@ public class BuildingThreshColliderScript : MonoBehaviour
                     {
                         building.ExitBuilding(1f, 1f); //
                     }
-                    playerMovement.isPlayerOutside = true;
+                    playerMovement.playerIsOutside = true;
                 }
             
         }

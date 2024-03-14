@@ -8,6 +8,8 @@ public class BuildingScript : MonoBehaviour
     public GameObject innerBuilding;
     public GameObject outerBuilding;
     public List<GameObject> gameObjectsToShowOutside = new List<GameObject>();
+    PlayerMovement playerMovement;
+    [SerializeField] GameObject Player;
     private List<GameObject> gameObjectsToShowOutsideSpriteList = new List<GameObject>();
     private List<Color> gameObjectsToShowOutsideColorList = new List<Color>();
     private List<GameObject> innerBuildingSpriteList = new List<GameObject>();
@@ -19,12 +21,14 @@ public class BuildingScript : MonoBehaviour
 
     private Coroutine innerBuildingFadeCoroutine;
     private Coroutine outerBuildingFadeCoroutine;
+    private Coroutine backdropFadeCoroutine;
     private string[] tagsToExludeEntExt = { "OpenDoor", "AlphaZeroEntExt" };
 
-
-    
-
-
+    void Awake()
+    { 
+        Player = GameObject.FindGameObjectWithTag("Player");
+        playerMovement = Player.GetComponent<PlayerMovement>(); 
+    }  
 
     // Start is called before the first frame update
     void Start()
@@ -55,6 +59,22 @@ public class BuildingScript : MonoBehaviour
         {
             StopCoroutine(this.outerBuildingFadeCoroutine);
         }
+        if(this.backdropFadeCoroutine != null)
+        {
+            StopCoroutine(this.backdropFadeCoroutine);
+        }
+
+        
+        // for (int i = 0; i < innerBuildingSpriteList.Count; i++)
+        // {                       
+        //     if (innerBuildingSpriteList[i].GetComponent<SpriteRenderer>().sortingLayerName == "Default")
+        //     {
+        //         SetSortingLayer(innerBuildingSpriteList[i], "Level0");
+        //         SetSortingLayer(Player, "Level0");
+        //     }
+        // }
+        backdropFadeCoroutine = StartCoroutine(FadeObject(false, 0f, GameObject.FindGameObjectWithTag("InnerBuildingBackdrop"), 1f));
+
         innerBuildingFadeCoroutine = StartCoroutine(FadeThenSetDontSort(false, innerSpriteSortingScriptObj, false, false, 0f, false, innerBuildingSpriteList, innerBuildingInitialColorList, null, tagsToExludeEntExt));
         outerBuildingFadeCoroutine = StartCoroutine(FadeThenSetDontSort(true, outerSpriteSortingScriptObj, true, false, 0f, false, outerBuildingSpriteList, null, 0f));
     }
@@ -68,6 +88,21 @@ public class BuildingScript : MonoBehaviour
         {
             StopCoroutine(this.outerBuildingFadeCoroutine);
         }
+        if(this.backdropFadeCoroutine != null)
+        {
+            StopCoroutine(this.backdropFadeCoroutine);
+        }
+
+        // for (int i = 0; i < innerBuildingSpriteList.Count; i++)
+        // {                       
+        //     if (innerBuildingSpriteList[i].GetComponent<SpriteRenderer>().sortingLayerName == "Level0")
+        //     {
+        //         SetSortingLayer(innerBuildingSpriteList[i], "Default");
+        //         SetSortingLayer(Player, "Default");
+        //     }
+        // }
+        backdropFadeCoroutine = StartCoroutine(FadeObject(false, 0f, GameObject.FindGameObjectWithTag("InnerBuildingBackdrop"), 0f));
+
         innerBuildingFadeCoroutine = StartCoroutine(FadeThenSetDontSort(true, innerSpriteSortingScriptObj, true, true, waitTimeInside, false, innerBuildingSpriteList, null, 0f));
         outerBuildingFadeCoroutine = StartCoroutine(FadeThenSetDontSort(false, outerSpriteSortingScriptObj, false, true, waitTimeOutside, false, outerBuildingSpriteList, outerBuildingInitialColorList, null, tagsToExludeEntExt));
     }
@@ -81,8 +116,26 @@ public class BuildingScript : MonoBehaviour
         {
             StopCoroutine(this.outerBuildingFadeCoroutine);
         }
-        innerBuildingFadeCoroutine = StartCoroutine(Fade(true, 0.3f, true, innerBuildingSpriteList, null, 0f));
-        outerBuildingFadeCoroutine = StartCoroutine(Fade(true, 0.3f, true, outerBuildingSpriteList, null, 0.35f, tagsToExludeEntExt));
+        // FadeThenSetDontSort
+        //                                     ( 
+        //                                     bool fadeFirst,
+        //                                     List<IsoSpriteSorting> issList, 
+        //                                     bool setDontSort, bool shouldWait, 
+        //                                     float? waitTime, 
+        //                                     bool behindBuilding, 
+        //                                     List<GameObject> spriteList, 
+        //                                     List<Color> colorList, 
+        //                                     float? alpha, 
+        //                                     string[] tagsToExclude = null
+        //                                     )
+
+        backdropFadeCoroutine = StartCoroutine(FadeObject(true, 0.3f, GameObject.FindGameObjectWithTag("InnerBuildingBackdrop"), 0f));
+
+        innerBuildingFadeCoroutine = StartCoroutine(FadeThenSetDontSort(true, innerSpriteSortingScriptObj, true, true, 1f, true, innerBuildingSpriteList, null, 0f));
+        outerBuildingFadeCoroutine = StartCoroutine(FadeThenSetDontSort(false, outerSpriteSortingScriptObj, false, true, 1f, true, outerBuildingSpriteList, null, 0.35f, tagsToExludeEntExt));
+
+        // innerBuildingFadeCoroutine = StartCoroutine(Fade(true, 0.3f, true, innerBuildingSpriteList, null, 0f));
+        // outerBuildingFadeCoroutine = StartCoroutine(Fade(true, 0.3f, true, outerBuildingSpriteList, null, 0.35f, tagsToExludeEntExt));
     }
 
 
@@ -91,9 +144,49 @@ public class BuildingScript : MonoBehaviour
     // coroutine for fading things in a sequence
     public IEnumerator Fade(bool shouldWait, float? waitTime, bool behindBuilding, List<GameObject> spriteList, List<Color> colorList, float? alpha, string[] tagsToExclude = null)
     {
-        if (shouldWait && waitTime.HasValue) // Check if waitTime has a value
+        if (shouldWait && waitTime.HasValue) // if Exiting the building
         {
             yield return new WaitForSeconds(waitTime.Value);
+
+            for (int i = 0; i < innerBuildingSpriteList.Count; i++)
+            {                       
+                if (innerBuildingSpriteList[i].GetComponent<SpriteRenderer>().sortingLayerName == "Level0")
+                {
+                    SetSortingLayer(innerBuildingSpriteList[i], "Default");
+                }
+            }
+            for (int i = 0; i < gameObjectsToShowOutsideSpriteList.Count; i++)
+            {            
+                    if (gameObjectsToShowOutsideSpriteList[i].GetComponent<SpriteRenderer>().sortingLayerName == "Level0")
+                    {
+                        SetSortingLayer(gameObjectsToShowOutsideSpriteList[i], "Default");
+                    }
+            }
+            if (Player.GetComponent<SpriteRenderer>().sortingLayerName == "Level0") // if the player exits building from the ground flow
+            {
+                SetSortingLayer(Player, "Default");
+            }
+        }
+        else // if entering the building
+        {
+            for (int i = 0; i < innerBuildingSpriteList.Count; i++)
+            {                       
+                if (innerBuildingSpriteList[i].GetComponent<SpriteRenderer>().sortingLayerName == "Default")
+                {
+                    SetSortingLayer(innerBuildingSpriteList[i], "Level0");
+                }
+            }
+            for (int i = 0; i < gameObjectsToShowOutsideSpriteList.Count; i++)
+            {                      
+                    if (gameObjectsToShowOutsideSpriteList[i].GetComponent<SpriteRenderer>().sortingLayerName == "Default")
+                    {
+                        SetSortingLayer(gameObjectsToShowOutsideSpriteList[i], "Level0");
+                    }
+            }
+            if (Player.GetComponent<SpriteRenderer>().sortingLayerName == "Default") // if the player enters building at the ground flow
+            {
+                SetSortingLayer(Player, "Level0");
+            }
         }
 
         for (float t = 0.0f; t < 1; t += Time.deltaTime) 
@@ -102,34 +195,20 @@ public class BuildingScript : MonoBehaviour
             {
                 SpriteRenderer sr = spriteList[i].GetComponent<SpriteRenderer>();
                 Transform tr = spriteList[i].transform;
-                // Transform parentTransform = tr.parent;
 
                 if (sr != null && (tagsToExclude == null || !Array.Exists(tagsToExclude, element => element == spriteList[i].tag)))        
                 {
                     if(colorList == null)
                     {
-                        // if(behindBuilding && sr.CompareTag("ClosedDoor") && tr.parent.GetComponentInChildren<BuildingThreshColliderScript>() != null)
-                        // {
-                        //     float nextAlpha = Mathf.Lerp(sr.color.a, 0.35f, t * 7f);
-                        //     sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, nextAlpha);
-                        // }
-                        // else if(sr.CompareTag("ClosedDoor") && tr.parent.GetComponentInChildren<BuildingThreshColliderScript>() != null)
-                        // {
-                        //     float nextAlpha = Mathf.Lerp(sr.color.a, 1f, t * 7f);
-                        //     sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, nextAlpha);
-                        // }
-                        // else
-                        // {
-                            if (alpha.HasValue)
-                            {
-                                float nextAlpha = Mathf.Lerp(sr.color.a, alpha.Value, t * 7f);
-                                sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, nextAlpha);
-                            }
-                        // }
+                        if (alpha.HasValue)
+                        {
+                            float nextAlpha = Mathf.Lerp(sr.color.a, alpha.Value, t * 1f);
+                            sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, nextAlpha);
+                        }
                     }
                     else
                     {
-                        float nextAlpha = Mathf.Lerp(sr.color.a, colorList[i].a, t * 7f);
+                        float nextAlpha = Mathf.Lerp(sr.color.a, colorList[i].a, t * 1f);
                         sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, nextAlpha);
                         // sr.color = colorList[i];
                     }    
@@ -139,21 +218,44 @@ public class BuildingScript : MonoBehaviour
             {
                 SpriteRenderer sr = gameObjectsToShowOutsideSpriteList[i].GetComponent<SpriteRenderer>();
 
-                if (behindBuilding)
+                if (behindBuilding && !gameObjectsToShowOutsideSpriteList[i].CompareTag("OpenDoor"))
                 {
-                    float nextAlpha = Mathf.Lerp(sr.color.a, 1f, t * 7f);
+                    float nextAlpha = Mathf.Lerp(sr.color.a, gameObjectsToShowOutsideColorList[i].a, t * 1f);
                     sr.color = gameObjectsToShowOutsideColorList[i];
-                }
-                // else
-                // {
-                //     sr.color = gameObjectsToShowOutsideColorList[i];
-                // }        
+                }     
             }
-
-
             yield return null;    
         }
 
+    }
+
+    public IEnumerator FadeObject(bool shouldWait, float? waitTime, GameObject sprite, float alpha)
+    {
+        if (shouldWait && waitTime.HasValue)
+        {
+            yield return new WaitForSeconds(waitTime.Value);
+        }
+
+        SpriteRenderer sr = sprite.GetComponent<SpriteRenderer>();
+
+        // Calculate duration based on the alpha difference
+        float alphaDiff = Mathf.Abs(sr.color.a - alpha);
+        float duration = alphaDiff / 1f; // Assuming alpha ranges from 0 to 1
+        float elapsedTime = 0.0f;
+
+        while (elapsedTime < duration)
+        {
+            elapsedTime += Time.deltaTime;
+            float t = elapsedTime / duration;
+
+            float nextAlpha = Mathf.Lerp(sr.color.a, alpha, t);
+            sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, nextAlpha);
+
+            yield return null;
+        }
+
+        // Ensure the final alpha value is set
+        sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, alpha);
     }
 
 
@@ -330,5 +432,18 @@ public class BuildingScript : MonoBehaviour
               
         // }   
     }
+
+    static void SetSortingLayer(GameObject gameObject, string sortingLayerName)
+    {
+        if(gameObject.GetComponent<SpriteRenderer>() != null) 
+        {
+          gameObject.GetComponent<SpriteRenderer>().sortingLayerName = sortingLayerName;
+        }
+        foreach (Transform child in gameObject.transform)
+        {
+            BuildingScript.SetSortingLayer(child.gameObject, sortingLayerName);
+        }    
+    }
+
 
 }

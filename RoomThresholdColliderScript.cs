@@ -43,16 +43,18 @@ public class RoomThresholdColliderScript : MonoBehaviour
 
     void Start()
     {
-        // get the sprites and add them to the corresponding lists
+        // get the sprites and add them to the -> corresponding lists
         GetSprites(FindSiblingWithTag("OpenDoor"), openDoorSpriteList);
         GetSprites(FindSiblingWithTag("ClosedDoor"), closedDoorSpriteList);
-
+        
+        //populate the initialOpenDoorAlpha list
         for (int i = 0; i < openDoorSpriteList.Count; i++)
         {
             Color initialColorOpen = openDoorSpriteList[i].GetComponent<SpriteRenderer>().color;
             initialOpenDoorAlpha.Add(initialColorOpen.a);
         }
 
+        //populate the initialClosedDoorAlpha list
         for (int i = 0; i < closedDoorSpriteList.Count; i++)
         {
             Color initialColorClosed = closedDoorSpriteList[i].GetComponent<SpriteRenderer>().color;
@@ -62,7 +64,8 @@ public class RoomThresholdColliderScript : MonoBehaviour
         SetOpenDoorToZeroAlpha();
 
         SetClosedDoorToInitialAlpha(); 
-
+        
+        //Parameters: SetDoorState(bool playerIsInDoorway, bool playerIsInRoomAbove, bool fade=false);
         SetDoorState(false, false);
     }
 
@@ -145,6 +148,7 @@ public class RoomThresholdColliderScript : MonoBehaviour
                 }  
                 else if (roomAbove != null)
                 {
+                    SetClosedDoorToInitialAlpha();
                     roomAbove.EnterRoom(true, 0.3f); 
                 }
             }

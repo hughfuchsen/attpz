@@ -19,7 +19,7 @@ public class TriggerButtonPress : MonoBehaviour
     // public List<GameObject> colliders = new List<GameObject>();
 
 
-    void Start()
+    void Awake()
     {
 
         for (int i = 0; i < treeObjects.Count; i++)

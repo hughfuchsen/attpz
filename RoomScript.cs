@@ -9,9 +9,7 @@ public class RoomScript : MonoBehaviour
     private List<Transform> childColliders = new List<Transform>(); // Separate list for child colliders
     public List<RoomThresholdColliderScript> doorsBelow = new List<RoomThresholdColliderScript>();
     private List<Coroutine> doorsBelowCoros = new List<Coroutine>();
-    private float doorBelowAlpha = 0.15f;
     public int wallHeight = 30;
-    public float displaceSpeed = 100;
     public float fadeSpeed = 100f;
     private Vector3 initialPosition;
     private List<Vector3> childColliderInitialPositions = new List<Vector3>();
@@ -45,20 +43,6 @@ public class RoomScript : MonoBehaviour
             }
         }
     }
-// public void EnterRoom(bool shouldWait, float? waitTime)
-// {
-//     // ...
-//     if (waitTime.HasValue)
-//     {
-//         roomsBelow[i].MoveDown(shouldWait, waitTime.Value);
-//     }
-//     else
-//     {
-//         // Handle the case where waitTime is null
-//         // You might want to add some default behavior or log an error here.
-//     }
-//     // ...
-// }
 
     public void EnterRoom(bool shouldWait, float? waitTime)
     {
@@ -86,7 +70,7 @@ public class RoomScript : MonoBehaviour
         }
     }
     
-    public void ExitRoom() 
+    public void ExitRoomAndSetDoorwayInstances() 
     {
         for (int i = 0; i < doorsBelow.Count; i++)
         {
@@ -95,9 +79,8 @@ public class RoomScript : MonoBehaviour
         }
     }
     
-    public void ResetRooms() //move rooms to initial positions
+    public void ResetRoomPositions() //move rooms to initial positions
     {
-        Debug.Log("YESSY");
         for (int i = 0; i < roomsSameOrAbove.Count; i++)
         {
             roomsSameOrAbove[i].MoveUp();
@@ -129,7 +112,7 @@ public class RoomScript : MonoBehaviour
         if (waitTime.HasValue)
         {
             // Move the parent object down
-            currentMotionCoroutine = StartCoroutine(Displace(shouldWait, waitTime.Value, this.gameObject, initialPosition + new Vector3(0, -wallHeight, 0)));//, 1));
+            currentMotionCoroutine = StartCoroutine(Displace(shouldWait, waitTime.Value, this.gameObject, initialPosition + new Vector3(0, -wallHeight, 0)));
         }
         else
         {
@@ -182,26 +165,6 @@ public class RoomScript : MonoBehaviour
         {
             childColliders[i].position = childColliderInitialPositions[i]; // Ensure the object reaches the exact target position
         }
-    }
-
-    private IEnumerator Fade(SpriteRenderer sr, float fadeTo)
-    {
-        for (float t = 0.0f; t < 1; t += Time.deltaTime) 
-        {
-            float currentAlpha = Mathf.Lerp(sr.color.a, fadeTo, t * fadeSpeed);
-            sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, fadeTo);
-            yield return null;
-        }
-        sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, fadeTo);
-    }
-
-    private void ResetDoorsBelowCoros()
-    {
-        for (int i = 0; i < doorsBelowCoros.Count; i++)
-        {
-            StopCoroutine(doorsBelowCoros[i]);
-        }
-        doorsBelowCoros = new List<Coroutine>();
     }
 }
 

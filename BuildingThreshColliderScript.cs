@@ -45,11 +45,11 @@ public class BuildingThreshColliderScript : MonoBehaviour
                 {
                     if (LayerMask.LayerToName(this.gameObject.layer) != "Default") // if player is not exiting building on the ground level
                     {
-                        building.ExitBuilding(0.3f, 0.3f);
+                        building.ExitBuilding(0.3f, 0.3f, false);
                     }
                     else      // if player is exiting building on the ground level
                     {
-                        building.ExitBuilding(1f, 1f); //
+                        building.ExitBuilding(0.3f, 0.3f, false); //
                     }
                     playerMovement.playerIsOutside = true;
                 }

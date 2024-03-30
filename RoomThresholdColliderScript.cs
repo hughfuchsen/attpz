@@ -34,58 +34,27 @@ public class RoomThresholdColliderScript : MonoBehaviour
     private string[] tagsToExludeEntExt = { "OpenDoor", "AlphaZeroEntExt" };
     
 
-
     void Awake()
-    { 
+    {
         Player = GameObject.FindGameObjectWithTag("Player");
         playerMovement = Player.GetComponent<PlayerMovement>(); 
-    }  
-
-    void Start()
-    {
+        
         // get the sprites and add them to the -> corresponding lists
         GetSprites(FindSiblingWithTag("OpenDoor"), openDoorSpriteList);
         GetSprites(FindSiblingWithTag("ClosedDoor"), closedDoorSpriteList);
-        
-        //populate the initialOpenDoorAlpha list
-        for (int i = 0; i < openDoorSpriteList.Count; i++)
-        {
-            Color initialColorOpen = openDoorSpriteList[i].GetComponent<SpriteRenderer>().color;
-            initialOpenDoorAlpha.Add(initialColorOpen.a);
-        }
 
-        //populate the initialClosedDoorAlpha list
-        for (int i = 0; i < closedDoorSpriteList.Count; i++)
-        {
-            Color initialColorClosed = closedDoorSpriteList[i].GetComponent<SpriteRenderer>().color;
-            initialClosedDoorAlpha.Add(initialColorClosed.a);
-        }
+        PopulateInitialColorLists();
 
         SetOpenDoorToZeroAlpha();
 
         SetClosedDoorToInitialAlpha(); 
         
-        //Parameters: SetDoorState(bool playerIsInDoorway, bool playerIsInRoomAbove, bool fade=false);
         SetDoorState(false, false);
     }
 
     void OnTriggerEnter2D()
     {
-        if(this.closedDoorFadeCoroutine != null)
-        {
-            StopCoroutine(this.closedDoorFadeCoroutine);
-        }
-
-        if(this.openDoorFadeCoroutine != null)
-        {
-            StopCoroutine(this.openDoorFadeCoroutine);
-        }
-
-        if (thresholdSortingSequenceCoro != null)
-        {
-            StopCoroutine(thresholdSortingSequenceCoro);
-            SetTreeSortingLayer(Player, initialSortingLayer);
-        }
+        StopAllCoros();
 
         playerMovement.motionDirection = "normal";
 
@@ -115,21 +84,7 @@ public class RoomThresholdColliderScript : MonoBehaviour
 
     void OnTriggerExit2D()
     {
-        if(this.closedDoorFadeCoroutine != null)
-        {
-            StopCoroutine(this.closedDoorFadeCoroutine);
-        }
-
-        if(this.openDoorFadeCoroutine != null)
-        {
-            StopCoroutine(this.openDoorFadeCoroutine);
-        }
-
-        if (thresholdSortingSequenceCoro != null)
-        {
-            StopCoroutine(thresholdSortingSequenceCoro);
-            SetTreeSortingLayer(Player, initialSortingLayer);
-        }
+        StopAllCoros();
 
         playerMovement.fixedDirectionLeft = false;
         playerMovement.fixedDirectionRight = false; // un-fix the player in \/ left/right diag way upon collider exit. 
@@ -137,28 +92,28 @@ public class RoomThresholdColliderScript : MonoBehaviour
             //ON EXIT CROSSING UP
         if (isPlayerCrossingUp())
         {
-            if (ThisThresholdIsAnEntranceToTheBuildingOrStairs())
+            if (ThisThresholdIsAnEntranceToTheBuildingOrIsStairs())
             {
-                if (roomBelow != null && roomAbove == null)
+                if (roomBelow != null && roomAbove == null) // if player is exiting the back of the building
                 {
-                    roomBelow.ResetRooms(); 
-                    roomBelow.ExitRoom(); 
+                    roomBelow.ResetRoomPositions(); 
+                    roomBelow.ExitRoomAndSetDoorwayInstances(); 
                     SetOpenDoorToZeroAlpha();
                     SetClosedDoorToInitialAlpha();
                 }  
-                else if (roomAbove != null)
+                else if (roomAbove != null) // if player is entering the building from the fro
                 {
-                    SetClosedDoorToInitialAlpha();
+                    // SetClosedDoorToInitialAlpha();
                     roomAbove.EnterRoom(true, 0.3f); 
                 }
             }
-            else 
+            else // if this threshold is just the entrance to a room and not a building entrance
             {               
                 SetClosedDoorToInitialAlpha(); 
                 if (roomBelow != null && roomAbove == null) // if there is no room above the thresh i.e. if 
                                                             // the player is leaving the level and the rooms need to go in their original pos.
                 {
-                    roomBelow.ResetRooms(); 
+                    roomBelow.ResetRoomPositions(); 
                 }
                 else if (roomAbove != null) 
                 {
@@ -167,7 +122,7 @@ public class RoomThresholdColliderScript : MonoBehaviour
 
                 if (roomBelow != null)
                 {
-                    roomBelow.ExitRoom();
+                    roomBelow.ExitRoomAndSetDoorwayInstances();
                 }
             }
             
@@ -178,16 +133,16 @@ public class RoomThresholdColliderScript : MonoBehaviour
         {
             if (roomAbove != null)
             {
-                roomAbove.ExitRoom();
+                roomAbove.ExitRoomAndSetDoorwayInstances();
                 SetOpenDoorToZeroAlpha();
                 SetClosedDoorToInitialAlpha();
             }
 
-            if (ThisThresholdIsAnEntranceToTheBuildingOrStairs())
+            if (ThisThresholdIsAnEntranceToTheBuildingOrIsStairs())
             {
                 if (roomBelow == null && roomAbove != null) // if the player IS inside bulding and ABOVE collider prior to collider exit
                 {
-                    roomAbove.ResetRooms();
+                    roomAbove.ResetRoomPositions();
                 }   
                 else
                 if (playerMovement.playerIsInside() && roomBelow != null) // if the player IS inside bulding and ABOVE collider, going down stairs and entering room downstairs
@@ -258,7 +213,7 @@ public class RoomThresholdColliderScript : MonoBehaviour
         }   
     }
 
-    bool ThisThresholdIsAnEntranceToTheBuildingOrStairs()
+    bool ThisThresholdIsAnEntranceToTheBuildingOrIsStairs()
     {
             if (this.transform.parent.GetComponentInChildren<BuildingThreshColliderScript>() != null
             ||  this.transform.parent.GetComponentInChildren<LevelThreshColliderScript>() != null
@@ -269,21 +224,62 @@ public class RoomThresholdColliderScript : MonoBehaviour
             return false;
     }
 
-
-    IEnumerator treeFade(
-      GameObject obj,
-      float fadeTo,
-      float fadeSpeed) 
+    void PopulateInitialColorLists()
     {
-        float fadeFrom = obj.GetComponent<SpriteRenderer>().color.a;
-
-        for (float t = 0.0f; t < 1f; t += Time.deltaTime) 
+                //populate the initialOpenDoorAlpha list
+        for (int i = 0; i < openDoorSpriteList.Count; i++)
         {
-            float currentAlpha = Mathf.Lerp(fadeFrom, fadeTo, t * fadeSpeed);
-            SetTreeAlpha(obj, currentAlpha);
-            yield return null;
+            Color initialColorOpen = openDoorSpriteList[i].GetComponent<SpriteRenderer>().color;
+            initialOpenDoorAlpha.Add(initialColorOpen.a);
+        }
+
+        //populate the initialClosedDoorAlpha list
+        for (int i = 0; i < closedDoorSpriteList.Count; i++)
+        {
+            Color initialColorClosed = closedDoorSpriteList[i].GetComponent<SpriteRenderer>().color;
+            initialClosedDoorAlpha.Add(initialColorClosed.a);
         }
     }
+
+    void StopAllCoros()
+    {
+        if(this.closedDoorFadeCoroutine != null)
+        {
+            StopCoroutine(this.closedDoorFadeCoroutine);
+        }
+
+        if(this.openDoorFadeCoroutine != null)
+        {
+            StopCoroutine(this.openDoorFadeCoroutine);
+        }
+        if (thresholdSortingSequenceCoro != null)
+        {
+            StopCoroutine(thresholdSortingSequenceCoro);
+            SetTreeSortingLayer(Player, initialSortingLayer);
+        }
+    }
+
+    IEnumerator treeFade(
+    GameObject obj,
+    float fadeTo,
+    float elapsedTime) 
+    {
+        float fadeFrom = obj.GetComponent<SpriteRenderer>().color.a;
+        float timer = 0.0f;
+
+        while (timer < elapsedTime) 
+        {
+            float t = timer / elapsedTime;
+            float currentAlpha = Mathf.Lerp(fadeFrom, fadeTo, t);
+            SetTreeAlpha(obj, currentAlpha);
+            timer += Time.deltaTime;
+            yield return null;
+        }
+
+        // Ensure final state
+        SetTreeAlpha(obj, fadeTo);
+    }
+
     
     void SetTreeAlpha(GameObject treeNode, float alpha, string[] tagsToExclude = null) 
     {
@@ -406,63 +402,66 @@ public class RoomThresholdColliderScript : MonoBehaviour
         }
     }
 
-    public void SetDoorState(bool playerIsInDoorway, bool playerIsInRoomAbove, bool fade=false) 
+    public void SetDoorState(bool playerIsInDoorway, bool playerIsInRoomAbove) 
     {
         this.playerIsInDoorway = playerIsInDoorway;
         this.playerIsInRoomAbove = playerIsInRoomAbove;
 
-        if (fade) 
-            {
-                if (playerIsInDoorway) 
+        if (playerIsInDoorway) 
+        {
+      
+            
+        }
+        else 
+        if (playerIsInRoomAbove) 
+        {
+            if (roomAbove != null)
+            {                    
+                for (int i = 0; i < roomAbove.doorsBelow.Count; i++)
                 {
-                    
-                }
-                else 
-                if (playerIsInRoomAbove) 
-                {
-                    if (roomAbove != null)
-                    {                    
-                        for (int i = 0; i < roomAbove.doorsBelow.Count; i++)
-                        {
-                            if (roomAbove.doorsBelow[i].FindSiblingWithTag("ClosedDoor") != null)
-                            {
-                                this.closedDoorFadeCoroutine = StartCoroutine(treeFade(roomAbove.doorsBelow[i].FindSiblingWithTag("ClosedDoor"), 0.35f, 3f));                    
-                                SetTreeAlpha(roomAbove.doorsBelow[i].FindSiblingWithTag("OpenDoor"), 0);
-                            }
-                        }
-                    }  
-                }
-                else if (playerMovement.playerIsOutside) {
-                    this.openDoorFadeCoroutine = StartCoroutine(treeFade(this.FindSiblingWithTag("OpenDoor"), 0, 3f));
-                }
-                else 
-                {
-                    if (roomAbove != null)
+                    if (roomAbove.doorsBelow[i].FindSiblingWithTag("ClosedDoor") != null)
                     {
-                        for (int i = 0; i < roomAbove.doorsBelow.Count; i++)
-                        {
-                            for (int j = 0; j < roomAbove.doorsBelow[i].closedDoorSpriteList.Count; j++)
-                            {
-                                this.closedDoorFadeCoroutine = StartCoroutine(treeFade(roomAbove.doorsBelow[i].closedDoorSpriteList[j], 
-                                                                                roomAbove.doorsBelow[i].initialClosedDoorAlpha[j], 3f)); 
-                            } 
-                        }   
-                    }              
+                        this.closedDoorFadeCoroutine = StartCoroutine(treeFade(roomAbove.doorsBelow[i].FindSiblingWithTag("ClosedDoor"), 0.35f, 0.3f));                    
+                        SetTreeAlpha(roomAbove.doorsBelow[i].FindSiblingWithTag("OpenDoor"), 0);
+                    }
                 }
+            }  
+        }
+        else if (playerMovement.playerIsOutside) {
+            if(this.FindSiblingWithTag("OpenDoor") != null)
+            {
+                this.openDoorFadeCoroutine = StartCoroutine(treeFade(this.FindSiblingWithTag("OpenDoor"), 0, 0.3f));
             }
+        }
+        else // if player is not in room above
+        {
+            if (roomAbove != null)
+            {
+                for (int i = 0; i < roomAbove.doorsBelow.Count; i++)
+                {
+                    for (int j = 0; j < roomAbove.doorsBelow[i].closedDoorSpriteList.Count; j++)
+                    {
+                        this.closedDoorFadeCoroutine = StartCoroutine(treeFade(roomAbove.doorsBelow[i].closedDoorSpriteList[j], 
+                                                                        roomAbove.doorsBelow[i].initialClosedDoorAlpha[j], 0.3f)); 
+                        // SetTreeAlpha(roomAbove.doorsBelow[i].closedDoorSpriteList[j], roomAbove.doorsBelow[i].initialClosedDoorAlpha[j]);
+                    } 
+                }   
+            }              
+        }
+            
         } 
 
     public void SetPlayerIsInDoorway(bool playerIsInDoorway) 
     {
         this.playerIsInDoorway = playerIsInDoorway;
-        SetDoorState(playerIsInDoorway, playerIsInRoomAbove, true);
+        SetDoorState(playerIsInDoorway, playerIsInRoomAbove);
     }
 
     public void SetPlayerIsInRoomAbove(bool playerIsInRoomAbove) 
     {
         this.playerIsInRoomAbove = playerIsInRoomAbove;
         //SetDoorState(playerIsInDoorway, playerIsInRoomAbove, true);
-        SetDoorState(playerIsInDoorway, playerIsInRoomAbove, true);
+        SetDoorState(playerIsInDoorway, playerIsInRoomAbove);
     }
 }
 

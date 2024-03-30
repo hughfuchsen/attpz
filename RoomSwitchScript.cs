@@ -11,13 +11,13 @@ public class RoomSwitchScript : MonoBehaviour
     void OnTriggerEnter2D()
     {
         room.EnterRoom(false, 0f);
-        // roomBelow.ExitRoom();
+        // roomBelow.ExitRoomAndSetDoorwayInstances();
     }
     void OnTriggerExit2D()
     {
         if (!disableExitTrigger)
         {
-            room.ExitRoom();
+            room.ExitRoomAndSetDoorwayInstances();
         }
         // roomBelow.EnterRoom(false, 0f);s
     }

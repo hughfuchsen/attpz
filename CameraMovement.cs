@@ -65,15 +65,27 @@ using UnityEngine;
 public class CameraMovement : MonoBehaviour
 {
     private float zoomSize = 300;
-    public Transform target;
+    [SerializeField] Transform target;
     public float smoothing;
     public Vector2 maxPosition;
     public Vector2 minPosition;
 
     private Vector3 targetPosition;
 
+    [SerializeField] GameObject innerBuildingBackdrop;
+
+    // void OnEnable()
+    // {
+    //     innerBuildingBackdrop = GameObject.FindWithTag("InnerBuildingBackdrop");
+    //     if (innerBuildingBackdrop != null)
+    //     {
+    //     innerBuildingBackdrop.SetActive(true); 
+    //     }
+    // }
+
     void Start()
     {
+        target = GameObject.FindGameObjectWithTag("Player").transform;
         GetComponent<Camera>().orthographicSize = zoomSize;
         targetPosition = transform.position;
     }

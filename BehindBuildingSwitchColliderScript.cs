@@ -24,6 +24,13 @@ public class BehindBuildingSwitchColliderScript : MonoBehaviour
             {
                 // do nuttin
             }
+            else if(!playerMovement.playerIsOutside)
+            {
+                for (int i = 0; i < building.outerBuildingSpriteList.Count; i++)
+                {
+                    building.SetTreeAlpha(building.outerBuildingSpriteList[i], 0.35f);
+                }                   
+            }
             else
             {
                 building.GoBehindBuilding();
@@ -34,14 +41,23 @@ public class BehindBuildingSwitchColliderScript : MonoBehaviour
     {
         if(building != null)
         {
-            if (playerMovement.fixedDirectionLeft || playerMovement.fixedDirectionRight)
+            if ((playerMovement.fixedDirectionLeft || playerMovement.fixedDirectionRight))
             {
                 // do nuttin
             }
+            else if(!playerMovement.playerIsOutside)
+            {
+                for (int i = 0; i < building.outerBuildingSpriteList.Count; i++)
+                {
+                    building.SetTreeAlpha(building.outerBuildingSpriteList[i], building.outerBuildingInitialColorList[i].a);
+                }              
+            }
             else
             {
-                building.ExitBuilding(0.3f, 0.3f);
+                building.ExitBuilding(0.1f, 0.1f, true);
             }
         }        
     }
 }
+
+

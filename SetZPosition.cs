@@ -25,6 +25,28 @@ public class SetZPosition : MonoBehaviour
                 obj.transform.position = newPosition;
             }
         }
+        RoundAllSpriteRenderers();
+
+    }
+    void RoundAllSpriteRenderers()
+    {
+        SpriteRenderer[] spriteRenderers = FindObjectsOfType<SpriteRenderer>();
+
+        foreach (SpriteRenderer spriteRenderer in spriteRenderers)
+        {
+            // Round the position of each sprite renderer to the nearest whole number
+            Vector3 roundedPosition = RoundVector(spriteRenderer.transform.position);
+            spriteRenderer.transform.position = roundedPosition;
+        }
+    }
+
+    Vector3 RoundVector(Vector3 vector)
+    {
+        return new Vector3(
+            Mathf.Round(vector.x),
+            Mathf.Round(vector.y),
+            Mathf.Round(vector.z)
+        );
     }
 }
 

@@ -6,14 +6,17 @@ public class TriggerButtonPress : MonoBehaviour
 {
     public List<GameObject> treeObjects = new List<GameObject>(); // List for the whole object
     public List<GameObject> vValueOscillatorObjects = new List<GameObject>(); // List for the whole object
-    public List<GameObject> sprites = new List<GameObject>(); // Separate list for singular sprites
-    public List<GameObject> vSprites = new List<GameObject>(); // Separate list for singular sprites
+    private List<GameObject> sprites = new List<GameObject>(); // Separate list for singular sprites
+    private List<GameObject> vSprites = new List<GameObject>(); // Separate list for singular sprites
     private List<Color> initialVValue = new List<Color>();
     private float vValueAmplitude = 0.01f; // The amplitude of the sine wave
     private float vValueFrequency = 10f; // The frequency of the sine wave
     private float time = 0f; // The current time for the sine wave animation
-    public List<GameObject> childColliders = new List<GameObject>(); // Separate list for singular child colliders
     private bool spacebarReleased = true; // Flag to track if spacebar was released
+
+    [SerializeField] GameObject Player;
+
+    PlayerMovement playerMovement;
 
 
     // public List<GameObject> colliders = new List<GameObject>();
@@ -21,6 +24,8 @@ public class TriggerButtonPress : MonoBehaviour
 
     void Awake()
     {
+        Player = GameObject.FindGameObjectWithTag("Player");
+        playerMovement = Player.GetComponent<PlayerMovement>(); 
 
         for (int i = 0; i < treeObjects.Count; i++)
         {
@@ -41,17 +46,12 @@ public class TriggerButtonPress : MonoBehaviour
         for (int i = 0; i < vSprites.Count; i++)
         {   
             initialVValue.Add(vSprites[i].GetComponent<SpriteRenderer>().color);
-        }
-        
-        for (int i = 0; i < childColliders.Count; i++)
-        {
-            childColliders[i].SetActive(false);
-        }      
+        }  
     }
 
     private void OnTriggerStay2D(Collider2D other)
     {
-        if (other.CompareTag("Player"))
+        if (other.CompareTag("Player") && !playerMovement.playerIsOutside)
         {
             OscillateVValue();
 
@@ -62,9 +62,9 @@ public class TriggerButtonPress : MonoBehaviour
                     SetAlpha(sprites[i], 1);
                 }
 
-                for (int i = 0; i < childColliders.Count; i++)
-                {
-                    childColliders[i].SetActive(true);
+                for (int i = 0; i < playerMovement.playerSpriteList.Count; i++)
+                {            
+                    playerMovement.SetAlpha(playerMovement.playerSpriteList[i], 0.15f);
                 }
 
                 spacebarReleased = false; // Spacebar is being held down
@@ -75,10 +75,9 @@ public class TriggerButtonPress : MonoBehaviour
                 {
                     SetAlpha(sprites[i], 0); // Reset alpha value to 0
                 }
-
-                for (int i = 0; i < childColliders.Count; i++)
-                {
-                    childColliders[i].SetActive(false);
+                for (int i = 0; i < playerMovement.playerSpriteList.Count; i++)
+                {            
+                    playerMovement.SetAlpha(playerMovement.playerSpriteList[i], playerMovement.initialPlayerColorList[i].a);
                 }
 
                 spacebarReleased = true; // Spacebar is released
@@ -90,22 +89,22 @@ public class TriggerButtonPress : MonoBehaviour
 
     private void OnTriggerExit2D(Collider2D other)
     {
-        if (other.CompareTag("Player"))
+        if (other.CompareTag("Player") && !playerMovement.playerIsOutside)
         {
             for (int i = 0; i < sprites.Count; i++)
             {
                 SetAlpha(sprites[i], 0);
             }
-
-            for (int i = 0; i < childColliders.Count; i++)
-            {
-                childColliders[i].SetActive(false);
-            }
             
             for (int i = 0; i < vSprites.Count; i++)
             {
                 SetColor(vSprites[i], initialVValue[i]);
-            }      
+            }  
+
+            for (int i = 0; i < playerMovement.playerSpriteList.Count; i++)
+            {            
+                playerMovement.SetAlpha(playerMovement.playerSpriteList[i], playerMovement.initialPlayerColorList[i].a);
+            }
         }
     }
 
@@ -121,20 +120,15 @@ public class TriggerButtonPress : MonoBehaviour
             GameObject current = stack.Pop();
             Transform currentTransform = current.transform;
 
-            // if (current.GetComponent<SpriteRenderer>() != null)
-            // {
-            //     spriteList.Add(current);
-            // }
+            if (current.GetComponent<SpriteRenderer>() != null)
+            {
+                spriteList.Add(current);
+            }
 
             int childCount = currentTransform.childCount;
             for (int i = 0; i < childCount; i++)
             {
                 GameObject child = currentTransform.GetChild(i).gameObject;
-
-                if (child.CompareTag("Collider"))
-                {
-                    childColliders.Add(child);
-                }
                 
                 if (child.GetComponent<SpriteRenderer>() != null)
                 {

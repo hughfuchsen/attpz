@@ -12,12 +12,12 @@ using UnityEngine;
 
 public class RoomThresholdColliderScript : MonoBehaviour
 {
-    public BuildingScript building;
     public RoomScript roomAbove;
     public RoomScript roomBelow;
     LevelThreshColliderScript levelThreshColliderScript;
     PlayerMovement playerMovement;
     [SerializeField] GameObject Player;
+    public bool itsALadder;
     private bool aboveCollider;
     private List<float> initialOpenDoorAlpha = new List<float>();
     private List<float> initialClosedDoorAlpha = new List<float>();
@@ -103,7 +103,7 @@ public class RoomThresholdColliderScript : MonoBehaviour
                 }  
                 else if (roomAbove != null) // if player is entering the building from the fro
                 {
-                    // SetClosedDoorToInitialAlpha();
+                    SetClosedDoorToInitialAlpha();
                     roomAbove.EnterRoom(true, 0.3f); 
                 }
             }
@@ -143,6 +143,7 @@ public class RoomThresholdColliderScript : MonoBehaviour
                 if (roomBelow == null && roomAbove != null) // if the player IS inside bulding and ABOVE collider prior to collider exit
                 {
                     roomAbove.ResetRoomPositions();
+                    roomAbove.ExitRoomAndSetDoorwayInstances();
                 }   
                 else
                 if (playerMovement.playerIsInside() && roomBelow != null) // if the player IS inside bulding and ABOVE collider, going down stairs and entering room downstairs
@@ -262,10 +263,16 @@ public class RoomThresholdColliderScript : MonoBehaviour
     IEnumerator treeFade(
     GameObject obj,
     float fadeTo,
-    float elapsedTime) 
+    float elapsedTime,
+    float waitTime = 0f) 
     {
         float fadeFrom = obj.GetComponent<SpriteRenderer>().color.a;
         float timer = 0.0f;
+
+        if(waitTime != 0f)
+        {
+            yield return new WaitForSeconds(waitTime);
+        }
 
         while (timer < elapsedTime) 
         {
@@ -421,7 +428,7 @@ public class RoomThresholdColliderScript : MonoBehaviour
                 {
                     if (roomAbove.doorsBelow[i].FindSiblingWithTag("ClosedDoor") != null)
                     {
-                        this.closedDoorFadeCoroutine = StartCoroutine(treeFade(roomAbove.doorsBelow[i].FindSiblingWithTag("ClosedDoor"), 0.35f, 0.3f));                    
+                        this.closedDoorFadeCoroutine = StartCoroutine(treeFade(roomAbove.doorsBelow[i].FindSiblingWithTag("ClosedDoor"), 0.2f, 0.3f));                    
                         SetTreeAlpha(roomAbove.doorsBelow[i].FindSiblingWithTag("OpenDoor"), 0);
                     }
                 }
@@ -432,6 +439,21 @@ public class RoomThresholdColliderScript : MonoBehaviour
             {
                 this.openDoorFadeCoroutine = StartCoroutine(treeFade(this.FindSiblingWithTag("OpenDoor"), 0, 0.3f));
             }
+            if (roomAbove != null && roomBelow == null)
+            {
+                for (int i = 0; i < roomAbove.doorsBelow.Count; i++)
+                {
+                    for (int j = 0; j < roomAbove.doorsBelow[i].closedDoorSpriteList.Count; j++)
+                    {
+                        if(roomAbove.doorsBelow[i].ThisThresholdIsAnEntranceToTheBuildingOrIsStairs())
+                        {
+                            this.closedDoorFadeCoroutine = StartCoroutine(treeFade(roomAbove.doorsBelow[i].closedDoorSpriteList[j], 
+                                                                            roomAbove.doorsBelow[i].initialClosedDoorAlpha[j], 0.3f, 0.3f)); 
+                            // SetTreeAlpha(roomAbove.doorsBelow[i].closedDoorSpriteList[j], roomAbove.doorsBelow[i].initialClosedDoorAlpha[j]);
+                        }
+                    } 
+                }   
+            }    
         }
         else // if player is not in room above
         {
@@ -449,7 +471,7 @@ public class RoomThresholdColliderScript : MonoBehaviour
             }              
         }
             
-        } 
+    } 
 
     public void SetPlayerIsInDoorway(bool playerIsInDoorway) 
     {

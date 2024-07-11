@@ -33,7 +33,7 @@ public class BehindBuildingSwitchColliderScript : MonoBehaviour
             }
             else
             {
-                building.GoBehindBuilding();
+                building.GoBehindBuilding();     
             }
         }
     }
@@ -47,13 +47,17 @@ public class BehindBuildingSwitchColliderScript : MonoBehaviour
             }
             else if(!playerMovement.playerIsOutside)
             {
+                for (int i = 0; i < building.gameObjectsToShowWhileOutsideSpriteList.Count; i++)
+                {
+                    building.SetTreeAlpha(building.gameObjectsToShowWhileOutsideSpriteList[i], building.gameObjectsToShowWhileOutsideColorList[i].a);
+                }              
                 for (int i = 0; i < building.outerBuildingSpriteList.Count; i++)
                 {
                     building.SetTreeAlpha(building.outerBuildingSpriteList[i], building.outerBuildingInitialColorList[i].a);
                 }              
             }
             else
-            {
+            {   
                 building.ExitBuilding(0.1f, 0.1f, true);
             }
         }        

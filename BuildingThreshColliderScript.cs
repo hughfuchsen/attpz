@@ -30,18 +30,24 @@ public class BuildingThreshColliderScript : MonoBehaviour
             }
             else
             {
-                building.EnterBuilding();
-                playerMovement.playerIsOutside = false;            
+                    if(playerMovement.playerIsOutside) 
+                    {     
+                        building.EnterBuilding();
+                    }                
+                    playerMovement.playerIsOutside = false;            
             }
         }
         else //if player crossing down
         {
                 if (backOfBuilding)   // entering the building from the back
-                {         
-                    building.EnterBuilding();
+                {   
+                    if(playerMovement.playerIsOutside) 
+                    {     
+                        building.EnterBuilding();
+                    }
                     playerMovement.playerIsOutside = false;            
                 }
-                else // entering the building fro the front
+                else // entering the building from the front
                 {
                     if (LayerMask.LayerToName(this.gameObject.layer) != "Default") // if player is not exiting building on the ground level
                     {

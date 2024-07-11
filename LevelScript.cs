@@ -12,7 +12,6 @@ public class LevelScript : MonoBehaviour
     private List<Transform> childColliders = new List<Transform>(); // Separate list for child colliders
     public int roomWidthX = 30;
     public int wallHeight = 31;
-    public float fadeSpeed = 100f;
     public bool oppositeMovement;
     public bool groundFloor;
     private bool displaced;
@@ -39,9 +38,16 @@ public class LevelScript : MonoBehaviour
             initialColorListToBeChangedWithLevelMovements.Add(initialColor);
         }
 
+
+        Player = GameObject.FindGameObjectWithTag("Player");
+        playerMovement = Player.GetComponent<PlayerMovement>();
+                
+    }
+    void Start()
+    {
         innerBuildingBackDropColor = GameObject.FindGameObjectWithTag("InnerBuildingBackdrop").GetComponent<SpriteRenderer>().color;
         Color.RGBToHSV(innerBuildingBackDropColor, out float bdh, out float bds, out float bdv);
-
+        
         for (int i = 0; i < initialColorList.Count; i++)
         {
             Color desaturatedColor = initialColorList[i];
@@ -56,12 +62,6 @@ public class LevelScript : MonoBehaviour
             desaturatedColorList.Add(desaturatedColor); // Add the modified color to the new list
         }
 
-        Player = GameObject.FindGameObjectWithTag("Player");
-        playerMovement = Player.GetComponent<PlayerMovement>();
-                
-    }
-    void Start()
-    {
         initialPosition = this.gameObject.transform.localPosition;
 
         FindColliderObjects(transform);

@@ -10,7 +10,6 @@ public class RoomScript : MonoBehaviour
     public List<RoomThresholdColliderScript> doorsBelow = new List<RoomThresholdColliderScript>();
     private List<Coroutine> doorsBelowCoros = new List<Coroutine>();
     public int wallHeight = 30;
-    public float fadeSpeed = 100f;
     private Vector3 initialPosition;
     private List<Vector3> childColliderInitialPositions = new List<Vector3>();
     private Coroutine currentMotionCoroutine;

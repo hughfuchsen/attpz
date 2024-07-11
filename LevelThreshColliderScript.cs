@@ -9,6 +9,8 @@ public class LevelThreshColliderScript : MonoBehaviour
 
     // public string initialSortingLayerUponEntry;
 
+    public bool itsALadder;
+
     public List<LevelScript> levelAboveOrEntering = new List<LevelScript>();
 
     public List<LevelScript> levelBelowOrEntering = new List<LevelScript>();

@@ -5,6 +5,7 @@ using UnityEngine;
 public class InclineMovement : MonoBehaviour
 {
     PlayerMovement playerMovement;
+    IsoSpriteSorting isoSpriteSortingScript;
     [SerializeField] GameObject Player;
     public string motionDirection;
     public string lowerSortingLayerToAssign;
@@ -21,6 +22,7 @@ public class InclineMovement : MonoBehaviour
     {
         Player = GameObject.FindGameObjectWithTag("Player");
         playerMovement = Player.GetComponent<PlayerMovement>();
+        isoSpriteSortingScript = Player.GetComponent<IsoSpriteSorting>();
     }
 
     void OnTriggerEnter2D(Collider2D collision)
@@ -95,24 +97,43 @@ public class InclineMovement : MonoBehaviour
             }
             else // if it is a ladder baby
             {
+                Debug.Log(playerMovement.motionDirection);
                 //alter the motion direction
                 if(playerMovement.motionDirection == "normal")
                 {
-                    playerMovement.motionDirection = motionDirection;
-                    gameObject.layer = LayerMask.NameToLayer(higherColliderLayerName);
-                    SetCollisionLayer(higherColliderLayerName);
+                    if((isPlayerCrossingUp() && (isPlayerCrossingLeft()||!isPlayerCrossingLeft())))
+                    {
+                        //add certain animation and anchoring here
+                        Debug.Log("1");
+                        playerMovement.motionDirection = motionDirection;
+                        gameObject.layer = LayerMask.NameToLayer(higherColliderLayerName);
+                        SetCollisionLayer(higherColliderLayerName);
+                    }
+                    else if((!isPlayerCrossingUp() && (isPlayerCrossingLeft()||!isPlayerCrossingLeft())))
+                    {
+                        Debug.Log("2");
+                        //add certain animation and anchoring here
+                        playerMovement.motionDirection = motionDirection;
+                        gameObject.layer = LayerMask.NameToLayer(higherColliderLayerName);
+                        SetCollisionLayer(higherColliderLayerName);
+                    }
+                    isoSpriteSortingScript.isMovable = false;
                 }
                 else if((isPlayerCrossingUp() && playerMovement.motionDirection == "upDownLadder"))
                 {
+                        Debug.Log("3");
                     playerMovement.motionDirection = "normal";  
                     SetTreeSortingLayer(collision.gameObject, higherSortingLayerToAssign);
+                    isoSpriteSortingScript.isMovable = true;
                 }
                 else if((!isPlayerCrossingUp() && playerMovement.motionDirection == "upDownLadder"))
                 {
+                    Debug.Log("4");
                     playerMovement.motionDirection = "normal"; 
                     gameObject.layer = LayerMask.NameToLayer(lowerColliderLayerName);
                     SetCollisionLayer(lowerColliderLayerName);
                     SetTreeSortingLayer(collision.gameObject, lowerSortingLayerToAssign);
+                    isoSpriteSortingScript.isMovable = true;
                 }
 
                 // alter the collider layer and sprite sorting layer that is active with the player

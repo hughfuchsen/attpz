@@ -18,6 +18,7 @@ public class RoomThresholdColliderScript : MonoBehaviour
     PlayerMovement playerMovement;
     [SerializeField] GameObject Player;
     public bool itsALadder;
+    public bool ladderTop;
     private bool aboveCollider;
     private List<float> initialOpenDoorAlpha = new List<float>();
     private List<float> initialClosedDoorAlpha = new List<float>();
@@ -39,7 +40,7 @@ public class RoomThresholdColliderScript : MonoBehaviour
         Player = GameObject.FindGameObjectWithTag("Player");
         playerMovement = Player.GetComponent<PlayerMovement>(); 
         
-        // get the sprites and add them to the -> corresponding lists
+        // get the sprites and add them to the -> corresponding lists 
         GetSprites(FindSiblingWithTag("OpenDoor"), openDoorSpriteList);
         GetSprites(FindSiblingWithTag("ClosedDoor"), closedDoorSpriteList);
 
@@ -55,125 +56,178 @@ public class RoomThresholdColliderScript : MonoBehaviour
     void OnTriggerEnter2D()
     {
         StopAllCoros();
-
-        playerMovement.motionDirection = "normal";
-
-        if (isPlayerCrossingUp())
+        if (!itsALadder)
         {
-            aboveCollider = false;
-        }
-        else
-        {
-            aboveCollider = true;
-        }
+            playerMovement.motionDirection = "normal";
 
-        if((isPlayerCrossingUp() && isPlayerCrossingLeft()) // is player going this \ (left diag) way or
-        || !isPlayerCrossingUp() && !isPlayerCrossingLeft()) // is player going this / (right diag) way :-)
-        {
-            playerMovement.fixedDirectionLeft = true; // fix the player in \ left diag way while inside the collider
-        }
-        else
-        {
-            playerMovement.fixedDirectionRight = true; // fix the player in / right diag way while inside the collider
-        }
+            if (isPlayerCrossingUp())
+            {
+                aboveCollider = false;
+            }
+            else
+            {
+                aboveCollider = true;
+            }
 
-        SetClosedDoorToZeroAlpha();
-        SetOpenDoorToInitialAlpha();
-        SetPlayerIsInDoorway(true);
+            if((isPlayerCrossingUp() && isPlayerCrossingLeft()) // is player going this \ (left diag) way or
+            || !isPlayerCrossingUp() && !isPlayerCrossingLeft()) // is player going this / (right diag) way :-)
+            {
+                playerMovement.fixedDirectionLeft = true; // fix the player in \ left diag way while inside the collider
+            }
+            else
+            {
+                playerMovement.fixedDirectionRight = true; // fix the player in / right diag way while inside the collider
+            }
+
+            SetClosedDoorToZeroAlpha();
+            SetOpenDoorToInitialAlpha();
+            SetPlayerIsInDoorway(true);
+        }
+        else // if it is a ladder
+        {
+            if(ladderTop)
+            {
+                if (roomBelow != null || roomAbove != null)
+                {
+                    roomBelow.ResetRoomPositions(); 
+                }
+            }  
+            else
+            {
+                if (roomBelow != null || roomAbove != null)
+                {
+                    // roomAbove.EnterRoom(true, 0.3f); 
+                    roomBelow.EnterRoom(true, 0.3f); 
+                }
+            }
+        }
     }
 
     void OnTriggerExit2D()
     {
         StopAllCoros();
-
-        playerMovement.fixedDirectionLeft = false;
-        playerMovement.fixedDirectionRight = false; // un-fix the player in \/ left/right diag way upon collider exit. 
-
-            //ON EXIT CROSSING UP
-        if (isPlayerCrossingUp())
+        if(!itsALadder)
         {
-            if (ThisThresholdIsAnEntranceToTheBuildingOrIsStairs())
+            playerMovement.fixedDirectionLeft = false;
+            playerMovement.fixedDirectionRight = false; // un-fix the player in \/ left/right diag way upon collider exit. 
+
+                //ON EXIT CROSSING UP
+            if (isPlayerCrossingUp())
             {
-                if (roomBelow != null && roomAbove == null) // if player is exiting the back of the building
+                if (ThisThresholdIsAnEntranceToTheBuildingOrIsStairs())
                 {
-                    roomBelow.ResetRoomPositions(); 
-                    roomBelow.ExitRoomAndSetDoorwayInstances(); 
+                    if (roomBelow != null && roomAbove == null) // if player is exiting the back of the building
+                    { 
+                        roomBelow.ResetRoomPositions(); 
+                        roomBelow.ExitRoomAndSetDoorwayInstances(); 
+                        SetOpenDoorToZeroAlpha();
+                        SetClosedDoorToInitialAlpha();
+                    }  
+                    else if (roomAbove != null) // if player is entering the building from the fro
+                    {
+                        SetClosedDoorToInitialAlpha();
+                        roomAbove.EnterRoom(true, 0.3f); 
+                    }
+                }
+                else // if this threshold is just the entrance to a room and not a building entrance
+                {               
+                    SetClosedDoorToInitialAlpha(); 
+                    if (roomBelow != null && roomAbove == null) // if there is no room above the thresh i.e. if 
+                                                                // the player is leaving the level and the rooms need to go in their original pos.
+                    {
+                        roomBelow.ResetRoomPositions(); 
+                    }
+                    else if (roomAbove != null) 
+                    {
+                        roomAbove.EnterRoom(false, 0f);
+                    }
+
+                    if (roomBelow != null)
+                    {
+                        roomBelow.ExitRoomAndSetDoorwayInstances();
+                    }
+                }
+                
+                aboveCollider = true;
+            }
+                
+            else //ON EXIT CROSSING DOWN
+            {
+                if (roomAbove != null)
+                {
+                    roomAbove.ExitRoomAndSetDoorwayInstances();
                     SetOpenDoorToZeroAlpha();
                     SetClosedDoorToInitialAlpha();
-                }  
-                else if (roomAbove != null) // if player is entering the building from the fro
-                {
-                    SetClosedDoorToInitialAlpha();
-                    roomAbove.EnterRoom(true, 0.3f); 
-                }
-            }
-            else // if this threshold is just the entrance to a room and not a building entrance
-            {               
-                SetClosedDoorToInitialAlpha(); 
-                if (roomBelow != null && roomAbove == null) // if there is no room above the thresh i.e. if 
-                                                            // the player is leaving the level and the rooms need to go in their original pos.
-                {
-                    roomBelow.ResetRoomPositions(); 
-                }
-                else if (roomAbove != null) 
-                {
-                    roomAbove.EnterRoom(false, 0f);
                 }
 
-                if (roomBelow != null)
+                if (ThisThresholdIsAnEntranceToTheBuildingOrIsStairs())
                 {
-                    roomBelow.ExitRoomAndSetDoorwayInstances();
-                }
-            }
-            
-            aboveCollider = true;
-        }
-            
-        else //ON EXIT CROSSING DOWN
-        {
-            if (roomAbove != null)
-            {
-                roomAbove.ExitRoomAndSetDoorwayInstances();
-                SetOpenDoorToZeroAlpha();
-                SetClosedDoorToInitialAlpha();
-            }
+                    if (roomBelow == null && roomAbove != null) // if the player IS inside bulding and ABOVE collider prior to collider exit
+                    {
+                        roomAbove.ResetRoomPositions();
+                        roomAbove.ExitRoomAndSetDoorwayInstances();
+                    }   
+                    else
+                    if (playerMovement.playerIsInside() && roomBelow != null) // if the player IS inside bulding and ABOVE collider, going down stairs and entering room downstairs
+                    {
+                        roomBelow.EnterRoom(false, 0f);
 
-            if (ThisThresholdIsAnEntranceToTheBuildingOrIsStairs())
-            {
-                if (roomBelow == null && roomAbove != null) // if the player IS inside bulding and ABOVE collider prior to collider exit
-                {
-                    roomAbove.ResetRoomPositions();
-                    roomAbove.ExitRoomAndSetDoorwayInstances();
-                }   
-                else
-                if (playerMovement.playerIsInside() && roomBelow != null) // if the player IS inside bulding and ABOVE collider, going down stairs and entering room downstairs
+                        SetClosedDoorToInitialAlpha();
+                        for (int i = 0; i < openDoorSpriteList.Count; i++)
+                        { 
+                            SetTreeAlpha(this.FindSiblingWithTag("OpenDoor"), 0);
+                        }  
+                    }    
+                }
+                else if (roomBelow != null) // entering a room going down while inside building
                 {
                     roomBelow.EnterRoom(false, 0f);
 
-                    SetClosedDoorToInitialAlpha();
-                    for (int i = 0; i < openDoorSpriteList.Count; i++)
-                    { 
-                        SetTreeAlpha(this.FindSiblingWithTag("OpenDoor"), 0);
-                    }  
-                }    
+                    if (playerMovement.playerIsInside() && aboveCollider) // if player is inside 
+                    {
+                        initialSortingLayer = Player.GetComponent<SpriteRenderer>().sortingLayerName;
+
+                        thresholdSortingSequenceCoro = StartCoroutine(ThresholdLayerSortingSequence(0.3f, Player, "ThresholdSequence"));
+                    }
+                }
+                            
+                aboveCollider = false;
+
             }
-            else if (roomBelow != null) // entering a room going down while inside building
+
+            SetPlayerIsInDoorway(false);
+        }
+        else // if it is a ladder
+        {
+            if(isPlayerCrossingUp())
             {
-                roomBelow.EnterRoom(false, 0f);
-
-                if (playerMovement.playerIsInside() && aboveCollider) // if player is inside 
+                if(playerMovement.playerIsOutside)
                 {
-                    initialSortingLayer = Player.GetComponent<SpriteRenderer>().sortingLayerName;
-
-                    thresholdSortingSequenceCoro = StartCoroutine(ThresholdLayerSortingSequence(0.3f, Player, "ThresholdSequence"));
+                    if (roomBelow != null || roomAbove != null)
+                    {
+                        roomBelow.ResetRoomPositions(); 
+                    }
+                }   
+            }  
+            else
+            {
+                if(!playerMovement.playerIsOutside)
+                {
+                    if (roomBelow != null || roomAbove != null)
+                    {
+                        // roomAbove.EnterRoom(true, 0.3f); 
+                        roomBelow.EnterRoom(true, 0.3f); 
+                    }
+                }
+                else
+                {
+                    if (roomBelow != null || roomAbove != null)
+                    {
+                        roomBelow.ResetRoomPositions(); 
+                    }
                 }
             }
-                         
-            aboveCollider = false;
-
         }
-
-        SetPlayerIsInDoorway(false);
     }
     private bool isPlayerCrossingUp()
     {

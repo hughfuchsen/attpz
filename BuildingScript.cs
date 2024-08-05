@@ -317,7 +317,7 @@ public class BuildingScript : MonoBehaviour
     }
 
     public IEnumerator SetAlphaOfOuterItemsThatRNotDefaultSpriteLayer(bool exitingBuilding, List<BuildingScript> buildingList)
-    // this function is for things such as balconies that show up over the backdrop. This function set's their alpha to 0 and back again upon building exit
+    // this function is for things such as balconies that show up over the backdrop. This function set's their alpha to 0 and back again upon building-exit
     {
         if(exitingBuilding)
         {

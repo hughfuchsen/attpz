@@ -8,7 +8,7 @@ public class BuildingScript : MonoBehaviour
     public GameObject innerBuilding;
     public GameObject outerBuilding;
     [SerializeField] public List<GameObject> gameObjectsToShowWhileOutside = new List<GameObject>();
-    [SerializeField] public List<BuildingScript> buildingsWithBalconies = new List<BuildingScript>();
+    BalconyManager balconyManager;
     PlayerMovement playerMovement;
     [SerializeField] GameObject Player;
     public List<GameObject> gameObjectsToShowWhileOutsideSpriteList = new List<GameObject>();
@@ -32,10 +32,11 @@ public class BuildingScript : MonoBehaviour
     { 
         Player = GameObject.FindGameObjectWithTag("Player");
         playerMovement = Player.GetComponent<PlayerMovement>(); 
+        balconyManager = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<BalconyManager>(); 
     }  
 
     // Start is called before the first frame update
-    void Start()
+    void Start() 
     {
         innerBuilding.SetActive(true);
         outerBuilding.SetActive(true);
@@ -72,7 +73,7 @@ public class BuildingScript : MonoBehaviour
             StopCoroutine(this.gameObjectsToHideWhileInsideFadeCoroutine);
         }
 
-        gameObjectsToHideWhileInsideFadeCoroutine = StartCoroutine(SetAlphaOfOuterItemsThatRNotDefaultSpriteLayer(false, buildingsWithBalconies));
+        gameObjectsToHideWhileInsideFadeCoroutine = StartCoroutine(SetAlphaOfOuterItemsThatRNotDefaultSpriteLayer(false));
         
         backdropFadeCoroutine = StartCoroutine(FadeInnerBuildingBackdrop(false, 0f, GameObject.FindGameObjectWithTag("InnerBuildingBackdrop"), 1f));
 
@@ -130,7 +131,7 @@ public class BuildingScript : MonoBehaviour
         //                                     float? alpha, 
         //                                     string[] tagsToExclude = null
         //                                     )
-        gameObjectsToHideWhileInsideFadeCoroutine = StartCoroutine(SetAlphaOfOuterItemsThatRNotDefaultSpriteLayer(true, buildingsWithBalconies));
+        gameObjectsToHideWhileInsideFadeCoroutine = StartCoroutine(SetAlphaOfOuterItemsThatRNotDefaultSpriteLayer(true));
 
         backdropFadeCoroutine = StartCoroutine(FadeInnerBuildingBackdrop(true, 0.3f, GameObject.FindGameObjectWithTag("InnerBuildingBackdrop"), 0f));
 
@@ -200,7 +201,7 @@ public class BuildingScript : MonoBehaviour
                         SetTreeSortingLayer(gameObjectsToShowWhileOutsideSpriteList[i], "Default");
                     }
             }
-            if (Player.GetComponent<SpriteRenderer>().sortingLayerName == "Level0") // if the player exits building from the ground flow
+            if (Player.transform.Find("head").GetComponent<SpriteRenderer>().sortingLayerName == "Level0") // if the player exits building from the ground floor
             {
                 SetTreeSortingLayer(Player, "Default");
             }
@@ -227,7 +228,7 @@ public class BuildingScript : MonoBehaviour
                         SetTreeSortingLayer(gameObjectsToShowWhileOutsideSpriteList[i], "Default");
                     }
             }
-            if (Player.GetComponent<SpriteRenderer>().sortingLayerName == "Level0") // if the player exits building from the ground flow
+            if (Player.transform.Find("head").GetComponent<SpriteRenderer>().sortingLayerName == "Level0") // if the player exits building from the ground flow
             {
                 SetTreeSortingLayer(Player, "Default");
             }
@@ -260,7 +261,7 @@ public class BuildingScript : MonoBehaviour
                         SetTreeSortingLayer(gameObjectsToShowWhileOutsideSpriteList[i], "Level0");
                     }
             }
-            if (Player.GetComponent<SpriteRenderer>().sortingLayerName == "Default") // if the player enters building at the ground flow
+            if (Player.transform.Find("head").GetComponent<SpriteRenderer>().sortingLayerName == "Default") // if the player enters building at the ground flow
             {
                 SetTreeSortingLayer(Player, "Level0");
             }
@@ -316,97 +317,98 @@ public class BuildingScript : MonoBehaviour
         yield return null;
     }
 
-    public IEnumerator SetAlphaOfOuterItemsThatRNotDefaultSpriteLayer(bool exitingBuilding, List<BuildingScript> buildingList)
+    public IEnumerator SetAlphaOfOuterItemsThatRNotDefaultSpriteLayer(bool exitingBuilding)
     // this function is for things such as balconies that show up over the backdrop. This function set's their alpha to 0 and back again upon building-exit
     {
         if(exitingBuilding)
         {
             yield return new WaitForSeconds(1f);
 
-            for (int i = 0; i < buildingsWithBalconies.Count; i++)
+            for (int i = 0; i < balconyManager.balconyList.Count; i++)
             { 
-                // gameObjectsToHideWhileInsideFadeCoroutine = StartCoroutine(treeFade());
 
-                for (int j = 0; j < buildingsWithBalconies[i].outerBuildingSpriteList.Count; j++)
-                {
                     // Get the SpriteRenderer component
-                    SpriteRenderer spriteRenderer = buildingsWithBalconies[i].outerBuildingSpriteList[j].GetComponent<SpriteRenderer>();
+                    SpriteRenderer spriteRenderer = balconyManager.balconyList[i].GetComponent<SpriteRenderer>();
+                    spriteRenderer.color = balconyManager.balconyInitialColorList[i];
                     
-                    // Check if the sorting layer name is not "Default"
-                    if (spriteRenderer.sortingLayerName != "Default")
-                    {
-                        // Get the initial color from the outerBuildingInitialColorList
-                        Color initialColor = buildingsWithBalconies[i].outerBuildingInitialColorList[j];
-
-                        // Set the alpha value from the initial color
-                        Color newColor = spriteRenderer.color;
-                        newColor.a = initialColor.a;
-                        
-                        // Assign the modified color back to the sprite's color
-                        spriteRenderer.color = newColor;
-                    }
-                }
-                for (int j = 0; j < buildingsWithBalconies[i].gameObjectsToShowWhileOutsideSpriteList.Count; j++)
-                {
-                    // if(buildingsWithBalconies[i].gameObjectsToShowWhileOutsideSpriteList[j].CompareTag("ClosedDoor"))
+                    // // Check if the sorting layer name is not "Default"
+                    // if (spriteRenderer.sortingLayerName != "Default")
                     // {
-                        // Get the SpriteRenderer component
-                        SpriteRenderer spriteRenderer = buildingsWithBalconies[i].gameObjectsToShowWhileOutsideSpriteList[j].GetComponent<SpriteRenderer>();
 
-                        // Create a new color with modified alpha value
-                        Color newColor = spriteRenderer.color;
-                        newColor.a = buildingsWithBalconies[i].gameObjectsToShowWhileOutsideColorList[j].a;
+                    //     // Set the alpha value from the initial color
+                    //     Color newColor = spriteRenderer.color;
+                    //     newColor.a = initialColor.a;
                         
-                        // Assign the modified color back to the sprite's color
-                        spriteRenderer.color = newColor;
+                    //     // Assign the modified color back to the sprite's color
+                    //     spriteRenderer.color = newColor;
                     // }
-                }
-
             }
+                // for (int j = 0; j < buildingsWithBalconies[i].gameObjectsToShowWhileOutsideSpriteList.Count; j++)
+                // {
+                //     // if(buildingsWithBalconies[i].gameObjectsToShowWhileOutsideSpriteList[j].CompareTag("ClosedDoor"))
+                //     // {
+                //         // Get the SpriteRenderer component
+                //         SpriteRenderer spriteRenderer = buildingsWithBalconies[i].gameObjectsToShowWhileOutsideSpriteList[j].GetComponent<SpriteRenderer>();
+
+                //         // Create a new color with modified alpha value
+                //         Color newColor = spriteRenderer.color;
+                //         newColor.a = buildingsWithBalconies[i].gameObjectsToShowWhileOutsideColorList[j].a;
+                        
+                //         // Assign the modified color back to the sprite's color
+                //         spriteRenderer.color = newColor;
+                //     // }
+                // }
+
         }
         else // if entering set the alphas to 0
         {
             // yield return new WaitForSeconds(0.3f);
 
-            for (int i = 0; i < buildingsWithBalconies.Count; i++)
+            for (int i = 0; i < balconyManager.balconyList.Count; i++)
             { 
+                SpriteRenderer spriteRenderer = balconyManager.balconyList[i].GetComponent<SpriteRenderer>();
+                Color color = spriteRenderer.color;  // Get the current color
+                color.a = 0f;                        // Modify the alpha channel
+                spriteRenderer.color = color;        // Assign the modified color back
+
+
                 // gameObjectsToHideWhileInsideFadeCoroutine = StartCoroutine(treeFade());
 
-                for (int j = 0; j < buildingsWithBalconies[i].outerBuildingSpriteList.Count; j++)
-                {
-                    // Get the SpriteRenderer component
-                    SpriteRenderer spriteRenderer = buildingsWithBalconies[i].outerBuildingSpriteList[j].GetComponent<SpriteRenderer>();
+                // for (int j = 0; j < buildingsWithBalconies[i].outerBuildingSpriteList.Count; j++)
+                // {
+                //     // Get the SpriteRenderer component
+                //     SpriteRenderer spriteRenderer = buildingsWithBalconies[i].outerBuildingSpriteList[j].GetComponent<SpriteRenderer>();
                     
-                    // Check if the sorting layer name is not "Default"
-                    if (spriteRenderer.sortingLayerName != "Default")
-                    {
-                        // Get the initial color from the outerBuildingInitialColorList
-                        Color initialColor = buildingsWithBalconies[i].outerBuildingInitialColorList[j];
+                //     // Check if the sorting layer name is not "Default"
+                //     if (spriteRenderer.sortingLayerName != "Default")
+                //     {
+                //         // Get the initial color from the outerBuildingInitialColorList
+                //         Color initialColor = buildingsWithBalconies[i].outerBuildingInitialColorList[j];
 
-                        // Set the alpha value to 0
-                        Color newColor = new Color(initialColor.r, initialColor.g, initialColor.b, 0);
+                //         // Set the alpha value to 0
+                //         Color newColor = new Color(initialColor.r, initialColor.g, initialColor.b, 0);
                         
-                        // Assign the modified color back to the sprite's color
-                        spriteRenderer.color = newColor;
-                    }
-                }
-                for (int j = 0; j < buildingsWithBalconies[i].gameObjectsToShowWhileOutsideSpriteList.Count; j++)
-                {
-                    SpriteRenderer spriteRenderer = buildingsWithBalconies[i].gameObjectsToShowWhileOutsideSpriteList[j].GetComponent<SpriteRenderer>();
+                //         // Assign the modified color back to the sprite's color
+                //         spriteRenderer.color = newColor;
+                //     }
+                // }
+                // for (int j = 0; j < buildingsWithBalconies[i].gameObjectsToShowWhileOutsideSpriteList.Count; j++)
+                // {
+                //     SpriteRenderer spriteRenderer = buildingsWithBalconies[i].gameObjectsToShowWhileOutsideSpriteList[j].GetComponent<SpriteRenderer>();
 
-                    if(buildingsWithBalconies[i].gameObjectsToShowWhileOutsideSpriteList[j].CompareTag("ClosedDoor")
-                        && spriteRenderer.sortingLayerName != "Default")
-                    {
-                        // Get the SpriteRenderer component
+                //     if(buildingsWithBalconies[i].gameObjectsToShowWhileOutsideSpriteList[j].CompareTag("ClosedDoor")
+                //         && spriteRenderer.sortingLayerName != "Default")
+                //     {
+                //         // Get the SpriteRenderer component
 
-                        // Create a new color with modified alpha value
-                        Color newColor = spriteRenderer.color;
-                        newColor.a = 0;
+                //         // Create a new color with modified alpha value
+                //         Color newColor = spriteRenderer.color;
+                //         newColor.a = 0;
                         
-                        // Assign the modified color back to the sprite's color
-                        spriteRenderer.color = newColor;
-                    }
-                }
+                //         // Assign the modified color back to the sprite's color
+                //         spriteRenderer.color = newColor;
+                //     }
+                // }
 
             }
         }

@@ -10,6 +10,8 @@ public class BuildingThreshColliderScript : MonoBehaviour
     public bool backOfBuilding;
     public bool rooftopLadder;
 
+
+
     void Start()
     {
         Player = GameObject.FindGameObjectWithTag("Player");
@@ -18,6 +20,8 @@ public class BuildingThreshColliderScript : MonoBehaviour
 
     void OnTriggerEnter2D()
     {
+        playerMovement.playerOnThresh = true;
+
         if(rooftopLadder)
         {
             // if(isPlayerCrossingUp())
@@ -33,6 +37,8 @@ public class BuildingThreshColliderScript : MonoBehaviour
     }
     void OnTriggerExit2D()
     {
+        playerMovement.playerOnThresh = false;
+
         if(!rooftopLadder)
         { 
             if(isPlayerCrossingUp()) //if player crossing up
@@ -40,10 +46,21 @@ public class BuildingThreshColliderScript : MonoBehaviour
                 if (backOfBuilding)
                 {
                     if (playerMovement.playerIsInside())
-                    {                
-                        building.GoBehindBuilding(); // go outside behind the buildinng
+                    {   
+                        if(this.GetComponent<RoomThresholdColliderScript>().roomAbove == null)
+                        {           
+                            building.GoBehindBuilding(); // go outside behind the buildinng
+                            playerMovement.playerIsOutside = true;
+                        }
                     }
-                    playerMovement.playerIsOutside = true;
+                    else
+                    {
+                        if(this.GetComponent<RoomThresholdColliderScript>().roomAbove != null)
+                        {                          
+                            building.EnterBuilding();
+                            playerMovement.playerIsOutside = false;
+                        }
+                    }
                 }
                 else
                 {
@@ -60,9 +77,20 @@ public class BuildingThreshColliderScript : MonoBehaviour
                     {   
                         if(playerMovement.playerIsOutside) 
                         {     
-                            building.EnterBuilding();
+                            if(this.GetComponent<RoomThresholdColliderScript>().roomBelow != null)
+                            {
+                                building.EnterBuilding();
+                                playerMovement.playerIsOutside = false;  
+                            }          
                         }
-                        playerMovement.playerIsOutside = false;            
+                        else
+                        {
+                            if(this.GetComponent<RoomThresholdColliderScript>().roomBelow == null)
+                            {
+                                building.GoBehindBuilding(); // go outside behind the buildinng
+                                playerMovement.playerIsOutside = true;  
+                            }          
+                        }
                     }
                     else // entering the building from the front
                     {

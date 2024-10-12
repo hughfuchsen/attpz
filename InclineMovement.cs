@@ -8,6 +8,7 @@ public class InclineMovement : MonoBehaviour
     IsoSpriteSorting isoSpriteSortingScript;
     [SerializeField] GameObject Player;
     public string motionDirection;
+    public Coroutine thresholdSortingSequenceCoro;
     public string lowerSortingLayerToAssign;
     public string higherSortingLayerToAssign;
     public string lowerColliderLayerName; // The name of the layer you want to switch to
@@ -15,7 +16,7 @@ public class InclineMovement : MonoBehaviour
     public bool topOfStairCase;
     public bool middleOfStairCase;
     public bool itsALadder;
-    public Coroutine thresholdSortingSequenceCoro;
+    public int ladderHeight = 0;
 
     // Start is called before the first frame update
     void Awake()
@@ -97,38 +98,88 @@ public class InclineMovement : MonoBehaviour
             }
             else // if it is a ladder baby
             {
-                Debug.Log(playerMovement.motionDirection);
                 //alter the motion direction
                 if(playerMovement.motionDirection == "normal")
                 {
+                    // anchor player to ladder
+                    if(!topOfStairCase)
+                    {
+                        Player.transform.position = FindSiblingWithTag("Ladder").transform.position - isoSpriteSortingScript.SorterPositionOffset;
+                    }
+                    else
+                    {
+                        Player.transform.position = FindSiblingWithTag("Ladder").transform.position - isoSpriteSortingScript.SorterPositionOffset + new Vector3(0, ladderHeight, 0);
+                    }
+
                     if((isPlayerCrossingUp() && (isPlayerCrossingLeft()||!isPlayerCrossingLeft())))
                     {
+                        //manage animation
+                        if(isPlayerCrossingLeft())
+                        {
+                            playerMovement.ladderAnimDirectionIndex = playerMovement.upLeftAnim;
+                        }
+                        else
+                        {
+                            playerMovement.ladderAnimDirectionIndex = playerMovement.upRightAnim;
+                        }
+
+                        
+                        if(!topOfStairCase)
+                        {
+                            playerMovement.motionDirection = "upLadder";
+                        }
+                        else
+                        {
+                            playerMovement.motionDirection = "downLadder";
+                        }
                         //add certain animation and anchoring here
-                        Debug.Log("1");
-                        playerMovement.motionDirection = motionDirection;
                         gameObject.layer = LayerMask.NameToLayer(higherColliderLayerName);
                         SetCollisionLayer(higherColliderLayerName);
                     }
                     else if((!isPlayerCrossingUp() && (isPlayerCrossingLeft()||!isPlayerCrossingLeft())))
                     {
-                        Debug.Log("2");
-                        //add certain animation and anchoring here
-                        playerMovement.motionDirection = motionDirection;
+                        //add certain animation 
+                        if(!topOfStairCase)
+                        {
+                            playerMovement.motionDirection = "upLadder";
+                            
+                            //manage animation
+                            if(isPlayerCrossingLeft())
+                            {
+                                playerMovement.ladderAnimDirectionIndex = playerMovement.leftAnim;
+                            }
+                            else
+                            {
+                                playerMovement.ladderAnimDirectionIndex = playerMovement.rightAnim;
+                            }
+                        }
+                        else
+                        {
+                            playerMovement.motionDirection = "downLadder";
+                            
+                            //manage animation
+                            if(isPlayerCrossingLeft())
+                            {
+                                playerMovement.ladderAnimDirectionIndex = playerMovement.upRightAnim;
+                            }
+                            else
+                            {
+                                playerMovement.ladderAnimDirectionIndex = playerMovement.upLeftAnim;
+                            }
+                        }
                         gameObject.layer = LayerMask.NameToLayer(higherColliderLayerName);
                         SetCollisionLayer(higherColliderLayerName);
                     }
                     isoSpriteSortingScript.isMovable = false;
                 }
-                else if((isPlayerCrossingUp() && playerMovement.motionDirection == "upDownLadder"))
+                else if((isPlayerCrossingUp() && playerMovement.motionDirection != "normal"))
                 {
-                        Debug.Log("3");
                     playerMovement.motionDirection = "normal";  
                     SetTreeSortingLayer(collision.gameObject, higherSortingLayerToAssign);
                     isoSpriteSortingScript.isMovable = true;
                 }
-                else if((!isPlayerCrossingUp() && playerMovement.motionDirection == "upDownLadder"))
+                else if((!isPlayerCrossingUp() && playerMovement.motionDirection != "normal"))
                 {
-                    Debug.Log("4");
                     playerMovement.motionDirection = "normal"; 
                     gameObject.layer = LayerMask.NameToLayer(lowerColliderLayerName);
                     SetCollisionLayer(lowerColliderLayerName);
@@ -158,7 +209,7 @@ public class InclineMovement : MonoBehaviour
 
 
 
-        void OnTriggerExit2D(Collider2D collision)
+    void OnTriggerExit2D(Collider2D collision)
     {
             if(collision.gameObject.tag == "Player")
             {
@@ -198,7 +249,7 @@ public class InclineMovement : MonoBehaviour
                         SetTreeSortingLayer(collision.gameObject, lowerSortingLayerToAssign);
                     }
                 }
-                else
+                else //if it is a ladder!
                 {
                     //alter the motion direction
                     if(playerMovement.motionDirection == "normal")
@@ -214,7 +265,7 @@ public class InclineMovement : MonoBehaviour
                             SetCollisionLayer(lowerColliderLayerName);
                         }
                     }
-                    else if (playerMovement.motionDirection == "upDownLadder")
+                    else if (playerMovement.motionDirection != "normal")
                     {
                         if(!topOfStairCase)
                         {
@@ -232,6 +283,11 @@ public class InclineMovement : MonoBehaviour
                                 playerMovement.motionDirection = "normal";  
                                 gameObject.layer = LayerMask.NameToLayer(higherColliderLayerName);
                                 SetCollisionLayer(higherColliderLayerName);
+                            }
+                            else
+                            {
+                                gameObject.layer = LayerMask.NameToLayer(lowerColliderLayerName);
+                                SetCollisionLayer(lowerColliderLayerName);
                             }
                         }
                     }
@@ -280,6 +336,52 @@ public class InclineMovement : MonoBehaviour
 
         // Re-enable collision with the target layer
         Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Player"), targetLayerIndex, false);
+    }
+
+    public GameObject FindSiblingWithTag(string tag, Transform transform = null) 
+    {
+        if (transform == null)
+        {
+            foreach (Transform child in this.gameObject.transform.parent)
+            {
+                if (child.CompareTag(tag))
+                {
+                    return child.gameObject; 
+                } 
+                else
+                {
+                    FindSiblingWithTag(tag, child);
+                }       
+            }
+        }
+        else 
+        {
+            foreach (Transform child in transform)
+            {
+                if (child.CompareTag(tag))
+                {
+                    return child.gameObject; //this returns the first sibling that has the corresponding tag
+                                            // then, if this group of siblings doesn's contain the tag, the next bit checks their descendants 
+                                            //and so on
+                }
+                else
+                {
+                    Transform descendant = child.gameObject.transform;
+                    if (descendant != null)
+                    {
+                        foreach (Transform child2 in descendant)
+                        {
+                            FindSiblingWithTag(tag, child2);
+                        }
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+            }
+        }
+        return null;
     }
     
 }

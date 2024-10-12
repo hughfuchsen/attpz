@@ -3,6 +3,8 @@
  using System.Collections;
  using System.Collections.Generic;
  using UnityEngine;
+
+ #if UNITY_EDITOR
  using UnityEditor;
  
  public class EditingShortcuts : EditorWindow {
@@ -15,7 +17,7 @@
 
      [MenuItem("Tools/Select Parent &c")]
         static void SelectParentOfObject() {
-            Selection.activeGameObject = Selection.activeGameObject.transform.parent.gameObject;
+            Selection.activeGameObject = Selection.activeGameObject.transform.parent.gameObject; 
         }
 
 
@@ -144,7 +146,5 @@
 		}
 	}
 
-    
-
-
  }
+ #endif

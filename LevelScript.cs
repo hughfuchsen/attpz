@@ -311,7 +311,7 @@ public class LevelScript : MonoBehaviour
             Color.RGBToHSV(color, out float h, out float s, out float v);
 
             // Check if saturation and value haven't been decreased yet
-            h = 60f / 360f;
+            h = 44f / 360f;
             if (s > s / 1.5f)
             {
                 s -= s / 1.5f;

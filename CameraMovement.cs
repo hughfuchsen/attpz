@@ -4,24 +4,31 @@ using UnityEngine;
 
 public class CameraMovement : MonoBehaviour
 {
+    PlayerMovement playerMovement;
+    [SerializeField] GameObject Player;
     private float zoomSize = 300;
-    [SerializeField] Transform target;
-    public float smoothing;
-    public Vector2 maxPosition;
-    public Vector2 minPosition;
+    public Transform target;
+    
+    public float smoothing = 200f;
+
+    public bool freezeCamPos = false;
+
+    public Coroutine adjustSmoothingCoro;
+
+    public float initialSmoothing = 200f;
+    // public Vector2 maxPosition;
+    // public Vector2 minPosition;
 
     private Vector3 targetPosition;
 
     [SerializeField] GameObject innerBuildingBackdrop;
+    [SerializeField] GameObject activateCharacterUI;
+    private ActivateCharacterUITrigger activateCharacterUITriggerScript;
 
-    // void OnEnable()
-    // {
-    //     innerBuildingBackdrop = GameObject.FindWithTag("InnerBuildingBackdrop");
-    //     if (innerBuildingBackdrop != null)
-    //     {
-    //     innerBuildingBackdrop.SetActive(true); 
-    //     }
-    // }
+    public Texture2D cursorTexture; // Assign your PNG in the Inspector
+    public Vector2 hotSpot = Vector2.zero; // Hotspot of the cursor (can be adjusted)
+
+
     void Awake()
     {
         innerBuildingBackdrop.SetActive(true);
@@ -31,11 +38,19 @@ public class CameraMovement : MonoBehaviour
     {
         target = GameObject.FindGameObjectWithTag("Player").transform;
         GetComponent<Camera>().orthographicSize = zoomSize;
-        targetPosition = transform.position;
-        
+        targetPosition = transform.localPosition;
+        initialSmoothing = smoothing;
         
         FixZCoordinates();
         FixZCoordinates();
+
+        Player = GameObject.FindGameObjectWithTag("Player");
+        playerMovement = Player.GetComponent<PlayerMovement>(); 
+
+        Cursor.SetCursor(cursorTexture, hotSpot, CursorMode.Auto);
+
+        activateCharacterUITriggerScript = activateCharacterUI.GetComponent<ActivateCharacterUITrigger>();
+
     }
 
     void FixedUpdate()
@@ -45,19 +60,34 @@ public class CameraMovement : MonoBehaviour
         if (zoomDelta != 0)
         {
             // Adjust zoomSize by a fixed amount
-            zoomSize = Mathf.Clamp(zoomSize - zoomDelta * 100, 50, 500);
+            zoomSize = Mathf.Clamp(zoomSize - zoomDelta * 100, 50, 220);
             GetComponent<Camera>().orthographicSize = zoomSize;
         }
     }
 
-    void LateUpdate()
+    // void Update()
+    // {
+    //     if (playerMovement.movementStartIndex != playerMovement.run && playerMovement.movementStartIndex != playerMovement.rideBike)
+    //     {
+    //         // When player is neither running nor riding a bike, use initial smoothing
+    //         smoothing = initialSmoothing;
+    //     }
+    //     else
+    //     {
+    //         // When player is either running or riding a bike, adjust smoothing
+    //         AdjustSmoothing(200f);
+    //     }
+    // }
+
+    void LateUpdate() // handle the nature of the camera following player
     {
         // Interpolate towards the target position
-        targetPosition = new Vector3(target.position.x, target.position.y, transform.position.z);
-        targetPosition.x = Mathf.Clamp(targetPosition.x, minPosition.x, maxPosition.x);
-        targetPosition.y = Mathf.Clamp(targetPosition.y, minPosition.y, maxPosition.y);
+        targetPosition = new Vector3(target.position.x + 7, target.position.y - 12, transform.position.z);
+        if(!freezeCamPos)
+        {
+            transform.position = Vector3.Lerp(transform.position, targetPosition, smoothing * Time.deltaTime);
+        }
 
-        transform.position = Vector3.Lerp(transform.position, targetPosition, smoothing * Time.deltaTime);
     }
     void FixZCoordinates()
     {
@@ -75,5 +105,40 @@ public class CameraMovement : MonoBehaviour
             }
         }
     }
+
+    public IEnumerator AdjustSmoothing(float final)
+    {
+
+        float elapsedTime = 0f;
+        float duration = 1f;
+
+        if(smoothing != final)
+        {
+            while (elapsedTime < duration)
+            {
+                elapsedTime += Time.deltaTime;
+                smoothing = Mathf.Lerp(initialSmoothing, final, elapsedTime / duration);
+                yield return null;
+            }
+            smoothing = final;
+        }
+
+    }
+
+    // public IEnumerator AdjustSmoothing(float final)
+    // {
+
+    //     float elapsedTime = 0f;
+    //     float duration = 4f;
+
+    //     while (elapsedTime < duration)
+    //     {
+    //         elapsedTime += Time.deltaTime;
+    //         smoothing = Mathf.Lerp(smoothing, final, elapsedTime / duration);
+    //         yield return null;
+    //     }
+
+    //     smoothing = final;
+    // }
 }
 

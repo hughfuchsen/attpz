@@ -46,7 +46,11 @@ public class BikeScript : MonoBehaviour
         {    
             if (playerMovement.spaceBarDeactivated == false)
             {
-                if (Input.GetKey(KeyCode.Space) && playerMovement.playerIsOutside && !playerMovement.playerOnBike)
+                if ((Input.GetKey(KeyCode.Space) || 
+    Input.GetKey(KeyCode.JoystickButton0) ||  // A button
+    Input.GetKey(KeyCode.JoystickButton1) ||  // B button
+    Input.GetKey(KeyCode.JoystickButton2) ||  // X button
+    Input.GetKey(KeyCode.JoystickButton3)) && playerMovement.playerIsOutside && !playerMovement.playerOnBike)
                 {
                     playerMovement.StartDeactivateSpaceBar(); // Use centralized method
 

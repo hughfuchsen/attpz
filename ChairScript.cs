@@ -11,6 +11,7 @@ public class ChairScript : MonoBehaviour
     public Vector3 currentSeatAnchorPoint;
     public Vector3 initialPlayerPosBeforeSitting;
 
+
     
 
 
@@ -48,10 +49,10 @@ public class ChairScript : MonoBehaviour
         {
             if (Input.GetKey(KeyCode.Space))
             {
-                if(cameraMovement.adjustSmoothingCoro != null)
-                {
-                    StopCoroutine(cameraMovement.adjustSmoothingCoro); 
-                }
+                // if(cameraMovement.adjustSmoothingCoro != null)
+                // {
+                //     StopCoroutine(cameraMovement.adjustSmoothingCoro); 
+                // }
 
 
                 

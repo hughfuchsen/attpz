@@ -34,12 +34,14 @@ public class ActivateCharacterUITrigger : MonoBehaviour
         backdrop = GameObject.FindGameObjectWithTag("InnerBuildingBackdrop");
 
 
+
         // playerMovement = player.GetComponent<PlayerMovement>();
     }
 
     IEnumerator LateStart() 
     {
         yield return new WaitForEndOfFrame();
+        yield return new WaitForEndOfFrame(); // wait for children to switch off separately
         
         chrctrCuzzyObj.SetActive(false);
     }
@@ -78,74 +80,80 @@ public class ActivateCharacterUITrigger : MonoBehaviour
 
     private IEnumerator FadeBackdropAndSetSortingLayersEtc(bool fadeFirst, float alpha)
     {
-        SpriteRenderer sr = backdrop.GetComponent<SpriteRenderer>();
+        // if (backdrop != null)
+        // {
+            SpriteRenderer sr = backdrop.GetComponent<SpriteRenderer>();
 
-        // Calculate duration based on the alpha difference
-        float alphaDiff = Mathf.Abs(sr.color.a - alpha);
-        float duration = alphaDiff; // Assuming alpha ranges from 0 to 1
-        float elapsedTime = 0.0f;
+            // Calculate duration based on the alpha difference
+            float alphaDiff = Mathf.Abs(sr.color.a - alpha);
+            float duration = alphaDiff; // Assuming alpha ranges from 0 to 1
+            float elapsedTime = 0.0f;
 
-        if(fadeFirst == false)
-        {
-            // chrctrCuzzyObj.SetActive(true);
-            steppedOnTrigger = true;
-
-            SetTreeSortingLayer(backdrop, "UI1");
-            SetTreeSortingLayer(Player, "UI2");
-            SetTreeSortingLayer(platform, "UI2");
-
-            chrctrCuzzyObj.SetActive(true);
-
-            while (elapsedTime < duration)
+            if(fadeFirst == false)
             {
-                elapsedTime += Time.deltaTime;
-                float t = elapsedTime / duration;
+                // chrctrCuzzyObj.SetActive(true);
+                steppedOnTrigger = true;
 
-                float nextAlpha = Mathf.Lerp(sr.color.a, alpha, t);
-                sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, nextAlpha);
+                SetTreeSortingLayer(backdrop, "UI1");
+                SetTreeSortingLayer(Player, "UI2");
+                SetTreeSortingLayer(platform, "UI2");
 
-                yield return null;
+                chrctrCuzzyObj.SetActive(true);
+
+                while (elapsedTime < duration)
+                {
+                    elapsedTime += Time.deltaTime;
+                    float t = elapsedTime / duration;
+
+                    float nextAlpha = Mathf.Lerp(sr.color.a, alpha, t);
+                    sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, nextAlpha);
+
+                    yield return null;
+                }
+
+                // yield return new WaitForSeconds(0.1f);
+
+
+
+                // yield return new WaitForSeconds(1f);
+
+                // Ensure the final alpha value is set
+                sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, alpha);
             }
-
-            // yield return new WaitForSeconds(0.1f);
-
-
-
-            // yield return new WaitForSeconds(1f);
-
-            // Ensure the final alpha value is set
-            sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, alpha);
-        }
-        else
-        {
-            chrctrCuzzyObj.SetActive(false);
-            while (elapsedTime < duration)
+            else
             {
-                elapsedTime += Time.deltaTime;
-                float t = elapsedTime / duration;
+                if(chrctrCuzzyObj != null)
+                {
+                    chrctrCuzzyObj.SetActive(false);
+                }
+                while (elapsedTime < duration)
+                {
+                    elapsedTime += Time.deltaTime;
+                    float t = elapsedTime / duration;
 
-                float nextAlpha = Mathf.Lerp(sr.color.a, alpha, t);
-                sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, nextAlpha);
+                    float nextAlpha = Mathf.Lerp(sr.color.a, alpha, t);
+                    sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, nextAlpha);
 
-                yield return null;
+                    yield return null;
+                }
+
+                yield return new WaitForSeconds(0.1f);
+
+
+
+
+                steppedOnTrigger = false;
+
+                SetTreeSortingLayer(backdrop, "Backdrop");
+                SetTreeSortingLayer(Player, "Default");
+                SetTreeSortingLayer(platform, "Default");
+
+
+
+                // Ensure the final alpha value is set
+                sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, alpha);  
             }
-
-            yield return new WaitForSeconds(0.1f);
-
-
-
-
-            steppedOnTrigger = false;
-
-            SetTreeSortingLayer(backdrop, "Backdrop");
-            SetTreeSortingLayer(Player, "Default");
-            SetTreeSortingLayer(platform, "Default");
-
-
-
-            // Ensure the final alpha value is set
-            sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, alpha);  
-        }
+        // }
     }
 
     static void SetTreeSortingLayer(GameObject gameObject, string sortingLayerName)

@@ -5,7 +5,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class CharacterCustomization : MonoBehaviour
+public class CharacterCustomization : MonoBehaviour 
 {
     PlayerMovement playerMovement;
     [SerializeField] GameObject Player;
@@ -40,15 +40,12 @@ public class CharacterCustomization : MonoBehaviour
     private Sprite lockedImage;
     private Sprite unlockedImage;
 
-    public SpriteRenderer skinColorButton;
-    public SpriteRenderer hairColorButton;
-    public SpriteRenderer shirtColorButton;
-    public SpriteRenderer pantsColorButton;
-    public SpriteRenderer jackettoColorButton;
-
-    public List<GameObject> shirtColors = new List<GameObject>();
-    public List<GameObject> pantsColors = new List<GameObject>();
-    public List<GameObject> shoeColors = new List<GameObject>();
+    // public Image skinColorButton;
+    public Image skinColorButton2;
+    public Image hairColorButton;
+    public Image shirtColorButton;
+    public Image pantsColorButton;
+    public Image jackettoColorButton;
 
     private int[] bodyTypeIndex1 = {5, 17, 29};
     private int[] bodyTypeIndex2 = {9, 21, 33};
@@ -80,8 +77,8 @@ public class CharacterCustomization : MonoBehaviour
     //     { 33, new int[] { 33, 34, 35, 36 } }
     // };
 
-    private int currentBodyTypeIndex = 0; // Index to track current body type
-    private int currentHeightIndex = 0;   // Index to track current height
+    public int currentBodyTypeIndex = 0; // Index to track current body type
+    public int currentHeightIndex = 0;   // Index to track current height
     public int currentWidthIndex = 0;    // Index to track current currentWidthIndex
     public int currentHairStyleIndex = 0;    //"" "" "" 
     public int currentHairColorIndex = 0;    //"" "" "" 
@@ -128,7 +125,7 @@ public class CharacterCustomization : MonoBehaviour
         lockPantsImgComponent = GameObject.FindGameObjectWithTag("LockPantsUI").GetComponent<Image>();
         lockJakettoImgComponent = GameObject.FindGameObjectWithTag("LockJackettoUI").GetComponent<Image>();
         lockShoesImgComponent = GameObject.FindGameObjectWithTag("LockShoesUI").GetComponent<Image>();
-        transform.Find("customiseButtons").gameObject.SetActive(false);
+        // transform.Find("customiseButtons").gameObject.SetActive(false);
 
         lockBodyImgComponent.sprite = unlockedImage;
         lockSkinImgComponent.sprite = unlockedImage;
@@ -517,7 +514,7 @@ public class CharacterCustomization : MonoBehaviour
     public void NextPants()
     {
         currentPantsIndex++;
-        if (currentPantsIndex >= 3)
+        if (currentPantsIndex >= 4)
         {
             currentPantsIndex = 0; // Wrap around to the first currentWidthIndex option
         }
@@ -537,6 +534,10 @@ public class CharacterCustomization : MonoBehaviour
         else if(currentPantsIndex == 2)
         {
             playerMovement.SetPantsToPants();
+        }
+        else if(currentPantsIndex == 3)
+        {
+            playerMovement.SetPantsToDress();
         }
         // else if(currentPantsIndex == 3)
         // {
@@ -560,17 +561,14 @@ public class CharacterCustomization : MonoBehaviour
         {
             playerMovement.SetNoJaketto();
         }
-        if(currentJakettoIndex == 1)
+        else if(currentJakettoIndex == 1 || currentJakettoIndex == 2 || currentJakettoIndex == 3)
         {
-            playerMovement.SetJakettoToVest();
+            playerMovement.SetJakettoVest();
         }
-        else if(currentJakettoIndex == 2)
+        else
         {
-            playerMovement.SetJaketto1();
-        }
-        else if(currentJakettoIndex == 3)
-        {
-            playerMovement.SetJaketto2();
+            currentJakettoIndex = 0;
+            UpdateJaketto();          
         }
     }
     
@@ -966,14 +964,14 @@ private void UpdateLockImage()
         //duplicate if statements because the indexes trip over each other otherwise!!!!!! :) be happy ok!
         if(!lockedShoes)
         {
-            currentFeetIndex = Random.Range(0, 2);
+            currentFeetIndex = Random.Range(0, 3);
             UpdateFeet();
         }
-        if(!lockedPants)
-        {
-            currentPantsIndex = Random.Range(0, 3);
-            UpdatePants();
-        }
+        // if(!lockedPants)
+        // {
+        //     currentPantsIndex = Random.Range(0, 4);
+        //     UpdatePants();
+        // }
         if(!lockedWaist)
         {
             currentWaistIndex = Random.Range(0, 2);
@@ -981,12 +979,12 @@ private void UpdateLockImage()
         }
         if(!lockedHair)
         {
-            currentHairColorIndex = Random.Range(1, 11);
+            currentHairColorIndex = Random.Range(0, 10);
             UpdateHairColor();
         }
         if(!lockedShirt)
         {
-            currentShirtIndex = Random.Range(1, 10);
+            currentShirtIndex = Random.Range(1, 10); // omit no shirt for rando
             UpdateShirt();
         }
         if(!lockedHeight)
@@ -1006,8 +1004,13 @@ private void UpdateLockImage()
         }
         if(!lockedPants)
         {
-            currentPantsColorIndex = Random.Range(0, 11);
+            currentPantsColorIndex = Random.Range(0, 10);
             UpdatePantsColor();
+        }
+        if(!lockedPants)
+        {
+            currentPantsIndex = Random.Range(0, 4);
+            UpdatePants();
         }
         if(!lockedShirt)
         {
@@ -1016,14 +1019,14 @@ private void UpdateLockImage()
         }
         if(!lockedHair)
         {
-            currentHairStyleIndex = Random.Range(1, 14);
-            UpdateHairStyle();
+            currentHairStyleIndex = Random.Range(0, 13);
+            UpdateHairStyle(); 
         }
         if(!lockedJaketto)
         {
             currentJakettoIndex = Random.Range(0, 9);
-            NextJaketto();
-            currentJakettoColorIndex = Random.Range(0, 11);
+            UpdateJaketto();
+            currentJakettoColorIndex = Random.Range(0, 10);
             UpdateJakettoColor();
         }
         if(!lockedSkinColor)
@@ -1031,6 +1034,90 @@ private void UpdateLockImage()
             currentSkinColorIndex = Random.Range(0, 7);
             UpdateSkinColor();
         }
+    }
+
+
+
+    
+    public void UpdateSpecific(int feet, 
+                                int pants, 
+                                int waist, 
+                                int hairCol, 
+                                int shirt, 
+                                int height, 
+                                int bodyType, 
+                                int width, 
+                                int pantsCol, 
+                                int shirtCol, 
+                                int hairStyle, 
+                                int jaketto, 
+                                int jakettoCol, 
+                                int skinCol)
+    {
+            currentPantsColorIndex = pantsCol;
+            UpdatePantsColor();
+        
+            currentShirtColorIndex = shirtCol;
+            UpdateShirtColor();
+
+            currentJakettoColorIndex = jakettoCol;
+            // UpdateJakettoColor();
+
+            currentHairColorIndex = hairCol;
+            UpdateHairColor();
+
+            currentSkinColorIndex = skinCol;
+            UpdateSkinColor();
+
+
+            currentShirtIndex = shirt;
+            // UpdateShirt();
+
+            currentJakettoIndex = jaketto;
+            UpdateJakettoColor();
+
+            // UpdateShirt();
+
+            
+            currentFeetIndex = feet;
+            UpdateFeet();
+       
+            // currentPantsIndex = pants;
+            // UpdatePants();
+       
+            currentWaistIndex = waist;
+            UpdateWaist();
+      
+
+       
+            currentHeightIndex = height;
+            SetBodyType();
+       
+            currentBodyTypeIndex = bodyType;
+            SetBodyType();
+       
+            currentWidthIndex = width;
+            SetBodyType();
+      
+            currentPantsColorIndex = pantsCol;
+            UpdatePantsColor();
+
+            currentPantsIndex = pants;
+            UpdatePants();
+        
+            currentShirtColorIndex = shirtCol;
+            UpdateShirtColor();
+       
+            currentHairStyleIndex = hairStyle;
+            UpdateHairStyle();
+
+     
+            // currentJakettoIndex = jaketto;
+            // UpdateJakettoColor();
+
+      
+
+        
     }
 
     // public void NextPants()

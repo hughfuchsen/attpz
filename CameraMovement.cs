@@ -4,22 +4,21 @@ using UnityEngine;
 
 public class CameraMovement : MonoBehaviour
 {
-    PlayerMovement playerMovement;
     [SerializeField] GameObject Player;
-    private float zoomSize = 300;
     public Transform target;
-    
-    public float smoothing = 200f;
+
+    public float smoothing = 1000f;
 
     public bool freezeCamPos = false;
 
-    public Coroutine adjustSmoothingCoro;
-
-    public float initialSmoothing = 200f;
-    // public Vector2 maxPosition;
-    // public Vector2 minPosition;
-
     private Vector3 targetPosition;
+
+    private float[] zoomLevels = { 50f, 100f, 150f, 200f, 220f }; // Array of zoom levels
+    private int currentZoomLevelIndex = 0; // Keep track of the current zoom level
+    private float zoomSize; // The current zoom size
+
+    private bool isZoomingIn = true;
+
 
     [SerializeField] GameObject innerBuildingBackdrop;
     [SerializeField] GameObject activateCharacterUI;
@@ -27,7 +26,6 @@ public class CameraMovement : MonoBehaviour
 
     public Texture2D cursorTexture; // Assign your PNG in the Inspector
     public Vector2 hotSpot = Vector2.zero; // Hotspot of the cursor (can be adjusted)
-
 
     void Awake()
     {
@@ -37,58 +35,76 @@ public class CameraMovement : MonoBehaviour
     void Start()
     {
         target = GameObject.FindGameObjectWithTag("Player").transform;
+        zoomSize = zoomLevels[currentZoomLevelIndex]; // Set initial zoom size
         GetComponent<Camera>().orthographicSize = zoomSize;
         targetPosition = transform.localPosition;
-        initialSmoothing = smoothing;
-        
-        FixZCoordinates();
-        FixZCoordinates();
 
         Player = GameObject.FindGameObjectWithTag("Player");
-        playerMovement = Player.GetComponent<PlayerMovement>(); 
-
-        Cursor.SetCursor(cursorTexture, hotSpot, CursorMode.Auto);
-
         activateCharacterUITriggerScript = activateCharacterUI.GetComponent<ActivateCharacterUITrigger>();
 
+        Cursor.SetCursor(cursorTexture, hotSpot, CursorMode.Auto);
     }
 
-    void FixedUpdate()
+    void Update()
     {
-        // Handle zooming
+        // Check if Y button is pressed
+        if (Input.GetKeyDown(KeyCode.JoystickButton3)) // Y button on Xbox controller
+        {
+            IncrementZoom();
+        }
+    }
+
+     void FixedUpdate()
+    {
+        // Handle zooming with mouse scroll wheel
         float zoomDelta = Input.GetAxis("Mouse ScrollWheel");
+
         if (zoomDelta != 0)
         {
             // Adjust zoomSize by a fixed amount
             zoomSize = Mathf.Clamp(zoomSize - zoomDelta * 100, 50, 220);
             GetComponent<Camera>().orthographicSize = zoomSize;
         }
+        // transform.position = target.transform.position + new Vector3(8,-14,0);
     }
 
-    // void Update()
-    // {
-    //     if (playerMovement.movementStartIndex != playerMovement.run && playerMovement.movementStartIndex != playerMovement.rideBike)
-    //     {
-    //         // When player is neither running nor riding a bike, use initial smoothing
-    //         smoothing = initialSmoothing;
-    //     }
-    //     else
-    //     {
-    //         // When player is either running or riding a bike, adjust smoothing
-    //         AdjustSmoothing(200f);
-    //     }
-    // }
+
+    void IncrementZoom()
+    {
+        if (isZoomingIn)
+        {
+            currentZoomLevelIndex++;
+            if (currentZoomLevelIndex >= zoomLevels.Length - 1)
+            {
+                currentZoomLevelIndex = zoomLevels.Length - 1; // Ensure it stays within bounds
+                isZoomingIn = false; // Reverse direction when max is reached
+            }
+        }
+        else
+        {
+            currentZoomLevelIndex--;
+            if (currentZoomLevelIndex <= 0)
+            {
+                currentZoomLevelIndex = 0; // Ensure it stays within bounds
+                isZoomingIn = true; // Reverse direction when min is reached
+            }
+        }
+        
+        zoomSize = zoomLevels[currentZoomLevelIndex];
+        GetComponent<Camera>().orthographicSize = zoomSize;
+    }
+
 
     void LateUpdate() // handle the nature of the camera following player
     {
-        // Interpolate towards the target position
         targetPosition = new Vector3(target.position.x + 7, target.position.y - 12, transform.position.z);
-        if(!freezeCamPos)
+        if (!freezeCamPos)
         {
             transform.position = Vector3.Lerp(transform.position, targetPosition, smoothing * Time.deltaTime);
         }
-
     }
+
+
     void FixZCoordinates()
     {
         GameObject[] allObjects = UnityEngine.Object.FindObjectsOfType<GameObject>();
@@ -106,24 +122,24 @@ public class CameraMovement : MonoBehaviour
         }
     }
 
-    public IEnumerator AdjustSmoothing(float final)
-    {
+    // public IEnumerator AdjustSmoothing(float final)
+    // {
 
-        float elapsedTime = 0f;
-        float duration = 1f;
+    //     float elapsedTime = 0f;
+    //     float duration = 1f;
 
-        if(smoothing != final)
-        {
-            while (elapsedTime < duration)
-            {
-                elapsedTime += Time.deltaTime;
-                smoothing = Mathf.Lerp(initialSmoothing, final, elapsedTime / duration);
-                yield return null;
-            }
-            smoothing = final;
-        }
+    //     if(smoothing != final)
+    //     {
+    //         while (elapsedTime < duration)
+    //         {
+    //             elapsedTime += Time.deltaTime;
+    //             smoothing = Mathf.Lerp(initialSmoothing, final, elapsedTime / duration);
+    //             yield return null;
+    //         }
+    //         smoothing = final;
+    //     }
 
-    }
+    // }
 
     // public IEnumerator AdjustSmoothing(float final)
     // {

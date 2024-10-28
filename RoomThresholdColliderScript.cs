@@ -17,6 +17,7 @@ public class RoomThresholdColliderScript : MonoBehaviour
     LevelThreshColliderScript levelThreshColliderScript;
     PlayerMovement playerMovement;
     [SerializeField] GameObject Player;
+    [SerializeField] BoxCollider2D playerCollider;
     public bool itsALadder;
     public bool ladderTop;
     private bool aboveCollider;
@@ -27,18 +28,27 @@ public class RoomThresholdColliderScript : MonoBehaviour
 
     private Coroutine closedDoorFadeCoroutine;
     private Coroutine openDoorFadeCoroutine;
-    public Coroutine thresholdSortingSequenceCoro; 
+    public Coroutine thresholdSortingSequenceCoro;
+    public Coroutine moveToCldrCenterCoro;
+
     private string initialSortingLayer;
     private bool playerIsInDoorway = false;
     private bool playerIsInRoomAbove = false;
 
     private string[] tagsToExludeEntExt = { "OpenDoor", "AlphaZeroEntExt" };
+
+    private bool isMoving;
     
+
+    public bool plyrCrsngLeft = false;
+
 
     void Awake()
     {
         Player = GameObject.FindGameObjectWithTag("Player");
         playerMovement = Player.GetComponent<PlayerMovement>(); 
+        playerCollider = Player.GetComponent<BoxCollider2D>();
+
         
         // get the sprites and add them to the -> corresponding lists 
         GetSprites(FindSiblingWithTag("OpenDoor"), openDoorSpriteList);
@@ -53,51 +63,149 @@ public class RoomThresholdColliderScript : MonoBehaviour
         SetDoorState(false, false);
     }
 
-    void OnTriggerEnter2D()
+    void OnTriggerEnter2D(Collider2D collision)
     {
-        StopAllCoros();
-        if (!itsALadder)
-        {
-            playerMovement.motionDirection = "normal";
+        if (collision.gameObject.tag == "Player")
+        {    
+            StopAllCoros();
+            if (!itsALadder)
+            {
+                // // Get the bounds of the BoxCollider2D attached to the object that this script is attached to
+                // Bounds triggerBounds = GetComponent<BoxCollider2D>().bounds;
 
-            if (isPlayerCrossingUp())
-            {
-                aboveCollider = false;
-            }
-            else
-            {
-                aboveCollider = true;
-            }
+                // // Find the point of contact (based on the collision between the player and the trigger object)
+                // Vector2 contactPoint = collision.ClosestPoint(playerCollider.transform.position);
 
-            if((isPlayerCrossingUp() && isPlayerCrossingLeft()) // is player going this \ (left diag) way or
-            || !isPlayerCrossingUp() && !isPlayerCrossingLeft()) // is player going this / (right diag) way :-)
-            {
-                playerMovement.fixedDirectionLeft = true; // fix the player in \ left diag way while inside the collider
-            }
-            else
-            {
-                playerMovement.fixedDirectionRight = true; // fix the player in / right diag way while inside the collider
-            }
+                // // Define regions within the trigger object's collider
+                // Vector2 center = triggerBounds.center;
+                // Vector2 max = triggerBounds.max;
+                // Vector2 min = triggerBounds.min;
 
-            SetClosedDoorToZeroAlpha();
-            SetOpenDoorToInitialAlpha();
-            SetPlayerIsInDoorway(true);
-        }
-        else // if it is a ladder
-        {
-            if(ladderTop)
-            {
-                if (roomBelow != null || roomAbove != null)
+                // // Check if the contact point (from the player's collider) is within the top-right quarter of the other object's collider
+                // if (contactPoint.x >= center.x)
+                // {
+                //     Debug.Log("founditRIGHT");
+                //     // Execute your desired code here for top-right of the trigger object
+                //     if(plyrCrsngLeft) 
+                //     {
+                //         // playerMovement.fixedDirectionLeftDiagonal = true; // fix the player in \ left diag way while inside the collider
+                //         // playerMovement.fixedDirectionRightDiagonal = false; // fix the player in \ left diag way while inside the collider
+                //     }
+                //     else if (!plyrCrsngLeft)
+                //     {
+                //         // playerMovement.fixedDirectionRightDiagonal = true; // fix the player in / right diag way while inside the collider
+                //         // playerMovement.fixedDirectionLeftDiagonal = false; // fix the player in / right diag way while inside the collider
+                //     }
+                // }
+                // // Check if the contact point is within the top-left quarter of the other object's collider
+                // else if (contactPoint.x <= center.x)
+                // {
+                //     Debug.Log("founditLEFT");
+                //     // Execute your desired code here for top-left of the trigger object
+                    
+                // }
+                // // Check if the contact point is within the bottom-left quarter of the other object's collider
+                // else if (contactPoint.x <= center.x && contactPoint.y <= center.y)
+                // {
+                //     // Debug.Log("founditbottomLEFT");
+                //     // Execute your desired code here for bottom-left of the trigger object
+                // }
+                // // Check if the contact point is within the bottom-right quarter of the other object's collider
+                // else if (contactPoint.x >= center.x && contactPoint.y <= center.y)
+                // {
+                //     // Debug.Log("founditbottomRIGHT");
+                //     // Execute your desired code here for bottom-right of the trigger object
+                // }
+
+
+                // Calculate the world space center of the collider
+                // Vector3 worldCenter = transform.TransformPoint(GetComponent<Collider2D>().bounds.center);
+
+                // moveToCldrCenterCoro = StartCoroutine(MovePlayerToCenter(collision.transform, worldCenter));
+
+                playerMovement.motionDirection = "normal";
+
+
+    //   if (angle > 292.5f && angle <= 337.5f)    { change = new Vector3(-1f,0.5f,0f); currentAnimationDirection = upLeftAnim;}
+    //   if (angle > 22.5f && angle <= 67.5f)      { change = new Vector3(-1f,0.5f,0f); currentAnimationDirection = upLeftAnim;}
+    //   if (angle > 337.5f && angle <= 360f)      { change = new Vector3(-1f,0.5f,0f); currentAnimationDirection = upLeftAnim;}
+    //   if (angle >= 0f && angle <= 22.5f)         { change = new Vector3(-1f,0.5f,0f); currentAnimationDirection = upLeftAnim;}
+    //   if (angle > 67.5f && angle <= 112.5f)     { change = new Vector3(-1f,0.5f,0f); currentAnimationDirection = upLeftAnim;}
+
+    //   // if (angle > 247.5f && angle <= 292.5f)    { change = new Vector3(-1f,0.5f,0f); currentAnimationDirection = upLeftAnim;}
+     
+    //   if (angle > 202.5f && angle <= 247.5f)    { change = new Vector3(1f,-0.5f,0f); currentAnimationDirection = rightDownAnim;}
+    //   if (angle > 112.5f && angle <= 157.5f)    { change = new Vector3(1f,-0.5f,0f); currentAnimationDirection = rightDownAnim;}
+    //   if (angle > 157.5f && angle <= 202.5f)    { change = new Vector3(1f,-0.5f,0f); currentAnimationDirection = rightDownAnim;}
+    //   if (angle > 247.5f && angle <= 292.5f)    { change = new Vector3(1f,-0.5f,0f); currentAnimationDirection = rightDownAnim;}
+
+                if(plyrCrsngLeft) 
                 {
-                    roomBelow.ResetRoomPositions(); 
+                    // playerMovement.fixedDirectionLeftDiagonal = true; // fix the player in \ left diag way while inside the collider
+                    // playerMovement.fixedDirectionRightDiagonal = false; // fix the player in \ left diag way while inside the collider
+
+                    playerMovement.controlDirectionToPlayerDirection[Direction.Left] = Direction.UpLeft;
+                    playerMovement.controlDirectionToPlayerDirection[Direction.UpLeft] = Direction.UpLeft;
+                    playerMovement.controlDirectionToPlayerDirection[Direction.UpFacingLeft] = Direction.UpLeft;
+                    playerMovement.controlDirectionToPlayerDirection[Direction.UpFacingRight] = Direction.UpLeft;
+                    playerMovement.controlDirectionToPlayerDirection[Direction.UpRight] = Direction.UpLeft;
+                    playerMovement.controlDirectionToPlayerDirection[Direction.Right] = Direction.RightDown;
+                    playerMovement.controlDirectionToPlayerDirection[Direction.RightDown] = Direction.RightDown;
+                    playerMovement.controlDirectionToPlayerDirection[Direction.DownFacingRight] = Direction.RightDown;
+                    playerMovement.controlDirectionToPlayerDirection[Direction.DownFacingLeft] = Direction.RightDown;
+                    playerMovement.controlDirectionToPlayerDirection[Direction.DownLeft] = Direction.RightDown;
+
+
                 }
-            }  
-            else
-            {
-                if (roomBelow != null || roomAbove != null)
+                else if (!plyrCrsngLeft)
                 {
-                    // roomAbove.EnterRoom(true, 0.3f); 
-                    roomBelow.EnterRoom(true, 0.3f); 
+                    // playerMovement.fixedDirectionRightDiagonal = true; // fix the player in / right diag way while inside the collider
+                    // playerMovement.fixedDirectionLeftDiagonal = false; // fix the player in / right diag way while inside the collider
+
+                    playerMovement.controlDirectionToPlayerDirection[Direction.Left] = Direction.DownLeft;
+                    playerMovement.controlDirectionToPlayerDirection[Direction.UpLeft] = Direction.UpRight;
+                    playerMovement.controlDirectionToPlayerDirection[Direction.UpFacingLeft] = Direction.UpRight;
+                    playerMovement.controlDirectionToPlayerDirection[Direction.UpFacingRight] = Direction.UpRight;
+                    playerMovement.controlDirectionToPlayerDirection[Direction.UpRight] = Direction.UpRight;
+                    playerMovement.controlDirectionToPlayerDirection[Direction.Right] = Direction.UpRight;
+                    playerMovement.controlDirectionToPlayerDirection[Direction.RightDown] = Direction.DownLeft;
+                    playerMovement.controlDirectionToPlayerDirection[Direction.DownFacingRight] = Direction.DownLeft;
+                    playerMovement.controlDirectionToPlayerDirection[Direction.DownFacingLeft] = Direction.DownLeft;
+                    playerMovement.controlDirectionToPlayerDirection[Direction.DownLeft] = Direction.DownLeft;
+                }
+
+                if (isPlayerCrossingUp())
+                {
+                    aboveCollider = false;
+                }
+                else
+                {
+                    aboveCollider = true;
+                }
+
+
+
+
+                SetClosedDoorToZeroAlpha();
+                SetOpenDoorToInitialAlpha();
+                SetPlayerIsInDoorway(true);
+            }
+            else // if it is a ladder
+            {
+                if(ladderTop)
+                {
+                    if (roomBelow != null || roomAbove != null)
+                    {
+                        roomBelow.ResetRoomPositions(); 
+                    }
+                }  
+                else
+                {
+                    if (roomBelow != null || roomAbove != null)
+                    {
+                        // roomAbove.EnterRoom(true, 0.3f); 
+                        roomBelow.EnterRoom(true, 0.3f); 
+                    }
                 }
             }
         }
@@ -108,8 +216,9 @@ public class RoomThresholdColliderScript : MonoBehaviour
         StopAllCoros();
         if(!itsALadder)
         {
-            playerMovement.fixedDirectionLeft = false;
-            playerMovement.fixedDirectionRight = false; // un-fix the player in \/ left/right diag way upon collider exit. 
+            // playerMovement.fixedDirectionLeftDiagonal = false;
+            // playerMovement.fixedDirectionRightDiagonal = false; // un-fix the player in \/ left/right diag way upon collider exit. 
+            playerMovement.ResetPlayerMovement(); 
 
                 //ON EXIT CROSSING UP
             if (isPlayerCrossingUp())
@@ -233,10 +342,7 @@ public class RoomThresholdColliderScript : MonoBehaviour
     {
         return GameObject.FindWithTag("Player").GetComponent<PlayerMovement>().change.y > 0;
     }
-    private bool isPlayerCrossingLeft()
-    {
-        return GameObject.FindWithTag("Player").GetComponent<PlayerMovement>().change.x < 0;
-    }
+
 
 
     void SetClosedDoorToZeroAlpha()
@@ -311,6 +417,10 @@ public class RoomThresholdColliderScript : MonoBehaviour
         {
             StopCoroutine(thresholdSortingSequenceCoro);
             SetTreeSortingLayer(Player, initialSortingLayer);
+        }
+        if (moveToCldrCenterCoro != null)
+        {
+            StopCoroutine(moveToCldrCenterCoro);
         }
     }
 
@@ -482,7 +592,7 @@ public class RoomThresholdColliderScript : MonoBehaviour
                 {
                     for (int j = 0; j < roomAbove.doorsBelow[i].closedDoorSpriteList.Count; j++)
                     {
-                        this.closedDoorFadeCoroutine = StartCoroutine(treeFade(roomAbove.doorsBelow[i].closedDoorSpriteList[j], 0.2f, 0.3f));
+                        this.closedDoorFadeCoroutine = StartCoroutine(treeFade(roomAbove.doorsBelow[i].closedDoorSpriteList[j], 0.3f, 0.3f));
                     }  
                     for (int k = 0; k < roomAbove.doorsBelow[i].closedDoorSpriteList.Count; k++)
                     {
@@ -534,6 +644,20 @@ public class RoomThresholdColliderScript : MonoBehaviour
         }
             
     } 
+
+    private IEnumerator MovePlayerToCenter(Transform player, Vector3 centerPoint)
+    {
+        isMoving = true;
+        // Continue moving until the player reaches close enough to the center
+        while (Vector2.Distance(player.position, centerPoint) > 0.1f)
+        {
+            // Move the player towards the center smoothly over time
+            player.position = Vector2.MoveTowards(player.position, centerPoint, 6 * Time.deltaTime);
+            yield return null; // Wait until the next frame before continuing the loop
+        }
+
+        isMoving = false;
+    }
 
     public void SetPlayerIsInDoorway(bool playerIsInDoorway) 
     {

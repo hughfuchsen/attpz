@@ -37,11 +37,13 @@ public class InclineMovement : MonoBehaviour
                     if((isPlayerCrossingUp() && isPlayerCrossingLeft()) 
                         || !isPlayerCrossingUp() && !isPlayerCrossingLeft())
                     {
-                        playerMovement.fixedDirectionLeft = true;
+                        playerMovement.fixedDirectionLeftDiagonal = true;
+                        playerMovement.fixedDirectionRightDiagonal = false;
                     }
                     else
                     {
-                        playerMovement.fixedDirectionRight = true;
+                        playerMovement.fixedDirectionRightDiagonal = true;
+                        playerMovement.fixedDirectionLeftDiagonal = false;
                     }
                 }
 
@@ -215,8 +217,8 @@ public class InclineMovement : MonoBehaviour
             {
                 if (!itsALadder)
                 {
-                    playerMovement.fixedDirectionLeft = false;
-                    playerMovement.fixedDirectionRight = false;
+                    playerMovement.fixedDirectionLeftDiagonal = false;
+                    playerMovement.fixedDirectionRightDiagonal = false;
 
 
                     if((isPlayerCrossingUp() && playerMovement.motionDirection == "normal" && !topOfStairCase) 

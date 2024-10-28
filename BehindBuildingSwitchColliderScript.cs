@@ -20,7 +20,7 @@ public class BehindBuildingSwitchColliderScript : MonoBehaviour
     {
         if(building != null)
         {
-            if (playerMovement.fixedDirectionLeft || playerMovement.fixedDirectionRight)
+            if (playerMovement.fixedDirectionLeftDiagonal || playerMovement.fixedDirectionRightDiagonal)
             {
                 // do nuttin
             }
@@ -41,7 +41,7 @@ public class BehindBuildingSwitchColliderScript : MonoBehaviour
     {
         if(building != null)
         {
-            if ((playerMovement.fixedDirectionLeft || playerMovement.fixedDirectionRight))
+            if ((playerMovement.fixedDirectionLeftDiagonal || playerMovement.fixedDirectionRightDiagonal))
             {
                 // do nuttin
             }

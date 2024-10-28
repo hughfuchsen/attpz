@@ -28,11 +28,15 @@ public class BuildingScript : MonoBehaviour
     private Coroutine backdropFadeCoroutine;
     private string[] tagsToExludeEntExt = { "OpenDoor", "AlphaZeroEntExt" };
 
-    void Awake()
+    SoundtrackScript soundtrackScript;
+
+    public void Awake()
     { 
         Player = GameObject.FindGameObjectWithTag("Player");
         playerMovement = Player.GetComponent<PlayerMovement>(); 
         balconyManager = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<BalconyManager>(); 
+
+        soundtrackScript = GameObject.FindGameObjectWithTag("SoundtrackScript").GetComponent<SoundtrackScript>();
     }  
 
     // Start is called before the first frame update
@@ -56,6 +60,11 @@ public class BuildingScript : MonoBehaviour
 
     public void EnterBuilding()
     {
+        soundtrackScript.FadeOutIn(soundtrackScript.track1, soundtrackScript.track2);
+
+
+
+
         if(this.innerBuildingFadeCoroutine != null)
         {
             StopCoroutine(this.innerBuildingFadeCoroutine);
@@ -96,6 +105,12 @@ public class BuildingScript : MonoBehaviour
     }
     public void ExitBuilding(float waitTimeInside, float waitTimeOutside, bool exitingFromBehindAlreadyOutside)
     {
+        if(soundtrackScript != null)
+        {
+            soundtrackScript.FadeOutIn(soundtrackScript.track2, soundtrackScript.track1);
+        }
+
+
         if(this.innerBuildingFadeCoroutine != null)
         {
             StopCoroutine(this.innerBuildingFadeCoroutine);

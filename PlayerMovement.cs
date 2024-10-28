@@ -2,7 +2,21 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using TMPro;  // This is necessary for using TMP_InputField
 
+public enum Direction
+{
+  Left,
+  UpLeft,
+  UpFacingLeft,
+  UpFacingRight,
+  UpRight,
+  Right,
+  RightDown,
+  DownFacingLeft,
+  DownFacingRight,
+  DownLeft,
+}
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -36,11 +50,20 @@ public class PlayerMovement : MonoBehaviour
 
   IsoSpriteSorting IsoSpriteSorting; 
 
-  public bool fixedDirectionLeft;
-  public bool fixedDirectionRight;
+  public bool fixedDirectionLeftDiagonal;
+  public bool fixedDirectionRightDiagonal;
+  public bool cantGoLeftUpMustGoLeftDown;
+  public bool cantGoRightUpMustGoLeftUp;
+  public bool cantGoRightDownMustGoLeftDown;
+  public bool cantGoLeftDownMustGoLeftUp;
+  public bool cantGoRightUpMustGoRightDown;
+  public bool cantGoLeftUpMustGoRightUp;
+  public bool cantGoLeftDownMustGoRightDown;
+  public bool cantGoRightDownMustGoRightUp;
   
   public bool playerIsOutside = false;
 
+  private bool facingLeft;
 
   private int animDirectionAdjustorInt = 26;
 
@@ -71,6 +94,7 @@ public class PlayerMovement : MonoBehaviour
   private Sprite[] allKneesShinsSprites; 
   private Sprite[] allAnklesSprites; 
   private Sprite[] allFeetSprites; 
+  private Sprite[] allDressSprites; 
   private Sprite[] allJakettoSprites; 
   private Sprite[] allLongSleeveSprites; 
   private Sprite[] allHandSprites; 
@@ -107,6 +131,7 @@ public class PlayerMovement : MonoBehaviour
   private SpriteRenderer anklesSprite;
   private SpriteRenderer feetSprite;
   private SpriteRenderer jakettoSprite;
+  private SpriteRenderer dressSprite;
   private SpriteRenderer longSleeveSprite;
   private SpriteRenderer handSprite;
   private SpriteRenderer shortSleeveSprite;
@@ -166,6 +191,7 @@ public class PlayerMovement : MonoBehaviour
   public Color currentShoeColor;
   public Color currentJakettoColor;
 
+  private TMP_InputField[] inputFields;
 
 
 
@@ -189,11 +215,14 @@ public class PlayerMovement : MonoBehaviour
       IsoSpriteSorting = GetComponent<IsoSpriteSorting>();
       // animator = GetComponent<Animator>();
       myRigidbody = GetComponent<Rigidbody2D>();
-      fixedDirectionLeft = false;
-      fixedDirectionRight = false;
+
 
       characterCustomization = GameObject.FindGameObjectWithTag("CharacterCustomizationMenu").GetComponent<CharacterCustomization>();
       bikeTransformAdjustment = Player.GetComponent<BikeTransformAdjustment>();
+
+
+      // Find all input fields in the scene
+      inputFields = FindObjectsOfType<TMP_InputField>();
 
 
       // initialBCOffset = Player.GetComponent<BoxCollider2D>().offset;
@@ -224,6 +253,7 @@ public class PlayerMovement : MonoBehaviour
       allAnklesSprites = Resources.LoadAll<Sprite>("ankles");
       allFeetSprites = Resources.LoadAll<Sprite>("feet");
       allJakettoSprites = Resources.LoadAll<Sprite>("jaketto");
+      allDressSprites = Resources.LoadAll<Sprite>("dress");
       allLongSleeveSprites = Resources.LoadAll<Sprite>("longSleeve");
       allHandSprites = Resources.LoadAll<Sprite>("hands");
       allShortSleeveSprites = Resources.LoadAll<Sprite>("shortSleeve");
@@ -257,6 +287,7 @@ public class PlayerMovement : MonoBehaviour
       anklesSprite = transform.Find("ankles").GetComponent<SpriteRenderer>();
       feetSprite = transform.Find("feet").GetComponent<SpriteRenderer>();
       jakettoSprite = transform.Find("jaketto").GetComponent<SpriteRenderer>();
+      dressSprite = transform.Find("dress").GetComponent<SpriteRenderer>();
       longSleeveSprite = transform.Find("longSleeve").GetComponent<SpriteRenderer>();
       handSprite = transform.Find("hands").GetComponent<SpriteRenderer>();
       shortSleeveSprite = transform.Find("shortSleeve").GetComponent<SpriteRenderer>();
@@ -298,6 +329,7 @@ public class PlayerMovement : MonoBehaviour
       anklesSprite.sprite = allAnklesSprites[bodyTypeNumber * bodyTypeIndexMultiplier];
       feetSprite.sprite = allFeetSprites[bodyTypeNumber * bodyTypeIndexMultiplier];
       jakettoSprite.sprite = allJakettoSprites[bodyTypeNumber * bodyTypeIndexMultiplier];
+      dressSprite.sprite = allDressSprites[bodyTypeNumber * bodyTypeIndexMultiplier];
       longSleeveSprite.sprite = allLongSleeveSprites[bodyTypeNumber * bodyTypeIndexMultiplier];
       handSprite.sprite = allHandSprites[bodyTypeNumber * bodyTypeIndexMultiplier];
       shortSleeveSprite.sprite = allShortSleeveSprites[bodyTypeNumber * bodyTypeIndexMultiplier];      
@@ -349,7 +381,12 @@ public class PlayerMovement : MonoBehaviour
       // }
 
       // Check if space is released
-      if (Input.GetKeyUp(KeyCode.Space))
+
+      if ((Input.GetKeyUp(KeyCode.Space) || 
+          Input.GetKeyUp(KeyCode.JoystickButton0) ||  // A button
+          Input.GetKeyUp(KeyCode.JoystickButton1) ||  // B button
+          Input.GetKeyUp(KeyCode.JoystickButton2) ||  // X button
+          Input.GetKeyUp(KeyCode.JoystickButton3)))
       {
           spaceBarDeactivated = false;
       }
@@ -376,7 +413,11 @@ public void AnimateMovement(int movementStartIndex, int movementFrameCount, int 
     {
       ClimbLadder();
     }
-    else if (Input.GetKey(KeyCode.Space) && !playerOnThresh && playerIsOutside && change != Vector3.zero)
+    else if ((Input.GetKey(KeyCode.Space) || 
+    Input.GetKey(KeyCode.JoystickButton0) ||  // A button
+    Input.GetKey(KeyCode.JoystickButton1) ||  // B button
+    Input.GetKey(KeyCode.JoystickButton2) ||  // X button
+    Input.GetKey(KeyCode.JoystickButton3))  && !playerOnThresh && playerIsOutside && change != Vector3.zero)
     {
       Run();
     }
@@ -391,7 +432,11 @@ public void AnimateMovement(int movementStartIndex, int movementFrameCount, int 
     // Check if space was released before this code
     if(spaceBarDeactivated == false)
     {
-        if (Input.GetKey(KeyCode.Space) && playerIsOutside && playerOnBike)
+        if ((Input.GetKey(KeyCode.Space) || 
+    Input.GetKey(KeyCode.JoystickButton0) ||  // A button
+    Input.GetKey(KeyCode.JoystickButton1) ||  // B button
+    Input.GetKey(KeyCode.JoystickButton2) ||  // X button
+    Input.GetKey(KeyCode.JoystickButton3)) && playerIsOutside && playerOnBike)
         {
             // StopBikeFunction
             StartDeactivateSpaceBar();
@@ -466,6 +511,7 @@ public void AnimateMovement(int movementStartIndex, int movementFrameCount, int 
         anklesSprite.sprite = allAnklesSprites[movementIndices[currentFrame]];
         feetSprite.sprite = allFeetSprites[movementIndices[currentFrame]];
         jakettoSprite.sprite = allJakettoSprites[movementIndices[currentFrame]];
+        dressSprite.sprite = allDressSprites[movementIndices[currentFrame]];
         longSleeveSprite.sprite = allLongSleeveSprites[movementIndices[currentFrame]];
         handSprite.sprite = allHandSprites[movementIndices[currentFrame]];
         shortSleeveSprite.sprite = allShortSleeveSprites[movementIndices[currentFrame]];
@@ -493,15 +539,24 @@ public void AnimateMovement(int movementStartIndex, int movementFrameCount, int 
     {
 
         change = Vector3.zero;
-        if (Input.GetKey(KeyCode.W)||Input.GetKey(KeyCode.A)||Input.GetKey(KeyCode.S)||Input.GetKey(KeyCode.D))
+        if (IsInputFieldFocused())
+        {
+          change = Vector3.zero;
+        }
+        else if (Input.GetKey(KeyCode.W)||Input.GetKey(KeyCode.A)||Input.GetKey(KeyCode.S)||Input.GetKey(KeyCode.D))
         {
           change.x = Input.GetAxisRaw("LeftSideHoriz1");
           change.y = Input.GetAxisRaw("LeftSideVert1");
         }
-        else
+        else if (Input.GetKey(KeyCode.UpArrow)||Input.GetKey(KeyCode.LeftArrow)||Input.GetKey(KeyCode.DownArrow)||Input.GetKey(KeyCode.RightArrow))
         {
           change.x = Input.GetAxisRaw("Horizontal");
           change.y = Input.GetAxisRaw("Vertical");
+        }
+        else
+        {
+          change.x = Input.GetAxis("Horizontal");
+          change.y = Input.GetAxis("Vertical");
         }
       
 
@@ -513,10 +568,10 @@ public void AnimateMovement(int movementStartIndex, int movementFrameCount, int 
             MoveCharacterVerticalInclineLeftAway();} 
         else if (motionDirection == "inclineRightAway") 
           {MoveCharacterVerticalInclineRightAway();}
-        else if (motionDirection == "inclineLeftToward") 
-          {MoveCharacterVerticalInclineLeftToward();}
-        else if (motionDirection == "inclineRightToward") 
-          {MoveCharacterVerticalInclineRightToward();}
+        // else if (motionDirection == "inclineLeftToward") 
+        //   {MoveCharacterVerticalInclineLeftToward();}
+        // else if (motionDirection == "inclineRightToward") 
+        //   {MoveCharacterVerticalInclineRightToward();}
         else if (motionDirection == "upDownLadder") 
           {MoveCharacterUpDownLadder();}
         else if (motionDirection == "upLadder") 
@@ -552,30 +607,78 @@ public void AnimateMovement(int movementStartIndex, int movementFrameCount, int 
     }
       void MoveCharacterVerticalInclineLeftAway()
   {
-    if(!fixedDirectionLeft)
-    {
-      if (change == Vector3.right+Vector3.up)   { change = new Vector3(1f,0.5f,0f); AnimateMovement(movementStartIndex, movementFrameCount, upRightAnim, bodyTypeNumber); }
-      if (change == Vector3.left+Vector3.up)    { change = new Vector3(-0.7f,1f,0f); AnimateMovement(movementStartIndex, movementFrameCount, upLeftAnim, bodyTypeNumber);}
-      if (change == Vector3.up)                 { change = new Vector3(-0.7f,1f,0f); AnimateMovement(movementStartIndex, movementFrameCount, upLeftAnim, bodyTypeNumber);}
-      if (change == Vector3.right)              { change = new Vector3(1f,0.5f,0f); AnimateMovement(movementStartIndex, movementFrameCount, upRightAnim, bodyTypeNumber);}
-      if (change == Vector3.right+Vector3.down) { change = new Vector3(0.7f,-1f,0f); AnimateMovement(movementStartIndex, movementFrameCount, rightDownAnim, bodyTypeNumber);}
-      if (change == Vector3.left+Vector3.down)  { change = new Vector3(-1f,-0.5f,0f); AnimateMovement(movementStartIndex, movementFrameCount, leftDownAnim, bodyTypeNumber);}
-      if (change == Vector3.down)               { change = new Vector3(0.7f,-1f,0f); AnimateMovement(movementStartIndex, movementFrameCount, rightDownAnim, bodyTypeNumber);}
-      if (change == Vector3.left)               { change = new Vector3(-1f,-0.5f,0f); AnimateMovement(movementStartIndex, movementFrameCount, leftAnim, bodyTypeNumber);}
-      myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
+    // if(!fixedDirectionLeftDiagonal)
+    // {
+      // if (change == Vector3.right+Vector3.up)   { change = new Vector3(1f,0.5f,0f); AnimateMovement(movementStartIndex, movementFrameCount, upRightAnim, bodyTypeNumber); }
+      // if (change == Vector3.left+Vector3.up)    { change = new Vector3(-0.7f,1f,0f); AnimateMovement(movementStartIndex, movementFrameCount, upLeftAnim, bodyTypeNumber);}
+      // if (change == Vector3.up)                 { change = new Vector3(-0.7f,1f,0f); AnimateMovement(movementStartIndex, movementFrameCount, upLeftAnim, bodyTypeNumber);}
+      // if (change == Vector3.right)              { change = new Vector3(1f,0.5f,0f); AnimateMovement(movementStartIndex, movementFrameCount, upRightAnim, bodyTypeNumber);}
+      // if (change == Vector3.right+Vector3.down) { change = new Vector3(0.7f,-1f,0f); AnimateMovement(movementStartIndex, movementFrameCount, rightDownAnim, bodyTypeNumber);}
+      // if (change == Vector3.left+Vector3.down)  { change = new Vector3(-1f,-0.5f,0f); AnimateMovement(movementStartIndex, movementFrameCount, leftDownAnim, bodyTypeNumber);}
+      // if (change == Vector3.down)               { change = new Vector3(0.7f,-1f,0f); AnimateMovement(movementStartIndex, movementFrameCount, rightDownAnim, bodyTypeNumber);}
+      // if (change == Vector3.left)               { change = new Vector3(-1f,-0.5f,0f); AnimateMovement(movementStartIndex, movementFrameCount, leftAnim, bodyTypeNumber);}
+      // myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
       
-    }
-    else
-    // fixedDirectionLeft
-    {    
-      if (change == Vector3.right+Vector3.up)   { change = new Vector3(-1f,0.5f,0f); AnimateMovement(movementStartIndex, movementFrameCount, upRightAnim, bodyTypeNumber); }
-      if (change == Vector3.left+Vector3.up)    { change = new Vector3(-0.7f,1f,0f); AnimateMovement(movementStartIndex, movementFrameCount, upLeftAnim, bodyTypeNumber);}
-      if (change == Vector3.up)                 { change = new Vector3(-0.7f,1f,0f); AnimateMovement(movementStartIndex, movementFrameCount, upLeftAnim, bodyTypeNumber);}
-      if (change == Vector3.right)              { change = new Vector3(-1f,0.5f,0f); AnimateMovement(movementStartIndex, movementFrameCount, upRightAnim, bodyTypeNumber);}
-      if (change == Vector3.right+Vector3.down) { change = new Vector3(0.7f,-1f,0f); AnimateMovement(movementStartIndex, movementFrameCount, rightDownAnim, bodyTypeNumber);}
-      if (change == Vector3.left+Vector3.down)  { change = new Vector3(1f,-0.5f,0f); AnimateMovement(movementStartIndex, movementFrameCount, leftDownAnim, bodyTypeNumber);}
-      if (change == Vector3.down)               { change = new Vector3(0.7f,-1f,0f); AnimateMovement(movementStartIndex, movementFrameCount, rightDownAnim, bodyTypeNumber);}
-      if (change == Vector3.left)               { change = new Vector3(1f,-0.5f,0f); AnimateMovement(movementStartIndex, movementFrameCount, leftAnim, bodyTypeNumber);}
+
+      // Calculate the angle in degrees (-180 to 180 degrees)
+      float angle = Mathf.Atan2(change.y, change.x) * Mathf.Rad2Deg;
+
+      // Adjust by 90 degrees to align 0 degrees with "up"
+      angle -= 90f;
+
+      // Convert negative angles to positive angles (0 to 360 degrees)
+      if (angle < 0) angle += 360;  
+
+     // Map the angle to movement directions and animations
+      if (angle > 0f && angle <= 90f)           { change = new Vector3(-0.7f,1f,0f); currentAnimationDirection = upLeftAnim; facingLeft = true; } // Inverted right-up to left-up      
+      else if (angle > 90f && angle <= 135f)    { change = new Vector3(-1f,-0.5f,0f); currentAnimationDirection = leftAnim; facingLeft = true; } // Inverted right to left
+      else if (angle > 135f && angle < 180)    { change = new Vector3(-1f,-0.5f,0f); currentAnimationDirection = leftDownAnim; facingLeft = true; } // Inverted right-down to left-down
+      else if (angle > 180f && angle <= 225f)   { change = new Vector3(0.7f,-1f,0f); currentAnimationDirection = rightDownAnim; facingLeft = false; }  // Inverted left-down to right-down
+      else if ((angle == 180f)) { change = new Vector3(0.7f,-1f,0f); currentAnimationDirection = rightDownAnim; facingLeft = false; }
+
+      else if (angle > 225f && angle <= 270f)   { change = new Vector3(0.7f,-1f,0f); currentAnimationDirection = rightAnim; facingLeft = false; }  // Inverted left-down to right-down
+      else if ((angle > 270f && angle <= 360f)) { change = new Vector3(1f,0.5f,0f); currentAnimationDirection = upRightAnim; facingLeft = false; } // Up
+      else if ((angle == 0f)) { change = new Vector3(-0.7f,1f,0f); currentAnimationDirection = upLeftAnim; facingLeft = true; }
+      
+      // else if (angle > 225f && angle <= 270f) { change = new Vector3(1f,-0.5f,0f); currentAnimationDirection = rightAnim; facingLeft = false; } // Inverted left to right
+
+      // Handle animation and movement
+      AnimateMovement(movementStartIndex, movementFrameCount, currentAnimationDirection, bodyTypeNumber);
+      myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
+
+
+
+
+
+
+
+
+
+    // }
+    // else
+    // // fixedDirectionLeftDiagonal
+    // {    
+    //   controlDirectionToPlayerDirection[Direction.Left] = Direction.UpLeft;
+    //   controlDirectionToPlayerDirection[Direction.UpLeft] = Direction.UpLeft;
+    //   controlDirectionToPlayerDirection[Direction.UpFacingLeft] = Direction.UpLeft;
+    //   controlDirectionToPlayerDirection[Direction.UpFacingRight] = Direction.UpLeft;
+    //   controlDirectionToPlayerDirection[Direction.UpRight] = Direction.UpLeft;
+    //   controlDirectionToPlayerDirection[Direction.Right] = Direction.RightDown;
+    //   controlDirectionToPlayerDirection[Direction.RightDown] = Direction.RightDown;
+    //   controlDirectionToPlayerDirection[Direction.DownFacingRight] = Direction.RightDown;
+    //   controlDirectionToPlayerDirection[Direction.DownFacingLeft] = Direction.RightDown;
+    //   controlDirectionToPlayerDirection[Direction.DownLeft] = Direction.RightDown;
+
+
+
+      // if (change == Vector3.right+Vector3.up)   { change = new Vector3(-1f,0.5f,0f); AnimateMovement(movementStartIndex, movementFrameCount, upRightAnim, bodyTypeNumber); }
+      // if (change == Vector3.left+Vector3.up)    { change = new Vector3(-0.7f,1f,0f); AnimateMovement(movementStartIndex, movementFrameCount, upLeftAnim, bodyTypeNumber);}
+      // if (change == Vector3.up)                 { change = new Vector3(-0.7f,1f,0f); AnimateMovement(movementStartIndex, movementFrameCount, upLeftAnim, bodyTypeNumber);}
+      // if (change == Vector3.right)              { change = new Vector3(-1f,0.5f,0f); AnimateMovement(movementStartIndex, movementFrameCount, upRightAnim, bodyTypeNumber);}
+      // if (change == Vector3.right+Vector3.down) { change = new Vector3(0.7f,-1f,0f); AnimateMovement(movementStartIndex, movementFrameCount, rightDownAnim, bodyTypeNumber);}
+      // if (change == Vector3.left+Vector3.down)  { change = new Vector3(1f,-0.5f,0f); AnimateMovement(movementStartIndex, movementFrameCount, leftDownAnim, bodyTypeNumber);}
+      // if (change == Vector3.down)               { change = new Vector3(0.7f,-1f,0f); AnimateMovement(movementStartIndex, movementFrameCount, rightDownAnim, bodyTypeNumber);}
+      // if (change == Vector3.left)               { change = new Vector3(1f,-0.5f,0f); AnimateMovement(movementStartIndex, movementFrameCount, leftAnim, bodyTypeNumber);}
 
 
       // if (change == Vector3.right+Vector3.up)   { change = new Vector3(-1f,0.5f,0f); }
@@ -586,14 +689,14 @@ public void AnimateMovement(int movementStartIndex, int movementFrameCount, int 
       // if (change == Vector3.left+Vector3.down)  { change = new Vector3(1f,-0.5f,0f); }
       // if (change == Vector3.down)               { change = new Vector3(0.7f,-1f,0f); }
       // if (change == Vector3.left)               { change = new Vector3(1f,-0.5f,0f); }
-      myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
+    //   myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
       
-    } 
+    // } 
   }
 
   void MoveCharacterVerticalInclineRightAway()
   {
-    if(!fixedDirectionRight)
+    if(!fixedDirectionRightDiagonal)
     {
       if (change == Vector3.right+Vector3.up)   { change = new Vector3(0.7f,1f,0f); AnimateMovement(movementStartIndex, movementFrameCount, upRightAnim, bodyTypeNumber); }
       if (change == Vector3.left+Vector3.up)    { change = new Vector3(-1f,0.5f,0f); AnimateMovement(movementStartIndex, movementFrameCount, upLeftAnim, bodyTypeNumber);}
@@ -657,7 +760,7 @@ public void AnimateMovement(int movementStartIndex, int movementFrameCount, int 
       
   }
 
-      void MoveCharacterVerticalInclineRightToward()
+  void MoveCharacterVerticalInclineRightToward()
   {
     if (change == Vector3.right+Vector3.up)   { change = new Vector3(1f,0.2f,0f); }
     if (change == Vector3.left+Vector3.up)    { change = new Vector3(-1f,-0.2f,0f); }
@@ -711,51 +814,147 @@ public void AnimateMovement(int movementStartIndex, int movementFrameCount, int 
       myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
   }
 
-  void MoveCharacter()
-  { 
-    if(!fixedDirectionLeft && !fixedDirectionRight)
-    {
-      if (change == Vector3.right+Vector3.up)   { change = new Vector3(1f,0.5f,0f); currentAnimationDirection = upRightAnim; }
-      if (change == Vector3.left+Vector3.up)    { change = new Vector3(-1f,0.5f,0f); currentAnimationDirection = upLeftAnim; }
-      if (change == Vector3.up)                 { change = new Vector3(-1f,0.5f,0f); currentAnimationDirection = upLeftAnim; }
-      if (change == Vector3.right)              { change = new Vector3(1f,0.5f,0f); currentAnimationDirection = upRightAnim; }
-      if (change == Vector3.right+Vector3.down) { change = new Vector3(1f,-0.5f,0f); currentAnimationDirection = rightAnim; }
-      if (change == Vector3.left+Vector3.down)  { change = new Vector3(-1f,-0.5f,0f); currentAnimationDirection = leftDownAnim; }
-      if (change == Vector3.down)               { change = new Vector3(1f,-0.5f,0f); currentAnimationDirection = rightDownAnim; }
-      if (change == Vector3.left)               { change = new Vector3(-1f,-0.5f,0f); currentAnimationDirection = leftAnim; }
-      AnimateMovement(movementStartIndex, movementFrameCount, currentAnimationDirection, bodyTypeNumber);
-      myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
 
-    }
-    else if(fixedDirectionLeft)
-    {
-      if (change == Vector3.right+Vector3.up)   { change = new Vector3(-1f,0.5f,0f); currentAnimationDirection = upLeftAnim;}
-      if (change == Vector3.left+Vector3.up)    { change = new Vector3(-1f,0.5f,0f); currentAnimationDirection = upLeftAnim;}
-      if (change == Vector3.up)                 { change = new Vector3(-1f,0.5f,0f); currentAnimationDirection = upLeftAnim;}
-      if (change == Vector3.right)              { change = new Vector3(-1f,0.5f,0f); currentAnimationDirection = upLeftAnim;}
-      if (change == Vector3.right+Vector3.down) { change = new Vector3(1f,-0.5f,0f); currentAnimationDirection = rightDownAnim;}
-      if (change == Vector3.left+Vector3.down)  { change = new Vector3(1f,-0.5f,0f); currentAnimationDirection = rightDownAnim;}
-      if (change == Vector3.down)               { change = new Vector3(1f,-0.5f,0f); currentAnimationDirection = rightDownAnim;}
-      if (change == Vector3.left)               { change = new Vector3(1f,-0.5f,0f); currentAnimationDirection = rightDownAnim;}
+
+public Dictionary<Direction, Direction> controlDirectionToPlayerDirection = new Dictionary<Direction, Direction>(){
+  {Direction.Left, Direction.Left},
+  {Direction.UpLeft, Direction.UpLeft},
+  {Direction.UpFacingLeft, Direction.UpFacingLeft},
+  {Direction.UpFacingRight, Direction.UpFacingRight},
+  {Direction.UpRight, Direction.UpRight},
+  {Direction.Right, Direction.Right},
+  {Direction.RightDown, Direction.RightDown},
+  {Direction.DownFacingLeft, Direction.DownFacingLeft},
+  {Direction.DownFacingRight, Direction.DownFacingRight},
+  {Direction.DownLeft, Direction.DownLeft},
+};
+
+
+public void ResetPlayerMovement()
+{
+  controlDirectionToPlayerDirection[Direction.Left] = Direction.Left;
+  controlDirectionToPlayerDirection[Direction.UpLeft] = Direction.UpLeft;
+  controlDirectionToPlayerDirection[Direction.UpFacingLeft] = Direction.UpFacingLeft;
+  controlDirectionToPlayerDirection[Direction.UpFacingRight] = Direction.UpFacingRight;
+  controlDirectionToPlayerDirection[Direction.UpRight] = Direction.UpRight;
+  controlDirectionToPlayerDirection[Direction.Right] = Direction.Right;
+  controlDirectionToPlayerDirection[Direction.RightDown] = Direction.RightDown;
+  controlDirectionToPlayerDirection[Direction.DownFacingRight] = Direction.DownFacingRight;
+  controlDirectionToPlayerDirection[Direction.DownFacingLeft] = Direction.DownFacingLeft;
+  controlDirectionToPlayerDirection[Direction.DownLeft] = Direction.DownLeft;
+}
+
+void MoveCharacter()
+{ 
+  // Calculate the angle in degrees (-180 to 180 degrees)
+  float angle = Mathf.Atan2(change.y, change.x) * Mathf.Rad2Deg;
+
+  // Adjust by 90 degrees to align 0 degrees with "up"
+  angle -= 90f;
+
+  // Convert negative angles to positive angles (0 to 360 degrees)
+  if (angle < 0) angle += 360;
+
+  if(playerOnBike)
+  {
+      // Map the angle to movement directions and animations
+      if (angle > 0f && angle <= 90f)           { change = new Vector3(-1f,0.5f,0f); currentAnimationDirection = upLeftAnim; facingLeft = true; } // Inverted right-up to left-up      
+      else if (angle > 90f && angle <= 135f)    { change = new Vector3(-1f,-0.5f,0f); currentAnimationDirection = leftAnim; facingLeft = true; } // Inverted right to left
+      else if (angle > 135f && angle < 180)    { change = new Vector3(-1f,-0.5f,0f); currentAnimationDirection = leftDownAnim; facingLeft = true; } // Inverted right-down to left-down
+      else if (angle > 180f && angle <= 225f)   { change = new Vector3(1f,-0.5f,0f); currentAnimationDirection = rightDownAnim; facingLeft = false; }  // Inverted left-down to right-down
+      else if ((angle == 180f))   
+        { 
+          if(facingLeft == true)
+          {
+            change = new Vector3(-1f,-0.5f,0f); currentAnimationDirection = leftDownAnim; facingLeft = true;  // Up
+          }
+          else
+          {
+            change = new Vector3(1f,-0.5f,0f); currentAnimationDirection = rightDownAnim; facingLeft = false; // Up
+          }
+        }
+      else if (angle > 225f && angle <= 270f)   { change = new Vector3(1f,-0.5f,0f); currentAnimationDirection = rightAnim; facingLeft = false; }  // Inverted left-down to right-down
+      else if ((angle > 270f && angle <= 360f)) { change = new Vector3(1f,0.5f,0f); currentAnimationDirection = upRightAnim; facingLeft = false; } // Up
+      else if ((angle == 0f))   
+              { 
+                if(facingLeft == true)
+                {
+                  change = new Vector3(-1f,0.5f,0f); currentAnimationDirection = upLeftAnim; facingLeft = true;  // Up
+                }
+                else
+                {
+                  change = new Vector3(1f,0.5f,0f); currentAnimationDirection = upRightAnim; facingLeft = false; // Up
+                }
+              }
+      
+      else if (angle > 225f && angle <= 270f) { change = new Vector3(1f,-0.5f,0f); currentAnimationDirection = rightAnim; facingLeft = false; } // Inverted left to right
+
+      // Handle animation and movement
       AnimateMovement(movementStartIndex, movementFrameCount, currentAnimationDirection, bodyTypeNumber);
       myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
-      
-    }              
-    else if (fixedDirectionRight)  
-    {
-      if (change == Vector3.right+Vector3.up)   { change = new Vector3(1f,0.5f,0f); currentAnimationDirection = upRightAnim;}
-      if (change == Vector3.left+Vector3.up)    { change = new Vector3(1f,0.5f,0f); currentAnimationDirection = upRightAnim;}
-      if (change == Vector3.up)                 { change = new Vector3(1f,0.5f,0f); currentAnimationDirection = upRightAnim;}
-      if (change == Vector3.right)              { change = new Vector3(1f,0.5f,0f); currentAnimationDirection = upRightAnim;}
-      if (change == Vector3.right+Vector3.down) { change = new Vector3(-1f,-0.5f,0f); currentAnimationDirection = leftAnim;}
-      if (change == Vector3.left+Vector3.down)  { change = new Vector3(-1f,-0.5f,0f); currentAnimationDirection = leftAnim;}
-      if (change == Vector3.down)               { change = new Vector3(-1f,-0.5f,0f); currentAnimationDirection = leftAnim;}
-      if (change == Vector3.left)               { change = new Vector3(-1f,-0.5f,0f); currentAnimationDirection = leftAnim;}
-      AnimateMovement(movementStartIndex, movementFrameCount, currentAnimationDirection, bodyTypeNumber);
-      myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
-      
-    }
   }
+  else
+  {
+      // Map the angle to control directions
+      Direction controlDirection = Direction.Left; // Default value should never be used
+      if ((angle > 0f && angle <= 22.5f))   { controlDirection = Direction.UpFacingLeft; } // Up
+      else if ((angle == 0f))   
+              {
+                if(facingLeft == true)
+                {
+                  controlDirection = Direction.UpFacingLeft;
+                }
+                else
+                {
+                  controlDirection = Direction.UpFacingRight;
+                }
+              }
+      
+      else if (angle > 22.5f && angle <= 67.5f)   { controlDirection = Direction.UpLeft; } // Inverted right-up to left-up
+      else if (angle > 67.5f && angle <= 112.5f)  { controlDirection = Direction.Left; } // Inverted right to left
+      else if (angle > 112.5f && angle <= 157.5f) { controlDirection = Direction.DownLeft; } // Inverted right-down to left-down
+      else if (angle > 157.5f && angle < 180f)   { controlDirection = Direction.DownFacingLeft; } // Down
+      else if (angle == 180f)  
+                {
+                if(facingLeft == true)
+                {
+                  controlDirection = Direction.DownFacingLeft;
+                }
+                else
+                {
+                  controlDirection = Direction.DownFacingRight;
+                }
+              }
+      else if (angle > 180f && angle <= 202.5f)   { controlDirection = Direction.DownFacingRight; } // Down
+      else if (angle > 202.5f && angle <= 247.5f) { controlDirection = Direction.RightDown; }  // Inverted left-down to right-down
+      else if (angle > 247.5f && angle <= 292.5f) { controlDirection = Direction.Right; } // Inverted left to right
+      else if (angle > 292.5f && angle <= 337.5f) { controlDirection = Direction.UpRight; }  // Inverted left-up to right-up
+      else if ((angle > 337.5f && angle <= 360f)) { controlDirection = Direction.UpFacingRight; } // Up
+      // Map control directions to player directions and animations
+      UpdatePlayerDirection(controlDirection);
+      // Handle animation and movement
+      AnimateMovement(movementStartIndex, movementFrameCount, currentAnimationDirection, bodyTypeNumber);
+      myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
+  };
+
+  void UpdatePlayerDirection(Direction controlDirection)
+  {
+    Direction playerDirection = controlDirectionToPlayerDirection[controlDirection];
+    if      (playerDirection == Direction.UpFacingLeft) { change = new Vector3(0f,1f,0f); currentAnimationDirection = upLeftAnim; facingLeft = true; }
+    else if (playerDirection == Direction.UpFacingRight) { change = new Vector3(0f,1f,0f); currentAnimationDirection = upRightAnim; facingLeft = false; }
+    else if (playerDirection == Direction.UpRight) { change = new Vector3(1f,0.5f,0f); currentAnimationDirection = upRightAnim; facingLeft = false; }
+    else if (playerDirection == Direction.Right) { change = new Vector3(1f,0f,0f); currentAnimationDirection = rightAnim; facingLeft = false; }
+    else if (playerDirection == Direction.RightDown) { change = new Vector3(1f,-0.5f,0f); currentAnimationDirection = rightDownAnim; facingLeft = false; }
+    else if (playerDirection == Direction.DownFacingRight) { change = new Vector3(0f,-1f,0f); currentAnimationDirection = rightDownAnim; facingLeft = false; }
+    else if (playerDirection == Direction.DownFacingLeft) { change = new Vector3(0f,-1f,0f); currentAnimationDirection = leftDownAnim; facingLeft = true; }
+    else if (playerDirection == Direction.DownLeft) { change = new Vector3(-1f,-0.5f,0f); currentAnimationDirection = leftDownAnim; facingLeft = true; }
+    else if (playerDirection == Direction.Left) { change = new Vector3(-1f,0f,0f); currentAnimationDirection = leftAnim; facingLeft = true; }
+    else if (playerDirection == Direction.UpLeft) { change = new Vector3(-1f,0.5f,0f); currentAnimationDirection = upLeftAnim; facingLeft = true; }
+  }
+
+
+
+}
 
     public void RideBike()
     {
@@ -869,10 +1068,17 @@ public void AnimateMovement(int movementStartIndex, int movementFrameCount, int 
         shortSleeveSprite.color = currentSkinColor;
         longSleeveSprite.color = currentSkinColor;
       }
-      else if(characterCustomization.currentJakettoIndex == 2)
+      else if(characterCustomization.currentJakettoIndex == 2) // short sleeve jaketto
       {
-        longSleeveSprite.color = currentSkinColor; // and if characterCustomization.currentJakettoIndex == 3 do nuttin!
+        shortSleeveSprite.color = currentJakettoColor;
+        longSleeveSprite.color = currentSkinColor; 
       }
+      else if(characterCustomization.currentJakettoIndex == 3) //long sleeeve jaketto
+      {
+        shortSleeveSprite.color = currentJakettoColor;
+        longSleeveSprite.color = currentJakettoColor;
+      }
+
       if(characterCustomization.currentWaistIndex == 0) // if waist is set to shirt color
       {
         waistSprite.color = currentPantsColor;
@@ -888,11 +1094,17 @@ public void AnimateMovement(int movementStartIndex, int movementFrameCount, int 
         shortSleeveSprite.color = currentSkinColor;
         longSleeveSprite.color = currentSkinColor;
       }
-      else if(characterCustomization.currentJakettoIndex == 2)
+      else if(characterCustomization.currentJakettoIndex == 2) // short sleeve jaketto
       {
+        shortSleeveSprite.color = currentJakettoColor;
         longSleeveSprite.color = currentSkinColor; 
-        // and if characterCustomization.currentJakettoIndex == 3 do nuttin!
       }
+      else if(characterCustomization.currentJakettoIndex == 3) //long sleeeve jaketto
+      {
+        shortSleeveSprite.color = currentJakettoColor;
+        longSleeveSprite.color = currentJakettoColor;
+      }
+
       if(characterCustomization.currentWaistIndex == 0) // if waist is set to shirt color
       {
         waistSprite.color = currentShirtColor;
@@ -909,11 +1121,17 @@ public void AnimateMovement(int movementStartIndex, int movementFrameCount, int 
         shortSleeveSprite.color = currentSkinColor;
         longSleeveSprite.color = currentSkinColor;
       }
-      else if(characterCustomization.currentJakettoIndex == 2)
+      else if(characterCustomization.currentJakettoIndex == 2) // short sleeve jaketto
       {
-        longSleeveSprite.color = currentSkinColor;
-        // and if characterCustomization.currentJakettoIndex == 3 do nuttin!
+        shortSleeveSprite.color = currentJakettoColor;
+        longSleeveSprite.color = currentSkinColor; 
       }
+      else if(characterCustomization.currentJakettoIndex == 3) //long sleeeve jaketto
+      {
+        shortSleeveSprite.color = currentJakettoColor;
+        longSleeveSprite.color = currentJakettoColor;
+      }
+
       if(waistSprite.color == currentShirtColor)
       {
         waistSprite.color = currentShirtColor;
@@ -929,10 +1147,15 @@ public void AnimateMovement(int movementStartIndex, int movementFrameCount, int 
         shortSleeveSprite.color = currentSkinColor;
         longSleeveSprite.color = currentSkinColor;
       }
-      else if(characterCustomization.currentJakettoIndex == 2)
+      else if(characterCustomization.currentJakettoIndex == 2) // short sleeve jaketto
       {
-        longSleeveSprite.color = currentSkinColor;
-        // and if characterCustomization.currentJakettoIndex == 3 do nuttin!
+        shortSleeveSprite.color = currentJakettoColor;
+        longSleeveSprite.color = currentSkinColor; 
+      }
+      else if(characterCustomization.currentJakettoIndex == 3) //long sleeeve jaketto
+      {
+        shortSleeveSprite.color = currentJakettoColor;
+        longSleeveSprite.color = currentJakettoColor;
       }
 
       if(waistSprite.color == currentShirtColor)
@@ -951,10 +1174,15 @@ public void AnimateMovement(int movementStartIndex, int movementFrameCount, int 
         shortSleeveSprite.color = currentShirtColor;
         longSleeveSprite.color = currentSkinColor;
       }
-      else if(characterCustomization.currentJakettoIndex == 2)
+      else if(characterCustomization.currentJakettoIndex == 2) // short sleeve jaketto
       {
-        longSleeveSprite.color = currentSkinColor;
-        // and if characterCustomization.currentJakettoIndex == 3 do nuttin!
+        shortSleeveSprite.color = currentJakettoColor;
+        longSleeveSprite.color = currentSkinColor; 
+      }
+      else if(characterCustomization.currentJakettoIndex == 3) //long sleeeve jaketto
+      {
+        shortSleeveSprite.color = currentJakettoColor;
+        longSleeveSprite.color = currentJakettoColor;
       }
 
       if(waistSprite.color == currentShirtColor)
@@ -973,10 +1201,15 @@ public void AnimateMovement(int movementStartIndex, int movementFrameCount, int 
         shortSleeveSprite.color = currentShirtColor;
         longSleeveSprite.color = currentSkinColor;
       }
-      else if(characterCustomization.currentJakettoIndex == 2)
+      else if(characterCustomization.currentJakettoIndex == 2) // short sleeve jaketto
       {
-        longSleeveSprite.color = currentSkinColor;
-        // and if characterCustomization.currentJakettoIndex == 3 do nuttin!
+        shortSleeveSprite.color = currentJakettoColor;
+        longSleeveSprite.color = currentSkinColor; 
+      }
+      else if(characterCustomization.currentJakettoIndex == 3) //long sleeeve jaketto
+      {
+        shortSleeveSprite.color = currentJakettoColor;
+        longSleeveSprite.color = currentJakettoColor;
       }
 
       if(waistSprite.color == currentShirtColor)
@@ -995,10 +1228,15 @@ public void AnimateMovement(int movementStartIndex, int movementFrameCount, int 
         shortSleeveSprite.color = currentShirtColor;
         longSleeveSprite.color = currentSkinColor;
       }
-      else if(characterCustomization.currentJakettoIndex == 2)
+      else if(characterCustomization.currentJakettoIndex == 2) // short sleeve jaketto
       {
-        longSleeveSprite.color = currentSkinColor;
-        // and if characterCustomization.currentJakettoIndex == 3 do nuttin!
+        shortSleeveSprite.color = currentJakettoColor;
+        longSleeveSprite.color = currentSkinColor; 
+      }
+      else if(characterCustomization.currentJakettoIndex == 3) //long sleeeve jaketto
+      {
+        shortSleeveSprite.color = currentJakettoColor;
+        longSleeveSprite.color = currentJakettoColor;
       }
 
       if(waistSprite.color == currentShirtColor)
@@ -1012,11 +1250,20 @@ public void AnimateMovement(int movementStartIndex, int movementFrameCount, int 
       collarSprite.color = currentShirtColor;
       torsoSprite.color = currentShirtColor;
 
-      if(characterCustomization.currentJakettoIndex == 0 || characterCustomization.currentJakettoIndex == 1
-          || characterCustomization.currentJakettoIndex == 2) // vest or no jaketto
+      if(characterCustomization.currentJakettoIndex == 0 || characterCustomization.currentJakettoIndex == 1) // vest or no jaketto
       {
         shortSleeveSprite.color = currentShirtColor;
         longSleeveSprite.color = currentShirtColor;
+      }
+            else if(characterCustomization.currentJakettoIndex == 2) // short sleeve jaketto
+      {
+        shortSleeveSprite.color = currentJakettoColor;
+        longSleeveSprite.color = currentShirtColor; 
+      }
+      else if(characterCustomization.currentJakettoIndex == 3) //long sleeeve jaketto
+      {
+        shortSleeveSprite.color = currentJakettoColor;
+        longSleeveSprite.color = currentJakettoColor;
       }
 
 
@@ -1031,13 +1278,21 @@ public void AnimateMovement(int movementStartIndex, int movementFrameCount, int 
       collarSprite.color = currentSkinColor;
       torsoSprite.color = currentShirtColor;
 
-      if(characterCustomization.currentJakettoIndex == 0 || characterCustomization.currentJakettoIndex == 1
-          || characterCustomization.currentJakettoIndex == 2) // vest or no jaketto
+      if(characterCustomization.currentJakettoIndex == 0 || characterCustomization.currentJakettoIndex == 1) // vest or no jaketto
       {
         shortSleeveSprite.color = currentShirtColor;
         longSleeveSprite.color = currentShirtColor;
       }
-
+      else if(characterCustomization.currentJakettoIndex == 2) // short sleeve jaketto
+      {
+        shortSleeveSprite.color = currentJakettoColor;
+        longSleeveSprite.color = currentShirtColor; 
+      }
+      else if(characterCustomization.currentJakettoIndex == 3) //long sleeeve jaketto
+      {
+        shortSleeveSprite.color = currentJakettoColor;
+        longSleeveSprite.color = currentJakettoColor;
+      }
 
       if(waistSprite.color == currentShirtColor)
       {
@@ -1050,11 +1305,20 @@ public void AnimateMovement(int movementStartIndex, int movementFrameCount, int 
       collarSprite.color = currentShirtColor;
       torsoSprite.color = currentShirtColor;
      
-      if(characterCustomization.currentJakettoIndex == 0 || characterCustomization.currentJakettoIndex == 1
-          || characterCustomization.currentJakettoIndex == 2) // vest or no jaketto
+      if(characterCustomization.currentJakettoIndex == 0 || characterCustomization.currentJakettoIndex == 1) // vest or no jaketto
       {
         shortSleeveSprite.color = currentShirtColor;
         longSleeveSprite.color = currentShirtColor;
+      }
+      else if(characterCustomization.currentJakettoIndex == 2) // short sleeve jaketto
+      {
+        shortSleeveSprite.color = currentJakettoColor;
+        longSleeveSprite.color = currentShirtColor; 
+      }
+      else if(characterCustomization.currentJakettoIndex == 3) //long sleeeve jaketto
+      {
+        shortSleeveSprite.color = currentJakettoColor;
+        longSleeveSprite.color = currentJakettoColor;
       }
 
       if(waistSprite.color == currentShirtColor)
@@ -1073,9 +1337,10 @@ public void AnimateMovement(int movementStartIndex, int movementFrameCount, int 
       {
         anklesSprite.color = currentSkinColor;
       }
+      SetNoDress();
     }
     public void SetPantsTo3QuarterPants()
-    {
+    {      
       if(anklesSprite.color != currentShoeColor)
       {
         waistShortsSprite.color = currentPantsColor;
@@ -1086,6 +1351,7 @@ public void AnimateMovement(int movementStartIndex, int movementFrameCount, int 
       {
         characterCustomization.NextPants();
       }
+      SetNoDress();
     }
     public void SetPantsToPants()
     {
@@ -1095,6 +1361,29 @@ public void AnimateMovement(int movementStartIndex, int movementFrameCount, int 
       {
         anklesSprite.color = currentPantsColor;
       }    
+      SetNoDress();
+    }
+
+    public void SetPantsToDress()
+    {
+ 
+      waistShortsSprite.color = currentPantsColor;
+      kneesShinsSprite.color = currentSkinColor;
+      if(anklesSprite.color != currentShoeColor)
+      {
+        anklesSprite.color = currentSkinColor;
+      }
+
+      Color color = currentPantsColor;
+      color.a = 1f;
+      dressSprite.color = color;  
+    }
+
+   public void SetNoDress()
+    {
+      Color color = currentPantsColor;
+      color.a = 0f;
+      dressSprite.color = color;
     }
 
 
@@ -1114,6 +1403,8 @@ public void AnimateMovement(int movementStartIndex, int movementFrameCount, int 
     {
       waistSprite.color = currentPantsColor;  
     }
+
+ 
 
 
     public void SetFeetToShoes()
@@ -1148,34 +1439,19 @@ public void AnimateMovement(int movementStartIndex, int movementFrameCount, int 
     }
 
 
-    public void SetNoJaketto()
+    public void  SetNoJaketto()
     {
       Color color = currentJakettoColor;
       color.a = 0f;
       jakettoSprite.color = color;
       characterCustomization.UpdateShirt();
     }
-    public void SetJakettoToVest()
+    public void SetJakettoVest()
     {
       Color color = currentJakettoColor;
       color.a = 1f;
       jakettoSprite.color = color;
       characterCustomization.UpdateShirt();
-    }
-    public void SetJaketto1()
-    {
-      Color color = currentJakettoColor;
-      shortSleeveSprite.color = color;
-      jakettoSprite.color = color;
-      color.a = 1f;
-    }
-    public void SetJaketto2()
-    {
-      Color color = currentJakettoColor;
-      shortSleeveSprite.color = currentJakettoColor;
-      longSleeveSprite.color = currentJakettoColor;
-      color.a = 1f;
-      jakettoSprite.color = color;
     }
 
 
@@ -1231,6 +1507,8 @@ public void AnimateMovement(int movementStartIndex, int movementFrameCount, int 
       shortSleeveSprite.color = HexToColor("#F5CBA7");
     };
     currentSkinColor = HexToColor("#F5CBA7");
+    // characterCustomization.skinColorButton.color = currentSkinColor;
+    characterCustomization.skinColorButton2.color = currentSkinColor;
   }
   
 
@@ -1285,6 +1563,9 @@ public void AnimateMovement(int movementStartIndex, int movementFrameCount, int 
       shortSleeveSprite.color = HexToColor("#F6B883");
     };
     currentSkinColor = HexToColor("#F6B883");
+    // characterCustomization.skinColorButton.color = currentSkinColor;
+    characterCustomization.skinColorButton2.color = currentSkinColor;
+
   }
 
   public void SetSkinColor3()
@@ -1338,6 +1619,8 @@ public void AnimateMovement(int movementStartIndex, int movementFrameCount, int 
         shortSleeveSprite.color = HexToColor("#E1A95F");
       };
       currentSkinColor = HexToColor("#E1A95F");
+      // characterCustomization.skinColorButton.color = currentSkinColor;
+      characterCustomization.skinColorButton2.color = currentSkinColor;
     }
 
   public void SetSkinColor4()
@@ -1391,6 +1674,8 @@ public void AnimateMovement(int movementStartIndex, int movementFrameCount, int 
         shortSleeveSprite.color = HexToColor("#C68642");
       };
       currentSkinColor = HexToColor("#C68642");
+      // characterCustomization.skinColorButton.color = currentSkinColor;
+      characterCustomization.skinColorButton2.color = currentSkinColor;
     }
 
   public void SetSkinColor5()
@@ -1444,6 +1729,8 @@ public void AnimateMovement(int movementStartIndex, int movementFrameCount, int 
         shortSleeveSprite.color = HexToColor("#8D5524");
       };
       currentSkinColor = HexToColor("#8D5524");
+      // characterCustomization.skinColorButton.color = currentSkinColor;
+      characterCustomization.skinColorButton2.color = currentSkinColor;
     }
 
   public void SetSkinColor6()
@@ -1497,6 +1784,8 @@ public void AnimateMovement(int movementStartIndex, int movementFrameCount, int 
         shortSleeveSprite.color = HexToColor("#5D4037");
       };
       currentSkinColor = HexToColor("#5D4037");
+      // characterCustomization.skinColorButton.color = currentSkinColor;
+      characterCustomization.skinColorButton2.color = currentSkinColor;
     }
 
   public void SetSkinColor7()
@@ -1550,6 +1839,8 @@ public void AnimateMovement(int movementStartIndex, int movementFrameCount, int 
         shortSleeveSprite.color = HexToColor("#3B2F2F");
       };
       currentSkinColor = HexToColor("#3B2F2F");
+      // characterCustomization.skinColorButton.color = currentSkinColor;
+      characterCustomization.skinColorButton2.color = currentSkinColor;
     }
 
 
@@ -1569,6 +1860,7 @@ public void AnimateMovement(int movementStartIndex, int movementFrameCount, int 
                 }
             }
           currentHairColor = HexToColor("#4E342E"); 
+          characterCustomization.hairColorButton.color = currentHairColor;
         }
     }
 
@@ -1587,6 +1879,7 @@ public void AnimateMovement(int movementStartIndex, int movementFrameCount, int 
                 }
             }
           currentHairColor = HexToColor("#1C1C1C"); 
+          characterCustomization.hairColorButton.color = currentHairColor;
         }
     }
 
@@ -1604,7 +1897,8 @@ public void AnimateMovement(int movementStartIndex, int movementFrameCount, int 
                     spriteRenderer.color = HexToColor("#F5D76E");  // Blonde
                 }
             }
-          currentHairColor = HexToColor("#F5D76E");  
+          currentHairColor = HexToColor("#F5D76E"); 
+          characterCustomization.hairColorButton.color = currentHairColor; 
         }
     }
 
@@ -1622,7 +1916,8 @@ public void AnimateMovement(int movementStartIndex, int movementFrameCount, int 
                     spriteRenderer.color = HexToColor("#A52A2A");  // Auburn (Red-Brown)
                 }
             }
-          currentHairColor = HexToColor("#A52A2A");  
+          currentHairColor = HexToColor("#A52A2A"); 
+          characterCustomization.hairColorButton.color = currentHairColor; 
         }
     }
 
@@ -1641,7 +1936,8 @@ public void AnimateMovement(int movementStartIndex, int movementFrameCount, int 
                 }
             }
         }
-      currentHairColor = HexToColor("#A9A9A9");  
+      currentHairColor = HexToColor("#A9A9A9");
+      characterCustomization.hairColorButton.color = currentHairColor;  
     }
 
     public void SetHairColor6()
@@ -1660,6 +1956,7 @@ public void AnimateMovement(int movementStartIndex, int movementFrameCount, int 
             }
         }
       currentHairColor = HexToColor("#00BFFF");  
+      characterCustomization.hairColorButton.color = currentHairColor;
     }
 
     public void SetHairColor7()
@@ -1678,6 +1975,7 @@ public void AnimateMovement(int movementStartIndex, int movementFrameCount, int 
             }
         }
       currentHairColor = HexToColor("#FFB6C1");  
+      characterCustomization.hairColorButton.color = currentHairColor;
     }
 
     public void SetHairColor8()
@@ -1695,7 +1993,8 @@ public void AnimateMovement(int movementStartIndex, int movementFrameCount, int 
                 }
             }
         }
-      currentHairColor = HexToColor("#E6E6FA");  
+      currentHairColor = HexToColor("#E6E6FA"); 
+      characterCustomization.hairColorButton.color = currentHairColor; 
     }
 
     public void SetHairColor9()
@@ -1714,6 +2013,7 @@ public void AnimateMovement(int movementStartIndex, int movementFrameCount, int 
             }
         }
       currentHairColor = HexToColor("#98FF98");  
+      characterCustomization.hairColorButton.color = currentHairColor;
     }
 
     public void SetHairColor10()
@@ -1731,7 +2031,8 @@ public void AnimateMovement(int movementStartIndex, int movementFrameCount, int 
                 }
             }
         }
-      currentHairColor = HexToColor("#8A2BE2");  
+      currentHairColor = HexToColor("#8A2BE2"); 
+      characterCustomization.hairColorButton.color = currentHairColor; 
     }
 
 
@@ -2120,6 +2421,7 @@ public void AnimateMovement(int movementStartIndex, int movementFrameCount, int 
       shortSleeveSprite.color = HexToColor("#FF6347");
     };
     currentShirtColor = HexToColor("#FF6347");
+    characterCustomization.shirtColorButton.color = currentShirtColor;
   }
 
   public void SetShirtColor2()
@@ -2149,6 +2451,7 @@ public void AnimateMovement(int movementStartIndex, int movementFrameCount, int 
       shortSleeveSprite.color = HexToColor("#4682B4");
     };
     currentShirtColor = HexToColor("#4682B4");
+    characterCustomization.shirtColorButton.color = currentShirtColor;
   }
 
   public void SetShirtColor3()
@@ -2178,6 +2481,7 @@ public void AnimateMovement(int movementStartIndex, int movementFrameCount, int 
       shortSleeveSprite.color = HexToColor("#32CD32");
     };
     currentShirtColor = HexToColor("#32CD32");
+    characterCustomization.shirtColorButton.color = currentShirtColor;
   }
 
   public void SetShirtColor4()
@@ -2207,6 +2511,7 @@ public void AnimateMovement(int movementStartIndex, int movementFrameCount, int 
       shortSleeveSprite.color = HexToColor("#FFD700");
     };
     currentShirtColor = HexToColor("#FFD700");
+    characterCustomization.shirtColorButton.color = currentShirtColor;
   }
 
   public void SetShirtColor5()
@@ -2236,6 +2541,7 @@ public void AnimateMovement(int movementStartIndex, int movementFrameCount, int 
       shortSleeveSprite.color = HexToColor("#8A2BE2");
     };
     currentShirtColor = HexToColor("#8A2BE2");
+    characterCustomization.shirtColorButton.color = currentShirtColor;
   }
 
   public void SetShirtColor6()
@@ -2265,6 +2571,7 @@ public void AnimateMovement(int movementStartIndex, int movementFrameCount, int 
       shortSleeveSprite.color = HexToColor("#DC143C");
     };
     currentShirtColor = HexToColor("#DC143C");
+    characterCustomization.shirtColorButton.color = currentShirtColor;
   }
   
   public void SetShirtColor7()
@@ -2294,7 +2601,9 @@ public void AnimateMovement(int movementStartIndex, int movementFrameCount, int 
       shortSleeveSprite.color = HexToColor("#20B2AA");
     };
     currentShirtColor = HexToColor("#20B2AA");
+    characterCustomization.shirtColorButton.color = currentShirtColor;
   }
+
 
   public void SetShirtColor8()
   {
@@ -2323,6 +2632,7 @@ public void AnimateMovement(int movementStartIndex, int movementFrameCount, int 
       shortSleeveSprite.color = HexToColor("#D3D3D3");
     };
     currentShirtColor = HexToColor("#D3D3D3");
+    characterCustomization.shirtColorButton.color = currentShirtColor;
   }
 
   public void SetShirtColor9()
@@ -2352,6 +2662,7 @@ public void AnimateMovement(int movementStartIndex, int movementFrameCount, int 
       shortSleeveSprite.color = HexToColor("#F08080");
     };
     currentShirtColor = HexToColor("#F08080");
+    characterCustomization.shirtColorButton.color = currentShirtColor;
   }
 
   public void SetShirtColor10()
@@ -2381,6 +2692,7 @@ public void AnimateMovement(int movementStartIndex, int movementFrameCount, int 
       shortSleeveSprite.color = HexToColor("#2F4F4F");
     };
     currentShirtColor = HexToColor("#2F4F4F");
+    characterCustomization.shirtColorButton.color = currentShirtColor;
   }
 
   public void SetShirtColor11()
@@ -2410,6 +2722,7 @@ public void AnimateMovement(int movementStartIndex, int movementFrameCount, int 
       shortSleeveSprite.color = HexToColor("#FF34F4");
     };
     currentShirtColor = HexToColor("#FF34F4");
+    characterCustomization.shirtColorButton.color = currentShirtColor;
   }
 
 
@@ -2418,6 +2731,7 @@ public void AnimateMovement(int movementStartIndex, int movementFrameCount, int 
 
 public void SetPantsColor1()
 {
+    dressSprite.color = HexToColor("#2C3E50");
     if(waistShortsSprite.color == currentPantsColor)
     {
         waistShortsSprite.color = HexToColor("#2C3E50");
@@ -2435,10 +2749,12 @@ public void SetPantsColor1()
         anklesSprite.color = HexToColor("#2C3E50");
     }
     currentPantsColor = HexToColor("#2C3E50");
+    characterCustomization.pantsColorButton.color = currentPantsColor;
 }
 
 public void SetPantsColor2()
 {
+    dressSprite.color = HexToColor("#A0522D");
     if(waistShortsSprite.color == currentPantsColor)
     {
         waistShortsSprite.color = HexToColor("#A0522D");
@@ -2456,10 +2772,12 @@ public void SetPantsColor2()
         anklesSprite.color = HexToColor("#A0522D");
     }
     currentPantsColor = HexToColor("#A0522D");
+    characterCustomization.pantsColorButton.color = currentPantsColor;
 }
 
 public void SetPantsColor3()
 {
+    dressSprite.color = HexToColor("#808080");
     if(waistShortsSprite.color == currentPantsColor)
     {
         waistShortsSprite.color = HexToColor("#808080");
@@ -2477,10 +2795,12 @@ public void SetPantsColor3()
         anklesSprite.color = HexToColor("#808080");
     }
     currentPantsColor = HexToColor("#808080");
+    characterCustomization.pantsColorButton.color = currentPantsColor;
 }
 
 public void SetPantsColor4()
 {
+    dressSprite.color = HexToColor("#556B2F");
     if(waistShortsSprite.color == currentPantsColor)
     {
         waistShortsSprite.color = HexToColor("#556B2F");
@@ -2498,10 +2818,12 @@ public void SetPantsColor4()
         anklesSprite.color = HexToColor("#556B2F");
     }
     currentPantsColor = HexToColor("#556B2F");
+    characterCustomization.pantsColorButton.color = currentPantsColor;
 }
 
 public void SetPantsColor5()
 {
+    dressSprite.color = HexToColor("#B0C4DE");
     if(waistShortsSprite.color == currentPantsColor)
     {
         waistShortsSprite.color = HexToColor("#B0C4DE");
@@ -2519,10 +2841,12 @@ public void SetPantsColor5()
         anklesSprite.color = HexToColor("#B0C4DE");
     }
     currentPantsColor = HexToColor("#B0C4DE");
+    characterCustomization.pantsColorButton.color = currentPantsColor;
 }
 
 public void SetPantsColor6()
 {
+    dressSprite.color = HexToColor("#4B0082");
     if(waistShortsSprite.color == currentPantsColor)
     {
         waistShortsSprite.color = HexToColor("#4B0082");
@@ -2540,10 +2864,12 @@ public void SetPantsColor6()
         anklesSprite.color = HexToColor("#4B0082");
     }
     currentPantsColor = HexToColor("#4B0082");
+    characterCustomization.pantsColorButton.color = currentPantsColor;
 }
 
 public void SetPantsColor7()
 {
+    dressSprite.color = HexToColor("#8B4513");
     if(waistShortsSprite.color == currentPantsColor)
     {
         waistShortsSprite.color = HexToColor("#8B4513");
@@ -2561,10 +2887,12 @@ public void SetPantsColor7()
         anklesSprite.color = HexToColor("#8B4513");
     }
     currentPantsColor = HexToColor("#8B4513");
+    characterCustomization.pantsColorButton.color = currentPantsColor;
 }
 
 public void SetPantsColor8()
 {
+    dressSprite.color = HexToColor("#696969");
     if(waistShortsSprite.color == currentPantsColor)
     {
         waistShortsSprite.color = HexToColor("#696969");
@@ -2582,10 +2910,12 @@ public void SetPantsColor8()
         anklesSprite.color = HexToColor("#696969");
     }
     currentPantsColor = HexToColor("#696969");
+    characterCustomization.pantsColorButton.color = currentPantsColor;
 }
 
 public void SetPantsColor9()
 {
+    dressSprite.color = HexToColor("#4682B4");
     if(waistShortsSprite.color == currentPantsColor)
     {
         waistShortsSprite.color = HexToColor("#4682B4");
@@ -2603,10 +2933,12 @@ public void SetPantsColor9()
         anklesSprite.color = HexToColor("#4682B4");
     }
     currentPantsColor = HexToColor("#4682B4");
+    characterCustomization.pantsColorButton.color = currentPantsColor;
 }
 
 public void SetPantsColor10()
 {
+    dressSprite.color = HexToColor("#000000");
     if(waistShortsSprite.color == currentPantsColor)
     {
         waistShortsSprite.color = HexToColor("#000000");
@@ -2624,65 +2956,76 @@ public void SetPantsColor10()
         anklesSprite.color = HexToColor("#000000");
     }
     currentPantsColor = HexToColor("#000000");
+    characterCustomization.pantsColorButton.color = currentPantsColor;
 }
 
 public void SetJakettoColor1()
 {
     currentJakettoColor = HexToColor("#556B2F");  // Dark Olive
+    characterCustomization.jackettoColorButton.color = currentJakettoColor;
     characterCustomization.UpdateJaketto();
 }
 
 public void SetJakettoColor2()
 {
     currentJakettoColor = HexToColor("#800020");  // Deep Burgundy
+    characterCustomization.jackettoColorButton.color = currentJakettoColor;
     characterCustomization.UpdateJaketto();
 }
 
 public void SetJakettoColor3()
 {
     currentJakettoColor = HexToColor("#6A5ACD");  // Slate Blue
+    characterCustomization.jackettoColorButton.color = currentJakettoColor;
     characterCustomization.UpdateJaketto();
 }
 
 public void SetJakettoColor4()
 {
     currentJakettoColor = HexToColor("#FFDB58");  // Mustard Yellow
+    characterCustomization.jackettoColorButton.color = currentJakettoColor;
     characterCustomization.UpdateJaketto();
 }
 
 public void SetJakettoColor5()
 {
     currentJakettoColor = HexToColor("#36454F");  // Charcoal
+    characterCustomization.jackettoColorButton.color = currentJakettoColor;
     characterCustomization.UpdateJaketto();
 }
 
 public void SetJakettoColor6()
 {
     currentJakettoColor = HexToColor("#228B22");  // Forest Green
+    characterCustomization.jackettoColorButton.color = currentJakettoColor;
     characterCustomization.UpdateJaketto();
 }
 
 public void SetJakettoColor7()
 {
     currentJakettoColor = HexToColor("#000080");  // Navy Blue
+    characterCustomization.jackettoColorButton.color = currentJakettoColor;
     characterCustomization.UpdateJaketto();
 }
 
 public void SetJakettoColor8()
 {
     currentJakettoColor = HexToColor("#8B4513");  // Chocolate Brown
+    characterCustomization.jackettoColorButton.color = currentJakettoColor;
     characterCustomization.UpdateJaketto();
 }
 
 public void SetJakettoColor9()
 {
     currentJakettoColor = HexToColor("#008080");  // Teal
+    characterCustomization.jackettoColorButton.color = currentJakettoColor;
     characterCustomization.UpdateJaketto();
 }
 
 public void SetJakettoColor10()
 {
     currentJakettoColor = HexToColor("#800000");  // Maroon
+    characterCustomization.jackettoColorButton.color = currentJakettoColor;
     characterCustomization.UpdateJaketto();
 }
 
@@ -2742,9 +3085,18 @@ public void SetJakettoColor10()
 
     public IEnumerator DeactivateSpaceBar()
     {
+      while ((Input.GetKey(KeyCode.Space) || 
+            Input.GetKey(KeyCode.JoystickButton0) ||  // A button
+            Input.GetKey(KeyCode.JoystickButton1) ||  // B button
+            Input.GetKey(KeyCode.JoystickButton2) ||  // X button
+            Input.GetKey(KeyCode.JoystickButton3)))
+      {
         spaceBarDeactivated = true;
 
-        yield return new WaitForSeconds(5f);
+        yield return null;
+      }
+
+        // yield return new WaitForSeconds(5f);
 
         spaceBarDeactivated = false;
     }
@@ -2758,14 +3110,28 @@ public void SetJakettoColor10()
         allowTimeForSpaceBarCoro = StartCoroutine(DeactivateSpaceBar());
     }
 
-    public void StopDeactivateSpaceBar()
+    // public void StopDeactivateSpaceBar()
+    // {
+    //     if (allowTimeForSpaceBarCoro != null)
+    //     {
+    //         StopCoroutine(allowTimeForSpaceBarCoro);
+    //         allowTimeForSpaceBarCoro = null;
+    //         spaceBarDeactivated = false;
+    //     }
+    // }
+
+
+    // Check if any input field is focused
+    private bool IsInputFieldFocused()
     {
-        if (allowTimeForSpaceBarCoro != null)
+        foreach (TMP_InputField inputField in inputFields)
         {
-            StopCoroutine(allowTimeForSpaceBarCoro);
-            allowTimeForSpaceBarCoro = null;
-            // spaceBarDeactivated = false;
+            if (inputField.isFocused)
+            {
+                return true;
+            }
         }
+        return false;
     }
     // public void ModifyBlendTree(int n, float amountX, float amountY)
     // {
@@ -2807,3 +3173,452 @@ public void SetJakettoColor10()
 
 
 
+    // if(!fixedDirectionLeftDiagonal && !fixedDirectionRightDiagonal)
+    // {
+    //   if (change == Vector3.right+Vector3.up)   { change = new Vector3(1f,0.5f,0f); currentAnimationDirection = upRightAnim; }
+    //   if (change == Vector3.left+Vector3.up)    { change = new Vector3(-1f,0.5f,0f); currentAnimationDirection = upLeftAnim; }
+    //   if (change == Vector3.up)                 { change = new Vector3(-1f,0.5f,0f); currentAnimationDirection = upLeftAnim; }
+    //   if (change == Vector3.right)              { change = new Vector3(1f,0.5f,0f); currentAnimationDirection = upRightAnim; }
+    //   if (change == Vector3.right+Vector3.down) { change = new Vector3(1f,-0.5f,0f); currentAnimationDirection = rightAnim; }
+    //   if (change == Vector3.left+Vector3.down)  { change = new Vector3(-1f,-0.5f,0f); currentAnimationDirection = leftDownAnim; }
+    //   if (change == Vector3.down)               { change = new Vector3(1f,-0.5f,0f); currentAnimationDirection = rightDownAnim; }
+    //   if (change == Vector3.left)               { change = new Vector3(-1f,-0.5f,0f); currentAnimationDirection = leftAnim; }
+    //   AnimateMovement(movementStartIndex, movementFrameCount, currentAnimationDirection, bodyTypeNumber);
+    //   myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
+
+    // }
+
+
+
+// void MoveCharacter()
+// { 
+//   // Calculate the angle in degrees (-180 to 180 degrees)
+//   float angle = Mathf.Atan2(change.y, change.x) * Mathf.Rad2Deg;
+
+//   // Adjust by 90 degrees to align 0 degrees with "up"
+//   angle -= 90f;
+
+//   // Convert negative angles to positive angles (0 to 360 degrees)
+//   if (angle < 0) angle += 360;
+
+//   if(playerOnBike)
+//   {
+//       // Map the angle to movement directions and animations
+//       if (angle > 0f && angle <= 90f)           { change = new Vector3(-1f,0.5f,0f); currentAnimationDirection = upLeftAnim; facingLeft = true; } // Inverted right-up to left-up      
+//       else if (angle > 90f && angle <= 135f)    { change = new Vector3(-1f,-0.5f,0f); currentAnimationDirection = leftAnim; facingLeft = true; } // Inverted right to left
+//       else if (angle > 135f && angle < 180)    { change = new Vector3(-1f,-0.5f,0f); currentAnimationDirection = leftDownAnim; facingLeft = true; } // Inverted right-down to left-down
+//       else if (angle > 180f && angle <= 225f)   { change = new Vector3(1f,-0.5f,0f); currentAnimationDirection = rightDownAnim; facingLeft = false; }  // Inverted left-down to right-down
+//       else if ((angle == 180f))   
+//         { 
+//           if(facingLeft == true)
+//           {
+//             change = new Vector3(-1f,-0.5f,0f); currentAnimationDirection = leftDownAnim; facingLeft = true;  // Up
+//           }
+//           else
+//           {
+//             change = new Vector3(1f,-0.5f,0f); currentAnimationDirection = rightDownAnim; facingLeft = false; // Up
+//           }
+//         }
+//       else if (angle > 225f && angle <= 270f)   { change = new Vector3(1f,-0.5f,0f); currentAnimationDirection = rightAnim; facingLeft = false; }  // Inverted left-down to right-down
+//       else if ((angle > 270f && angle <= 360f)) { change = new Vector3(1f,0.5f,0f); currentAnimationDirection = upRightAnim; facingLeft = false; } // Up
+//       else if ((angle == 0f))   
+//               { 
+//                 if(facingLeft == true)
+//                 {
+//                   change = new Vector3(-1f,0.5f,0f); currentAnimationDirection = upLeftAnim; facingLeft = true;  // Up
+//                 }
+//                 else
+//                 {
+//                   change = new Vector3(1f,0.5f,0f); currentAnimationDirection = upRightAnim; facingLeft = false; // Up
+//                 }
+//               }
+      
+//       else if (angle > 225f && angle <= 270f) { change = new Vector3(1f,-0.5f,0f); currentAnimationDirection = rightAnim; facingLeft = false; } // Inverted left to right
+
+//       // Handle animation and movement
+//       AnimateMovement(movementStartIndex, movementFrameCount, currentAnimationDirection, bodyTypeNumber);
+//       myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
+//   }
+//   else if(!fixedDirectionLeftDiagonal 
+//           && !fixedDirectionRightDiagonal 
+//           && !cantGoLeftUpMustGoLeftDown 
+//           && !cantGoRightUpMustGoLeftUp 
+//           && !cantGoRightDownMustGoLeftDown 
+//           && !cantGoLeftDownMustGoLeftUp 
+//           && !cantGoRightUpMustGoRightDown 
+//           && !cantGoLeftUpMustGoRightUp 
+//           && !cantGoLeftDownMustGoRightDown
+//           && !cantGoRightDownMustGoRightUp)
+//   {
+//       // Map the angle to movement directions and animations
+//       if ((angle > 0f && angle <= 22.5f))   { change = new Vector3(0f,1f,0f); currentAnimationDirection = upLeftAnim; facingLeft = true; } // Up
+//       else if ((angle == 0f))   
+//               { 
+//                 change = new Vector3(0f,1f,0f); 
+//                 if(facingLeft == true)
+//                 {
+//                   currentAnimationDirection = upLeftAnim; facingLeft = true;  // Up
+//                 }
+//                 else
+//                 {
+//                   currentAnimationDirection = upRightAnim; facingLeft = false; // Up
+//                 }
+//               }
+      
+//       else if (angle > 22.5f && angle <= 67.5f)        { change = new Vector3(-1f,0.5f,0f); currentAnimationDirection = upLeftAnim; facingLeft = true; } // Inverted right-up to left-up
+//       else if (angle > 67.5f && angle <= 112.5f)  { change = new Vector3(-1f,0f,0f); currentAnimationDirection = leftAnim; facingLeft = true; } // Inverted right to left
+//       else if (angle > 112.5f && angle <= 157.5f) { change = new Vector3(-1f,-0.5f,0f); currentAnimationDirection = leftDownAnim; facingLeft = true; } // Inverted right-down to left-down
+//       else if (angle > 157.5f && angle < 180f)   { change = new Vector3(0f,-1f,0f); currentAnimationDirection = leftDownAnim; facingLeft = true; } // Down
+//       else if (angle == 180f)  
+//                 { 
+//                 change = new Vector3(0f,-1f,0f); 
+//                 if(facingLeft == true)
+//                 {
+//                   currentAnimationDirection = leftDownAnim; facingLeft = true;  // Up
+//                 }
+//                 else
+//                 {
+//                   currentAnimationDirection = rightDownAnim; facingLeft = false; // Up
+//                 }
+//               }
+//       else if (angle > 180f && angle <= 202.5f)   { change = new Vector3(0f,-1f,0f); currentAnimationDirection = rightDownAnim; facingLeft = false; } // Down
+//       else if (angle > 202.5f && angle <= 247.5f) { change = new Vector3(1f,-0.5f,0f); currentAnimationDirection = rightDownAnim; facingLeft = false; }  // Inverted left-down to right-down
+//       else if (angle > 247.5f && angle <= 292.5f) { change = new Vector3(1f,0f,0f); currentAnimationDirection = rightAnim; facingLeft = false; } // Inverted left to right
+//       else if (angle > 292.5f && angle <= 337.5f) { change = new Vector3(1f,0.5f,0f); currentAnimationDirection = upRightAnim; facingLeft = false; }  // Inverted left-up to right-up
+//       else if ((angle > 337.5f && angle <= 360f)) { change = new Vector3(0f,1f,0f); currentAnimationDirection = upRightAnim; facingLeft = false; } // Up
+//       // Handle animation and movement
+//       AnimateMovement(movementStartIndex, movementFrameCount, currentAnimationDirection, bodyTypeNumber);
+//       myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
+//   }
+
+//     else if(fixedDirectionLeftDiagonal)
+//     {
+//       if (angle > 292.5f && angle <= 337.5f)    { change = new Vector3(-1f,0.5f,0f); currentAnimationDirection = upLeftAnim;}
+//       if (angle > 22.5f && angle <= 67.5f)      { change = new Vector3(-1f,0.5f,0f); currentAnimationDirection = upLeftAnim;}
+//       if (angle > 337.5f && angle <= 360f)      { change = new Vector3(-1f,0.5f,0f); currentAnimationDirection = upLeftAnim;}
+//       if (angle >= 0f && angle <= 22.5f)         { change = new Vector3(-1f,0.5f,0f); currentAnimationDirection = upLeftAnim;}
+//       if (angle > 67.5f && angle <= 112.5f)     { change = new Vector3(-1f,0.5f,0f); currentAnimationDirection = upLeftAnim;}
+
+//       // if (angle > 247.5f && angle <= 292.5f)    { change = new Vector3(-1f,0.5f,0f); currentAnimationDirection = upLeftAnim;}
+     
+//       if (angle > 202.5f && angle <= 247.5f)    { change = new Vector3(1f,-0.5f,0f); currentAnimationDirection = rightDownAnim;}
+//       if (angle > 112.5f && angle <= 157.5f)    { change = new Vector3(1f,-0.5f,0f); currentAnimationDirection = rightDownAnim;}
+//       if (angle > 157.5f && angle <= 202.5f)    { change = new Vector3(1f,-0.5f,0f); currentAnimationDirection = rightDownAnim;}
+//       if (angle > 247.5f && angle <= 292.5f)    { change = new Vector3(1f,-0.5f,0f); currentAnimationDirection = rightDownAnim;}
+
+//       AnimateMovement(movementStartIndex, movementFrameCount, currentAnimationDirection, bodyTypeNumber);
+//       myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
+      
+//     }              
+//     else if (fixedDirectionRightDiagonal)   
+//     {
+//       if (angle > 292.5f && angle <= 337.5f)    { change = new Vector3(1f,0.5f,0f); currentAnimationDirection = upRightAnim;}
+//       if (angle > 22.5f && angle <= 67.5f)      { change = new Vector3(1f,0.5f,0f); currentAnimationDirection = upRightAnim;}
+//       if (angle > 337.5f && angle <= 360f)      { change = new Vector3(1f,0.5f,0f); currentAnimationDirection = upRightAnim;}
+//       if (angle >= 0f && angle <= 22.5f)         { change = new Vector3(1f,0.5f,0f); currentAnimationDirection = upRightAnim;}
+//       if (angle > 67.5f && angle <= 112.5f)     { change = new Vector3(-1f,-0.5f,0f); currentAnimationDirection = leftDownAnim;}
+
+//       // if (angle > 247.5f && angle <= 292.5f)    { change = new Vector3(-1f,0.5f,0f); currentAnimationDirection = upLeftAnim;}
+     
+//       if (angle > 202.5f && angle <= 247.5f)    { change = new Vector3(-1f,-0.5f,0f); currentAnimationDirection = leftDownAnim;}
+//       if (angle > 112.5f && angle <= 157.5f)    { change = new Vector3(-1f,-0.5f,0f); currentAnimationDirection = leftDownAnim;}
+//       if (angle > 157.5f && angle <= 202.5f)    { change = new Vector3(-1f,-0.5f,0f); currentAnimationDirection = leftDownAnim;}
+//       if (angle > 247.5f && angle <= 292.5f)    { change = new Vector3(1f,0.5f,0f); currentAnimationDirection = upRightAnim;}
+//       AnimateMovement(movementStartIndex, movementFrameCount, currentAnimationDirection, bodyTypeNumber);
+//       myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
+      
+//     }
+//     else if(cantGoLeftUpMustGoLeftDown) //1
+//     {
+//         // Map the angle to movement directions and animations
+//         if ((angle > 0f && angle <= 22.5f))   { change = new Vector3(-1f,-0.5f,0f); currentAnimationDirection = leftDownAnim; facingLeft = true; } // Up
+//         else if ((angle == 0f))   
+//                 { 
+//                   change = new Vector3(0f,1f,0f); 
+//                   if(facingLeft == true)
+//                   {
+//                     currentAnimationDirection = upLeftAnim; facingLeft = true;  // Up
+//                   }
+//                   else
+//                   {
+//                     currentAnimationDirection = upRightAnim; facingLeft = false; // Up
+//                   }
+//                 }
+        
+//         else if (angle > 22.5f && angle <= 67.5f)    { change = new Vector3(-1f,-0.5f,0f); currentAnimationDirection = leftDownAnim; facingLeft = true; } // Inverted right-up to left-up
+//         else if (angle > 67.5f && angle <= 112.5f)  { change = new Vector3(-1f,-0.5f,0f); currentAnimationDirection = leftDownAnim; facingLeft = true; } // Inverted right to left
+//         else if (angle > 112.5f && angle <= 157.5f) { change = new Vector3(-1f,-0.5f,0f); currentAnimationDirection = leftDownAnim; facingLeft = true; } // Inverted right-down to left-down
+//         else if (angle > 157.5f && angle < 180f)   { change = new Vector3(0f,-1f,0f); currentAnimationDirection = leftDownAnim; facingLeft = true; } // Down
+//         else if (angle == 180f)  
+//                   { 
+//                   change = new Vector3(0f,-1f,0f); 
+//                   if(facingLeft == true)
+//                   {
+//                     currentAnimationDirection = leftDownAnim; facingLeft = true;  // Up
+//                   }
+//                   else
+//                   {
+//                     currentAnimationDirection = rightDownAnim; facingLeft = false; // Up
+//                   }
+//                 }
+//         else if (angle > 180f && angle <= 202.5f)   { change = new Vector3(0f,-1f,0f); currentAnimationDirection = rightDownAnim; facingLeft = false; } // Down
+//         else if (angle > 202.5f && angle <= 247.5f) { change = new Vector3(1f,-0.5f,0f); currentAnimationDirection = rightDownAnim; facingLeft = false; }  // Inverted left-down to right-down
+//         else if (angle > 247.5f && angle <= 292.5f) { change = new Vector3(1f,0f,0f); currentAnimationDirection = rightAnim; facingLeft = false; } // Inverted left to right
+//         else if (angle > 292.5f && angle <= 337.5f) { change = new Vector3(1f,0.5f,0f); currentAnimationDirection = upRightAnim; facingLeft = false; }  // Inverted left-up to right-up
+//         else if ((angle > 337.5f && angle <= 360f)) { change = new Vector3(0f,1f,0f); currentAnimationDirection = upRightAnim; facingLeft = false; } // Up
+//         // Handle animation and movement
+//         AnimateMovement(movementStartIndex, movementFrameCount, currentAnimationDirection, bodyTypeNumber);
+//         myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
+//     }
+//     else if(cantGoRightUpMustGoLeftUp) //2
+//       {
+//           // Map the angle to movement directions and animations
+//           if ((angle > 0f && angle <= 22.5f))   { change = new Vector3(-1f,-0.5f,0f); currentAnimationDirection = upLeftAnim; facingLeft = true; } // Up (changed)
+//           else if (angle == 0f)   { change = new Vector3(-1f,0.5f,0f); currentAnimationDirection = upLeftAnim; facingLeft = true;}// up (changed)
+          
+//           else if (angle > 22.5f && angle <= 67.5f)        { change = new Vector3(-1f,0.5f,0f); currentAnimationDirection = upLeftAnim; facingLeft = true; } // Inverted right-up to left-up
+//           else if (angle > 67.5f && angle <= 112.5f)  { change = new Vector3(-1f,0f,0f); currentAnimationDirection = leftAnim; facingLeft = true; } // Inverted right to left
+//           else if (angle > 112.5f && angle <= 157.5f) { change = new Vector3(-1f,-0.5f,0f); currentAnimationDirection = leftDownAnim; facingLeft = true; } // Inverted right-down to left-down
+//           else if (angle > 157.5f && angle < 180f)   { change = new Vector3(0f,-1f,0f); currentAnimationDirection = leftDownAnim; facingLeft = true; } // Down
+//           else if (angle == 180f)  
+//                     { 
+//                     change = new Vector3(0f,-1f,0f); 
+//                     if(facingLeft == true)
+//                     {
+//                       currentAnimationDirection = leftDownAnim; facingLeft = true;  // Up
+//                     }
+//                     else
+//                     {
+//                       currentAnimationDirection = rightDownAnim; facingLeft = false; // Up
+//                     }
+//                   }
+//           else if (angle > 180f && angle <= 202.5f)   { change = new Vector3(0f,-1f,0f); currentAnimationDirection = rightDownAnim; facingLeft = false; } // Down
+//           else if (angle > 202.5f && angle <= 247.5f) { change = new Vector3(1f,-0.5f,0f); currentAnimationDirection = rightDownAnim; facingLeft = false; }  // Inverted left-down to right-down
+//           else if (angle > 247.5f && angle <= 292.5f) { change = new Vector3(1f,0f,0f); currentAnimationDirection = rightAnim; facingLeft = false; } // Inverted left to right
+//           else if (angle > 292.5f && angle <= 337.5f) { change = new Vector3(-1f,0.5f,0f); currentAnimationDirection = upLeftAnim; facingLeft = true; }  // Inverted left-up to right-up (changed)
+//           else if ((angle > 337.5f && angle <= 360f)) { change = new Vector3(-1f,0.5f,0f); currentAnimationDirection = upLeftAnim; facingLeft = true; } // Up (changed)
+//           // Handle animation and movement
+//           AnimateMovement(movementStartIndex, movementFrameCount, currentAnimationDirection, bodyTypeNumber);
+//           myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
+//       }  
+//       else if(cantGoRightDownMustGoLeftDown) //3
+//         {
+//             // Map the angle to movement directions and animations
+//             if ((angle > 0f && angle <= 22.5f))   { change = new Vector3(0f,1f,0f); currentAnimationDirection = upLeftAnim; facingLeft = true; } // Up
+//             else if ((angle == 0f))   
+//                     { 
+//                       change = new Vector3(0f,1f,0f); 
+//                       if(facingLeft == true)
+//                       {
+//                         currentAnimationDirection = upLeftAnim; facingLeft = true;  // Up
+//                       }
+//                       else
+//                       {
+//                         currentAnimationDirection = upRightAnim; facingLeft = false; // Up
+//                       }
+//                     }
+            
+//             else if (angle > 22.5f && angle <= 67.5f)        { change = new Vector3(-1f,0.5f,0f); currentAnimationDirection = upLeftAnim; facingLeft = true; } // Inverted right-up to left-up
+//             else if (angle > 67.5f && angle <= 112.5f)  { change = new Vector3(-1f,0f,0f); currentAnimationDirection = leftAnim; facingLeft = true; } // Inverted right to left
+//             else if (angle > 112.5f && angle <= 157.5f) { change = new Vector3(-1f,-0.5f,0f); currentAnimationDirection = leftDownAnim; facingLeft = true; } // Inverted right-down to left-down
+//             else if (angle > 157.5f && angle < 180f)   { change = new Vector3(-1f,-0.5f,0f); currentAnimationDirection = leftDownAnim; facingLeft = true; } // Down (changed)
+//             else if (angle == 180f) { change = new Vector3(-1f,-0.5f,0f); currentAnimationDirection = leftDownAnim; facingLeft = true; }  // down (changed)
+//             else if (angle > 180f && angle <= 202.5f)   { change = new Vector3(-1f,-0.5f,0f); currentAnimationDirection = leftDownAnim; facingLeft = true; } // Down (changed)
+//             else if (angle > 202.5f && angle <= 247.5f) { change = new Vector3(-1f,-0.5f,0f); currentAnimationDirection = leftDownAnim; facingLeft = true; }  // Inverted left-down to right-down (changed)
+//             else if (angle > 247.5f && angle <= 292.5f) { change = new Vector3(1f,0f,0f); currentAnimationDirection = rightAnim; facingLeft = false; } // Inverted left to right
+//             else if (angle > 292.5f && angle <= 337.5f) { change = new Vector3(1f,0.5f,0f); currentAnimationDirection = upRightAnim; facingLeft = false; }  // Inverted left-up to right-up
+//             else if ((angle > 337.5f && angle <= 360f)) { change = new Vector3(0f,1f,0f); currentAnimationDirection = upRightAnim; facingLeft = false; } // Up
+//             // Handle animation and movement
+//             AnimateMovement(movementStartIndex, movementFrameCount, currentAnimationDirection, bodyTypeNumber);
+//             myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
+//         } 
+//     else if(cantGoLeftDownMustGoLeftUp) //4
+//       {
+//           // Map the angle to movement directions and animations
+//           if ((angle > 0f && angle <= 22.5f))   { change = new Vector3(0f,1f,0f); currentAnimationDirection = upLeftAnim; facingLeft = true; } // Up
+//           else if ((angle == 0f))   
+//                   { 
+//                     change = new Vector3(0f,1f,0f); 
+//                     if(facingLeft == true)
+//                     {
+//                       currentAnimationDirection = upLeftAnim; facingLeft = true;  // Up
+//                     }
+//                     else
+//                     {
+//                       currentAnimationDirection = upRightAnim; facingLeft = false; // Up
+//                     }
+//                   }
+          
+//           else if (angle > 22.5f && angle <= 67.5f)        { change = new Vector3(-1f,0.5f,0f); currentAnimationDirection = upLeftAnim; facingLeft = true; } // Inverted right-up to left-up
+//           else if (angle > 67.5f && angle <= 112.5f)  { change = new Vector3(-1f,0.5f,0f); currentAnimationDirection = upLeftAnim; facingLeft = true; } // Inverted right to left (changed)
+//           else if (angle > 112.5f && angle <= 157.5f) { change = new Vector3(-1f,0.5f,0f); currentAnimationDirection = upLeftAnim; facingLeft = true; } // Inverted right-down to left-down (changed)
+//           else if (angle > 157.5f && angle < 180f)   { change = new Vector3(-1f,0.5f,0f); currentAnimationDirection = upLeftAnim; facingLeft = true; } // Down (changed)
+//           else if (angle == 180f)  
+//                     { 
+//                     change = new Vector3(0f,-1f,0f); 
+//                     if(facingLeft == true)
+//                     {
+//                       currentAnimationDirection = leftDownAnim; facingLeft = true;  // Up
+//                     }
+//                     else
+//                     {
+//                       currentAnimationDirection = rightDownAnim; facingLeft = false; // Up
+//                     }
+//                   }
+//           else if (angle > 180f && angle <= 202.5f)   { change = new Vector3(0f,-1f,0f); currentAnimationDirection = rightDownAnim; facingLeft = false; } // Down
+//           else if (angle > 202.5f && angle <= 247.5f) { change = new Vector3(1f,-0.5f,0f); currentAnimationDirection = rightDownAnim; facingLeft = false; }  // Inverted left-down to right-down
+//           else if (angle > 247.5f && angle <= 292.5f) { change = new Vector3(1f,0f,0f); currentAnimationDirection = rightAnim; facingLeft = false; } // Inverted left to right
+//           else if (angle > 292.5f && angle <= 337.5f) { change = new Vector3(1f,0.5f,0f); currentAnimationDirection = upRightAnim; facingLeft = false; }  // Inverted left-up to right-up
+//           else if ((angle > 337.5f && angle <= 360f)) { change = new Vector3(0f,1f,0f); currentAnimationDirection = upRightAnim; facingLeft = false; } // Up
+//           // Handle animation and movement
+//           AnimateMovement(movementStartIndex, movementFrameCount, currentAnimationDirection, bodyTypeNumber);
+//           myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
+//       }  
+//       else if(cantGoRightUpMustGoRightDown)// 5
+//       {
+//           // Map the angle to movement directions and animations
+//           if ((angle > 0f && angle <= 22.5f))   { change = new Vector3(0f,1f,0f); currentAnimationDirection = upLeftAnim; facingLeft = true; } // Up
+//           else if ((angle == 0f))   
+//                   { 
+//                     change = new Vector3(0f,1f,0f); 
+//                     if(facingLeft == true)
+//                     {
+//                       currentAnimationDirection = upLeftAnim; facingLeft = true;  // Up
+//                     }
+//                     else
+//                     {
+//                       currentAnimationDirection = upRightAnim; facingLeft = false; // Up
+//                     }
+//                   }
+          
+//           else if (angle > 22.5f && angle <= 67.5f)        { change = new Vector3(-1f,0.5f,0f); currentAnimationDirection = upLeftAnim; facingLeft = true; } // Inverted right-up to left-up
+//           else if (angle > 67.5f && angle <= 112.5f)  { change = new Vector3(-1f,0f,0f); currentAnimationDirection = leftAnim; facingLeft = true; } // Inverted right to left
+//           else if (angle > 112.5f && angle <= 157.5f) { change = new Vector3(-1f,-0.5f,0f); currentAnimationDirection = leftDownAnim; facingLeft = true; } // Inverted right-down to left-down
+//           else if (angle > 157.5f && angle < 180f)   { change = new Vector3(0f,-1f,0f); currentAnimationDirection = leftDownAnim; facingLeft = true; } // Down
+//           else if (angle == 180f)  
+//                     { 
+//                     change = new Vector3(0f,-1f,0f); 
+//                     if(facingLeft == true)
+//                     {
+//                       currentAnimationDirection = leftDownAnim; facingLeft = true;  // Up
+//                     }
+//                     else
+//                     {
+//                       currentAnimationDirection = rightDownAnim; facingLeft = false; // Up
+//                     }
+//                   }
+//           else if (angle > 180f && angle <= 202.5f)   { change = new Vector3(0f,-1f,0f); currentAnimationDirection = rightDownAnim; facingLeft = false; } // Down
+//           else if (angle > 202.5f && angle <= 247.5f) { change = new Vector3(1f,-0.5f,0f); currentAnimationDirection = rightDownAnim; facingLeft = false; }  // Inverted left-down to right-down
+//           else if (angle > 247.5f && angle <= 292.5f) { change = new Vector3(1f,-0.5f,0f); currentAnimationDirection = rightDownAnim; facingLeft = false; } // Inverted left to right (changed)
+//           else if (angle > 292.5f && angle <= 337.5f) { change = new Vector3(1f,-0.5f,0f); currentAnimationDirection = rightDownAnim; facingLeft = false; }  // Inverted left-up to right-up (changed)
+//           else if ((angle > 337.5f && angle <= 360f)) { change = new Vector3(1f,-0.5f,0f); currentAnimationDirection = rightDownAnim; facingLeft = false; } // Up (changed)
+//           // Handle animation and movement
+//           AnimateMovement(movementStartIndex, movementFrameCount, currentAnimationDirection, bodyTypeNumber);
+//           myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
+//       } 
+//       else if(cantGoLeftUpMustGoRightUp) //6
+//         {
+//             // Map the angle to movement directions and animations
+//             if ((angle > 0f && angle <= 22.5f))   { change = new Vector3(1f,0.5f,0f); currentAnimationDirection = upRightAnim; facingLeft = false; } // Up (changed)
+//             else if ((angle == 0f)) { change = new Vector3(1f,0.5f,0f); currentAnimationDirection = upRightAnim; facingLeft = false; } // Up (changed)
+//             else if (angle > 22.5f && angle <= 67.5f)        { change = new Vector3(1f,0.5f,0f); currentAnimationDirection = upRightAnim; facingLeft = false; } // Inverted right-up to left-up (changed)
+//             else if (angle > 67.5f && angle <= 112.5f)  { change = new Vector3(-1f,0f,0f); currentAnimationDirection = leftAnim; facingLeft = true; } // Inverted right to left
+//             else if (angle > 112.5f && angle <= 157.5f) { change = new Vector3(-1f,-0.5f,0f); currentAnimationDirection = leftDownAnim; facingLeft = true; } // Inverted right-down to left-down
+//             else if (angle > 157.5f && angle < 180f)   { change = new Vector3(0f,-1f,0f); currentAnimationDirection = leftDownAnim; facingLeft = true; } // Down
+//             else if (angle == 180f)  
+//                       { 
+//                       change = new Vector3(0f,-1f,0f); 
+//                       if(facingLeft == true)
+//                       {
+//                         currentAnimationDirection = leftDownAnim; facingLeft = true;  // Up
+//                       }
+//                       else
+//                       {
+//                         currentAnimationDirection = rightDownAnim; facingLeft = false; // Up
+//                       }
+//                     }
+//             else if (angle > 180f && angle <= 202.5f)   { change = new Vector3(0f,-1f,0f); currentAnimationDirection = rightDownAnim; facingLeft = false; } // Down
+//             else if (angle > 202.5f && angle <= 247.5f) { change = new Vector3(1f,-0.5f,0f); currentAnimationDirection = rightDownAnim; facingLeft = false; }  // Inverted left-down to right-down
+//             else if (angle > 247.5f && angle <= 292.5f) { change = new Vector3(1f,0f,0f); currentAnimationDirection = rightAnim; facingLeft = false; } // Inverted left to right
+//             else if (angle > 292.5f && angle <= 337.5f) { change = new Vector3(1f,0.5f,0f); currentAnimationDirection = upRightAnim; facingLeft = false; }  // Inverted left-up to right-up
+//             else if ((angle > 337.5f && angle <= 360f)) { change = new Vector3(1f,0.5f,0f); currentAnimationDirection = upRightAnim; facingLeft = false; } // Up (changed)
+//             // Handle animation and movement
+//             AnimateMovement(movementStartIndex, movementFrameCount, currentAnimationDirection, bodyTypeNumber);
+//             myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
+//         }
+//       else if(cantGoLeftDownMustGoRightDown) //7
+//         {
+//             // Map the angle to movement directions and animations
+//             if ((angle > 0f && angle <= 22.5f))   { change = new Vector3(0f,1f,0f); currentAnimationDirection = upLeftAnim; facingLeft = true; } // Up
+//             else if ((angle == 0f))   
+//                     { 
+//                       change = new Vector3(0f,1f,0f); 
+//                       if(facingLeft == true)
+//                       {
+//                         currentAnimationDirection = upLeftAnim; facingLeft = true;  // Up
+//                       }
+//                       else
+//                       {
+//                         currentAnimationDirection = upRightAnim; facingLeft = false; // Up
+//                       }
+//                     }
+            
+//             else if (angle > 22.5f && angle <= 67.5f)        { change = new Vector3(-1f,0.5f,0f); currentAnimationDirection = upLeftAnim; facingLeft = true; } // Inverted right-up to left-up
+//             else if (angle > 67.5f && angle <= 112.5f)  { change = new Vector3(-1f,0f,0f); currentAnimationDirection = leftAnim; facingLeft = true; } // Inverted right to left
+//             else if (angle > 112.5f && angle <= 157.5f) { change = new Vector3(1f,-0.5f,0f); currentAnimationDirection = rightDownAnim; facingLeft = false; } // Inverted right-down to left-down (changed)
+//             else if (angle > 157.5f && angle < 180f)   { change = new Vector3(1f,-0.5f,0f); currentAnimationDirection = rightDownAnim; facingLeft = false; } // Down (changed)
+//             else if (angle == 180f)  
+//                       { change = new Vector3(1f,-0.5f,0f); currentAnimationDirection = rightDownAnim; facingLeft = false; } // Up (changed)
+//             else if (angle > 180f && angle <= 202.5f)   { change = new Vector3(1f,-0.5f,0f); currentAnimationDirection = rightDownAnim; facingLeft = false; } // Down (changed)
+//             else if (angle > 202.5f && angle <= 247.5f) { change = new Vector3(1f,-0.5f,0f); currentAnimationDirection = rightDownAnim; facingLeft = false; }  // Inverted left-down to right-down
+//             else if (angle > 247.5f && angle <= 292.5f) { change = new Vector3(1f,0f,0f); currentAnimationDirection = rightAnim; facingLeft = false; } // Inverted left to right
+//             else if (angle > 292.5f && angle <= 337.5f) { change = new Vector3(1f,0.5f,0f); currentAnimationDirection = upRightAnim; facingLeft = false; }  // Inverted left-up to right-up
+//             else if ((angle > 337.5f && angle <= 360f)) { change = new Vector3(0f,1f,0f); currentAnimationDirection = upRightAnim; facingLeft = false; } // Up
+//             // Handle animation and movement
+//             AnimateMovement(movementStartIndex, movementFrameCount, currentAnimationDirection, bodyTypeNumber);
+//             myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
+//         }
+//       else if(cantGoRightDownMustGoRightUp) //8
+//         {
+//             // Map the angle to movement directions and animations
+//             if ((angle > 0f && angle <= 22.5f))   { change = new Vector3(0f,1f,0f); currentAnimationDirection = upLeftAnim; facingLeft = true; } // Up
+//             else if ((angle == 0f))   
+//                     { 
+//                       change = new Vector3(0f,1f,0f); 
+//                       if(facingLeft == true)
+//                       {
+//                         currentAnimationDirection = upLeftAnim; facingLeft = true;  // Up
+//                       }
+//                       else
+//                       {
+//                         currentAnimationDirection = upRightAnim; facingLeft = false; // Up
+//                       }
+//                     }
+            
+//             else if (angle > 22.5f && angle <= 67.5f)        { change = new Vector3(-1f,0.5f,0f); currentAnimationDirection = upLeftAnim; facingLeft = true; } // Inverted right-up to left-up
+//             else if (angle > 67.5f && angle <= 112.5f)  { change = new Vector3(-1f,0f,0f); currentAnimationDirection = leftAnim; facingLeft = true; } // Inverted right to left
+//             else if (angle > 112.5f && angle <= 157.5f) { change = new Vector3(-1f,-0.5f,0f); currentAnimationDirection = leftDownAnim; facingLeft = true; } // Inverted right-down to left-down
+//             else if (angle > 157.5f && angle < 180f)   { change = new Vector3(0f,-1f,0f); currentAnimationDirection = leftDownAnim; facingLeft = true; } // Down
+//             else if (angle == 180f)  
+//                       { 
+//                       change = new Vector3(0f,-1f,0f); 
+//                       if(facingLeft == true)
+//                       {
+//                         currentAnimationDirection = leftDownAnim; facingLeft = true;  // Up
+//                       }
+//                       else
+//                       {
+//                         currentAnimationDirection = rightDownAnim; facingLeft = false; // Up
+//                       }
+//                     }
+//             else if (angle > 180f && angle <= 202.5f)   { change = new Vector3(1f,0.5f,0f); currentAnimationDirection = upRightAnim; facingLeft = false; } // Down (changed)
+//             else if (angle > 202.5f && angle <= 247.5f) { change = new Vector3(1f,0.5f,0f); currentAnimationDirection = upRightAnim; facingLeft = false; }  // Inverted left-down to right-down
+//             else if (angle > 247.5f && angle <= 292.5f) { change = new Vector3(1f,0.5f,0f); currentAnimationDirection = upRightAnim; facingLeft = false; } // Inverted left to right
+//             else if (angle > 292.5f && angle <= 337.5f) { change = new Vector3(1f,0.5f,0f); currentAnimationDirection = upRightAnim; facingLeft = false; }  // Inverted left-up to right-up
+//             else if ((angle > 337.5f && angle <= 360f)) { change = new Vector3(0f,1f,0f); currentAnimationDirection = upRightAnim; facingLeft = false; } // Up
+//             // Handle animation and movement
+//             AnimateMovement(movementStartIndex, movementFrameCount, currentAnimationDirection, bodyTypeNumber);
+//             myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
+//         }
+    
+//     }

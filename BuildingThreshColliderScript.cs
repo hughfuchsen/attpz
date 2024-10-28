@@ -10,12 +10,15 @@ public class BuildingThreshColliderScript : MonoBehaviour
     public bool backOfBuilding;
     public bool rooftopLadder;
 
+    SoundtrackScript soundtrackScript;
 
 
     void Start()
     {
         Player = GameObject.FindGameObjectWithTag("Player");
         playerMovement = Player.GetComponent<PlayerMovement>(); 
+        soundtrackScript = GameObject.FindGameObjectWithTag("SoundtrackScript").GetComponent<SoundtrackScript>();
+
     }
 
     void OnTriggerEnter2D()
@@ -50,6 +53,7 @@ public class BuildingThreshColliderScript : MonoBehaviour
                         if(this.GetComponent<RoomThresholdColliderScript>().roomAbove == null)
                         {           
                             building.GoBehindBuilding(); // go outside behind the buildinng
+                            soundtrackScript.FadeOutIn(soundtrackScript.track2, soundtrackScript.track1);
                             playerMovement.playerIsOutside = true;
                         }
                     }
@@ -88,6 +92,7 @@ public class BuildingThreshColliderScript : MonoBehaviour
                             if(this.GetComponent<RoomThresholdColliderScript>().roomBelow == null)
                             {
                                 building.GoBehindBuilding(); // go outside behind the buildinng
+                                soundtrackScript.FadeOutIn(soundtrackScript.track2, soundtrackScript.track1);
                                 playerMovement.playerIsOutside = true;  
                             }          
                         }

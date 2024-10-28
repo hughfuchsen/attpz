@@ -38,19 +38,39 @@ public class LevelThreshColliderScript : MonoBehaviour
         if((isPlayerCrossingUp() && isPlayerCrossingLeft()) // is player going this \ (left diag) way or
         || !isPlayerCrossingUp() && !isPlayerCrossingLeft()) // is player going this / (right diag) way :-)
         {
-            playerMovement.fixedDirectionLeft = true; // fix the player in \ left diag way while inside the collider
+            // playerMovement.fixedDirectionLeftDiagonal = true; // fix the player in \ left diag way while inside the collider
+            playerMovement.controlDirectionToPlayerDirection[Direction.Left] = Direction.UpLeft;
+            playerMovement.controlDirectionToPlayerDirection[Direction.UpLeft] = Direction.UpLeft;
+            playerMovement.controlDirectionToPlayerDirection[Direction.UpFacingLeft] = Direction.UpLeft;
+            playerMovement.controlDirectionToPlayerDirection[Direction.UpFacingRight] = Direction.UpLeft;
+            playerMovement.controlDirectionToPlayerDirection[Direction.UpRight] = Direction.UpLeft;
+            playerMovement.controlDirectionToPlayerDirection[Direction.Right] = Direction.RightDown;
+            playerMovement.controlDirectionToPlayerDirection[Direction.RightDown] = Direction.RightDown;
+            playerMovement.controlDirectionToPlayerDirection[Direction.DownFacingRight] = Direction.RightDown;
+            playerMovement.controlDirectionToPlayerDirection[Direction.DownFacingLeft] = Direction.RightDown;
+            playerMovement.controlDirectionToPlayerDirection[Direction.DownLeft] = Direction.RightDown;
         }
         else
         {
-            playerMovement.fixedDirectionRight = true; // fix the player in / right diag way while inside the collider
+            // playerMovement.fixedDirectionRightDiagonal = true; // fix the player in / right diag way while inside the collider
+        playerMovement.controlDirectionToPlayerDirection[Direction.Left] = Direction.DownLeft;
+        playerMovement.controlDirectionToPlayerDirection[Direction.UpLeft] = Direction.UpRight;
+        playerMovement.controlDirectionToPlayerDirection[Direction.UpFacingLeft] = Direction.UpRight;
+        playerMovement.controlDirectionToPlayerDirection[Direction.UpFacingRight] = Direction.UpRight;
+        playerMovement.controlDirectionToPlayerDirection[Direction.UpRight] = Direction.UpRight;
+        playerMovement.controlDirectionToPlayerDirection[Direction.Right] = Direction.UpRight;
+        playerMovement.controlDirectionToPlayerDirection[Direction.RightDown] = Direction.DownLeft;
+        playerMovement.controlDirectionToPlayerDirection[Direction.DownFacingRight] = Direction.DownLeft;
+        playerMovement.controlDirectionToPlayerDirection[Direction.DownFacingLeft] = Direction.DownLeft;
+        playerMovement.controlDirectionToPlayerDirection[Direction.DownLeft] = Direction.DownLeft;
         }
         // fixing the player's movement inside the collider ensures the correct conditions are met upon collider exit
 
     }
     private void OnTriggerExit2D()
     {
-        playerMovement.fixedDirectionLeft = false;
-        playerMovement.fixedDirectionRight = false;  // un-fix the player in \/ left/right diag way upon collider exit.      
+        // un-fix the player in \/ left/right diag way upon collider exit. 
+        playerMovement.ResetPlayerMovement();     
         
         if(isPlayerCrossingUp()) //crossing up bro
         {

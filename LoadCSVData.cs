@@ -37,7 +37,7 @@ public class LoadCSVData : MonoBehaviour
     private string csvFilePath;
     private CharacterCustomization customization;
     
-    private PlayerMovement playerMovement;
+    private PlayerAnimationAndMovement playerMovement;
     private TMP_InputField[] inputFields;
 
     // List to store CSV rows
@@ -53,6 +53,11 @@ public class LoadCSVData : MonoBehaviour
     private string likesVerb;
     private string dislikesVerb;
     // private Random random = new Random();
+
+    private List<int> chosenDataRow;
+
+    private GameObject npcPrefab = Resources.Load<GameObject>("NPCPrefab");
+
 
 
     void Start()
@@ -71,7 +76,7 @@ public class LoadCSVData : MonoBehaviour
         csvFilePath = Path.Combine(Application.persistentDataPath, "CharacterProfilesPrototype7.csv");
         GameObject customizationMenu = GameObject.FindGameObjectWithTag("CharacterCustomizationMenu");
         customization = customizationMenu.GetComponent<CharacterCustomization>();
-        playerMovement = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerMovement>();;
+        playerMovement = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerAnimationAndMovement>();;
 
 
 
@@ -504,6 +509,7 @@ public class LoadCSVData : MonoBehaviour
             if (intParams.Length == 14)
             {
                 List<int> parameters = intParams.Select(param => int.Parse(param.Trim())).ToList();
+                chosenDataRow = parameters;
                 customization.UpdateSpecific(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4],
                                             parameters[5], parameters[6], parameters[7], parameters[8], parameters[9],
                                             parameters[10], parameters[11], parameters[12], parameters[13]);
@@ -513,7 +519,14 @@ public class LoadCSVData : MonoBehaviour
     }
 
 
+    public void SpawnPerson()
+    {
+        // at the current dataRows[i] there is a list of indices that we want to get and pass to an NPC controller script.
+        npcPrefab.UpdateNPC(chosenDataRow, uiText.text);
+        GameObject npc = Instantiate(npcPrefab, new Vector3(-1277, 670, 0), Quaternion.identity);  
 
+
+    }
 
 
 

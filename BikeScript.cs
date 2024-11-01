@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class BikeScript : MonoBehaviour
 {
-    PlayerMovement playerMovement;
+    PlayerAnimationAndMovement playerMovement;
     IsoSpriteSorting isoSpriteSorting;
 
     [SerializeField] GameObject bike;
@@ -26,7 +26,7 @@ public class BikeScript : MonoBehaviour
     public void Start()
     {
       Player = GameObject.FindGameObjectWithTag("Player");
-      playerMovement = Player.GetComponent<PlayerMovement>();
+      playerMovement = Player.GetComponent<PlayerAnimationAndMovement>();
 
       bikeSprite = bike.transform.Find("bikeSprite").GetComponent<SpriteRenderer>();
       isoSpriteSorting = bike.GetComponent<IsoSpriteSorting>();

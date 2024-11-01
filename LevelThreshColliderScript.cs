@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class LevelThreshColliderScript : MonoBehaviour
 {
-    PlayerMovement playerMovement;
+    PlayerAnimationAndMovement playerMovement;
     [SerializeField] GameObject Player;
 
     // public string initialSortingLayerUponEntry;
@@ -16,12 +16,15 @@ public class LevelThreshColliderScript : MonoBehaviour
     public List<LevelScript> levelBelowOrEntering = new List<LevelScript>();
 
     private bool aboveCollider;
+
+    public bool plyrCrsngLeft = false;
+
     
     // Start is called before the first frame update
     void Start()
     {
         Player = GameObject.FindGameObjectWithTag("Player");
-        playerMovement = Player.GetComponent<PlayerMovement>();
+        playerMovement = Player.GetComponent<PlayerAnimationAndMovement>();
     }
 
     private void OnTriggerEnter2D()
@@ -35,8 +38,8 @@ public class LevelThreshColliderScript : MonoBehaviour
             aboveCollider = true;
         }
 
-        if((isPlayerCrossingUp() && isPlayerCrossingLeft()) // is player going this \ (left diag) way or
-        || !isPlayerCrossingUp() && !isPlayerCrossingLeft()) // is player going this / (right diag) way :-)
+        if(plyrCrsngLeft) // is player going this \ (left diag) way or
+         // is player going this / (right diag) way :-)
         {
             // playerMovement.fixedDirectionLeftDiagonal = true; // fix the player in \ left diag way while inside the collider
             playerMovement.controlDirectionToPlayerDirection[Direction.Left] = Direction.UpLeft;
@@ -196,10 +199,10 @@ public class LevelThreshColliderScript : MonoBehaviour
 
     private bool isPlayerCrossingUp()
     {
-        return GameObject.FindWithTag("Player").GetComponent<PlayerMovement>().change.y > 0;
+        return GameObject.FindWithTag("Player").GetComponent<PlayerAnimationAndMovement>().change.y > 0;
     }
     private bool isPlayerCrossingLeft()
     {
-        return GameObject.FindWithTag("Player").GetComponent<PlayerMovement>().change.x < 0;
+        return GameObject.FindWithTag("Player").GetComponent<PlayerAnimationAndMovement>().change.x < 0;
     }
 }

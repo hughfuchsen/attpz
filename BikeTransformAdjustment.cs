@@ -5,7 +5,7 @@ using UnityEngine;
 public class BikeTransformAdjustment : MonoBehaviour
 {
 
-    PlayerMovement playerMovement;
+    PlayerAnimationAndMovement playerMovement;
     [SerializeField] GameObject Player;
     [SerializeField] GameObject bike;
 
@@ -18,7 +18,7 @@ public class BikeTransformAdjustment : MonoBehaviour
     public void Start()
     {
         Player = GameObject.FindGameObjectWithTag("Player");
-        playerMovement = Player.GetComponent<PlayerMovement>();  
+        playerMovement = Player.GetComponent<PlayerAnimationAndMovement>();  
 
         bike = transform.Find("bike").gameObject;
         initialBikeTransformPosition = bike.transform.localPosition;   

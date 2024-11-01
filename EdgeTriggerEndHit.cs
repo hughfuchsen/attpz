@@ -1,185 +1,3 @@
-// using UnityEngine;
-// using System.Collections;
-
-// public class EdgeTriggerEndHit : MonoBehaviour
-// {
-//     public float centerThreshold = 3f;  // Adjust this value to define how close to the center the player needs to be
-//     public float checkInterval = 0.1f;  // Optional: check interval for position in seconds
-//     private EdgeCollider2D edgeCollider;
-//     private Coroutine checkCenterCoroutine;
-
-//     private Vector2 playerPosition;
-//     private Vector2 playerOffset = new Vector2(8f, -28f);  // Offset for player's position (X: 8, Y: -28)
-//     private Vector2 playerPositionCollisionPointOffset;
-//     Vector2 collisionPointOffset;
-//     public bool aboveThreshold;
-//     public bool leftDiagThreshold;
-
-//     PlayerMovement playerMovement;
-
-//     // Player offset values
-
-//     void Start()
-//     {
-//         edgeCollider = GetComponent<EdgeCollider2D>();
-//         playerMovement = GameObject.FindWithTag("Player").GetComponent<PlayerMovement>();
-//         playerPosition = (Vector2)playerMovement.transform.position + playerOffset;
-
-//     }
-
-//     void OnTriggerEnter2D(Collider2D other)
-//     {
-//         if (other.CompareTag("Player"))
-//         {
-//             playerMovement.cantGoLeftDownMustGoLeftUp = false;
-//             playerMovement.cantGoLeftDownMustGoRightDown = false;
-//             playerMovement.cantGoLeftUpMustGoLeftDown = false;
-//             playerMovement.cantGoLeftUpMustGoRightUp = false;
-//             playerMovement.cantGoRightDownMustGoLeftDown = false;
-//             playerMovement.cantGoRightDownMustGoRightUp = false;
-//             playerMovement.cantGoRightUpMustGoLeftUp = false;
-//             playerMovement.cantGoRightUpMustGoRightDown = false;
-
-//             // Stop the coroutine when the player exits the trigger
-//             if (checkCenterCoroutine != null)
-//             {
-//                 StopCoroutine(checkCenterCoroutine);
-//                 checkCenterCoroutine = null;
-//             }
-//             // Get the exact collision point of the player's collider
-//             collisionPointOffset = GetColliderContactPoint(other);
-
-//             playerPositionCollisionPointOffset = playerPosition - collisionPointOffset;
-            
-//             // Start the coroutine to check if the player is at the center
-//             checkCenterCoroutine = StartCoroutine(CheckIfPlayerIsAtCenter());
-
-
-
-//             Vector2 leftEnd = transform.TransformPoint(edgeCollider.points[0]);
-//             Vector2 rightEnd = transform.TransformPoint(edgeCollider.points[edgeCollider.pointCount - 1]);
-
-//             Vector2 centerPoint = (leftEnd + rightEnd) / 2;
-
-//             if(leftDiagThreshold)
-//             {
-//                 if (IsLeftOfCenter(playerPosition, centerPoint))
-//                 {
-//                     if(aboveThreshold)
-//                     {
-//                         playerMovement.cantGoRightDownMustGoRightUp = true;
-//                     }
-//                     else
-//                     {
-//                         playerMovement.cantGoLeftUpMustGoRightUp = true;
-//                     }
-//                 }
-//                 else
-//                 {
-//                     if(aboveThreshold)
-//                     {
-//                         playerMovement.cantGoRightDownMustGoLeftDown = true;
-//                     }
-//                     else
-//                     {
-//                         playerMovement.cantGoLeftUpMustGoLeftDown = true;
-//                     }
-//                 }
-//             }
-//             else
-//             {
-//                 if (IsLeftOfCenter(playerPosition, centerPoint))
-//                 {
-//                     if(aboveThreshold)
-//                     {
-//                         playerMovement.cantGoLeftDownMustGoRightDown = true;
-//                     }
-//                     else
-//                     {
-//                         playerMovement.cantGoRightUpMustGoRightDown = true;
-//                     }
-//                 }
-//                 else
-//                 {
-//                     if(aboveThreshold)
-//                     {
-//                         playerMovement.cantGoLeftDownMustGoLeftUp = true;
-//                     }
-//                     else
-//                     {
-//                         playerMovement.cantGoRightUpMustGoLeftUp = true;
-//                     }
-//                 }
-//             }
-//         }
-//     }
-
-//     void OnTriggerExit2D(Collider2D other)
-//     {
-//         if (other.CompareTag("Player"))
-//         {
-//             playerMovement.cantGoLeftDownMustGoLeftUp = false;
-//             playerMovement.cantGoLeftDownMustGoRightDown = false;
-//             playerMovement.cantGoLeftUpMustGoLeftDown = false;
-//             playerMovement.cantGoLeftUpMustGoRightUp = false;
-//             playerMovement.cantGoRightDownMustGoLeftDown = false;
-//             playerMovement.cantGoRightDownMustGoRightUp = false;
-//             playerMovement.cantGoRightUpMustGoLeftUp = false;
-//             playerMovement.cantGoRightUpMustGoRightDown = false;
-
-//             if (checkCenterCoroutine != null)
-//             {
-//                 StopCoroutine(checkCenterCoroutine);
-//                 checkCenterCoroutine = null;
-//             }
-//         }
-//     }
-
-//     private Vector2 GetColliderContactPoint(Collider2D playerCollider)
-//     {
-//         // If using a BoxCollider2D, CircleCollider2D, or any other 2D collider
-//         ContactPoint2D[] contactPoints = new ContactPoint2D[1];
-//         playerCollider.GetContacts(contactPoints);
-//         // Debug.Log(contactPoints[0].point);
-//         return contactPoints[0].point;  // Returns the exact point of contact
-//     }
-
-//     private bool IsLeftOfCenter(Vector2 playerPosition, Vector2 centerPoint)
-//     {
-//         return playerPosition.x < centerPoint.x;
-//     }
-
-//     private IEnumerator CheckIfPlayerIsAtCenter()
-//     {
-//         Vector2 leftEnd = transform.TransformPoint(edgeCollider.points[0]);
-//         Vector2 rightEnd = transform.TransformPoint(edgeCollider.points[edgeCollider.pointCount - 1]);
-//         Vector2 centerPoint = (leftEnd + rightEnd) / 2;
-
-//         while (true)
-//         {
-//             // Vector2 playerPosition = (Vector2)playerTransform.position + playerOffset;
-//             float distanceToCenter = Vector2.Distance(playerPosition + playerPositionCollisionPointOffset, centerPoint);
-
-//             if (distanceToCenter <= centerThreshold)
-//             {
-//                 Debug.Log("Player is at the center of the edge collider.");
-//                 playerMovement.cantGoLeftDownMustGoLeftUp = false;
-//                 playerMovement.cantGoLeftDownMustGoRightDown = false;
-//                 playerMovement.cantGoLeftUpMustGoLeftDown = false;
-//                 playerMovement.cantGoLeftUpMustGoRightUp = false;
-//                 playerMovement.cantGoRightDownMustGoLeftDown = false;
-//                 playerMovement.cantGoRightDownMustGoRightUp = false;
-//                 playerMovement.cantGoRightUpMustGoLeftUp = false;
-//                 playerMovement.cantGoRightUpMustGoRightDown = false;  
-//                 yield break;
-//             }
-
-//             yield return new WaitForSeconds(checkInterval);
-//         }
-//     }
-// }
-
-
 using UnityEngine;
 using System.Collections;
 
@@ -195,45 +13,59 @@ public class EdgeTriggerEndHit : MonoBehaviour
     
     private Vector2 playerPosition;
     private Vector2 playerOffset = new Vector2(8f, -28f);  // Offset for player's position (X: 8, Y: -28)
-    private Vector2 playerPositionCollisionPointOffset;
+    private Vector2 playerPositionWithCollisionPointOffest;
     Vector2 collisionPointOffset;
     public bool aboveThreshold;
     public bool leftDiagThreshold;
 
-    PlayerMovement playerMovement;
+    Vector2 leftEnd;
+    Vector2 rightEnd;
+    Vector2 centerPoint;
+
+    PlayerAnimationAndMovement playerMovement;
 
     void Start()
     {
         // Get references for player, player movement, and player collider
         edgeCollider = GetComponent<EdgeCollider2D>();
         player = GameObject.FindWithTag("Player");
-        playerMovement = player.GetComponent<PlayerMovement>();
+        playerMovement = player.GetComponent<PlayerAnimationAndMovement>();
         playerCollider = player.GetComponent<BoxCollider2D>();
-        
- 
+
+        leftEnd = transform.TransformPoint(edgeCollider.points[0]);
+        // Debug.Log("left end" + leftEnd);
+
+        rightEnd = transform.TransformPoint(edgeCollider.points[edgeCollider.pointCount - 1]);
+        // Debug.Log("right end" + rightEnd);
+
+
+        centerPoint = (leftEnd + rightEnd) / 2;
+        // Debug.Log("centre point" + centerPoint);
+
     }
 
     void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Player"))
         {
-            playerMovement.ResetPlayerMovement();  // Reset movement restrictions
+            // playerMovement.ResetPlayerMovement();  // Reset movement restrictions
 
             if (checkCenterCoroutine != null)
             {
                 StopCoroutine(checkCenterCoroutine);
                 checkCenterCoroutine = null;
             }
+           
+            // Update the player's position during runtime
+            playerPosition = (Vector2)player.transform.position + playerOffset;
+            // Debug.Log(GetColliderContactPoint(playerCollider));
             
-            Vector2 leftEnd = transform.TransformPoint(edgeCollider.points[0]);
-            Vector2 rightEnd = transform.TransformPoint(edgeCollider.points[edgeCollider.pointCount - 1]);
-            Vector2 centerPoint = (leftEnd + rightEnd) / 2;
+            
+            // Start the coroutine to check if the player is at the center
+            checkCenterCoroutine = StartCoroutine(CheckIfPlayerIsAtCenter());
 
             // Handle movement restrictions based on thresholds
             HandleMovementRestrictions(playerPosition, centerPoint);
-           
-            // Start the coroutine to check if the player is at the center
-            checkCenterCoroutine = StartCoroutine(CheckIfPlayerIsAtCenter());
         }
     }
 
@@ -241,13 +73,13 @@ public class EdgeTriggerEndHit : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            playerMovement.ResetPlayerMovement();  // Reset movement restrictions
-
             if (checkCenterCoroutine != null)
             {
                 StopCoroutine(checkCenterCoroutine);
                 checkCenterCoroutine = null;
             }
+
+            playerMovement.ResetPlayerMovement();  // Reset movement restrictions
         }
     }
 
@@ -255,10 +87,10 @@ public class EdgeTriggerEndHit : MonoBehaviour
     {
         ContactPoint2D[] contactPoints = new ContactPoint2D[10]; // Increased array size
         int contactCount = playerCollider.GetContacts(contactPoints);
-
+        Debug.Log(contactCount);
         if (contactCount > 0)
         {
-            Debug.Log("Contact Point: " + contactPoints[0].point);
+            // Debug.Log("Contact Point: " + contactPoints[0].point);
             return contactPoints[0].point;  // Return the first point of contact
         }
         else
@@ -270,24 +102,19 @@ public class EdgeTriggerEndHit : MonoBehaviour
 
     private IEnumerator CheckIfPlayerIsAtCenter()
     {
-        Vector2 leftEnd = transform.TransformPoint(edgeCollider.points[0]);
-        Vector2 rightEnd = transform.TransformPoint(edgeCollider.points[edgeCollider.pointCount - 1]);
-        Vector2 centerPoint = (leftEnd + rightEnd) / 2;
-        Debug.Log("centerpoint" + centerPoint);
-
-
         while (true)
         {
             // Update the player's position during runtime
             playerPosition = (Vector2)player.transform.position + playerOffset;            
-            collisionPointOffset = GetColliderContactPoint(playerCollider);
-            Vector2 adjustedPlayerPosition = playerPosition + collisionPointOffset;
-            float distanceToCenter = Vector2.Distance(adjustedPlayerPosition, centerPoint);
-            Debug.Log("dist to center:" + distanceToCenter);
+            // Vector2 adjustedPlayerOffset = playerPosition + collisionPointOffset;
+            float distanceToCenter = Vector2.Distance(playerPosition, centerPoint);
+            // float distanceToCenter = Mathf.Abs(playerPosition.x - centerPoint.x);
+            // Debug.Log("dist to center:" + distanceToCenter);
+            // Debug.Log("playerPos:" + playerPosition);
 
             if (distanceToCenter <= centerThreshold)
             {
-                Debug.Log("Player is at the center of the edge collider.");
+                // Debug.Log("Player is at the center of the edge collider.");
                 playerMovement.ResetPlayerMovement();  // Reset restrictions once at center
                 yield break;
             }

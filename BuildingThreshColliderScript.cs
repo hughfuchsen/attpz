@@ -5,7 +5,7 @@ using UnityEngine;
 public class BuildingThreshColliderScript : MonoBehaviour
 {
     public BuildingScript building;
-    PlayerMovement playerMovement;
+    PlayerAnimationAndMovement playerMovement;
     [SerializeField] GameObject Player;
     public bool backOfBuilding;
     public bool rooftopLadder;
@@ -16,7 +16,7 @@ public class BuildingThreshColliderScript : MonoBehaviour
     void Start()
     {
         Player = GameObject.FindGameObjectWithTag("Player");
-        playerMovement = Player.GetComponent<PlayerMovement>(); 
+        playerMovement = Player.GetComponent<PlayerAnimationAndMovement>(); 
         soundtrackScript = GameObject.FindGameObjectWithTag("SoundtrackScript").GetComponent<SoundtrackScript>();
 
     }

@@ -5,10 +5,10 @@ using UnityEngine;
 public class TreeFadeTrigger : MonoBehaviour
 
 {
-  PlayerMovement playerMovement;
+  PlayerAnimationAndMovement PlayerAnimationAndMovement;
   [SerializeField] GameObject Player;  
   public GameObject obj;
-  public float alpha = 0.15f;
+  public float defaultFadeAlphaFloat = 0.15f;
   private Coroutine fadeCoro;
   private Coroutine resetTagsCoro;
 
@@ -16,37 +16,35 @@ public class TreeFadeTrigger : MonoBehaviour
   private List<float> fadedAlphaFloatList = new List<float>();
   private List<GameObject> objListToFade = new List<GameObject>();
 
+
+
+
   void Awake()
   {
     Player = GameObject.FindGameObjectWithTag("Player");
-    playerMovement = Player.GetComponent<PlayerMovement>(); 
+    PlayerAnimationAndMovement = Player.GetComponent<PlayerAnimationAndMovement>(); 
     
 
     if (obj != null)
     {
       GetSprites(obj, objListToFade);
-      setTreeAlpha(gameObject, 1);
+      setTreeAlpha(objListToFade, initialAlphaFloatList);
     }
 
-    //populate the objListToFade list
-    for (int i = 0; i < objListToFade.Count; i++)
-    {
-        Color initialObjColor = objListToFade[i].GetComponent<SpriteRenderer>().color;
-        initialAlphaFloatList.Add(initialObjColor.a);
-        Color fadedAlphaObjColor = objListToFade[i].GetComponent<SpriteRenderer>().color;
-        fadedAlphaObjColor.a = alpha;
-        fadedAlphaFloatList.Add(fadedAlphaObjColor.a);
 
-    }  
   }
 
   void OnTriggerEnter2D()
   {
-    StopAllCoros();
+    // StopAllCoros();
+    setTreeAlpha(objListToFade, fadedAlphaFloatList);
 
-    if(playerMovement.playerOnThresh == false) // if player is not on building threshold
+
+    if(PlayerAnimationAndMovement.playerOnThresh == false) // if player is not on building threshold
     {
-      fadeCoro = StartCoroutine(treeFade(objListToFade, fadedAlphaFloatList));
+      // fadeCoro = StartCoroutine(treeFade(objListToFade, fadedAlphaFloatList));
+      setTreeAlpha(objListToFade, fadedAlphaFloatList);
+
     }
     else
     {
@@ -56,11 +54,12 @@ public class TreeFadeTrigger : MonoBehaviour
   }
   void OnTriggerExit2D()
   {
-    StopAllCoros();
+    // StopAllCoros();
 
-    if(playerMovement.playerOnThresh == false)
+    if(PlayerAnimationAndMovement.playerOnThresh == false)
     {
-      fadeCoro = StartCoroutine(treeFade(objListToFade, initialAlphaFloatList));
+      // fadeCoro = StartCoroutine(treeFade(objListToFade, initialAlphaFloatList));
+      setTreeAlpha(objListToFade, initialAlphaFloatList);
       obj.tag = "Untagged";
       TagChildrenOfTaggedParents("Untagged");
     }
@@ -73,32 +72,37 @@ public class TreeFadeTrigger : MonoBehaviour
   }
 
 
-  void setTreeAlpha(GameObject treeNode, float alpha) 
-  {
-    SpriteRenderer sr = treeNode.GetComponent<SpriteRenderer>();
-    if ((sr != null))
-    {
-        sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, alpha);
-    }
-  }   
-  
-  IEnumerator treeFade(
-  List<GameObject> spriteList,
-  // List<float> fadeFrom,
-  List<float> fadeTo) 
+  void setTreeAlpha(List<GameObject> spriteList, List<float> fadeTo) 
   {
     for (int i = 0; i < spriteList.Count; i++)
     {
-      // for (float t = 0.0f; t < 1; t += Time.deltaTime) 
-      // {
-        // float currentAlpha = Mathf.Lerp(fadeFrom[i], fadeTo[i], t * 10);
-        // setTreeAlpha(spriteList[i], currentAlpha);
-        // float currentAlpha = Mathf.Lerp(fadeFrom[i], fadeTo[i], t * 10);
-        setTreeAlpha(spriteList[i], fadeTo[i]);
-      // }
+      SpriteRenderer sr = spriteList[i].GetComponent<SpriteRenderer>();
+      if ((sr != null))
+      {
+          sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, fadeTo[i]);
+      }
     }
-    yield return null;
-  }
+
+
+  }   
+  
+  // IEnumerator treeFade(
+  // List<GameObject> spriteList,
+  // // List<float> fadeFrom,
+  // List<float> fadeTo) 
+  // {
+  //   for (int i = 0; i < spriteList.Count; i++)
+  //   {
+  //     // for (float t = 0.0f; t < 1; t += Time.deltaTime) 
+  //     // {
+  //       // float currentAlpha = Mathf.Lerp(fadeFrom[i], fadeTo[i], t * 10);
+  //       // setTreeAlpha(spriteList[i], currentAlpha);
+  //       // float currentAlpha = Mathf.Lerp(fadeFrom[i], fadeTo[i], t * 10);
+  //       setTreeAlpha(spriteList[i], fadeTo[i]);
+  //     // }
+  //   }
+  //   yield return null;
+  // }
   
   IEnumerator resetTagsToUntaggedAfterWait()
   {
@@ -108,19 +112,19 @@ public class TreeFadeTrigger : MonoBehaviour
     yield return null;
   }
 
-  void StopAllCoros()
-  {
-      if(fadeCoro != null)
-      {
-          StopCoroutine(fadeCoro);
-      }
+  // void StopAllCoros()
+  // {
+  //     if(fadeCoro != null)
+  //     {
+  //         StopCoroutine(fadeCoro);
+  //     }
 
-      if(resetTagsCoro != null)
-      {
-          StopCoroutine(resetTagsCoro);
-      }
+  //     if(resetTagsCoro != null)
+  //     {
+  //         StopCoroutine(resetTagsCoro);
+  //     }
 
-  }
+  // }
 
   private void TagChildrenOfTaggedParents(string tag)
   {
@@ -176,6 +180,12 @@ public class TreeFadeTrigger : MonoBehaviour
               if (sr != null)
               {
                   spriteList.Add(currentNode);
+
+                  Color initialObjColor = sr.color;
+                  initialAlphaFloatList.Add(initialObjColor.a);
+                  Color fadedAlphaObjColor = sr.color;
+                  fadedAlphaObjColor.a = defaultFadeAlphaFloat;
+                  fadedAlphaFloatList.Add(fadedAlphaObjColor.a);              
               }
 
               foreach (Transform child in currentNode.transform)

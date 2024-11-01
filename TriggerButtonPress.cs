@@ -16,7 +16,7 @@ public class TriggerButtonPress : MonoBehaviour
 
     [SerializeField] GameObject Player;
 
-    PlayerMovement playerMovement;
+    PlayerAnimationAndMovement playerMovement;
 
 
     // public List<GameObject> colliders = new List<GameObject>();
@@ -25,7 +25,7 @@ public class TriggerButtonPress : MonoBehaviour
     void Awake()
     {
         Player = GameObject.FindGameObjectWithTag("Player");
-        playerMovement = Player.GetComponent<PlayerMovement>(); 
+        playerMovement = Player.GetComponent<PlayerAnimationAndMovement>(); 
 
         for (int i = 0; i < treeObjects.Count; i++)
         {

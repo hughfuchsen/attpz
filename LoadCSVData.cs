@@ -4,6 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using System.Collections;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -27,6 +28,7 @@ public class LoadCSVData : MonoBehaviour
     // Button for submission
     public Button submitButton;
 
+
     public GameObject creationUI;
     public GameObject thanxMsgUI;
 
@@ -35,9 +37,9 @@ public class LoadCSVData : MonoBehaviour
 
     // CSV management
     private string csvFilePath;
-    private CharacterCustomization customization;
+    private CharacterCustomization characterCustomization;
     
-    private PlayerAnimationAndMovement playerMovement;
+    private CharacterMovement characterMovement;
     private TMP_InputField[] inputFields;
 
     // List to store CSV rows
@@ -56,12 +58,18 @@ public class LoadCSVData : MonoBehaviour
 
     private List<int> chosenDataRow;
 
-    private GameObject npcPrefab = Resources.Load<GameObject>("NPCPrefab");
+    private GameObject npcPrefab;
+
+    public GameObject npc;
 
 
 
     void Start()
     {
+        StartCoroutine(LateStartDisplayRandomBodyCoro());
+
+        npcPrefab = Resources.Load<GameObject>("NPCPrefab");
+
         inputFields = new TMP_InputField[] { nameInputField, memoryInputField, likesInputField, dislikesInputField, favQuoteInputField};
 
         // // Initialize dropdown options for "Companion"
@@ -75,8 +83,8 @@ public class LoadCSVData : MonoBehaviour
         // Initialize paths and references
         csvFilePath = Path.Combine(Application.persistentDataPath, "CharacterProfilesPrototype7.csv");
         GameObject customizationMenu = GameObject.FindGameObjectWithTag("CharacterCustomizationMenu");
-        customization = customizationMenu.GetComponent<CharacterCustomization>();
-        playerMovement = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerAnimationAndMovement>();;
+        characterCustomization = GameObject.FindGameObjectWithTag("Player").GetComponent<CharacterCustomization>();
+        characterMovement = GameObject.FindGameObjectWithTag("Player").GetComponent<CharacterMovement>();
 
 
 
@@ -113,6 +121,16 @@ public class LoadCSVData : MonoBehaviour
         likesInputField.textComponent.enableWordWrapping = true;
         dislikesInputField.textComponent.enableWordWrapping = true;
         favQuoteInputField.textComponent.enableWordWrapping = true;
+    }
+
+    IEnumerator LateStartDisplayRandomBodyCoro()
+    {
+        // Wait until the end of the current frame
+        yield return new WaitForEndOfFrame();
+
+        DisplayRandomRow();
+        SpawnPerson();
+
     }
 
     private void ValidateInputFields()
@@ -183,7 +201,7 @@ public class LoadCSVData : MonoBehaviour
             return; // Exit the method to prevent form submission
         }
 
-        // Get character customization parameters and format them
+        // Get character characterCustomization parameters and format them
         string charParams = GetCharacterCustomizationParams();
 
         // Create the new row for the CSV
@@ -211,6 +229,14 @@ public class LoadCSVData : MonoBehaviour
 
         // Append character parameters to the row
         newRow.Append(charParams);
+
+        // hopfully one day can get convos for player-made characters
+        newRow.Append(",");
+        newRow.Append(",");
+        newRow.Append(",");
+        newRow.Append(",");
+        // hopfully one day can get convos for player-made characters
+
 
         // Append the row to the CSV file
         AppendRowToCSV(newRow.ToString());
@@ -264,14 +290,14 @@ public class LoadCSVData : MonoBehaviour
 
     private string GetCharacterCustomizationParams()
     {
-        // Join the customization parameters with commas and wrap them in quotes
+        // Join the characterCustomization parameters with commas and wrap them in quotes
         int[] customizationParams = new int[]
         {
-            customization.currentFeetIndex, customization.currentPantsIndex, customization.currentWaistIndex,
-            customization.currentHairColorIndex, customization.currentShirtIndex, customization.currentHeightIndex,
-            customization.currentBodyTypeIndex, customization.currentWidthIndex, customization.currentPantsColorIndex,
-            customization.currentShirtColorIndex, customization.currentHairStyleIndex, customization.currentJakettoIndex,
-            customization.currentJakettoColorIndex, customization.currentSkinColorIndex
+            characterCustomization.currentFeetIndex, characterCustomization.currentPantsIndex, characterCustomization.currentWaistIndex,
+            characterCustomization.currentHairColorIndex, characterCustomization.currentShirtIndex, characterCustomization.currentHeightIndex,
+            characterCustomization.currentBodyTypeIndex, characterCustomization.currentWidthIndex, characterCustomization.currentPantsColorIndex,
+            characterCustomization.currentShirtColorIndex, characterCustomization.currentHairStyleIndex, characterCustomization.currentJakettoIndex,
+            characterCustomization.currentJakettoColorIndex, characterCustomization.currentSkinColorIndex
         };
 
         // Join parameters as a comma-separated string and wrap them in double quotes
@@ -317,14 +343,14 @@ public class LoadCSVData : MonoBehaviour
                 row[i] = row[i].Trim(' ', '"');
             }
 
-            // Ensure that we are working with a 7-column row
-            if (row.Length == 7) 
+            // Ensure that we are working with a 11-column row
+            if (row.Length == 11) 
             {
                 dataRows.Add(row); // Add each valid row to dataRows
             }
             else
             {
-                Debug.LogWarning($"Skipped row with {row.Length} columns instead of 7.");
+                Debug.LogWarning($"Skipped row with {row.Length} columns instead of 11.");
             }
         }
     }
@@ -332,7 +358,7 @@ public class LoadCSVData : MonoBehaviour
     // Search functionality
     public void UpdateSuggestions(string currentText)
     {
-        Debug.Log($"search {currentText}");
+        // Debug.Log($"search {currentText}");
         ClearSuggestions();
         if (string.IsNullOrEmpty(currentText)) return;
 
@@ -384,12 +410,12 @@ public class LoadCSVData : MonoBehaviour
 
     //             uiText.text = displayText.ToString();
 
-    //             // Handle character customization params
+    //             // Handle character characterCustomization params
     //             string[] intParams = row[6].Split(',').Where(param => !string.IsNullOrWhiteSpace(param)).ToArray();
     //             if (intParams.Length == 14)
     //             {
     //                 List<int> parameters = intParams.Select(param => int.Parse(param.Trim())).ToList();
-    //                 customization.UpdateSpecific(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4],
+    //                 characterCustomization.UpdateSpecific(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4],
     //                                             parameters[5], parameters[6], parameters[7], parameters[8], parameters[9],
     //                                             parameters[10], parameters[11], parameters[12], parameters[13]);
     //             }
@@ -504,13 +530,13 @@ public class LoadCSVData : MonoBehaviour
 
             uiText.text = displayText.ToString();
 
-            // Handle character customization params
+            // Handle character characterCustomization params
             string[] intParams = row[6].Split(',').Where(param => !string.IsNullOrWhiteSpace(param)).ToArray();
             if (intParams.Length == 14)
             {
                 List<int> parameters = intParams.Select(param => int.Parse(param.Trim())).ToList();
                 chosenDataRow = parameters;
-                customization.UpdateSpecific(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4],
+                characterCustomization.UpdateSpecific(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4],
                                             parameters[5], parameters[6], parameters[7], parameters[8], parameters[9],
                                             parameters[10], parameters[11], parameters[12], parameters[13]);
             }
@@ -518,14 +544,25 @@ public class LoadCSVData : MonoBehaviour
     }
     }
 
+    public void UpdateNPC(List<int> parameters, GameObject obj)
+    {
+        obj.GetComponent<CharacterCustomization>().UpdateSpecific(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4],
+                            parameters[5], parameters[6], parameters[7], parameters[8], parameters[9],
+                            parameters[10], parameters[11], parameters[12], parameters[13]);
+        
+    }
 
     public void SpawnPerson()
     {
         // at the current dataRows[i] there is a list of indices that we want to get and pass to an NPC controller script.
-        npcPrefab.UpdateNPC(chosenDataRow, uiText.text);
-        GameObject npc = Instantiate(npcPrefab, new Vector3(-1277, 670, 0), Quaternion.identity);  
-
-
+        npc= Instantiate(npcPrefab, new Vector3(-1608, 84, 0), Quaternion.identity); 
+        UpdateNPC(chosenDataRow, npc);
+    }
+    public void SpawnRandomPerson()
+    {
+        // at the current dataRows[i] there is a list of indices that we want to get and pass to an NPC controller script.
+        npc= Instantiate(npcPrefab, new Vector3(-1608, 84, 0), Quaternion.identity); 
+        UpdateNPC(chosenDataRow, npc);
     }
 
 

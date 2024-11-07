@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class LevelThreshColliderScript : MonoBehaviour
 {
-    PlayerAnimationAndMovement playerMovement;
+    CharacterMovement playerMovement;
     [SerializeField] GameObject Player;
 
     // public string initialSortingLayerUponEntry;
@@ -24,7 +24,7 @@ public class LevelThreshColliderScript : MonoBehaviour
     void Start()
     {
         Player = GameObject.FindGameObjectWithTag("Player");
-        playerMovement = Player.GetComponent<PlayerAnimationAndMovement>();
+        playerMovement = Player.GetComponent<CharacterMovement>();
     }
 
     private void OnTriggerEnter2D()
@@ -199,10 +199,10 @@ public class LevelThreshColliderScript : MonoBehaviour
 
     private bool isPlayerCrossingUp()
     {
-        return GameObject.FindWithTag("Player").GetComponent<PlayerAnimationAndMovement>().change.y > 0;
+        return GameObject.FindWithTag("Player").GetComponent<CharacterMovement>().change.y > 0;
     }
     private bool isPlayerCrossingLeft()
     {
-        return GameObject.FindWithTag("Player").GetComponent<PlayerAnimationAndMovement>().change.x < 0;
+        return GameObject.FindWithTag("Player").GetComponent<CharacterMovement>().change.x < 0;
     }
 }

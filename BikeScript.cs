@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class BikeScript : MonoBehaviour
 {
-    PlayerAnimationAndMovement playerMovement;
+    CharacterAnimation characterAnimation;
+    CharacterMovement characterMovement;
     IsoSpriteSorting isoSpriteSorting;
 
     [SerializeField] GameObject bike;
@@ -14,7 +15,6 @@ public class BikeScript : MonoBehaviour
 
     public Color bikeColor;
 
-    public Vector3 scale;
 
 
 
@@ -26,17 +26,15 @@ public class BikeScript : MonoBehaviour
     public void Start()
     {
       Player = GameObject.FindGameObjectWithTag("Player");
-      playerMovement = Player.GetComponent<PlayerAnimationAndMovement>();
+      characterAnimation = Player.GetComponent<CharacterAnimation>();
+      characterMovement = Player.GetComponent<CharacterMovement>();
 
       bikeSprite = bike.transform.Find("bikeSprite").GetComponent<SpriteRenderer>();
       isoSpriteSorting = bike.GetComponent<IsoSpriteSorting>();
       bikeColor = bikeSprite.color;
-    //   bikeCollider = bike.transform.Find("bikeCollider").gameObject;
-
 
       allBikeSprites = Resources.LoadAll<Sprite>("bike");
       bikeSprite.sprite = allBikeSprites[1];
-
     }
 
 
@@ -44,17 +42,17 @@ public class BikeScript : MonoBehaviour
     {
         if(other.CompareTag("Player"))
         {    
-            if (playerMovement.spaceBarDeactivated == false)
+            if (characterMovement.spaceBarDeactivated == false)
             {
-                if ((Input.GetKey(KeyCode.Space) || 
-    Input.GetKey(KeyCode.JoystickButton0) ||  // A button
-    Input.GetKey(KeyCode.JoystickButton1) ||  // B button
-    Input.GetKey(KeyCode.JoystickButton2) ||  // X button
-    Input.GetKey(KeyCode.JoystickButton3)) && playerMovement.playerIsOutside && !playerMovement.playerOnBike)
+                  if ((Input.GetKey(KeyCode.Space) || 
+                      Input.GetKey(KeyCode.JoystickButton0) ||  // A button
+                      Input.GetKey(KeyCode.JoystickButton1) ||  // B button
+                      Input.GetKey(KeyCode.JoystickButton2) ||  // X button
+                      Input.GetKey(KeyCode.JoystickButton3)) && characterMovement.playerIsOutside && !characterMovement.playerOnBike)
                 {
-                    playerMovement.StartDeactivateSpaceBar(); // Use centralized method
+                    characterMovement.StartDeactivateSpaceBar(); // Use centralized method
 
-                    playerMovement.playerOnBike = true;
+                    characterMovement.playerOnBike = true;
                     bikeColor.a = 0f;
                     bikeSprite.color = bikeColor;
                     bike.transform.Find("bikeCollider").gameObject.SetActive(false);
@@ -67,7 +65,7 @@ public class BikeScript : MonoBehaviour
     // {
     //     if(other.CompareTag("Player"))
     //     {   
-    //         playerMovement.StopDeactivateSpaceBar(); // Use centralized method
+    //         characterAnimation.StopDeactivateSpaceBar(); // Use centralized method
     //     }
     // }
 
@@ -79,15 +77,15 @@ public class BikeScript : MonoBehaviour
       bikeColor.a = 1;
       bikeSprite.color = bikeColor;
 
-      if(playerMovement.currentAnimationDirection == playerMovement.upRightAnim)
+      if(characterAnimation.currentAnimationDirection == characterAnimation.upRightAnim)
       {
-        this.transform.parent.localScale = new Vector3(1,1,1);
+        this.transform.parent.localScale = new Vector3(1,1,1); //flips x
         bikeSprite.flipX = true;
         bikeSprite.sprite = allBikeSprites[0];
         isoSpriteSorting.SorterPositionOffset.y = -8;
         isoSpriteSorting.SorterPositionOffset2.y = -0;
       }
-      else if(playerMovement.currentAnimationDirection == playerMovement.upLeftAnim)
+      else if(characterAnimation.currentAnimationDirection == characterAnimation.upLeftAnim)
       {
         this.transform.parent.localScale = new Vector3(-1,1,1);
         bikeSprite.flipX = true;
@@ -95,8 +93,8 @@ public class BikeScript : MonoBehaviour
         isoSpriteSorting.SorterPositionOffset.y = 0;
         isoSpriteSorting.SorterPositionOffset2.y = -8;
       }
-      else if(playerMovement.currentAnimationDirection == playerMovement.rightAnim 
-      || playerMovement.currentAnimationDirection == playerMovement.rightDownAnim)
+      else if(characterAnimation.currentAnimationDirection == characterAnimation.rightAnim 
+      || characterAnimation.currentAnimationDirection == characterAnimation.rightDownAnim)
       {
         this.transform.parent.localScale = new Vector3(-1,1,1);
         bikeSprite.flipX = false;
@@ -104,8 +102,8 @@ public class BikeScript : MonoBehaviour
         isoSpriteSorting.SorterPositionOffset.y = 0;
         isoSpriteSorting.SorterPositionOffset2.y = -8;
       }
-      else if(playerMovement.currentAnimationDirection == playerMovement.leftAnim 
-      || playerMovement.currentAnimationDirection == playerMovement.leftDownAnim)
+      else if(characterAnimation.currentAnimationDirection == characterAnimation.leftAnim 
+      || characterAnimation.currentAnimationDirection == characterAnimation.leftDownAnim)
       {
         this.transform.parent.localScale = new Vector3(1,1,1);
         bikeSprite.flipX = false;

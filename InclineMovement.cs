@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class InclineMovement : MonoBehaviour
 {
-    PlayerAnimationAndMovement playerMovement;
+    CharacterMovement characterMovement;
+    CharacterAnimation characterAnimation;
     IsoSpriteSorting isoSpriteSortingScript;
     [SerializeField] GameObject Player;
     public string motionDirection;
@@ -23,8 +24,9 @@ public class InclineMovement : MonoBehaviour
     // Start is called before the first frame update
     void Awake()
     {
-        Player = GameObject.FindGameObjectWithTag("Player");
-        playerMovement = Player.GetComponent<PlayerAnimationAndMovement>();
+        Player = GameObject.FindGameObjectWithTag("Player"); // assign to player
+        characterMovement = Player.GetComponent<CharacterMovement>();
+        characterAnimation = Player.GetComponent<CharacterAnimation>();
         isoSpriteSortingScript = Player.GetComponent<IsoSpriteSorting>();
     }
 
@@ -32,45 +34,47 @@ public class InclineMovement : MonoBehaviour
     {
         if (collision.gameObject.tag == "Player")
         {
+            characterMovement.playerOnThresh = true;
+
             if (!itsALadder) // if it's not a ladder
             {
                 if(plyrCrsngLeft == true)
                 {
-                    playerMovement.controlDirectionToPlayerDirection[Direction.Left] = Direction.UpLeft;
-                    playerMovement.controlDirectionToPlayerDirection[Direction.UpLeft] = Direction.UpLeft;
-                    playerMovement.controlDirectionToPlayerDirection[Direction.UpFacingLeft] = Direction.UpLeft;
-                    playerMovement.controlDirectionToPlayerDirection[Direction.UpFacingRight] = Direction.UpLeft;
-                    playerMovement.controlDirectionToPlayerDirection[Direction.UpRight] = Direction.UpLeft;
-                    playerMovement.controlDirectionToPlayerDirection[Direction.Right] = Direction.RightDown;
-                    playerMovement.controlDirectionToPlayerDirection[Direction.RightDown] = Direction.RightDown;
-                    playerMovement.controlDirectionToPlayerDirection[Direction.DownFacingRight] = Direction.RightDown;
-                    playerMovement.controlDirectionToPlayerDirection[Direction.DownFacingLeft] = Direction.RightDown;
-                    playerMovement.controlDirectionToPlayerDirection[Direction.DownLeft] = Direction.RightDown;
+                    characterMovement.controlDirectionToPlayerDirection[Direction.Left] = Direction.UpLeft;
+                    characterMovement.controlDirectionToPlayerDirection[Direction.UpLeft] = Direction.UpLeft;
+                    characterMovement.controlDirectionToPlayerDirection[Direction.UpFacingLeft] = Direction.UpLeft;
+                    characterMovement.controlDirectionToPlayerDirection[Direction.UpFacingRight] = Direction.UpLeft;
+                    characterMovement.controlDirectionToPlayerDirection[Direction.UpRight] = Direction.UpLeft;
+                    characterMovement.controlDirectionToPlayerDirection[Direction.Right] = Direction.RightDown;
+                    characterMovement.controlDirectionToPlayerDirection[Direction.RightDown] = Direction.RightDown;
+                    characterMovement.controlDirectionToPlayerDirection[Direction.DownFacingRight] = Direction.RightDown;
+                    characterMovement.controlDirectionToPlayerDirection[Direction.DownFacingLeft] = Direction.RightDown;
+                    characterMovement.controlDirectionToPlayerDirection[Direction.DownLeft] = Direction.RightDown;
                 }
                 else
                 {
-                    playerMovement.controlDirectionToPlayerDirection[Direction.Left] = Direction.DownLeft;
-                    playerMovement.controlDirectionToPlayerDirection[Direction.UpLeft] = Direction.UpRight;
-                    playerMovement.controlDirectionToPlayerDirection[Direction.UpFacingLeft] = Direction.UpRight;
-                    playerMovement.controlDirectionToPlayerDirection[Direction.UpFacingRight] = Direction.UpRight;
-                    playerMovement.controlDirectionToPlayerDirection[Direction.UpRight] = Direction.UpRight;
-                    playerMovement.controlDirectionToPlayerDirection[Direction.Right] = Direction.UpRight;
-                    playerMovement.controlDirectionToPlayerDirection[Direction.RightDown] = Direction.DownLeft;
-                    playerMovement.controlDirectionToPlayerDirection[Direction.DownFacingRight] = Direction.DownLeft;
-                    playerMovement.controlDirectionToPlayerDirection[Direction.DownFacingLeft] = Direction.DownLeft;
-                    playerMovement.controlDirectionToPlayerDirection[Direction.DownLeft] = Direction.DownLeft;
+                    characterMovement.controlDirectionToPlayerDirection[Direction.Left] = Direction.DownLeft;
+                    characterMovement.controlDirectionToPlayerDirection[Direction.UpLeft] = Direction.UpRight;
+                    characterMovement.controlDirectionToPlayerDirection[Direction.UpFacingLeft] = Direction.UpRight;
+                    characterMovement.controlDirectionToPlayerDirection[Direction.UpFacingRight] = Direction.UpRight;
+                    characterMovement.controlDirectionToPlayerDirection[Direction.UpRight] = Direction.UpRight;
+                    characterMovement.controlDirectionToPlayerDirection[Direction.Right] = Direction.UpRight;
+                    characterMovement.controlDirectionToPlayerDirection[Direction.RightDown] = Direction.DownLeft;
+                    characterMovement.controlDirectionToPlayerDirection[Direction.DownFacingRight] = Direction.DownLeft;
+                    characterMovement.controlDirectionToPlayerDirection[Direction.DownFacingLeft] = Direction.DownLeft;
+                    characterMovement.controlDirectionToPlayerDirection[Direction.DownLeft] = Direction.DownLeft;
                 }
 
                 //alter the motion direction
-                if((isPlayerCrossingUp() && playerMovement.motionDirection == "normal" && !topOfStairCase) 
-                    || (!isPlayerCrossingUp() && playerMovement.motionDirection == "normal" && topOfStairCase))
+                if((isPlayerCrossingUp() && characterMovement.motionDirection == "normal" && !topOfStairCase) 
+                    || (!isPlayerCrossingUp() && characterMovement.motionDirection == "normal" && topOfStairCase))
                 {
-                    playerMovement.motionDirection = motionDirection;  
+                    characterMovement.motionDirection = motionDirection;  
                 }
-                else if((isPlayerCrossingUp() && playerMovement.motionDirection != "normal" && topOfStairCase) 
-                    || (!isPlayerCrossingUp() && playerMovement.motionDirection != "normal" && !topOfStairCase))
+                else if((isPlayerCrossingUp() && characterMovement.motionDirection != "normal" && topOfStairCase) 
+                    || (!isPlayerCrossingUp() && characterMovement.motionDirection != "normal" && !topOfStairCase))
                 {
-                    playerMovement.motionDirection = "normal";  
+                    characterMovement.motionDirection = "normal";  
                 }
 
                 // alter the collider layer and sprite sorting layer that is active with the player
@@ -115,7 +119,7 @@ public class InclineMovement : MonoBehaviour
             else // if it is a ladder baby
             {
                 //alter the motion direction
-                if(playerMovement.motionDirection == "normal")
+                if(characterMovement.motionDirection == "normal")
                 {
                     // anchor player to ladder
                     if(!topOfStairCase)
@@ -132,21 +136,21 @@ public class InclineMovement : MonoBehaviour
                         //manage animation
                         if(isPlayerCrossingLeft())
                         {
-                            playerMovement.ladderAnimDirectionIndex = playerMovement.upLeftAnim;
+                            characterAnimation.ladderAnimDirectionIndex = characterAnimation.upLeftAnim;
                         }
                         else
                         {
-                            playerMovement.ladderAnimDirectionIndex = playerMovement.upRightAnim;
+                            characterAnimation.ladderAnimDirectionIndex = characterAnimation.upRightAnim;
                         }
 
                         
                         if(!topOfStairCase)
                         {
-                            playerMovement.motionDirection = "upLadder";
+                            characterMovement.motionDirection = "upLadder";
                         }
                         else
                         {
-                            playerMovement.motionDirection = "downLadder";
+                            characterMovement.motionDirection = "downLadder";
                         }
                         //add certain animation and anchoring here
                         gameObject.layer = LayerMask.NameToLayer(higherColliderLayerName);
@@ -157,30 +161,30 @@ public class InclineMovement : MonoBehaviour
                         //add certain animation 
                         if(!topOfStairCase)
                         {
-                            playerMovement.motionDirection = "upLadder";
+                            characterMovement.motionDirection = "upLadder";
                             
                             //manage animation
                             if(isPlayerCrossingLeft())
                             {
-                                playerMovement.ladderAnimDirectionIndex = playerMovement.leftAnim;
+                                characterAnimation.ladderAnimDirectionIndex = characterAnimation.leftAnim;
                             }
                             else
                             {
-                                playerMovement.ladderAnimDirectionIndex = playerMovement.rightAnim;
+                                characterAnimation.ladderAnimDirectionIndex = characterAnimation.rightAnim;
                             }
                         }
                         else
                         {
-                            playerMovement.motionDirection = "downLadder";
+                            characterMovement.motionDirection = "downLadder";
                             
                             //manage animation
                             if(isPlayerCrossingLeft())
                             {
-                                playerMovement.ladderAnimDirectionIndex = playerMovement.upRightAnim;
+                                characterAnimation.ladderAnimDirectionIndex = characterAnimation.upRightAnim;
                             }
                             else
                             {
-                                playerMovement.ladderAnimDirectionIndex = playerMovement.upLeftAnim;
+                                characterAnimation.ladderAnimDirectionIndex = characterAnimation.upLeftAnim;
                             }
                         }
                         gameObject.layer = LayerMask.NameToLayer(higherColliderLayerName);
@@ -188,15 +192,15 @@ public class InclineMovement : MonoBehaviour
                     }
                     isoSpriteSortingScript.isMovable = false;
                 }
-                else if((isPlayerCrossingUp() && playerMovement.motionDirection != "normal"))
+                else if((isPlayerCrossingUp() && characterMovement.motionDirection != "normal"))
                 {
-                    playerMovement.motionDirection = "normal";  
+                    characterMovement.motionDirection = "normal";  
                     SetTreeSortingLayer(collision.gameObject, higherSortingLayerToAssign);
                     isoSpriteSortingScript.isMovable = true;
                 }
-                else if((!isPlayerCrossingUp() && playerMovement.motionDirection != "normal"))
+                else if((!isPlayerCrossingUp() && characterMovement.motionDirection != "normal"))
                 {
-                    playerMovement.motionDirection = "normal"; 
+                    characterMovement.motionDirection = "normal"; 
                     gameObject.layer = LayerMask.NameToLayer(lowerColliderLayerName);
                     SetCollisionLayer(lowerColliderLayerName);
                     SetTreeSortingLayer(collision.gameObject, lowerSortingLayerToAssign);
@@ -229,17 +233,19 @@ public class InclineMovement : MonoBehaviour
     {
             if(collision.gameObject.tag == "Player")
             {
+                characterMovement.playerOnThresh = false;
+
                 if (!itsALadder)
                 {
-                    if((isPlayerCrossingUp() && playerMovement.motionDirection == "normal" && !topOfStairCase) 
-                        || (!isPlayerCrossingUp() && playerMovement.motionDirection == "normal" && topOfStairCase))
+                    if((isPlayerCrossingUp() && characterMovement.motionDirection == "normal" && !topOfStairCase) 
+                        || (!isPlayerCrossingUp() && characterMovement.motionDirection == "normal" && topOfStairCase))
                     {
-                        playerMovement.motionDirection = motionDirection;  
+                        characterMovement.motionDirection = motionDirection;  
                     }
-                    else if((isPlayerCrossingUp() && playerMovement.motionDirection != "normal" && topOfStairCase) 
-                        || (!isPlayerCrossingUp() && playerMovement.motionDirection != "normal" && !topOfStairCase))
+                    else if((isPlayerCrossingUp() && characterMovement.motionDirection != "normal" && topOfStairCase) 
+                        || (!isPlayerCrossingUp() && characterMovement.motionDirection != "normal" && !topOfStairCase))
                     {
-                        playerMovement.motionDirection = "normal";  
+                        characterMovement.motionDirection = "normal";  
                     }
 
                     if(isPlayerCrossingUp() && topOfStairCase)
@@ -262,12 +268,12 @@ public class InclineMovement : MonoBehaviour
                     }
                     
                     // un-fix the player in \/ left/right diag way upon collider exit. 
-                    playerMovement.ResetPlayerMovement();                 
+                    characterMovement.ResetPlayerMovement();                 
                 }
                 else //if it is a ladder!
                 {
                     //alter the motion direction
-                    if(playerMovement.motionDirection == "normal")
+                    if(characterMovement.motionDirection == "normal")
                     {
                         if(topOfStairCase)
                         {
@@ -280,13 +286,13 @@ public class InclineMovement : MonoBehaviour
                             SetCollisionLayer(lowerColliderLayerName);
                         }
                     }
-                    else if (playerMovement.motionDirection != "normal")
+                    else if (characterMovement.motionDirection != "normal")
                     {
                         if(!topOfStairCase)
                         {
                             if (!isPlayerCrossingUp())
                             {
-                                playerMovement.motionDirection = "normal";  
+                                characterMovement.motionDirection = "normal";  
                                 gameObject.layer = LayerMask.NameToLayer(lowerColliderLayerName);
                                 SetCollisionLayer(lowerColliderLayerName);
                             }
@@ -295,7 +301,7 @@ public class InclineMovement : MonoBehaviour
                         {
                             if (isPlayerCrossingUp())
                             {
-                                playerMovement.motionDirection = "normal";  
+                                characterMovement.motionDirection = "normal";  
                                 gameObject.layer = LayerMask.NameToLayer(higherColliderLayerName);
                                 SetCollisionLayer(higherColliderLayerName);
                             }
@@ -328,16 +334,12 @@ public class InclineMovement : MonoBehaviour
 
     private bool isPlayerCrossingUp()
     {
-        return GameObject.FindWithTag("Player").GetComponent<PlayerAnimationAndMovement>().change.y > 0;
+        return GameObject.FindWithTag("Player").GetComponent<CharacterMovement>().change.y > 0;
     }
     private bool isPlayerCrossingLeft()
     {
-        return GameObject.FindWithTag("Player").GetComponent<PlayerAnimationAndMovement>().change.x < 0;
+        return GameObject.FindWithTag("Player").GetComponent<CharacterMovement>().change.x < 0;
     }
-    // public void SetCollisionLayer(string targetLayerName)
-    // {
-    //     GameObject.FindWithTag("Player").layer = LayerMask.NameToLayer(targetLayerName);
-    // }
     
     public void SetCollisionLayer(string targetLayerName)
     {

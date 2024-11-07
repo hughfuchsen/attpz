@@ -1,1153 +1,3 @@
-// using System.Collections;
-// using System.Collections.Generic;
-// using System.Linq;
-
-// using UnityEngine;
-// using UnityEngine.UI;
-
-// public class CharacterCustomization : MonoBehaviour 
-// {
-//     PlayerAnimationAndMovement playerMovement;
-//     [SerializeField] GameObject Player;
-
-
-
-//     public bool lockedSkinColor = false;
-//     public bool lockedBodyType = false;
-//     public bool lockedHeight = false;
-//     public bool lockedWidth = false;
-//     public bool lockedHair = false;
-//     public bool lockedShirt = false;
-//     public bool lockedWaist = false;
-//     public bool lockedPants = false;
-//     public bool lockedJaketto = false;
-//     public bool lockedShoes = false;
-
-//     // Declare Image components for each locked attribute
-//     private Image lockBodyImgComponent;
-//     private Image lockSkinImgComponent;
-//     private Image lockHeightImgComponent;
-//     private Image lockWidthImgComponent;
-//     private Image lockHairImgComponent;
-//     private Image lockShirtImgComponent;
-//     private Image lockWaistImgComponent;
-//     private Image lockPantsImgComponent;
-//     private Image lockJakettoImgComponent;
-//     private Image lockShoesImgComponent;
-
-//      // Sprites for locked and unlocked states
-//     private Sprite lockedImage;
-//     private Sprite unlockedImage;
-
-//     // public Image skinColorButton;
-//     public Image skinColorButton2;
-//     public Image hairColorButton;
-//     public Image shirtColorButton;
-//     public Image pantsColorButton;
-//     public Image jackettoColorButton;
-
-
-//     public int currentBodyTypeIndex = 0; // Index to track current body type
-//     public int currentHeightIndex = 0;   // Index to track current height
-//     public int currentWidthIndex = 0;    // Index to track current currentWidthIndex
-//     public int currentHairStyleIndex = 0;    //"" "" "" 
-//     public int currentHairColorIndex = 0;    //"" "" "" 
-//     public int currentShirtIndex = 0;    //"" "" "" 
-//     public int currentWaistIndex = 0;   
-//     public int currentPantsIndex = 0;   
-//     public int currentFeetIndex = 0;    
-//     public int currentJakettoIndex = 0;    
-//     public int currentSkinColorIndex = 0;   
-//     public int currentShirtColorIndex = 0;   
-//     public int currentPantsColorIndex = 0;   
-//     public int currentJakettoColorIndex = 0;   
-
-
-
-//     public void Start()
-//     {
-//         Player = GameObject.FindGameObjectWithTag("Player");
-//         playerMovement = Player.GetComponent<PlayerAnimationAndMovement>(); 
-      
-//         int[] bodyTypeIndex1 = {5,17,29};
-//         int[] bodyTypeIndex2 = {9,21,33};
-//         int[] bodyTypeIndex3 = {1,13,25};
-
-//         int[] heightIndex1 = {5,9,1};
-//         int[] heightIndex2 = {17,21,13};
-//         int[] heightIndex3 = {29, 33, 25};
-
-//         SetBodyType();
-
-
-//         unlockedImage = Resources.Load<Sprite>("unlockedUI");
-//         lockedImage = Resources.Load<Sprite>("lockedUI");
-
-//          // Find and assign all lock Image components by their tags
-
-//         lockBodyImgComponent = GameObject.FindGameObjectWithTag("LockBodyUI").GetComponent<Image>();
-//         lockSkinImgComponent = GameObject.FindGameObjectWithTag("LockSkinUI").GetComponent<Image>();
-//         lockHeightImgComponent = GameObject.FindGameObjectWithTag("LockHeightUI").GetComponent<Image>();
-//         lockWidthImgComponent = GameObject.FindGameObjectWithTag("LockWidthUI").GetComponent<Image>();
-//         lockHairImgComponent = GameObject.FindGameObjectWithTag("LockHairUI").GetComponent<Image>();
-//         lockShirtImgComponent = GameObject.FindGameObjectWithTag("LockShirtUI").GetComponent<Image>();
-//         lockWaistImgComponent = GameObject.FindGameObjectWithTag("LockWaistUI").GetComponent<Image>();
-//         lockPantsImgComponent = GameObject.FindGameObjectWithTag("LockPantsUI").GetComponent<Image>();
-//         lockJakettoImgComponent = GameObject.FindGameObjectWithTag("LockJackettoUI").GetComponent<Image>();
-//         lockShoesImgComponent = GameObject.FindGameObjectWithTag("LockShoesUI").GetComponent<Image>();
-//         // transform.Find("customiseButtons").gameObject.SetActive(false);
-
-//         lockBodyImgComponent.sprite = unlockedImage;
-//         lockSkinImgComponent.sprite = unlockedImage;
-//         lockHeightImgComponent.sprite = unlockedImage;
-//         lockWidthImgComponent.sprite = unlockedImage;
-//         lockHairImgComponent.sprite = unlockedImage;
-//         lockShirtImgComponent.sprite = unlockedImage;
-//         lockWaistImgComponent.sprite = unlockedImage;
-//         lockPantsImgComponent.sprite = unlockedImage;
-//         lockJakettoImgComponent.sprite = unlockedImage;
-//         lockShoesImgComponent.sprite = unlockedImage;
-
-
-//     }
-
-//     // Body Type Selection
-//     public void NextBodyType()
-//     {
-//         currentBodyTypeIndex ++; // Increment body type index
-//         if (currentBodyTypeIndex >= 3)
-//         {
-//             currentBodyTypeIndex = 0; // Wrap around to the first body type option
-//         }
-//         SetBodyType();
-//         // SetBodyType();
-//     }
-
-//     // public void PreviousBodyType()
-//     // {
-//     //     currentBodyTypeIndex --; // Decrement body type index
-//     //     if (currentBodyTypeIndex < 0)
-//     //     {
-//     //         currentBodyTypeIndex = 2; // Wrap around to the last body type option
-//     //     }
-//     //     SetBodyType();
-//     //     // SetBodyType();    
-//     // }
-
-//     // Height Selection
-//     public void NextHeight()
-//     {
-//         // int[] availableHeights = heightOptions[bodyTypeIndexSet[currentBodyTypeIndex]]; // Get height options for current body type
-//         currentHeightIndex++;
-//         if (currentHeightIndex >= 3)
-//         {
-//             currentHeightIndex = 0; 
-//         }
-//         SetBodyType();
-//         // SetBodyType();
-//     }
-
-//     // public void PreviousHeight()
-//     // {
-//     //     // int[] availableHeights = heightOptions[bodyTypeIndexSet[currentBodyTypeIndex]]; // Get height options for current body type
-//     //     currentHeightIndex--;
-//     //     if (currentHeightIndex < 0)
-//     //     {
-//     //         currentHeightIndex = 2; 
-//     //     }
-//     //     SetBodyType();
-//     //     // SetBodyType();
-//     // }
-
-//     private void SetBodyType()
-//     {
-//         if(currentHeightIndex == 2 && currentBodyTypeIndex == 0)
-//         {
-//             bodyTypeNumber = 1 + currentWidthIndex;
-//         }
-//         if(currentHeightIndex == 0 && currentBodyTypeIndex == 0)
-//         {
-//             bodyTypeNumber = 5 + currentWidthIndex;
-//         }
-//         if(currentHeightIndex == 1 && currentBodyTypeIndex == 0)
-//         {
-//             bodyTypeNumber = 9 + currentWidthIndex;
-//         }
-//         if(currentHeightIndex == 2 && currentBodyTypeIndex == 1)
-//         {
-//             bodyTypeNumber = 13 + currentWidthIndex;
-//         }
-//         if(currentHeightIndex == 0 && currentBodyTypeIndex == 1)
-//         {
-//             bodyTypeNumber = 17 + currentWidthIndex;
-//         }
-//         if(currentHeightIndex == 1 && currentBodyTypeIndex == 1)
-//         {
-//             bodyTypeNumber = 21 + currentWidthIndex;
-//         }
-//         if(currentHeightIndex == 2 && currentBodyTypeIndex == 2)
-//         {
-//             bodyTypeNumber = 25 + currentWidthIndex;
-//         }
-//         if(currentHeightIndex == 0 && currentBodyTypeIndex == 2)
-//         {
-//             bodyTypeNumber = 29 + currentWidthIndex;
-//         }
-//         if(currentHeightIndex == 1 && currentBodyTypeIndex == 2)
-//         {
-//             bodyTypeNumber = 33 + currentWidthIndex;
-//         }
-
-
-//         // adjust the box collider on playa
-//         if(currentWidthIndex == 0)
-//         {
-//             Vector2 newSize = Player.GetComponent<BoxCollider2D>().size;
-//             newSize.x = 6f + currentWidthIndex;
-//             Player.GetComponent<BoxCollider2D>().size = newSize;
-//             Vector2 newOffset = Player.GetComponent<BoxCollider2D>().offset;
-//             // newOffset = new Vector2(16f, -43.5f);
-//             Player.GetComponent<BoxCollider2D>().offset = newOffset;
-//         }
-//         if(currentWidthIndex == 1)
-//         {
-//             Vector2 newSize = Player.GetComponent<BoxCollider2D>().size;
-//             newSize.x = 6f + currentWidthIndex;
-//             Player.GetComponent<BoxCollider2D>().size = newSize;
-//             Vector2 newOffset = Player.GetComponent<BoxCollider2D>().offset;
-//             // newOffset = new Vector2(16f, -43.5f);
-//             Player.GetComponent<BoxCollider2D>().offset = newOffset;
-//         }
-//         if(currentWidthIndex == 2)
-//         {
-//             Vector2 newSize = Player.GetComponent<BoxCollider2D>().size;
-//             newSize.x = 6f + currentWidthIndex;
-//             Player.GetComponent<BoxCollider2D>().size = newSize;
-//             Vector2 newOffset = Player.GetComponent<BoxCollider2D>().offset;
-//             // newOffset = new Vector2(16f, -43.5f);
-//             Player.GetComponent<BoxCollider2D>().offset = newOffset;
-//         }
-//         if(currentWidthIndex == 3)
-//         {
-//             Vector2 newSize = Player.GetComponent<BoxCollider2D>().size;
-//             newSize.x = 6f + currentWidthIndex;
-//             Player.GetComponent<BoxCollider2D>().size = newSize;
-//             Vector2 newOffset = Player.GetComponent<BoxCollider2D>().offset;
-//             // newOffset = new Vector2(16f, -43.5f);
-//             Player.GetComponent<BoxCollider2D>().offset = newOffset;
-//         }
-//     }
-
-//     private int[] widthIndexSet = {0, 1, 2, 3};
-
-
-//     // Width Selection
-//     public void NextWidth()
-//     {
-//         currentWidthIndex++;
-//         if (currentWidthIndex >= widthIndexSet.Length)
-//         {
-//             currentWidthIndex = 0; // Wrap around to the first currentWidthIndex option
-//         }
-//         SetBodyType();
-//         // SetBodyType();
-//     }
-
-//     public void PreviousWidth()
-//     {
-//         currentWidthIndex--;
-//         if (currentWidthIndex < 0)
-//         {
-//             currentWidthIndex = widthIndexSet.Length - 1; 
-//         }
-//         SetBodyType();
-//         // SetBodyType();
-//     }
-
-//     // private void SetWidth()
-//     // {
-//     //     int[] availableWidths = widthOptions[bodyTypeNumber];
-//     //     bodyTypeNumber = availableWidths[currentWidthIndex];
-//     //     Debug.Log("Width: " + bodyTypeNumber); // Log current currentWidthIndex
-//     // }
-
-
-//     public void NextHairStyle()
-//     {
-//         currentHairStyleIndex++;
-//         // if (currentHairStyleIndex >= 10)
-//         // {
-//         //     currentHairStyleIndex = 0; // Wrap around to the first currentWidthIndex option
-//         // }
-//         if (currentHairStyleIndex >= 13)
-//         {
-//             currentHairStyleIndex = 0; // Wrap around to the first currentWidthIndex option
-//         }
-//         UpdateHairStyle();
-//     }
-
-//     public void UpdateHairStyle()
-//     {
-
-//         if(currentHairStyleIndex == 0)
-//         {
-//             SetHairStyle1();
-//         }
-//         else if(currentHairStyleIndex == 1)
-//         {
-//             SetHairStyle2();
-//         }
-//         else if(currentHairStyleIndex == 2)
-//         {
-//             SetHairStyle3();
-//         }
-//         else if(currentHairStyleIndex == 3)
-//         {
-//             SetHairStyle4();
-//         }
-//         else if(currentHairStyleIndex == 4)
-//         {
-//             SetHairStyle5();
-//         }
-//         else if(currentHairStyleIndex == 5)
-//         {
-//             SetHairStyle6();
-//         }
-//         else if(currentHairStyleIndex == 6)
-//         {
-//             SetHairStyle7();
-//         }
-//         else if(currentHairStyleIndex == 7)
-//         {
-//             SetHairStyle8();
-//         }
-//         else if(currentHairStyleIndex == 8)
-//         {
-//             SetHairStyle9();
-//         }
-//         else if(currentHairStyleIndex == 9)
-//         {
-//             SetHairStyle10();
-//         }
-//         else if(currentHairStyleIndex == 10)
-//         {
-//             SetHairStyle11();
-//         }
-//         else if(currentHairStyleIndex == 11)
-//         {
-//             SetHairStyle12();
-//         }
-//         else if(currentHairStyleIndex == 12)
-//         {
-//             SetHairStyle13();
-//         }
-
-
-
-
-//     }
-
-//        public void NextHairColor()
-//     {
-//         currentHairColorIndex++;
-//         if (currentHairColorIndex >= 10)
-//         {
-//             currentHairColorIndex = 0; // Wrap around to the first currentWidthIndex option
-//         }
-//         UpdateHairColor();
-//     }
-
-//     public void UpdateHairColor()
-//     {
-
-//         if(currentHairColorIndex == 0)
-//         {
-//             SetHairColor1();
-//         }
-//         else if(currentHairColorIndex == 1)
-//         {
-//             SetHairColor2();
-//         }
-//         else if(currentHairColorIndex == 2)
-//         {
-//             SetHairColor3();
-//         }
-//         else if(currentHairColorIndex == 3)
-//         {
-//             SetHairColor4();
-//         }
-//         else if(currentHairColorIndex == 4)
-//         {
-//             SetHairColor5();
-//         }
-//         else if(currentHairColorIndex == 5)
-//         {
-//             SetHairColor6();
-//         }
-//         else if(currentHairColorIndex == 6)
-//         {
-//             SetHairColor7();
-//         }
-//         else if(currentHairColorIndex == 7)
-//         {
-//             SetHairColor8();
-//         }
-//         else if(currentHairColorIndex == 8)
-//         {
-//             SetHairColor9();
-//         }
-//         else if(currentHairColorIndex == 9)
-//         {
-//             SetHairColor10();
-//         }
-//     }
-//     public void NextShirt()
-//     {
-//         currentShirtIndex++;
-//         if (currentShirtIndex >= 10)
-//         {
-//             currentShirtIndex = 0; // Wrap around to the first currentWidthIndex option
-//         }
-//         UpdateShirt();
-//     }
-
-//     public void UpdateShirt()
-//     {
-//         if(currentShirtIndex == 0)
-//         {
-//             SetShirtToBirthdaySuit();
-//         }
-//         else if(currentShirtIndex == 1)
-//         {
-//             SetShirtToSinglet1();
-//         }
-//         else if(currentShirtIndex == 2)
-//         {
-//             SetShirtToSinglet2();
-//         }
-//         else if(currentShirtIndex == 3)
-//         {
-//             SetShirtToSinglet3();
-//         }
-//         else if(currentShirtIndex == 4)
-//         {
-//             SetShirtToTShirt1();
-//         }
-//         else if(currentShirtIndex == 5)
-//         {
-//             SetShirtToTShirt2();
-//         }
-//         else if(currentShirtIndex == 6)
-//         {
-//             SetShirtToTShirt3();
-//         }
-//         else if(currentShirtIndex == 7)
-//         {
-//             SetShirtToLSShirt1();
-//         }
-//         else if(currentShirtIndex == 8)
-//         {
-//             SetShirtToLSShirt2();
-//         }
-//         else if(currentShirtIndex == 9)
-//         {
-//             SetShirtToLSShirt3();
-//         }
-//     }
-
-
-//     public void NextWaist()
-//     {
-//         currentWaistIndex++;
-//         if (currentWaistIndex >= 2)
-//         {
-//             currentWaistIndex = 0; // Wrap around to the first currentWidthIndex option
-//         }
-//         UpdateWaist();
-//     }
-
-//     public void UpdateWaist()
-//     {
-//         if(currentWaistIndex == 0)
-//         {
-//             SetWaistToShirt();
-//         }
-//         else if(currentWaistIndex == 1)
-//         {
-//             SetWaistToPants();
-//         }
-//         // else if(currentWaistIndex == 2)
-//         // {
-//         //     SetWaistToSkin();
-//         // }
-//     }
-//     public void NextPants()
-//     {
-//         currentPantsIndex++;
-//         if (currentPantsIndex >= 4)
-//         {
-//             currentPantsIndex = 0; // Wrap around to the first currentWidthIndex option
-//         }
-//         UpdatePants();
-//     }
-
-//     public void UpdatePants()
-//     {
-//         if(currentPantsIndex == 0)
-//         {
-//             SetPantsToShorts();
-//         }
-//         else if(currentPantsIndex == 1)
-//         {
-//             SetPantsTo3QuarterPants();
-//         }
-//         else if(currentPantsIndex == 2)
-//         {
-//             SetPantsToPants();
-//         }
-//         else if(currentPantsIndex == 3)
-//         {
-//             SetPantsToDress();
-//         }
-//         // else if(currentPantsIndex == 3)
-//         // {
-//         //     SetPantsToBirthdaySuit();
-//         // }
-//     }
-    
-//     public void NextJaketto()
-//     {
-//         currentJakettoIndex++;
-//         if (currentJakettoIndex >= 4)
-//         {
-//             currentJakettoIndex = 0; // Wrap around to the first currentWidthIndex option
-//         }
-//         UpdateJaketto();
-//     }
-
-//     public void UpdateJaketto()
-//     {
-//         if(currentJakettoIndex == 0)
-//         {
-//             SetNoJaketto();
-//         }
-//         else if(currentJakettoIndex == 1 || currentJakettoIndex == 2 || currentJakettoIndex == 3)
-//         {
-//             SetJakettoVest();
-//         }
-//         else
-//         {
-//             currentJakettoIndex = 0;
-//             UpdateJaketto();          
-//         }
-//     }
-    
-    
-//     public void NextFeet()
-//     {
-//         currentFeetIndex++;
-//         if (currentFeetIndex >= 3)
-//         {
-//             currentFeetIndex = 0; // Wrap around to the first currentWidthIndex option
-//         }
-//         UpdateFeet();
-//     }
-
-//     public void UpdateFeet()
-//     {
-//         if(currentFeetIndex == 0)
-//         {
-//             SetFeetToBoots();
-//         }
-//         else if(currentFeetIndex == 1)
-//         {
-//             SetFeetToShoes();
-//         }
-//         else if(currentFeetIndex == 2)
-//         {
-//             SetFeetToBareFoot();
-//         }
-//     }
-//     public void NextSkinColor()
-//     {
-//         currentSkinColorIndex++;
-//         if (currentSkinColorIndex >= 7)
-//         {
-//             currentSkinColorIndex = 0; // Wrap around to the first currentWidthIndex option
-//         }
-//         UpdateSkinColor();
-//     }
-
-//     public void UpdateSkinColor()
-//     {
-//         if(currentSkinColorIndex == 0)
-//         {
-//             SetSkinColor1();
-//         }
-//         else if(currentSkinColorIndex == 1)
-//         {
-//             SetSkinColor2();
-//         }
-//         else if(currentSkinColorIndex == 2)
-//         {
-//             SetSkinColor3();
-//         }
-//         else if(currentSkinColorIndex == 3)
-//         {
-//             SetSkinColor4();
-//         }
-//         else if(currentSkinColorIndex == 4)
-//         {
-//             SetSkinColor5();
-//         }
-//         else if(currentSkinColorIndex == 5)
-//         {
-//             SetSkinColor6();
-//         }
-//         else if(currentSkinColorIndex == 6)
-//         {
-//             SetSkinColor7();
-//         }
-//     }
-
-
-
-//     public void NextShirtColor()
-//     {
-//         currentShirtColorIndex++;
-//         if (currentShirtColorIndex >= 11)
-//         {
-//             currentShirtColorIndex = 0; // Wrap around to the first currentWidthIndex option
-//         }
-//         UpdateShirtColor();
-//     }
-
-//     public void UpdateShirtColor()
-//     {
-//         if(currentShirtColorIndex == 0)
-//         {
-//             SetShirtColor1();
-//         }
-//         else if(currentShirtColorIndex == 1)
-//         {
-//             SetShirtColor2();
-//         }
-//         else if(currentShirtColorIndex == 2)
-//         {
-//             SetShirtColor3();
-//         }
-//         else if(currentShirtColorIndex == 3)
-//         {
-//             SetShirtColor4();
-//         }
-//         else if(currentShirtColorIndex == 4)
-//         {
-//             SetShirtColor5();
-//         }
-//         else if(currentShirtColorIndex == 5)
-//         {
-//             SetShirtColor6();
-//         }
-//         else if(currentShirtColorIndex == 6)
-//         {
-//             SetShirtColor7();
-//         }
-//         else if(currentShirtColorIndex == 7)
-//         {
-//             SetShirtColor8();
-//         }
-//         else if(currentShirtColorIndex == 8)
-//         {
-//             SetShirtColor9();
-//         }
-//         else if(currentShirtColorIndex == 9)
-//         {
-//             SetShirtColor10();
-//         }
-//         else if(currentShirtColorIndex == 10)
-//         {
-//             SetShirtColor11();
-//         }
-//     }
-
-
-//     public void NextJakettoColor()
-//     {
-//         currentJakettoColorIndex++;
-//         if (currentJakettoColorIndex >= 11)
-//         {
-//             currentJakettoColorIndex = 0; // Wrap around to the first currentWidthIndex option
-//         }
-//         UpdateJakettoColor();
-//     }
-
-//     public void UpdateJakettoColor()
-//     {
-//         if(currentJakettoColorIndex == 0)
-//         {
-//             SetJakettoColor1();
-//         }
-//         else if(currentJakettoColorIndex == 1)
-//         {
-//             SetJakettoColor2();
-//         }
-//         else if(currentJakettoColorIndex == 2)
-//         {
-//             SetJakettoColor3();
-//         }
-//         else if(currentJakettoColorIndex == 3)
-//         {
-//             SetJakettoColor4();
-//         }
-//         else if(currentJakettoColorIndex == 4)
-//         {
-//             SetJakettoColor5();
-//         }
-//         else if(currentJakettoColorIndex == 5)
-//         {
-//             SetJakettoColor6();
-//         }
-//         else if(currentJakettoColorIndex == 6)
-//         {
-//             SetJakettoColor7();
-//         }
-//         else if(currentJakettoColorIndex == 7)
-//         {
-//             SetJakettoColor8();
-//         }
-//         else if(currentJakettoColorIndex == 8)
-//         {
-//             SetJakettoColor9();
-//         }
-//         else if(currentJakettoColorIndex == 9)
-//         {
-//             SetJakettoColor10();
-//         }
-//     }
-
-
-//    public void NextPantsColor()
-//     {
-//         currentPantsColorIndex++;
-//         if (currentPantsColorIndex >= 10)
-//         {
-//             currentPantsColorIndex = 0; // Wrap around to the first currentWidthIndex option
-//         }
-//         UpdatePantsColor();
-//     }
-
-//     public void UpdatePantsColor()
-//     {
-//         if(currentPantsColorIndex == 0)
-//         {
-//             SetPantsColor1();
-//         }
-//         else if(currentPantsColorIndex == 1)
-//         {
-//             SetPantsColor2();
-//         }
-//         else if(currentPantsColorIndex == 2)
-//         {
-//             SetPantsColor3();
-//         }
-//         else if(currentPantsColorIndex == 3)
-//         {
-//             SetPantsColor4();
-//         }
-//         else if(currentPantsColorIndex == 4)
-//         {
-//             SetPantsColor5();
-//         }
-//         else if(currentPantsColorIndex == 5)
-//         {
-//             SetPantsColor6();
-//         }
-//         else if(currentPantsColorIndex == 6)
-//         {
-//             SetPantsColor7();
-//         }
-//         else if(currentPantsColorIndex == 7)
-//         {
-//             SetPantsColor8();
-//         }
-//         else if(currentPantsColorIndex == 8)
-//         {
-//             SetPantsColor9();
-//         }
-//         else if(currentPantsColorIndex == 9)
-//         {
-//             SetPantsColor10();
-//         }
-//     }
-
-// private void UpdateLockImage()
-// {
-//     // thisButtonIsLocked = !thisButtonIsLocked;  // Example placeholder
-
-//     // Check all locked states and update their images accordingly
-    
-//     if (lockedSkinColor)
-//     {
-//         lockSkinImgComponent.sprite = lockedImage;
-//     }
-//     else
-//     {
-//         lockSkinImgComponent.sprite = unlockedImage;
-//     }
-
-//     if (lockedBodyType)
-//     {
-//         lockBodyImgComponent.sprite = lockedImage;
-//     }
-//     else
-//     {
-//         lockBodyImgComponent.sprite = unlockedImage;
-//     }
-
-//     if (lockedHeight)
-//     {
-//         lockHeightImgComponent.sprite = lockedImage;
-//     }
-//     else
-//     {
-//         lockHeightImgComponent.sprite = unlockedImage;
-//     }
-
-//     if (lockedWidth)
-//     {
-//         lockWidthImgComponent.sprite = lockedImage;
-//     }
-//     else
-//     {
-//         lockWidthImgComponent.sprite = unlockedImage;
-//     }
-
-//     if (lockedHair)
-//     {
-//         lockHairImgComponent.sprite = lockedImage;
-//     }
-//     else
-//     {
-//         lockHairImgComponent.sprite = unlockedImage;
-//     }
-
-//     if (lockedShirt)
-//     {
-//         lockShirtImgComponent.sprite = lockedImage;
-//     }
-//     else
-//     {
-//         lockShirtImgComponent.sprite = unlockedImage;
-//     }
-
-//     if (lockedWaist)
-//     {
-//         lockWaistImgComponent.sprite = lockedImage;
-//     }
-//     else
-//     {
-//         lockWaistImgComponent.sprite = unlockedImage;
-//     }
-
-//     if (lockedPants)
-//     {
-//         lockPantsImgComponent.sprite = lockedImage;
-//     }
-//     else
-//     {
-//         lockPantsImgComponent.sprite = unlockedImage;
-//     }
-
-//     if (lockedJaketto)
-//     {
-//         lockJakettoImgComponent.sprite = lockedImage;
-//     }
-//     else
-//     {
-//         lockJakettoImgComponent.sprite = unlockedImage;
-//     }
-
-//     if (lockedShoes)
-//     {
-//         lockShoesImgComponent.sprite = lockedImage;
-//     }
-//     else
-//     {
-//         lockShoesImgComponent.sprite = unlockedImage;
-//     }
-// }
-
-//     public void SkinColorLock()
-//     {
-//         lockedSkinColor = !lockedSkinColor;
-//         UpdateLockImage();
-//     }
-
-//     public void BodyTypeLock()
-//     {
-//         lockedBodyType = !lockedBodyType;
-//         UpdateLockImage();
-//     }
-//     public void HeightLock()
-//     {
-//         lockedHeight = !lockedHeight;
-//         UpdateLockImage();
-//     }
-//     public void WidthLock()
-//     {
-//         lockedWidth = !lockedWidth;
-//         UpdateLockImage();
-//     }
-//     public void HairLock()
-//     {
-//         lockedHair = !lockedHair;
-//         UpdateLockImage();
-//     }
-//     public void ShirtLock()
-//     {
-//         lockedShirt = !lockedShirt;
-//         UpdateLockImage();
-//     }
-//     public void WaistLock()
-//     {
-//         lockedWaist = !lockedWaist;
-//         UpdateLockImage();
-//     }
-//     public void PantsLock()
-//     {
-//         lockedPants = !lockedPants;
-//         UpdateLockImage();
-//     }
-//     public void JakettoLock()
-//     {
-//         lockedJaketto = !lockedJaketto;
-//         UpdateLockImage();
-//     }
-//     public void ShoesLock()
-//     {
-//         lockedShoes = !lockedShoes;
-//         UpdateLockImage();
-//     }
-
-//     public void UpdateRandom()
-//     {
-//         //duplicate if statements because the indexes trip over each other otherwise!!!!!! :) be happy ok!
-//         if(!lockedShoes)
-//         {
-//             currentFeetIndex = Random.Range(0, 3);
-//             UpdateFeet();
-//         }
-//         // if(!lockedPants)
-//         // {
-//         //     currentPantsIndex = Random.Range(0, 4);
-//         //     UpdatePants();
-//         // }
-//         if(!lockedWaist)
-//         {
-//             currentWaistIndex = Random.Range(0, 2);
-//             UpdateWaist();
-//         }
-//         if(!lockedHair)
-//         {
-//             currentHairColorIndex = Random.Range(0, 10);
-//             UpdateHairColor();
-//         }
-//         if(!lockedShirt)
-//         {
-//             currentShirtIndex = Random.Range(1, 10); // omit no shirt for rando
-//             UpdateShirt();
-//         }
-//         if(!lockedHeight)
-//         {
-//             currentHeightIndex = Random.Range(0, 3);
-//             SetBodyType();
-//         }
-//         if(!lockedBodyType)
-//         {
-//             currentBodyTypeIndex = Random.Range(0, 3);
-//             SetBodyType();
-//         }
-//         if(!lockedWidth)
-//         {
-//             currentWidthIndex = Random.Range(0, 4);
-//             SetBodyType();
-//         }
-//         if(!lockedPants)
-//         {
-//             currentPantsColorIndex = Random.Range(0, 10);
-//             UpdatePantsColor();
-//         }
-//         if(!lockedPants)
-//         {
-//             currentPantsIndex = Random.Range(0, 4);
-//             UpdatePants();
-//         }
-//         if(!lockedShirt)
-//         {
-//             currentShirtColorIndex = Random.Range(0, 11);
-//             UpdateShirtColor();
-//         }
-//         if(!lockedHair)
-//         {
-//             currentHairStyleIndex = Random.Range(0, 13);
-//             UpdateHairStyle(); 
-//         }
-//         if(!lockedJaketto)
-//         {
-//             currentJakettoIndex = Random.Range(0, 9);
-//             UpdateJaketto();
-//             currentJakettoColorIndex = Random.Range(0, 10);
-//             UpdateJakettoColor();
-//         }
-//         if(!lockedSkinColor)
-//         {
-//             currentSkinColorIndex = Random.Range(0, 7);
-//             UpdateSkinColor();
-//         }
-//     }
-
-
-
-    
-//     public void UpdateSpecific(int feet, 
-//                                 int pants, 
-//                                 int waist, 
-//                                 int hairCol, 
-//                                 int shirt, 
-//                                 int height, 
-//                                 int bodyType, 
-//                                 int width, 
-//                                 int pantsCol, 
-//                                 int shirtCol, 
-//                                 int hairStyle, 
-//                                 int jaketto, 
-//                                 int jakettoCol, 
-//                                 int skinCol)
-//     {
-//             currentPantsColorIndex = pantsCol;
-//             UpdatePantsColor();
-        
-//             currentShirtColorIndex = shirtCol;
-//             UpdateShirtColor();
-
-//             currentJakettoColorIndex = jakettoCol;
-//             // UpdateJakettoColor();
-
-//             currentHairColorIndex = hairCol;
-//             UpdateHairColor();
-
-//             currentSkinColorIndex = skinCol;
-//             UpdateSkinColor();
-
-
-//             currentShirtIndex = shirt;
-//             // UpdateShirt();
-
-//             currentJakettoIndex = jaketto;
-//             UpdateJakettoColor();
-
-//             // UpdateShirt();
-
-            
-//             currentFeetIndex = feet;
-//             UpdateFeet();
-       
-//             // currentPantsIndex = pants;
-//             // UpdatePants();
-       
-//             currentWaistIndex = waist;
-//             UpdateWaist();
-      
-
-       
-//             currentHeightIndex = height;
-//             SetBodyType();
-       
-//             currentBodyTypeIndex = bodyType;
-//             SetBodyType();
-       
-//             currentWidthIndex = width;
-//             SetBodyType();
-      
-//             currentPantsColorIndex = pantsCol;
-//             UpdatePantsColor();
-
-//             currentPantsIndex = pants;
-//             UpdatePants();
-        
-//             currentShirtColorIndex = shirtCol;
-//             UpdateShirtColor();
-       
-//             currentHairStyleIndex = hairStyle;
-//             UpdateHairStyle();
-
-     
-//             // currentJakettoIndex = jaketto;
-//             // UpdateJakettoColor();
-
-      
-
-        
-//     }
-
-//     // public void NextPants()
-//     // {
-//     //     currentPantsIndex++;
-//     //     if (currentPantsIndex >= 3)
-//     //     {
-//     //         currentPantsIndex = 0; // Wrap around to the first currentWidthIndex option
-//     //     }
-//     //     UpdatePants();
-//     // }
-
-//     // public void UpdatePants()
-//     // {
-//     //     if(currentPantsIndex == 0)
-//     //     {
-//     //         SetPantsToShorts();
-//     //     }
-//     //     else if(currentPantsIndex == 1)
-//     //     {
-//     //         SetPantsTo3QuarterPants();
-//     //     }
-//     //     else if(currentPantsIndex == 2)
-//     //     {
-//     //         SetPantsToPants();
-//     //     }
-//     // }
-
-
-
-
-//     public void ToggleCustomizeUI()
-//     {
-//         GameObject customizeButtons = transform.Find("customiseButtons").gameObject;
-//         bool isActive = customizeButtons.activeSelf;
-//         customizeButtons.SetActive(!isActive);  // Toggles the active state
-//     }
-
-
-
-
-
-//     Color HexToColor(string hex)
-//     {
-//         Color newCol;
-//         if (ColorUtility.TryParseHtmlString(hex, out newCol))
-//         {
-//             return newCol;
-//         }
-//         else
-//         {
-//             Debug.LogError("Invalid hex color string: " + hex);
-//             return Color.black; // Return black if conversion fails
-//         }
-//     }
-// }
-
-
-
-
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -1157,11 +7,11 @@ using UnityEngine.UI;
 
 public class CharacterCustomization : MonoBehaviour 
 {
-    // PlayerAnimationAndMovement playerMovement;
-    PlayerAnimationAndMovement playerControllerScript;
+    // CharacterMovement playerMovement;
+    // CharacterMovement characterAnimation;
+    public CharacterAnimation characterAnimation;
 
-    // PlayerCntrlerScript playerControllerScript;
-    [SerializeField] GameObject Player;
+    // PlayerCntrlerScript characterAnimation;
 
 
 
@@ -1217,13 +67,11 @@ public class CharacterCustomization : MonoBehaviour
 
 
 
-    public void Start()
-    {
-
-        Player = GameObject.FindGameObjectWithTag("Player");
-        
-        playerControllerScript = Player.GetComponent<PlayerAnimationAndMovement>(); 
-        // playerControllerScript = playerMovement;
+    public void Awake()
+    {        
+        // characterAnimation = GetComponent<CharacterMovement>(); 
+        characterAnimation = GetComponent<CharacterAnimation>(); 
+        // characterAnimation = playerMovement;
       
         int[] bodyTypeIndex1 = {5,17,29};
         int[] bodyTypeIndex2 = {9,21,33};
@@ -1263,8 +111,6 @@ public class CharacterCustomization : MonoBehaviour
         lockPantsImgComponent.sprite = unlockedImage;
         lockJakettoImgComponent.sprite = unlockedImage;
         lockShoesImgComponent.sprite = unlockedImage;
-
-
     }
 
     // Body Type Selection
@@ -1319,78 +165,78 @@ public class CharacterCustomization : MonoBehaviour
     {
         if(currentHeightIndex == 2 && currentBodyTypeIndex == 0)
         {
-            playerControllerScript.bodyTypeNumber = 1 + currentWidthIndex;
+            characterAnimation.bodyTypeNumber = 1 + currentWidthIndex;
         }
         if(currentHeightIndex == 0 && currentBodyTypeIndex == 0)
         {
-            playerControllerScript.bodyTypeNumber = 5 + currentWidthIndex;
+            characterAnimation.bodyTypeNumber = 5 + currentWidthIndex;
         }
         if(currentHeightIndex == 1 && currentBodyTypeIndex == 0)
         {
-            playerControllerScript.bodyTypeNumber = 9 + currentWidthIndex;
+            characterAnimation.bodyTypeNumber = 9 + currentWidthIndex;
         }
         if(currentHeightIndex == 2 && currentBodyTypeIndex == 1)
         {
-            playerControllerScript.bodyTypeNumber = 13 + currentWidthIndex;
+            characterAnimation.bodyTypeNumber = 13 + currentWidthIndex;
         }
         if(currentHeightIndex == 0 && currentBodyTypeIndex == 1)
         {
-            playerControllerScript.bodyTypeNumber = 17 + currentWidthIndex;
+            characterAnimation.bodyTypeNumber = 17 + currentWidthIndex;
         }
         if(currentHeightIndex == 1 && currentBodyTypeIndex == 1)
         {
-            playerControllerScript.bodyTypeNumber = 21 + currentWidthIndex;
+            characterAnimation.bodyTypeNumber = 21 + currentWidthIndex;
         }
         if(currentHeightIndex == 2 && currentBodyTypeIndex == 2)
         {
-            playerControllerScript.bodyTypeNumber = 25 + currentWidthIndex;
+            characterAnimation.bodyTypeNumber = 25 + currentWidthIndex;
         }
         if(currentHeightIndex == 0 && currentBodyTypeIndex == 2)
         {
-            playerControllerScript.bodyTypeNumber = 29 + currentWidthIndex;
+            characterAnimation.bodyTypeNumber = 29 + currentWidthIndex;
         }
         if(currentHeightIndex == 1 && currentBodyTypeIndex == 2)
         {
-            playerControllerScript.bodyTypeNumber = 33 + currentWidthIndex;
+            characterAnimation.bodyTypeNumber = 33 + currentWidthIndex;
         }
 
 
         // adjust the box collider on playa
         if(currentWidthIndex == 0)
         {
-            Vector2 newSize = Player.GetComponent<BoxCollider2D>().size;
+            Vector2 newSize = GetComponent<BoxCollider2D>().size;
             newSize.x = 6f + currentWidthIndex;
-            Player.GetComponent<BoxCollider2D>().size = newSize;
-            Vector2 newOffset = Player.GetComponent<BoxCollider2D>().offset;
+            GetComponent<BoxCollider2D>().size = newSize;
+            Vector2 newOffset = GetComponent<BoxCollider2D>().offset;
             // newOffset = new Vector2(16f, -43.5f);
-            Player.GetComponent<BoxCollider2D>().offset = newOffset;
+            GetComponent<BoxCollider2D>().offset = newOffset;
         }
         if(currentWidthIndex == 1)
         {
-            Vector2 newSize = Player.GetComponent<BoxCollider2D>().size;
+            Vector2 newSize = GetComponent<BoxCollider2D>().size;
             newSize.x = 6f + currentWidthIndex;
-            Player.GetComponent<BoxCollider2D>().size = newSize;
-            Vector2 newOffset = Player.GetComponent<BoxCollider2D>().offset;
+            GetComponent<BoxCollider2D>().size = newSize;
+            Vector2 newOffset = GetComponent<BoxCollider2D>().offset;
             // newOffset = new Vector2(16f, -43.5f);
-            Player.GetComponent<BoxCollider2D>().offset = newOffset;
+            GetComponent<BoxCollider2D>().offset = newOffset;
         }
         if(currentWidthIndex == 2)
         {
-            Vector2 newSize = Player.GetComponent<BoxCollider2D>().size;
+            Vector2 newSize = GetComponent<BoxCollider2D>().size;
             newSize.x = 6f + currentWidthIndex;
-            Player.GetComponent<BoxCollider2D>().size = newSize;
-            Vector2 newOffset = Player.GetComponent<BoxCollider2D>().offset;
+            GetComponent<BoxCollider2D>().size = newSize;
+            Vector2 newOffset = GetComponent<BoxCollider2D>().offset;
             // newOffset = new Vector2(16f, -43.5f);
-            Player.GetComponent<BoxCollider2D>().offset = newOffset;
+            GetComponent<BoxCollider2D>().offset = newOffset;
         }
         if(currentWidthIndex == 3)
         {
-            Vector2 newSize = Player.GetComponent<BoxCollider2D>().size;
+            Vector2 newSize = GetComponent<BoxCollider2D>().size;
             newSize.x = 6f + currentWidthIndex;
-            Player.GetComponent<BoxCollider2D>().size = newSize;
-            Vector2 newOffset = Player.GetComponent<BoxCollider2D>().offset;
+            GetComponent<BoxCollider2D>().size = newSize;
+            Vector2 newOffset = GetComponent<BoxCollider2D>().offset;
             // newOffset = new Vector2(16f, -43.5f);
-            Player.GetComponent<BoxCollider2D>().offset = newOffset;
+            GetComponent<BoxCollider2D>().offset = newOffset;
         }
     }
 
@@ -2088,11 +934,7 @@ private void UpdateLockImage()
     public void UpdateRandom()
     {
         //duplicate if statements because the indexes trip over each other otherwise!!!!!! :) be happy ok!
-        if(!lockedShoes)
-        {
-            currentFeetIndex = Random.Range(0, 3);
-            UpdateFeet();
-        }
+
         // if(!lockedPants)
         // {
         //     currentPantsIndex = Random.Range(0, 4);
@@ -2102,6 +944,11 @@ private void UpdateLockImage()
         {
             currentWaistIndex = Random.Range(0, 2);
             UpdateWaist();
+        }
+        if(!lockedShoes)
+        {
+            currentFeetIndex = Random.Range(0, 3);
+            UpdateFeet();
         }
         if(!lockedHair)
         {
@@ -2289,296 +1136,296 @@ private void UpdateLockImage()
 
     public void SetShirtToBirthdaySuit()
     {
-      playerControllerScript.throatSprite.color = playerControllerScript.currentSkinColor;
-      playerControllerScript.collarSprite.color = playerControllerScript.currentSkinColor;
-      playerControllerScript.torsoSprite.color = playerControllerScript.currentSkinColor;
+      characterAnimation.throatSprite.color = characterAnimation.currentSkinColor;
+      characterAnimation.collarSprite.color = characterAnimation.currentSkinColor;
+      characterAnimation.torsoSprite.color = characterAnimation.currentSkinColor;
       
       if(currentJakettoIndex == 0 || currentJakettoIndex == 1) // vest or no jaketto
       {
-        playerControllerScript.shortSleeveSprite.color = playerControllerScript.currentSkinColor;
-        playerControllerScript.longSleeveSprite.color = playerControllerScript.currentSkinColor;
+        characterAnimation.shortSleeveSprite.color = characterAnimation.currentSkinColor;
+        characterAnimation.longSleeveSprite.color = characterAnimation.currentSkinColor;
       }
       else if(currentJakettoIndex == 2) // short sleeve jaketto
       {
-        playerControllerScript.shortSleeveSprite.color = playerControllerScript.currentJakettoColor;
-        playerControllerScript.longSleeveSprite.color = playerControllerScript.currentSkinColor; 
+        characterAnimation.shortSleeveSprite.color = characterAnimation.currentJakettoColor;
+        characterAnimation.longSleeveSprite.color = characterAnimation.currentSkinColor; 
       }
       else if(currentJakettoIndex == 3) //long sleeeve jaketto
       {
-        playerControllerScript.shortSleeveSprite.color = playerControllerScript.currentJakettoColor;
-        playerControllerScript.longSleeveSprite.color = playerControllerScript.currentJakettoColor;
+        characterAnimation.shortSleeveSprite.color = characterAnimation.currentJakettoColor;
+        characterAnimation.longSleeveSprite.color = characterAnimation.currentJakettoColor;
       }
 
       if(currentWaistIndex == 0) // if waist is set to shirt color
       {
-        playerControllerScript.waistSprite.color = playerControllerScript.currentPantsColor;
+        characterAnimation.waistSprite.color = characterAnimation.currentPantsColor;
       }
     }
     public void SetShirtToSinglet1()
     {
-      playerControllerScript.throatSprite.color = playerControllerScript.currentSkinColor;
-      playerControllerScript.collarSprite.color = playerControllerScript.currentSkinColor;
-      playerControllerScript.torsoSprite.color = playerControllerScript.currentShirtColor;
+      characterAnimation.throatSprite.color = characterAnimation.currentSkinColor;
+      characterAnimation.collarSprite.color = characterAnimation.currentSkinColor;
+      characterAnimation.torsoSprite.color = characterAnimation.currentShirtColor;
       if(currentJakettoIndex == 0 || currentJakettoIndex == 1) // vest or no jaketto
       {
-        playerControllerScript.shortSleeveSprite.color = playerControllerScript.currentSkinColor;
-        playerControllerScript.longSleeveSprite.color = playerControllerScript.currentSkinColor;
+        characterAnimation.shortSleeveSprite.color = characterAnimation.currentSkinColor;
+        characterAnimation.longSleeveSprite.color = characterAnimation.currentSkinColor;
       }
       else if(currentJakettoIndex == 2) // short sleeve jaketto
       {
-        playerControllerScript.shortSleeveSprite.color = playerControllerScript.currentJakettoColor;
-        playerControllerScript.longSleeveSprite.color = playerControllerScript.currentSkinColor; 
+        characterAnimation.shortSleeveSprite.color = characterAnimation.currentJakettoColor;
+        characterAnimation.longSleeveSprite.color = characterAnimation.currentSkinColor; 
       }
       else if(currentJakettoIndex == 3) //long sleeeve jaketto
       {
-        playerControllerScript.shortSleeveSprite.color = playerControllerScript.currentJakettoColor;
-        playerControllerScript.longSleeveSprite.color = playerControllerScript.currentJakettoColor;
+        characterAnimation.shortSleeveSprite.color = characterAnimation.currentJakettoColor;
+        characterAnimation.longSleeveSprite.color = characterAnimation.currentJakettoColor;
       }
 
       if(currentWaistIndex == 0) // if waist is set to shirt color
       {
-        playerControllerScript.waistSprite.color = playerControllerScript.currentShirtColor;
+        characterAnimation.waistSprite.color = characterAnimation.currentShirtColor;
         currentWaistIndex = 0;
       }
     }
     public void SetShirtToSinglet2()
     {
-      playerControllerScript.throatSprite.color = playerControllerScript.currentSkinColor;
-      playerControllerScript.collarSprite.color = playerControllerScript.currentShirtColor;
-      playerControllerScript.torsoSprite.color = playerControllerScript.currentShirtColor;
+      characterAnimation.throatSprite.color = characterAnimation.currentSkinColor;
+      characterAnimation.collarSprite.color = characterAnimation.currentShirtColor;
+      characterAnimation.torsoSprite.color = characterAnimation.currentShirtColor;
       if(currentJakettoIndex == 0 || currentJakettoIndex == 1) // vest or no jaketto
       {
-        playerControllerScript.shortSleeveSprite.color = playerControllerScript.currentSkinColor;
-        playerControllerScript.longSleeveSprite.color = playerControllerScript.currentSkinColor;
+        characterAnimation.shortSleeveSprite.color = characterAnimation.currentSkinColor;
+        characterAnimation.longSleeveSprite.color = characterAnimation.currentSkinColor;
       }
       else if(currentJakettoIndex == 2) // short sleeve jaketto
       {
-        playerControllerScript.shortSleeveSprite.color = playerControllerScript.currentJakettoColor;
-        playerControllerScript.longSleeveSprite.color = playerControllerScript.currentSkinColor; 
+        characterAnimation.shortSleeveSprite.color = characterAnimation.currentJakettoColor;
+        characterAnimation.longSleeveSprite.color = characterAnimation.currentSkinColor; 
       }
       else if(currentJakettoIndex == 3) //long sleeeve jaketto
       {
-        playerControllerScript.shortSleeveSprite.color = playerControllerScript.currentJakettoColor;
-        playerControllerScript.longSleeveSprite.color = playerControllerScript.currentJakettoColor;
+        characterAnimation.shortSleeveSprite.color = characterAnimation.currentJakettoColor;
+        characterAnimation.longSleeveSprite.color = characterAnimation.currentJakettoColor;
       }
 
-      if(playerControllerScript.waistSprite.color == playerControllerScript.currentShirtColor)
+      if(characterAnimation.waistSprite.color == characterAnimation.currentShirtColor)
       {
-        playerControllerScript.waistSprite.color = playerControllerScript.currentShirtColor;
+        characterAnimation.waistSprite.color = characterAnimation.currentShirtColor;
       }
     }
     public void SetShirtToSinglet3()
     {
-      playerControllerScript.throatSprite.color = playerControllerScript.currentShirtColor;
-      playerControllerScript.collarSprite.color = playerControllerScript.currentShirtColor;
-      playerControllerScript.torsoSprite.color = playerControllerScript.currentShirtColor;
+      characterAnimation.throatSprite.color = characterAnimation.currentShirtColor;
+      characterAnimation.collarSprite.color = characterAnimation.currentShirtColor;
+      characterAnimation.torsoSprite.color = characterAnimation.currentShirtColor;
       if(currentJakettoIndex == 0 || currentJakettoIndex == 1) // vest or no jaketto
       {
-        playerControllerScript.shortSleeveSprite.color = playerControllerScript.currentSkinColor;
-        playerControllerScript.longSleeveSprite.color = playerControllerScript.currentSkinColor;
+        characterAnimation.shortSleeveSprite.color = characterAnimation.currentSkinColor;
+        characterAnimation.longSleeveSprite.color = characterAnimation.currentSkinColor;
       }
       else if(currentJakettoIndex == 2) // short sleeve jaketto
       {
-        playerControllerScript.shortSleeveSprite.color = playerControllerScript.currentJakettoColor;
-        playerControllerScript.longSleeveSprite.color = playerControllerScript.currentSkinColor; 
+        characterAnimation.shortSleeveSprite.color = characterAnimation.currentJakettoColor;
+        characterAnimation.longSleeveSprite.color = characterAnimation.currentSkinColor; 
       }
       else if(currentJakettoIndex == 3) //long sleeeve jaketto
       {
-        playerControllerScript.shortSleeveSprite.color = playerControllerScript.currentJakettoColor;
-        playerControllerScript.longSleeveSprite.color = playerControllerScript.currentJakettoColor;
+        characterAnimation.shortSleeveSprite.color = characterAnimation.currentJakettoColor;
+        characterAnimation.longSleeveSprite.color = characterAnimation.currentJakettoColor;
       }
 
-      if(playerControllerScript.waistSprite.color == playerControllerScript.currentShirtColor)
+      if(characterAnimation.waistSprite.color == characterAnimation.currentShirtColor)
       {
-        playerControllerScript.waistSprite.color = playerControllerScript.currentShirtColor;
+        characterAnimation.waistSprite.color = characterAnimation.currentShirtColor;
       }
     }
     public void SetShirtToTShirt1()
     {
-        playerControllerScript.throatSprite.color = playerControllerScript.currentSkinColor;
-        playerControllerScript.collarSprite.color = playerControllerScript.currentShirtColor;
-        playerControllerScript.torsoSprite.color = playerControllerScript.currentShirtColor;
+        characterAnimation.throatSprite.color = characterAnimation.currentSkinColor;
+        characterAnimation.collarSprite.color = characterAnimation.currentShirtColor;
+        characterAnimation.torsoSprite.color = characterAnimation.currentShirtColor;
 
         if (currentJakettoIndex == 0 || currentJakettoIndex == 1) // vest or no jaketto
         {
-            playerControllerScript.shortSleeveSprite.color = playerControllerScript.currentShirtColor;
-            playerControllerScript.longSleeveSprite.color = playerControllerScript.currentSkinColor;
+            characterAnimation.shortSleeveSprite.color = characterAnimation.currentShirtColor;
+            characterAnimation.longSleeveSprite.color = characterAnimation.currentSkinColor;
         }
         else if (currentJakettoIndex == 2) // short sleeve jaketto
         {
-            playerControllerScript.shortSleeveSprite.color = playerControllerScript.currentJakettoColor;
-            playerControllerScript.longSleeveSprite.color = playerControllerScript.currentSkinColor;
+            characterAnimation.shortSleeveSprite.color = characterAnimation.currentJakettoColor;
+            characterAnimation.longSleeveSprite.color = characterAnimation.currentSkinColor;
         }
         else if (currentJakettoIndex == 3) // long sleeve jaketto
         {
-            playerControllerScript.shortSleeveSprite.color = playerControllerScript.currentJakettoColor;
-            playerControllerScript.longSleeveSprite.color = playerControllerScript.currentJakettoColor;
+            characterAnimation.shortSleeveSprite.color = characterAnimation.currentJakettoColor;
+            characterAnimation.longSleeveSprite.color = characterAnimation.currentJakettoColor;
         }
 
-        if (playerControllerScript.waistSprite.color == playerControllerScript.currentShirtColor)
+        if (characterAnimation.waistSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.waistSprite.color = playerControllerScript.currentShirtColor;
+            characterAnimation.waistSprite.color = characterAnimation.currentShirtColor;
         }
     }
 
     public void SetShirtToTShirt2()
     {
-        playerControllerScript.throatSprite.color = playerControllerScript.currentSkinColor;
-        playerControllerScript.collarSprite.color = playerControllerScript.currentSkinColor;
-        playerControllerScript.torsoSprite.color = playerControllerScript.currentShirtColor;
+        characterAnimation.throatSprite.color = characterAnimation.currentSkinColor;
+        characterAnimation.collarSprite.color = characterAnimation.currentSkinColor;
+        characterAnimation.torsoSprite.color = characterAnimation.currentShirtColor;
 
         if (currentJakettoIndex == 0 || currentJakettoIndex == 1) // vest or no jaketto
         {
-            playerControllerScript.shortSleeveSprite.color = playerControllerScript.currentShirtColor;
-            playerControllerScript.longSleeveSprite.color = playerControllerScript.currentSkinColor;
+            characterAnimation.shortSleeveSprite.color = characterAnimation.currentShirtColor;
+            characterAnimation.longSleeveSprite.color = characterAnimation.currentSkinColor;
         }
         else if (currentJakettoIndex == 2) // short sleeve jaketto
         {
-            playerControllerScript.shortSleeveSprite.color = playerControllerScript.currentJakettoColor;
-            playerControllerScript.longSleeveSprite.color = playerControllerScript.currentSkinColor;
+            characterAnimation.shortSleeveSprite.color = characterAnimation.currentJakettoColor;
+            characterAnimation.longSleeveSprite.color = characterAnimation.currentSkinColor;
         }
         else if (currentJakettoIndex == 3) // long sleeve jaketto
         {
-            playerControllerScript.shortSleeveSprite.color = playerControllerScript.currentJakettoColor;
-            playerControllerScript.longSleeveSprite.color = playerControllerScript.currentJakettoColor;
+            characterAnimation.shortSleeveSprite.color = characterAnimation.currentJakettoColor;
+            characterAnimation.longSleeveSprite.color = characterAnimation.currentJakettoColor;
         }
 
-        if (playerControllerScript.waistSprite.color == playerControllerScript.currentShirtColor)
+        if (characterAnimation.waistSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.waistSprite.color = playerControllerScript.currentShirtColor;
+            characterAnimation.waistSprite.color = characterAnimation.currentShirtColor;
         }
     }
 
     public void SetShirtToTShirt3()
     {
-        playerControllerScript.throatSprite.color = playerControllerScript.currentShirtColor;
-        playerControllerScript.collarSprite.color = playerControllerScript.currentShirtColor;
-        playerControllerScript.torsoSprite.color = playerControllerScript.currentShirtColor;
+        characterAnimation.throatSprite.color = characterAnimation.currentShirtColor;
+        characterAnimation.collarSprite.color = characterAnimation.currentShirtColor;
+        characterAnimation.torsoSprite.color = characterAnimation.currentShirtColor;
 
         if (currentJakettoIndex == 0 || currentJakettoIndex == 1) // vest or no jaketto
         {
-            playerControllerScript.shortSleeveSprite.color = playerControllerScript.currentShirtColor;
-            playerControllerScript.longSleeveSprite.color = playerControllerScript.currentSkinColor;
+            characterAnimation.shortSleeveSprite.color = characterAnimation.currentShirtColor;
+            characterAnimation.longSleeveSprite.color = characterAnimation.currentSkinColor;
         }
         else if (currentJakettoIndex == 2) // short sleeve jaketto
         {
-            playerControllerScript.shortSleeveSprite.color = playerControllerScript.currentJakettoColor;
-            playerControllerScript.longSleeveSprite.color = playerControllerScript.currentSkinColor;
+            characterAnimation.shortSleeveSprite.color = characterAnimation.currentJakettoColor;
+            characterAnimation.longSleeveSprite.color = characterAnimation.currentSkinColor;
         }
         else if (currentJakettoIndex == 3) // long sleeve jaketto
         {
-            playerControllerScript.shortSleeveSprite.color = playerControllerScript.currentJakettoColor;
-            playerControllerScript.longSleeveSprite.color = playerControllerScript.currentJakettoColor;
+            characterAnimation.shortSleeveSprite.color = characterAnimation.currentJakettoColor;
+            characterAnimation.longSleeveSprite.color = characterAnimation.currentJakettoColor;
         }
 
-        if (playerControllerScript.waistSprite.color == playerControllerScript.currentShirtColor)
+        if (characterAnimation.waistSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.waistSprite.color = playerControllerScript.currentShirtColor;
+            characterAnimation.waistSprite.color = characterAnimation.currentShirtColor;
         }
     }
 
     public void SetShirtToLSShirt1()
         {
-        playerControllerScript.throatSprite.color = playerControllerScript.currentSkinColor;
-        playerControllerScript.collarSprite.color = playerControllerScript.currentShirtColor;
-        playerControllerScript.torsoSprite.color = playerControllerScript.currentShirtColor;
+        characterAnimation.throatSprite.color = characterAnimation.currentSkinColor;
+        characterAnimation.collarSprite.color = characterAnimation.currentShirtColor;
+        characterAnimation.torsoSprite.color = characterAnimation.currentShirtColor;
 
         if(currentJakettoIndex == 0 || currentJakettoIndex == 1) // vest or no jaketto
         {
-            playerControllerScript.shortSleeveSprite.color = playerControllerScript.currentShirtColor;
-            playerControllerScript.longSleeveSprite.color = playerControllerScript.currentShirtColor;
+            characterAnimation.shortSleeveSprite.color = characterAnimation.currentShirtColor;
+            characterAnimation.longSleeveSprite.color = characterAnimation.currentShirtColor;
         }
                 else if(currentJakettoIndex == 2) // short sleeve jaketto
         {
-            playerControllerScript.shortSleeveSprite.color = playerControllerScript.currentJakettoColor;
-            playerControllerScript.longSleeveSprite.color = playerControllerScript.currentShirtColor; 
+            characterAnimation.shortSleeveSprite.color = characterAnimation.currentJakettoColor;
+            characterAnimation.longSleeveSprite.color = characterAnimation.currentShirtColor; 
         }
         else if(currentJakettoIndex == 3) //long sleeeve jaketto
         {
-            playerControllerScript.shortSleeveSprite.color = playerControllerScript.currentJakettoColor;
-            playerControllerScript.longSleeveSprite.color = playerControllerScript.currentJakettoColor;
+            characterAnimation.shortSleeveSprite.color = characterAnimation.currentJakettoColor;
+            characterAnimation.longSleeveSprite.color = characterAnimation.currentJakettoColor;
         }
 
 
-        if(playerControllerScript.waistSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.waistSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.waistSprite.color = playerControllerScript.currentShirtColor;
+            characterAnimation.waistSprite.color = characterAnimation.currentShirtColor;
         }
         }
         public void SetShirtToLSShirt2()
         {
-        playerControllerScript.throatSprite.color = playerControllerScript.currentSkinColor;
-        playerControllerScript.collarSprite.color = playerControllerScript.currentSkinColor;
-        playerControllerScript.torsoSprite.color = playerControllerScript.currentShirtColor;
+        characterAnimation.throatSprite.color = characterAnimation.currentSkinColor;
+        characterAnimation.collarSprite.color = characterAnimation.currentSkinColor;
+        characterAnimation.torsoSprite.color = characterAnimation.currentShirtColor;
 
         if(currentJakettoIndex == 0 || currentJakettoIndex == 1) // vest or no jaketto
         {
-            playerControllerScript.shortSleeveSprite.color = playerControllerScript.currentShirtColor;
-            playerControllerScript.longSleeveSprite.color = playerControllerScript.currentShirtColor;
+            characterAnimation.shortSleeveSprite.color = characterAnimation.currentShirtColor;
+            characterAnimation.longSleeveSprite.color = characterAnimation.currentShirtColor;
         }
         else if(currentJakettoIndex == 2) // short sleeve jaketto
         {
-            playerControllerScript.shortSleeveSprite.color = playerControllerScript.currentJakettoColor;
-            playerControllerScript.longSleeveSprite.color = playerControllerScript.currentShirtColor; 
+            characterAnimation.shortSleeveSprite.color = characterAnimation.currentJakettoColor;
+            characterAnimation.longSleeveSprite.color = characterAnimation.currentShirtColor; 
         }
         else if(currentJakettoIndex == 3) //long sleeeve jaketto
         {
-            playerControllerScript.shortSleeveSprite.color = playerControllerScript.currentJakettoColor;
-            playerControllerScript.longSleeveSprite.color = playerControllerScript.currentJakettoColor;
+            characterAnimation.shortSleeveSprite.color = characterAnimation.currentJakettoColor;
+            characterAnimation.longSleeveSprite.color = characterAnimation.currentJakettoColor;
         }
 
-        if(playerControllerScript.waistSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.waistSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.waistSprite.color = playerControllerScript.currentShirtColor;
+            characterAnimation.waistSprite.color = characterAnimation.currentShirtColor;
         }
         }
         public void SetShirtToLSShirt3()
         {
-        playerControllerScript.throatSprite.color = playerControllerScript.currentShirtColor;
-        playerControllerScript.collarSprite.color = playerControllerScript.currentShirtColor;
-        playerControllerScript.torsoSprite.color = playerControllerScript.currentShirtColor;
+        characterAnimation.throatSprite.color = characterAnimation.currentShirtColor;
+        characterAnimation.collarSprite.color = characterAnimation.currentShirtColor;
+        characterAnimation.torsoSprite.color = characterAnimation.currentShirtColor;
         
         if(currentJakettoIndex == 0 || currentJakettoIndex == 1) // vest or no jaketto
         {
-            playerControllerScript.shortSleeveSprite.color = playerControllerScript.currentShirtColor;
-            playerControllerScript.longSleeveSprite.color = playerControllerScript.currentShirtColor;
+            characterAnimation.shortSleeveSprite.color = characterAnimation.currentShirtColor;
+            characterAnimation.longSleeveSprite.color = characterAnimation.currentShirtColor;
         }
         else if(currentJakettoIndex == 2) // short sleeve jaketto
         {
-            playerControllerScript.shortSleeveSprite.color = playerControllerScript.currentJakettoColor;
-            playerControllerScript.longSleeveSprite.color = playerControllerScript.currentShirtColor; 
+            characterAnimation.shortSleeveSprite.color = characterAnimation.currentJakettoColor;
+            characterAnimation.longSleeveSprite.color = characterAnimation.currentShirtColor; 
         }
         else if(currentJakettoIndex == 3) //long sleeeve jaketto
         {
-            playerControllerScript.shortSleeveSprite.color = playerControllerScript.currentJakettoColor;
-            playerControllerScript.longSleeveSprite.color = playerControllerScript.currentJakettoColor;
+            characterAnimation.shortSleeveSprite.color = characterAnimation.currentJakettoColor;
+            characterAnimation.longSleeveSprite.color = characterAnimation.currentJakettoColor;
         }
 
-        if(playerControllerScript.waistSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.waistSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.waistSprite.color = playerControllerScript.currentShirtColor;
+            characterAnimation.waistSprite.color = characterAnimation.currentShirtColor;
         }
         }
 
 
     public void SetPantsToShorts()
     {
-        playerControllerScript.waistShortsSprite.color = playerControllerScript.currentPantsColor;
-        playerControllerScript.kneesShinsSprite.color = playerControllerScript.currentSkinColor;
-        if (playerControllerScript.anklesSprite.color != playerControllerScript.currentShoeColor)
+        characterAnimation.waistShortsSprite.color = characterAnimation.currentPantsColor;
+        characterAnimation.kneesShinsSprite.color = characterAnimation.currentSkinColor;
+        if (characterAnimation.anklesSprite.color != characterAnimation.currentShoeColor)
         {
-            playerControllerScript.anklesSprite.color = playerControllerScript.currentSkinColor;
+            characterAnimation.anklesSprite.color = characterAnimation.currentSkinColor;
         }
         SetNoDress();
     }
 
     public void SetPantsTo3QuarterPants()
     {
-        if (playerControllerScript.anklesSprite.color != playerControllerScript.currentShoeColor)
+        if (characterAnimation.anklesSprite.color != characterAnimation.currentShoeColor)
         {
-            playerControllerScript.waistShortsSprite.color = playerControllerScript.currentPantsColor;
-            playerControllerScript.kneesShinsSprite.color = playerControllerScript.currentPantsColor;
-            playerControllerScript.anklesSprite.color = playerControllerScript.currentSkinColor;
+            characterAnimation.waistShortsSprite.color = characterAnimation.currentPantsColor;
+            characterAnimation.kneesShinsSprite.color = characterAnimation.currentPantsColor;
+            characterAnimation.anklesSprite.color = characterAnimation.currentSkinColor;
         }
         else
         {
@@ -2589,11 +1436,11 @@ private void UpdateLockImage()
 
     public void SetPantsToPants()
     {
-        playerControllerScript.waistShortsSprite.color = playerControllerScript.currentPantsColor;
-        playerControllerScript.kneesShinsSprite.color = playerControllerScript.currentPantsColor;
-        if (playerControllerScript.anklesSprite.color != playerControllerScript.currentShoeColor)
+        characterAnimation.waistShortsSprite.color = characterAnimation.currentPantsColor;
+        characterAnimation.kneesShinsSprite.color = characterAnimation.currentPantsColor;
+        if (characterAnimation.anklesSprite.color != characterAnimation.currentShoeColor)
         {
-            playerControllerScript.anklesSprite.color = playerControllerScript.currentPantsColor;
+            characterAnimation.anklesSprite.color = characterAnimation.currentPantsColor;
         }
         SetNoDress();
     }
@@ -2601,24 +1448,24 @@ private void UpdateLockImage()
         public void SetPantsToDress()
     {
  
-      playerControllerScript.waistShortsSprite.color = playerControllerScript.currentPantsColor;
-      playerControllerScript.kneesShinsSprite.color = playerControllerScript.currentSkinColor;
-      if(playerControllerScript.anklesSprite.color != playerControllerScript.currentShoeColor)
+      characterAnimation.waistShortsSprite.color = characterAnimation.currentPantsColor;
+      characterAnimation.kneesShinsSprite.color = characterAnimation.currentSkinColor;
+      if(characterAnimation.anklesSprite.color != characterAnimation.currentShoeColor)
       {
-        playerControllerScript.anklesSprite.color = playerControllerScript.currentSkinColor;
+        characterAnimation.anklesSprite.color = characterAnimation.currentSkinColor;
       }
 
-      Color color = playerControllerScript.currentPantsColor;
+      Color color = characterAnimation.currentPantsColor;
       color.a = 1f;
-      playerControllerScript.dressSprite.color = color;  
+      characterAnimation.dressSprite.color = color;  
     }
 
 
     public void SetNoDress()
     {
-        Color color = playerControllerScript.currentPantsColor;
+        Color color = characterAnimation.currentPantsColor;
         color.a = 0f;
-        playerControllerScript.dressSprite.color = color;
+        characterAnimation.dressSprite.color = color;
     }
 
 
@@ -2627,64 +1474,64 @@ private void UpdateLockImage()
         if (currentShirtIndex == 0) // if no shirt is on
         {
             currentWaistIndex = 1; // set waist to pants
-            playerControllerScript.waistSprite.color = playerControllerScript.currentPantsColor;
+            characterAnimation.waistSprite.color = characterAnimation.currentPantsColor;
         }
         else
         {
-            playerControllerScript.waistSprite.color = playerControllerScript.currentShirtColor;
+            characterAnimation.waistSprite.color = characterAnimation.currentShirtColor;
         }
     }
 
     public void SetWaistToPants()
     {
-        playerControllerScript.waistSprite.color = playerControllerScript.currentPantsColor;
+        characterAnimation.waistSprite.color = characterAnimation.currentPantsColor;
     }
 
     public void SetFeetToShoes()
     {
-        playerControllerScript.feetSprite.color = playerControllerScript.currentShoeColor;
+        characterAnimation.feetSprite.color = characterAnimation.currentShoeColor;
         if (currentPantsIndex == 2)
         {
-            playerControllerScript.anklesSprite.color = playerControllerScript.currentPantsColor;
+            characterAnimation.anklesSprite.color = characterAnimation.currentPantsColor;
         }
         else
         {
-            playerControllerScript.anklesSprite.color = playerControllerScript.currentSkinColor;
+            characterAnimation.anklesSprite.color = characterAnimation.currentSkinColor;
         }
     }
 
     public void SetFeetToBareFoot()
     {
-        playerControllerScript.feetSprite.color = playerControllerScript.currentSkinColor;
+        characterAnimation.feetSprite.color = characterAnimation.currentSkinColor;
         if (currentPantsIndex == 2)
         {
-            playerControllerScript.anklesSprite.color = playerControllerScript.currentPantsColor;
+            characterAnimation.anklesSprite.color = characterAnimation.currentPantsColor;
         }
         else
         {
-            playerControllerScript.anklesSprite.color = playerControllerScript.currentSkinColor;
+            characterAnimation.anklesSprite.color = characterAnimation.currentSkinColor;
         }
     }
 
     public void SetFeetToBoots()
     {
-        playerControllerScript.feetSprite.color = playerControllerScript.currentShoeColor;
-        playerControllerScript.anklesSprite.color = playerControllerScript.currentShoeColor;
+        characterAnimation.feetSprite.color = characterAnimation.currentShoeColor;
+        characterAnimation.anklesSprite.color = characterAnimation.currentShoeColor;
     }
 
     public void SetNoJaketto()
     {
-        Color color = playerControllerScript.currentJakettoColor;
+        Color color = characterAnimation.currentJakettoColor;
         color.a = 0f;
-        playerControllerScript.jakettoSprite.color = color;
+        characterAnimation.jakettoSprite.color = color;
         UpdateShirt();
     }
 
     public void SetJakettoVest()
     {
-        Color color = playerControllerScript.currentJakettoColor;
+        Color color = characterAnimation.currentJakettoColor;
         color.a = 1f;
-        playerControllerScript.jakettoSprite.color = color;
+        characterAnimation.jakettoSprite.color = color;
         UpdateShirt();
     }
 
@@ -2692,386 +1539,407 @@ private void UpdateLockImage()
 
     public void SetSkinColor1()
     {
-        if (playerControllerScript.headSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.headSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.headSprite.color = HexToColor("#F5CBA7");
+            characterAnimation.headSprite.color = HexToColor("#F5CBA7");
         }
-        if (playerControllerScript.throatSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.throatSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.throatSprite.color = HexToColor("#F5CBA7");
+            characterAnimation.throatSprite.color = HexToColor("#F5CBA7");
         }
-        if (playerControllerScript.collarSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.collarSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.collarSprite.color = HexToColor("#F5CBA7");
+            characterAnimation.collarSprite.color = HexToColor("#F5CBA7");
         }
-        if (playerControllerScript.torsoSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.torsoSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.torsoSprite.color = HexToColor("#F5CBA7");
+            characterAnimation.torsoSprite.color = HexToColor("#F5CBA7");
         }
-        if (playerControllerScript.waistShortsSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.waistShortsSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.waistShortsSprite.color = HexToColor("#F5CBA7");
+            characterAnimation.waistShortsSprite.color = HexToColor("#F5CBA7");
         }
-        if (playerControllerScript.waistSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.waistSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.waistSprite.color = HexToColor("#F5CBA7");
+            characterAnimation.waistSprite.color = HexToColor("#F5CBA7");
         }
-        if (playerControllerScript.kneesShinsSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.kneesShinsSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.kneesShinsSprite.color = HexToColor("#F5CBA7");
+            characterAnimation.kneesShinsSprite.color = HexToColor("#F5CBA7");
         }
-        if (playerControllerScript.anklesSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.anklesSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.anklesSprite.color = HexToColor("#F5CBA7");
+            characterAnimation.anklesSprite.color = HexToColor("#F5CBA7");
         }
-        if (playerControllerScript.feetSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.feetSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.feetSprite.color = HexToColor("#F5CBA7");
+            characterAnimation.feetSprite.color = HexToColor("#F5CBA7");
         }
-        if (playerControllerScript.longSleeveSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.longSleeveSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.longSleeveSprite.color = HexToColor("#F5CBA7");
+            characterAnimation.longSleeveSprite.color = HexToColor("#F5CBA7");
         }
-        if (playerControllerScript.handSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.handSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.handSprite.color = HexToColor("#F5CBA7");
+            characterAnimation.handSprite.color = HexToColor("#F5CBA7");
         }
-        if (playerControllerScript.shortSleeveSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.shortSleeveSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.shortSleeveSprite.color = HexToColor("#F5CBA7");
+            characterAnimation.shortSleeveSprite.color = HexToColor("#F5CBA7");
         }
-        playerControllerScript.currentSkinColor = HexToColor("#F5CBA7");
-        skinColorButton2.color = playerControllerScript.currentSkinColor;
+        characterAnimation.currentSkinColor = HexToColor("#F5CBA7");
+        if(skinColorButton2 != null)
+        {
+            skinColorButton2.color = characterAnimation.currentSkinColor;
+        }
     }
 
     public void SetSkinColor2()
     {
-        if (playerControllerScript.headSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.headSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.headSprite.color = HexToColor("#F6B883");
+            characterAnimation.headSprite.color = HexToColor("#F6B883");
         }
-        if (playerControllerScript.throatSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.throatSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.throatSprite.color = HexToColor("#F6B883");
+            characterAnimation.throatSprite.color = HexToColor("#F6B883");
         }
-        if (playerControllerScript.collarSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.collarSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.collarSprite.color = HexToColor("#F6B883");
+            characterAnimation.collarSprite.color = HexToColor("#F6B883");
         }
-        if (playerControllerScript.torsoSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.torsoSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.torsoSprite.color = HexToColor("#F6B883");
+            characterAnimation.torsoSprite.color = HexToColor("#F6B883");
         }
-        if (playerControllerScript.waistShortsSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.waistShortsSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.waistShortsSprite.color = HexToColor("#F6B883");
+            characterAnimation.waistShortsSprite.color = HexToColor("#F6B883");
         }
-        if (playerControllerScript.waistSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.waistSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.waistSprite.color = HexToColor("#F6B883");
+            characterAnimation.waistSprite.color = HexToColor("#F6B883");
         }
-        if (playerControllerScript.kneesShinsSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.kneesShinsSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.kneesShinsSprite.color = HexToColor("#F6B883");
+            characterAnimation.kneesShinsSprite.color = HexToColor("#F6B883");
         }
-        if (playerControllerScript.anklesSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.anklesSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.anklesSprite.color = HexToColor("#F6B883");
+            characterAnimation.anklesSprite.color = HexToColor("#F6B883");
         }
-        if (playerControllerScript.feetSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.feetSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.feetSprite.color = HexToColor("#F6B883");
+            characterAnimation.feetSprite.color = HexToColor("#F6B883");
         }
-        if (playerControllerScript.longSleeveSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.longSleeveSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.longSleeveSprite.color = HexToColor("#F6B883");
+            characterAnimation.longSleeveSprite.color = HexToColor("#F6B883");
         }
-        if (playerControllerScript.handSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.handSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.handSprite.color = HexToColor("#F6B883");
+            characterAnimation.handSprite.color = HexToColor("#F6B883");
         }
-        if (playerControllerScript.shortSleeveSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.shortSleeveSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.shortSleeveSprite.color = HexToColor("#F6B883");
+            characterAnimation.shortSleeveSprite.color = HexToColor("#F6B883");
         }
-        playerControllerScript.currentSkinColor = HexToColor("#F6B883");
-        skinColorButton2.color = playerControllerScript.currentSkinColor;
+        characterAnimation.currentSkinColor = HexToColor("#F6B883");
+        if(skinColorButton2 != null)
+        {
+            skinColorButton2.color = characterAnimation.currentSkinColor;
+        }
     }
 
     public void SetSkinColor3()
     {
-        if (playerControllerScript.headSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.headSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.headSprite.color = HexToColor("#E1A95F");
+            characterAnimation.headSprite.color = HexToColor("#E1A95F");
         }
-        if (playerControllerScript.throatSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.throatSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.throatSprite.color = HexToColor("#E1A95F");
+            characterAnimation.throatSprite.color = HexToColor("#E1A95F");
         }
-        if (playerControllerScript.collarSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.collarSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.collarSprite.color = HexToColor("#E1A95F");
+            characterAnimation.collarSprite.color = HexToColor("#E1A95F");
         }
-        if (playerControllerScript.torsoSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.torsoSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.torsoSprite.color = HexToColor("#E1A95F");
+            characterAnimation.torsoSprite.color = HexToColor("#E1A95F");
         }
-        if (playerControllerScript.waistSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.waistSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.waistSprite.color = HexToColor("#E1A95F");
+            characterAnimation.waistSprite.color = HexToColor("#E1A95F");
         }
-        if (playerControllerScript.waistShortsSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.waistShortsSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.waistShortsSprite.color = HexToColor("#E1A95F");
+            characterAnimation.waistShortsSprite.color = HexToColor("#E1A95F");
         }
-        if (playerControllerScript.kneesShinsSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.kneesShinsSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.kneesShinsSprite.color = HexToColor("#E1A95F");
+            characterAnimation.kneesShinsSprite.color = HexToColor("#E1A95F");
         }
-        if (playerControllerScript.anklesSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.anklesSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.anklesSprite.color = HexToColor("#E1A95F");
+            characterAnimation.anklesSprite.color = HexToColor("#E1A95F");
         }
-        if (playerControllerScript.feetSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.feetSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.feetSprite.color = HexToColor("#E1A95F");
+            characterAnimation.feetSprite.color = HexToColor("#E1A95F");
         }
-        if (playerControllerScript.longSleeveSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.longSleeveSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.longSleeveSprite.color = HexToColor("#E1A95F");
+            characterAnimation.longSleeveSprite.color = HexToColor("#E1A95F");
         }
-        if (playerControllerScript.handSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.handSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.handSprite.color = HexToColor("#E1A95F");
+            characterAnimation.handSprite.color = HexToColor("#E1A95F");
         }
-        if (playerControllerScript.shortSleeveSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.shortSleeveSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.shortSleeveSprite.color = HexToColor("#E1A95F");
+            characterAnimation.shortSleeveSprite.color = HexToColor("#E1A95F");
         }
-        playerControllerScript.currentSkinColor = HexToColor("#E1A95F");
-        skinColorButton2.color = playerControllerScript.currentSkinColor;
+        characterAnimation.currentSkinColor = HexToColor("#E1A95F");
+        if(skinColorButton2 != null)
+        {
+            skinColorButton2.color = characterAnimation.currentSkinColor;
+        }
     }
 
     public void SetSkinColor4()
     {
-        if (playerControllerScript.headSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.headSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.headSprite.color = HexToColor("#C68642");
+            characterAnimation.headSprite.color = HexToColor("#C68642");
         }
-        if (playerControllerScript.throatSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.throatSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.throatSprite.color = HexToColor("#C68642");
+            characterAnimation.throatSprite.color = HexToColor("#C68642");
         }
-        if (playerControllerScript.collarSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.collarSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.collarSprite.color = HexToColor("#C68642");
+            characterAnimation.collarSprite.color = HexToColor("#C68642");
         }
-        if (playerControllerScript.torsoSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.torsoSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.torsoSprite.color = HexToColor("#C68642");
+            characterAnimation.torsoSprite.color = HexToColor("#C68642");
         }
-        if (playerControllerScript.waistSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.waistSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.waistSprite.color = HexToColor("#C68642");
+            characterAnimation.waistSprite.color = HexToColor("#C68642");
         }
-        if (playerControllerScript.waistShortsSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.waistShortsSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.waistShortsSprite.color = HexToColor("#C68642");
+            characterAnimation.waistShortsSprite.color = HexToColor("#C68642");
         }
-        if (playerControllerScript.kneesShinsSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.kneesShinsSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.kneesShinsSprite.color = HexToColor("#C68642");
+            characterAnimation.kneesShinsSprite.color = HexToColor("#C68642");
         }
-        if (playerControllerScript.anklesSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.anklesSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.anklesSprite.color = HexToColor("#C68642");
+            characterAnimation.anklesSprite.color = HexToColor("#C68642");
         }
-        if (playerControllerScript.feetSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.feetSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.feetSprite.color = HexToColor("#C68642");
+            characterAnimation.feetSprite.color = HexToColor("#C68642");
         }
-        if (playerControllerScript.longSleeveSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.longSleeveSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.longSleeveSprite.color = HexToColor("#C68642");
+            characterAnimation.longSleeveSprite.color = HexToColor("#C68642");
         }
-        if (playerControllerScript.handSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.handSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.handSprite.color = HexToColor("#C68642");
+            characterAnimation.handSprite.color = HexToColor("#C68642");
         }
-        if (playerControllerScript.shortSleeveSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.shortSleeveSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.shortSleeveSprite.color = HexToColor("#C68642");
+            characterAnimation.shortSleeveSprite.color = HexToColor("#C68642");
         }
-        playerControllerScript.currentSkinColor = HexToColor("#C68642");
-        skinColorButton2.color = playerControllerScript.currentSkinColor;
+        characterAnimation.currentSkinColor = HexToColor("#C68642");
+        if(skinColorButton2 != null)
+        {
+            skinColorButton2.color = characterAnimation.currentSkinColor;
+        }
     }
 
     public void SetSkinColor5()
     {
-        if (playerControllerScript.headSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.headSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.headSprite.color = HexToColor("#B57A3D");
+            characterAnimation.headSprite.color = HexToColor("#B57A3D");
         }
-        if (playerControllerScript.throatSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.throatSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.throatSprite.color = HexToColor("#B57A3D");
+            characterAnimation.throatSprite.color = HexToColor("#B57A3D");
         }
-        if (playerControllerScript.collarSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.collarSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.collarSprite.color = HexToColor("#B57A3D");
+            characterAnimation.collarSprite.color = HexToColor("#B57A3D");
         }
-        if (playerControllerScript.torsoSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.torsoSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.torsoSprite.color = HexToColor("#B57A3D");
+            characterAnimation.torsoSprite.color = HexToColor("#B57A3D");
         }
-        if (playerControllerScript.waistSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.waistSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.waistSprite.color = HexToColor("#B57A3D");
+            characterAnimation.waistSprite.color = HexToColor("#B57A3D");
         }
-        if (playerControllerScript.waistShortsSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.waistShortsSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.waistShortsSprite.color = HexToColor("#B57A3D");
+            characterAnimation.waistShortsSprite.color = HexToColor("#B57A3D");
         }
-        if (playerControllerScript.kneesShinsSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.kneesShinsSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.kneesShinsSprite.color = HexToColor("#B57A3D");
+            characterAnimation.kneesShinsSprite.color = HexToColor("#B57A3D");
         }
-        if (playerControllerScript.anklesSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.anklesSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.anklesSprite.color = HexToColor("#B57A3D");
+            characterAnimation.anklesSprite.color = HexToColor("#B57A3D");
         }
-        if (playerControllerScript.feetSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.feetSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.feetSprite.color = HexToColor("#B57A3D");
+            characterAnimation.feetSprite.color = HexToColor("#B57A3D");
         }
-        if (playerControllerScript.longSleeveSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.longSleeveSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.longSleeveSprite.color = HexToColor("#B57A3D");
+            characterAnimation.longSleeveSprite.color = HexToColor("#B57A3D");
         }
-        if (playerControllerScript.handSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.handSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.handSprite.color = HexToColor("#B57A3D");
+            characterAnimation.handSprite.color = HexToColor("#B57A3D");
         }
-        if (playerControllerScript.shortSleeveSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.shortSleeveSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.shortSleeveSprite.color = HexToColor("#B57A3D");
+            characterAnimation.shortSleeveSprite.color = HexToColor("#B57A3D");
         }
-        playerControllerScript.currentSkinColor = HexToColor("#B57A3D");
-        skinColorButton2.color = playerControllerScript.currentSkinColor;
+        characterAnimation.currentSkinColor = HexToColor("#B57A3D");
+        if(skinColorButton2 != null)
+        {
+            skinColorButton2.color = characterAnimation.currentSkinColor;
+        }
     }
 
     public void SetSkinColor6()
     {
-        if (playerControllerScript.headSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.headSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.headSprite.color = HexToColor("#DFA10B");
+            characterAnimation.headSprite.color = HexToColor("#DFA10B");
         }
-        if (playerControllerScript.throatSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.throatSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.throatSprite.color = HexToColor("#DFA10B");
+            characterAnimation.throatSprite.color = HexToColor("#DFA10B");
         }
-        if (playerControllerScript.collarSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.collarSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.collarSprite.color = HexToColor("#DFA10B");
+            characterAnimation.collarSprite.color = HexToColor("#DFA10B");
         }
-        if (playerControllerScript.torsoSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.torsoSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.torsoSprite.color = HexToColor("#DFA10B");
+            characterAnimation.torsoSprite.color = HexToColor("#DFA10B");
         }
-        if (playerControllerScript.waistSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.waistSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.waistSprite.color = HexToColor("#DFA10B");
+            characterAnimation.waistSprite.color = HexToColor("#DFA10B");
         }
-        if (playerControllerScript.waistShortsSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.waistShortsSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.waistShortsSprite.color = HexToColor("#DFA10B");
+            characterAnimation.waistShortsSprite.color = HexToColor("#DFA10B");
         }
-        if (playerControllerScript.kneesShinsSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.kneesShinsSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.kneesShinsSprite.color = HexToColor("#DFA10B");
+            characterAnimation.kneesShinsSprite.color = HexToColor("#DFA10B");
         }
-        if (playerControllerScript.anklesSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.anklesSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.anklesSprite.color = HexToColor("#DFA10B");
+            characterAnimation.anklesSprite.color = HexToColor("#DFA10B");
         }
-        if (playerControllerScript.feetSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.feetSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.feetSprite.color = HexToColor("#DFA10B");
+            characterAnimation.feetSprite.color = HexToColor("#DFA10B");
         }
-        if (playerControllerScript.longSleeveSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.longSleeveSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.longSleeveSprite.color = HexToColor("#DFA10B");
+            characterAnimation.longSleeveSprite.color = HexToColor("#DFA10B");
         }
-        if (playerControllerScript.handSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.handSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.handSprite.color = HexToColor("#DFA10B");
+            characterAnimation.handSprite.color = HexToColor("#DFA10B");
         }
-        if (playerControllerScript.shortSleeveSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.shortSleeveSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.shortSleeveSprite.color = HexToColor("#DFA10B");
+            characterAnimation.shortSleeveSprite.color = HexToColor("#DFA10B");
         }
-        playerControllerScript.currentSkinColor = HexToColor("#DFA10B");
-        skinColorButton2.color = playerControllerScript.currentSkinColor;
+        characterAnimation.currentSkinColor = HexToColor("#DFA10B");
+        if(skinColorButton2 != null)
+        {
+            skinColorButton2.color = characterAnimation.currentSkinColor;
+        }
     }
 
     public void SetSkinColor7()
     {
-        if (playerControllerScript.headSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.headSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.headSprite.color = HexToColor("#E1B24B");
+            characterAnimation.headSprite.color = HexToColor("#E1B24B");
         }
-        if (playerControllerScript.throatSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.throatSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.throatSprite.color = HexToColor("#E1B24B");
+            characterAnimation.throatSprite.color = HexToColor("#E1B24B");
         }
-        if (playerControllerScript.collarSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.collarSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.collarSprite.color = HexToColor("#E1B24B");
+            characterAnimation.collarSprite.color = HexToColor("#E1B24B");
         }
-        if (playerControllerScript.torsoSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.torsoSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.torsoSprite.color = HexToColor("#E1B24B");
+            characterAnimation.torsoSprite.color = HexToColor("#E1B24B");
         }
-        if (playerControllerScript.waistSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.waistSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.waistSprite.color = HexToColor("#E1B24B");
+            characterAnimation.waistSprite.color = HexToColor("#E1B24B");
         }
-        if (playerControllerScript.waistShortsSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.waistShortsSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.waistShortsSprite.color = HexToColor("#E1B24B");
+            characterAnimation.waistShortsSprite.color = HexToColor("#E1B24B");
         }
-        if (playerControllerScript.kneesShinsSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.kneesShinsSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.kneesShinsSprite.color = HexToColor("#E1B24B");
+            characterAnimation.kneesShinsSprite.color = HexToColor("#E1B24B");
         }
-        if (playerControllerScript.anklesSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.anklesSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.anklesSprite.color = HexToColor("#E1B24B");
+            characterAnimation.anklesSprite.color = HexToColor("#E1B24B");
         }
-        if (playerControllerScript.feetSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.feetSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.feetSprite.color = HexToColor("#E1B24B");
+            characterAnimation.feetSprite.color = HexToColor("#E1B24B");
         }
-        if (playerControllerScript.longSleeveSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.longSleeveSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.longSleeveSprite.color = HexToColor("#E1B24B");
+            characterAnimation.longSleeveSprite.color = HexToColor("#E1B24B");
         }
-        if (playerControllerScript.handSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.handSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.handSprite.color = HexToColor("#E1B24B");
+            characterAnimation.handSprite.color = HexToColor("#E1B24B");
         }
-        if (playerControllerScript.shortSleeveSprite.color == playerControllerScript.currentSkinColor)
+        if (characterAnimation.shortSleeveSprite.color == characterAnimation.currentSkinColor)
         {
-            playerControllerScript.shortSleeveSprite.color = HexToColor("#E1B24B");
+            characterAnimation.shortSleeveSprite.color = HexToColor("#E1B24B");
         }
-        playerControllerScript.currentSkinColor = HexToColor("#E1B24B");
-        skinColorButton2.color = playerControllerScript.currentSkinColor;
+        characterAnimation.currentSkinColor = HexToColor("#E1B24B");
+        if(skinColorButton2 != null)
+        {
+            skinColorButton2.color = characterAnimation.currentSkinColor;
+        }
     }
 
 
     public void SetHairColor1()
     {
-        Transform hair = playerControllerScript.transform.Find("hair");
+        Transform hair = characterAnimation.transform.Find("hair");
         if (hair != null)
         {
             foreach (Transform child in hair)
@@ -3083,14 +1951,17 @@ private void UpdateLockImage()
                     spriteRenderer.color = HexToColor("#4E342E");  // Brunette (Brown)
                 }
             }
-            playerControllerScript.currentHairColor = HexToColor("#4E342E");
-            hairColorButton.color = playerControllerScript.currentHairColor;
+            characterAnimation.currentHairColor = HexToColor("#4E342E");
+            if(hairColorButton != null)
+            {
+                hairColorButton.color = characterAnimation.currentHairColor;
+            }
         }
     }
 
     public void SetHairColor2()
     {
-        Transform hair = playerControllerScript.transform.Find("hair");
+        Transform hair = characterAnimation.transform.Find("hair");
         if (hair != null)
         {
             foreach (Transform child in hair)
@@ -3102,14 +1973,17 @@ private void UpdateLockImage()
                     spriteRenderer.color = HexToColor("#1C1C1C");  // Black
                 }
             }
-            playerControllerScript.currentHairColor = HexToColor("#1C1C1C");
-            hairColorButton.color = playerControllerScript.currentHairColor;
+            characterAnimation.currentHairColor = HexToColor("#1C1C1C");
+            if(hairColorButton != null)
+            {
+                hairColorButton.color = characterAnimation.currentHairColor;
+            }
         }
     }
 
     public void SetHairColor3()
     {
-        Transform hair = playerControllerScript.transform.Find("hair");
+        Transform hair = characterAnimation.transform.Find("hair");
         if (hair != null)
         {
             foreach (Transform child in hair)
@@ -3121,14 +1995,17 @@ private void UpdateLockImage()
                     spriteRenderer.color = HexToColor("#F5D76E");  // Blonde
                 }
             }
-            playerControllerScript.currentHairColor = HexToColor("#F5D76E");
-            hairColorButton.color = playerControllerScript.currentHairColor;
+            characterAnimation.currentHairColor = HexToColor("#F5D76E");
+            if(hairColorButton != null)
+            {
+                hairColorButton.color = characterAnimation.currentHairColor;
+            }
         }
     }
 
     public void SetHairColor4()
     {
-        Transform hair = playerControllerScript.transform.Find("hair");
+        Transform hair = characterAnimation.transform.Find("hair");
         if (hair != null)
         {
             foreach (Transform child in hair)
@@ -3140,14 +2017,17 @@ private void UpdateLockImage()
                     spriteRenderer.color = HexToColor("#A52A2A");  // Auburn (Red-Brown)
                 }
             }
-            playerControllerScript.currentHairColor = HexToColor("#A52A2A");
-            hairColorButton.color = playerControllerScript.currentHairColor;
+            characterAnimation.currentHairColor = HexToColor("#A52A2A");
+            if(hairColorButton != null)
+            {
+                hairColorButton.color = characterAnimation.currentHairColor;
+            }
         }
     }
 
     public void SetHairColor5()
     {
-        Transform hair = playerControllerScript.transform.Find("hair");
+        Transform hair = characterAnimation.transform.Find("hair");
         if (hair != null)
         {
             foreach (Transform child in hair)
@@ -3159,14 +2039,17 @@ private void UpdateLockImage()
                     spriteRenderer.color = HexToColor("#A9A9A9");  // Gray
                 }
             }
-            playerControllerScript.currentHairColor = HexToColor("#A9A9A9");
-            hairColorButton.color = playerControllerScript.currentHairColor;
+            characterAnimation.currentHairColor = HexToColor("#A9A9A9");
+            if(hairColorButton != null)
+            {
+                hairColorButton.color = characterAnimation.currentHairColor;
+            }
         }
     }
 
     public void SetHairColor6()
     {
-        Transform hair = playerControllerScript.transform.Find("hair");
+        Transform hair = characterAnimation.transform.Find("hair");
         if (hair != null)
         {
             foreach (Transform child in hair)
@@ -3178,14 +2061,17 @@ private void UpdateLockImage()
                     spriteRenderer.color = HexToColor("#00BFFF");  // Electric Blue
                 }
             }
-            playerControllerScript.currentHairColor = HexToColor("#00BFFF");
-            hairColorButton.color = playerControllerScript.currentHairColor;
+            characterAnimation.currentHairColor = HexToColor("#00BFFF");
+            if(hairColorButton != null)
+            {
+                hairColorButton.color = characterAnimation.currentHairColor;
+            }
         }
     }
 
     public void SetHairColor7()
     {
-        Transform hair = playerControllerScript.transform.Find("hair");
+        Transform hair = characterAnimation.transform.Find("hair");
         if (hair != null)
         {
             foreach (Transform child in hair)
@@ -3197,14 +2083,17 @@ private void UpdateLockImage()
                     spriteRenderer.color = HexToColor("#FFB6C1");  // Pastel Pink
                 }
             }
-            playerControllerScript.currentHairColor = HexToColor("#FFB6C1");
-            hairColorButton.color = playerControllerScript.currentHairColor;
+            characterAnimation.currentHairColor = HexToColor("#FFB6C1");
+            if(hairColorButton != null)
+            {
+                hairColorButton.color = characterAnimation.currentHairColor;
+            }
         }
     }
 
     public void SetHairColor8()
     {
-        Transform hair = playerControllerScript.transform.Find("hair");
+        Transform hair = characterAnimation.transform.Find("hair");
         if (hair != null)
         {
             foreach (Transform child in hair)
@@ -3216,14 +2105,17 @@ private void UpdateLockImage()
                     spriteRenderer.color = HexToColor("#E6E6FA");  // Lavender
                 }
             }
-            playerControllerScript.currentHairColor = HexToColor("#E6E6FA");
-            hairColorButton.color = playerControllerScript.currentHairColor;
+            characterAnimation.currentHairColor = HexToColor("#E6E6FA");
+            if(hairColorButton != null)
+            {
+                hairColorButton.color = characterAnimation.currentHairColor;
+            }
         }
     }
 
     public void SetHairColor9()
     {
-        Transform hair = playerControllerScript.transform.Find("hair");
+        Transform hair = characterAnimation.transform.Find("hair");
         if (hair != null)
         {
             foreach (Transform child in hair)
@@ -3235,14 +2127,17 @@ private void UpdateLockImage()
                     spriteRenderer.color = HexToColor("#98FF98");  // Mint Green
                 }
             }
-            playerControllerScript.currentHairColor = HexToColor("#98FF98");
-            hairColorButton.color = playerControllerScript.currentHairColor;
+            characterAnimation.currentHairColor = HexToColor("#98FF98");
+            if(hairColorButton != null)
+            {
+                hairColorButton.color = characterAnimation.currentHairColor;
+            }
         }
     }
 
     public void SetHairColor10()
     {
-        Transform hair = playerControllerScript.transform.Find("hair");
+        Transform hair = characterAnimation.transform.Find("hair");
         if (hair != null)
         {
             foreach (Transform child in hair)
@@ -3254,8 +2149,11 @@ private void UpdateLockImage()
                     spriteRenderer.color = HexToColor("#8A2BE2");  // Vibrant Purple
                 }
             }
-            playerControllerScript.currentHairColor = HexToColor("#8A2BE2");
-            hairColorButton.color = playerControllerScript.currentHairColor;
+            characterAnimation.currentHairColor = HexToColor("#8A2BE2");
+            if(hairColorButton != null)
+            {
+                hairColorButton.color = characterAnimation.currentHairColor;
+            }
         }
     }
 
@@ -3263,7 +2161,7 @@ private void UpdateLockImage()
 
     public void SetHairStyle1()
     {
-        Transform hair = playerControllerScript.transform.Find("hair");
+        Transform hair = characterAnimation.transform.Find("hair");
         if (hair != null)
         {
             foreach (Transform child in hair)
@@ -3273,7 +2171,7 @@ private void UpdateLockImage()
                 {
                   if (child.gameObject.name.Contains("hair0Top") || child.gameObject.name.Contains("hair0Bottom"))
                   {
-                      spriteRenderer.color = playerControllerScript.currentHairColor;  
+                      spriteRenderer.color = characterAnimation.currentHairColor;  
                       Color color = spriteRenderer.color;
                       color.a = 1f;  // Set alpha to 1 (fully visible)
                       spriteRenderer.color = color;
@@ -3291,7 +2189,7 @@ private void UpdateLockImage()
 
     public void SetHairStyle2()
     {
-        Transform hair = playerControllerScript.transform.Find("hair");
+        Transform hair = characterAnimation.transform.Find("hair");
         if (hair != null)
         {
             foreach (Transform child in hair)
@@ -3303,7 +2201,7 @@ private void UpdateLockImage()
                       || child.gameObject.name.Contains("hair0Bottom")
                       || child.gameObject.name.Contains("hairFringe1"))
                   {
-                      spriteRenderer.color = playerControllerScript.currentHairColor;                    
+                      spriteRenderer.color = characterAnimation.currentHairColor;                    
                       Color color = spriteRenderer.color;
                       color.a = 1f;  // Set alpha to 1 (fully visible)
                       spriteRenderer.color = color;
@@ -3321,7 +2219,7 @@ private void UpdateLockImage()
 
     public void SetHairStyle3()
     {
-        Transform hair = playerControllerScript.transform.Find("hair");
+        Transform hair = characterAnimation.transform.Find("hair");
         if (hair != null)
         {
             foreach (Transform child in hair)
@@ -3333,7 +2231,7 @@ private void UpdateLockImage()
                       || child.gameObject.name.Contains("hair1Bottom")
                       || child.gameObject.name.Contains("hairFringe1"))
                   {
-                      spriteRenderer.color = playerControllerScript.currentHairColor;                    
+                      spriteRenderer.color = characterAnimation.currentHairColor;                    
                       Color color = spriteRenderer.color;
                       color.a = 1f;  // Set alpha to 1 (fully visible)
                       spriteRenderer.color = color;
@@ -3351,7 +2249,7 @@ private void UpdateLockImage()
 
     public void SetHairStyle4()
     {
-        Transform hair = playerControllerScript.transform.Find("hair");
+        Transform hair = characterAnimation.transform.Find("hair");
         if (hair != null)
         {
             foreach (Transform child in hair)
@@ -3362,7 +2260,7 @@ private void UpdateLockImage()
                   if (child.gameObject.name.Contains("hair1Top") 
                       || child.gameObject.name.Contains("hair1Bottom"))
                   {
-                      spriteRenderer.color = playerControllerScript.currentHairColor;  
+                      spriteRenderer.color = characterAnimation.currentHairColor;  
                       Color color = spriteRenderer.color;
                       color.a = 1f;  // Set alpha to 1 (fully visible)
                       spriteRenderer.color = color;
@@ -3380,7 +2278,7 @@ private void UpdateLockImage()
 
     public void SetHairStyle5()
     {
-        Transform hair = playerControllerScript.transform.Find("hair");
+        Transform hair = characterAnimation.transform.Find("hair");
         if (hair != null)
         {
             foreach (Transform child in hair)
@@ -3390,7 +2288,7 @@ private void UpdateLockImage()
                 {
                   if (child.gameObject.name.Contains("mohawk"))
                   {
-                      spriteRenderer.color = playerControllerScript.currentHairColor;  
+                      spriteRenderer.color = characterAnimation.currentHairColor;  
                       Color color = spriteRenderer.color;
                       color.a = 1f;  // Set alpha to 1 (fully visible)
                       spriteRenderer.color = color;
@@ -3408,7 +2306,7 @@ private void UpdateLockImage()
 
     public void SetHairStyle6()
     {
-        Transform hair = playerControllerScript.transform.Find("hair");
+        Transform hair = characterAnimation.transform.Find("hair");
         if (hair != null)
         {
             foreach (Transform child in hair)
@@ -3418,7 +2316,7 @@ private void UpdateLockImage()
                 {
                   if (child.gameObject.name.Contains("hair1Top") || child.gameObject.name.Contains("hair2Bottom") )
                   {
-                      spriteRenderer.color = playerControllerScript.currentHairColor;  
+                      spriteRenderer.color = characterAnimation.currentHairColor;  
                       Color color = spriteRenderer.color;
                       color.a = 1f;  // Set alpha to 1 (fully visible)
                       spriteRenderer.color = color;
@@ -3436,7 +2334,7 @@ private void UpdateLockImage()
 
     public void SetHairStyle7()
     {
-        Transform hair = playerControllerScript.transform.Find("hair");
+        Transform hair = characterAnimation.transform.Find("hair");
         if (hair != null)
         {
             foreach (Transform child in hair)
@@ -3446,7 +2344,7 @@ private void UpdateLockImage()
                 {
                   if (child.gameObject.name.Contains("hair1Top") || child.gameObject.name.Contains("hair3Bottom") )
                   {
-                      spriteRenderer.color = playerControllerScript.currentHairColor;  
+                      spriteRenderer.color = characterAnimation.currentHairColor;  
                       Color color = spriteRenderer.color;
                       color.a = 1f;  // Set alpha to 1 (fully visible)
                       spriteRenderer.color = color;
@@ -3464,7 +2362,7 @@ private void UpdateLockImage()
 
     public void SetHairStyle8()
     {
-        Transform hair = playerControllerScript.transform.Find("hair");
+        Transform hair = characterAnimation.transform.Find("hair");
         if (hair != null)
         {
             foreach (Transform child in hair)
@@ -3474,7 +2372,7 @@ private void UpdateLockImage()
                 {
                   if (child.gameObject.name.Contains("hair1Top") || child.gameObject.name.Contains("hair4Bottom") )
                   {
-                      spriteRenderer.color = playerControllerScript.currentHairColor;  
+                      spriteRenderer.color = characterAnimation.currentHairColor;  
                       Color color = spriteRenderer.color;
                       color.a = 1f;  // Set alpha to 1 (fully visible)
                       spriteRenderer.color = color;
@@ -3491,7 +2389,7 @@ private void UpdateLockImage()
     }
     public void SetHairStyle9()
     {
-        Transform hair = playerControllerScript.transform.Find("hair");
+        Transform hair = characterAnimation.transform.Find("hair");
         if (hair != null)
         {
             foreach (Transform child in hair)
@@ -3501,7 +2399,7 @@ private void UpdateLockImage()
                 {
                   if (child.gameObject.name.Contains("hair1Top") || child.gameObject.name.Contains("hair1Bottom") || child.gameObject.name.Contains("hair6Bottom") )
                   {
-                      spriteRenderer.color = playerControllerScript.currentHairColor;  
+                      spriteRenderer.color = characterAnimation.currentHairColor;  
                       Color color = spriteRenderer.color;
                       color.a = 1f;  // Set alpha to 1 (fully visible)
                       spriteRenderer.color = color;
@@ -3518,7 +2416,7 @@ private void UpdateLockImage()
     }
     public void SetHairStyle10()
     {
-        Transform hair = playerControllerScript.transform.Find("hair");
+        Transform hair = characterAnimation.transform.Find("hair");
         if (hair != null)
         {
             foreach (Transform child in hair)
@@ -3529,7 +2427,7 @@ private void UpdateLockImage()
                   if (child.gameObject.name.Contains("hair7Top")
                   || child.gameObject.name.Contains("hair7Bottom"))
                   {
-                      spriteRenderer.color = playerControllerScript.currentHairColor;  
+                      spriteRenderer.color = characterAnimation.currentHairColor;  
                       Color color = spriteRenderer.color;
                       color.a = 1f;  // Set alpha to 1 (fully visible)
                       spriteRenderer.color = color;
@@ -3546,7 +2444,7 @@ private void UpdateLockImage()
     }
     public void SetHairStyle11()
     {
-        Transform hair = playerControllerScript.transform.Find("hair");
+        Transform hair = characterAnimation.transform.Find("hair");
         if (hair != null)
         {
             foreach (Transform child in hair)
@@ -3556,7 +2454,7 @@ private void UpdateLockImage()
                 {
                   if (child.gameObject.name.Contains("hair8Top") || child.gameObject.name.Contains("hair8Bottom"))
                   {
-                      spriteRenderer.color = playerControllerScript.currentHairColor;  
+                      spriteRenderer.color = characterAnimation.currentHairColor;  
                       Color color = spriteRenderer.color;
                       color.a = 1f;  // Set alpha to 1 (fully visible)
                       spriteRenderer.color = color;
@@ -3573,7 +2471,7 @@ private void UpdateLockImage()
     }
     public void SetHairStyle12()
     {
-        Transform hair = playerControllerScript.transform.Find("hair");
+        Transform hair = characterAnimation.transform.Find("hair");
         if (hair != null)
         {
             foreach (Transform child in hair)
@@ -3583,7 +2481,7 @@ private void UpdateLockImage()
                 {
                   if (child.gameObject.name.Contains("hair0Bottom"))
                   {
-                      spriteRenderer.color = playerControllerScript.currentHairColor;  
+                      spriteRenderer.color = characterAnimation.currentHairColor;  
                       Color color = spriteRenderer.color;
                       color.a = 1f;  // Set alpha to 1 (fully visible)
                       spriteRenderer.color = color;
@@ -3600,7 +2498,7 @@ private void UpdateLockImage()
     }
     public void SetHairStyle13()
     {
-        Transform hair = playerControllerScript.transform.Find("hair");
+        Transform hair = characterAnimation.transform.Find("hair");
         if (hair != null)
         {
             foreach (Transform child in hair)
@@ -3621,635 +2519,728 @@ private void UpdateLockImage()
 
     public void SetShirtColor1()
     {
-        if(playerControllerScript.throatSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.throatSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.throatSprite.color = HexToColor("#FF6347");
+            characterAnimation.throatSprite.color = HexToColor("#FF6347");
         }
-        if(playerControllerScript.collarSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.collarSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.collarSprite.color = HexToColor("#FF6347");
+            characterAnimation.collarSprite.color = HexToColor("#FF6347");
         }
-        if(playerControllerScript.torsoSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.torsoSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.torsoSprite.color = HexToColor("#FF6347");
+            characterAnimation.torsoSprite.color = HexToColor("#FF6347");
         }
-        if(playerControllerScript.waistSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.waistSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.waistSprite.color = HexToColor("#FF6347");
+            characterAnimation.waistSprite.color = HexToColor("#FF6347");
         }
-        if(playerControllerScript.longSleeveSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.longSleeveSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.longSleeveSprite.color = HexToColor("#FF6347");
+            characterAnimation.longSleeveSprite.color = HexToColor("#FF6347");
         }
-        if(playerControllerScript.shortSleeveSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.shortSleeveSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.shortSleeveSprite.color = HexToColor("#FF6347");
+            characterAnimation.shortSleeveSprite.color = HexToColor("#FF6347");
         }
-        playerControllerScript.currentShirtColor = HexToColor("#FF6347");
-        shirtColorButton.color = playerControllerScript.currentShirtColor;
+        characterAnimation.currentShirtColor = HexToColor("#FF6347");
+        if(shirtColorButton != null)
+        {
+            shirtColorButton.color = characterAnimation.currentShirtColor;
+        }
     }
 
     public void SetShirtColor2()
     {
-        if(playerControllerScript.throatSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.throatSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.throatSprite.color = HexToColor("#4682B4");
+            characterAnimation.throatSprite.color = HexToColor("#4682B4");
         }
-        if(playerControllerScript.collarSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.collarSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.collarSprite.color = HexToColor("#4682B4");
+            characterAnimation.collarSprite.color = HexToColor("#4682B4");
         }
-        if(playerControllerScript.torsoSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.torsoSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.torsoSprite.color = HexToColor("#4682B4");
+            characterAnimation.torsoSprite.color = HexToColor("#4682B4");
         }
-        if(playerControllerScript.waistSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.waistSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.waistSprite.color = HexToColor("#4682B4");
+            characterAnimation.waistSprite.color = HexToColor("#4682B4");
         }
-        if(playerControllerScript.longSleeveSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.longSleeveSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.longSleeveSprite.color = HexToColor("#4682B4");
+            characterAnimation.longSleeveSprite.color = HexToColor("#4682B4");
         }
-        if(playerControllerScript.shortSleeveSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.shortSleeveSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.shortSleeveSprite.color = HexToColor("#4682B4");
+            characterAnimation.shortSleeveSprite.color = HexToColor("#4682B4");
         }
-        playerControllerScript.currentShirtColor = HexToColor("#4682B4");
-        shirtColorButton.color = playerControllerScript.currentShirtColor;
+        characterAnimation.currentShirtColor = HexToColor("#4682B4");
+        if(shirtColorButton != null)
+        {
+            shirtColorButton.color = characterAnimation.currentShirtColor;
+        }
     }
 
     public void SetShirtColor3()
     {
-        if(playerControllerScript.throatSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.throatSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.throatSprite.color = HexToColor("#32CD32");
+            characterAnimation.throatSprite.color = HexToColor("#32CD32");
         }
-        if(playerControllerScript.collarSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.collarSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.collarSprite.color = HexToColor("#32CD32");
+            characterAnimation.collarSprite.color = HexToColor("#32CD32");
         }
-        if(playerControllerScript.torsoSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.torsoSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.torsoSprite.color = HexToColor("#32CD32");
+            characterAnimation.torsoSprite.color = HexToColor("#32CD32");
         }
-        if(playerControllerScript.waistSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.waistSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.waistSprite.color = HexToColor("#32CD32");
+            characterAnimation.waistSprite.color = HexToColor("#32CD32");
         }
-        if(playerControllerScript.longSleeveSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.longSleeveSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.longSleeveSprite.color = HexToColor("#32CD32");
+            characterAnimation.longSleeveSprite.color = HexToColor("#32CD32");
         }
-        if(playerControllerScript.shortSleeveSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.shortSleeveSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.shortSleeveSprite.color = HexToColor("#32CD32");
+            characterAnimation.shortSleeveSprite.color = HexToColor("#32CD32");
         }
-        playerControllerScript.currentShirtColor = HexToColor("#32CD32");
-        shirtColorButton.color = playerControllerScript.currentShirtColor;
+        characterAnimation.currentShirtColor = HexToColor("#32CD32");
+        if(shirtColorButton != null)
+        {
+            shirtColorButton.color = characterAnimation.currentShirtColor;
+        }   
     }
 
     public void SetShirtColor4()
     {
-        if(playerControllerScript.throatSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.throatSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.throatSprite.color = HexToColor("#FFD700");
+            characterAnimation.throatSprite.color = HexToColor("#FFD700");
         }
-        if(playerControllerScript.collarSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.collarSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.collarSprite.color = HexToColor("#FFD700");
+            characterAnimation.collarSprite.color = HexToColor("#FFD700");
         }
-        if(playerControllerScript.torsoSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.torsoSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.torsoSprite.color = HexToColor("#FFD700");
+            characterAnimation.torsoSprite.color = HexToColor("#FFD700");
         }
-        if(playerControllerScript.waistSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.waistSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.waistSprite.color = HexToColor("#FFD700");
+            characterAnimation.waistSprite.color = HexToColor("#FFD700");
         }
-        if(playerControllerScript.longSleeveSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.longSleeveSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.longSleeveSprite.color = HexToColor("#FFD700");
+            characterAnimation.longSleeveSprite.color = HexToColor("#FFD700");
         }
-        if(playerControllerScript.shortSleeveSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.shortSleeveSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.shortSleeveSprite.color = HexToColor("#FFD700");
+            characterAnimation.shortSleeveSprite.color = HexToColor("#FFD700");
         }
-        playerControllerScript.currentShirtColor = HexToColor("#FFD700");
-        shirtColorButton.color = playerControllerScript.currentShirtColor;
+        characterAnimation.currentShirtColor = HexToColor("#FFD700");
+        if(shirtColorButton != null)
+        {
+            shirtColorButton.color = characterAnimation.currentShirtColor;
+        }
     }
 
     public void SetShirtColor5()
     {
-        if(playerControllerScript.throatSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.throatSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.throatSprite.color = HexToColor("#8A2BE2");
+            characterAnimation.throatSprite.color = HexToColor("#8A2BE2");
         }
-        if(playerControllerScript.collarSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.collarSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.collarSprite.color = HexToColor("#8A2BE2");
+            characterAnimation.collarSprite.color = HexToColor("#8A2BE2");
         }
-        if(playerControllerScript.torsoSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.torsoSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.torsoSprite.color = HexToColor("#8A2BE2");
+            characterAnimation.torsoSprite.color = HexToColor("#8A2BE2");
         }
-        if(playerControllerScript.waistSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.waistSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.waistSprite.color = HexToColor("#8A2BE2");
+            characterAnimation.waistSprite.color = HexToColor("#8A2BE2");
         }
-        if(playerControllerScript.longSleeveSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.longSleeveSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.longSleeveSprite.color = HexToColor("#8A2BE2");
+            characterAnimation.longSleeveSprite.color = HexToColor("#8A2BE2");
         }
-        if(playerControllerScript.shortSleeveSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.shortSleeveSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.shortSleeveSprite.color = HexToColor("#8A2BE2");
+            characterAnimation.shortSleeveSprite.color = HexToColor("#8A2BE2");
         }
-        playerControllerScript.currentShirtColor = HexToColor("#8A2BE2");
-        shirtColorButton.color = playerControllerScript.currentShirtColor;
+        characterAnimation.currentShirtColor = HexToColor("#8A2BE2");
+        if(shirtColorButton != null)
+        {
+            shirtColorButton.color = characterAnimation.currentShirtColor;
+        }
     }
 
     public void SetShirtColor6()
     {
-        if(playerControllerScript.throatSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.throatSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.throatSprite.color = HexToColor("#DC143C");
+            characterAnimation.throatSprite.color = HexToColor("#DC143C");
         }
-        if(playerControllerScript.collarSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.collarSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.collarSprite.color = HexToColor("#DC143C");
+            characterAnimation.collarSprite.color = HexToColor("#DC143C");
         }
-        if(playerControllerScript.torsoSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.torsoSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.torsoSprite.color = HexToColor("#DC143C");
+            characterAnimation.torsoSprite.color = HexToColor("#DC143C");
         }
-        if(playerControllerScript.waistSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.waistSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.waistSprite.color = HexToColor("#DC143C");
+            characterAnimation.waistSprite.color = HexToColor("#DC143C");
         }
-        if(playerControllerScript.longSleeveSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.longSleeveSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.longSleeveSprite.color = HexToColor("#DC143C");
+            characterAnimation.longSleeveSprite.color = HexToColor("#DC143C");
         }
-        if(playerControllerScript.shortSleeveSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.shortSleeveSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.shortSleeveSprite.color = HexToColor("#DC143C");
+            characterAnimation.shortSleeveSprite.color = HexToColor("#DC143C");
         }
-        playerControllerScript.currentShirtColor = HexToColor("#DC143C");
-        shirtColorButton.color = playerControllerScript.currentShirtColor;
+        characterAnimation.currentShirtColor = HexToColor("#DC143C");
+        if(shirtColorButton != null)
+        {
+            shirtColorButton.color = characterAnimation.currentShirtColor;
+        }
     }
 
     public void SetShirtColor7()
     {
-        if(playerControllerScript.throatSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.throatSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.throatSprite.color = HexToColor("#20B2AA");
+            characterAnimation.throatSprite.color = HexToColor("#20B2AA");
         }
-        if(playerControllerScript.collarSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.collarSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.collarSprite.color = HexToColor("#20B2AA");
+            characterAnimation.collarSprite.color = HexToColor("#20B2AA");
         }
-        if(playerControllerScript.torsoSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.torsoSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.torsoSprite.color = HexToColor("#20B2AA");
+            characterAnimation.torsoSprite.color = HexToColor("#20B2AA");
         }
-        if(playerControllerScript.waistSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.waistSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.waistSprite.color = HexToColor("#20B2AA");
+            characterAnimation.waistSprite.color = HexToColor("#20B2AA");
         }
-        if(playerControllerScript.longSleeveSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.longSleeveSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.longSleeveSprite.color = HexToColor("#20B2AA");
+            characterAnimation.longSleeveSprite.color = HexToColor("#20B2AA");
         }
-        if(playerControllerScript.shortSleeveSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.shortSleeveSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.shortSleeveSprite.color = HexToColor("#20B2AA");
+            characterAnimation.shortSleeveSprite.color = HexToColor("#20B2AA");
         }
-        playerControllerScript.currentShirtColor = HexToColor("#20B2AA");
-        shirtColorButton.color = playerControllerScript.currentShirtColor;
+        characterAnimation.currentShirtColor = HexToColor("#20B2AA");
+        if(shirtColorButton != null)
+        {
+            shirtColorButton.color = characterAnimation.currentShirtColor;
+        }
     }
 
     public void SetShirtColor8()
     {
-        if(playerControllerScript.throatSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.throatSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.throatSprite.color = HexToColor("#D3D3D3");
+            characterAnimation.throatSprite.color = HexToColor("#D3D3D3");
         };
-        if(playerControllerScript.collarSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.collarSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.collarSprite.color = HexToColor("#D3D3D3");
+            characterAnimation.collarSprite.color = HexToColor("#D3D3D3");
         };
-        if(playerControllerScript.torsoSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.torsoSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.torsoSprite.color = HexToColor("#D3D3D3");
+            characterAnimation.torsoSprite.color = HexToColor("#D3D3D3");
         };
-        if(playerControllerScript.waistSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.waistSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.waistSprite.color = HexToColor("#D3D3D3");
+            characterAnimation.waistSprite.color = HexToColor("#D3D3D3");
         };
-        if(playerControllerScript.longSleeveSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.longSleeveSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.longSleeveSprite.color = HexToColor("#D3D3D3");
+            characterAnimation.longSleeveSprite.color = HexToColor("#D3D3D3");
         };
-        if(playerControllerScript.shortSleeveSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.shortSleeveSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.shortSleeveSprite.color = HexToColor("#D3D3D3");
+            characterAnimation.shortSleeveSprite.color = HexToColor("#D3D3D3");
         };
-        playerControllerScript.currentShirtColor = HexToColor("#D3D3D3");
-        shirtColorButton.color = playerControllerScript.currentShirtColor;
+        characterAnimation.currentShirtColor = HexToColor("#D3D3D3");
+        if(shirtColorButton != null)
+        {
+            shirtColorButton.color = characterAnimation.currentShirtColor;
+        }
     }
 
     public void SetShirtColor9()
     {
-        if(playerControllerScript.throatSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.throatSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.throatSprite.color = HexToColor("#F08080");
+            characterAnimation.throatSprite.color = HexToColor("#F08080");
         };
-        if(playerControllerScript.collarSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.collarSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.collarSprite.color = HexToColor("#F08080");
+            characterAnimation.collarSprite.color = HexToColor("#F08080");
         };
-        if(playerControllerScript.torsoSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.torsoSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.torsoSprite.color = HexToColor("#F08080");
+            characterAnimation.torsoSprite.color = HexToColor("#F08080");
         };
-        if(playerControllerScript.waistSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.waistSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.waistSprite.color = HexToColor("#F08080");
+            characterAnimation.waistSprite.color = HexToColor("#F08080");
         };
-        if(playerControllerScript.longSleeveSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.longSleeveSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.longSleeveSprite.color = HexToColor("#F08080");
+            characterAnimation.longSleeveSprite.color = HexToColor("#F08080");
         };
-        if(playerControllerScript.shortSleeveSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.shortSleeveSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.shortSleeveSprite.color = HexToColor("#F08080");
+            characterAnimation.shortSleeveSprite.color = HexToColor("#F08080");
         };
-        playerControllerScript.currentShirtColor = HexToColor("#F08080");
-        shirtColorButton.color = playerControllerScript.currentShirtColor;
+        characterAnimation.currentShirtColor = HexToColor("#F08080");
+        if(shirtColorButton != null)
+        {
+            shirtColorButton.color = characterAnimation.currentShirtColor;
+        }
     }
 
     public void SetShirtColor10()
     {
-        if(playerControllerScript.throatSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.throatSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.throatSprite.color = HexToColor("#2F4F4F");
+            characterAnimation.throatSprite.color = HexToColor("#2F4F4F");
         };
-        if(playerControllerScript.collarSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.collarSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.collarSprite.color = HexToColor("#2F4F4F");
+            characterAnimation.collarSprite.color = HexToColor("#2F4F4F");
         };
-        if(playerControllerScript.torsoSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.torsoSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.torsoSprite.color = HexToColor("#2F4F4F");
+            characterAnimation.torsoSprite.color = HexToColor("#2F4F4F");
         };
-        if(playerControllerScript.waistSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.waistSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.waistSprite.color = HexToColor("#2F4F4F");
+            characterAnimation.waistSprite.color = HexToColor("#2F4F4F");
         };
-        if(playerControllerScript.longSleeveSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.longSleeveSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.longSleeveSprite.color = HexToColor("#2F4F4F");
+            characterAnimation.longSleeveSprite.color = HexToColor("#2F4F4F");
         };
-        if(playerControllerScript.shortSleeveSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.shortSleeveSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.shortSleeveSprite.color = HexToColor("#2F4F4F");
+            characterAnimation.shortSleeveSprite.color = HexToColor("#2F4F4F");
         };
-        playerControllerScript.currentShirtColor = HexToColor("#2F4F4F");
-        shirtColorButton.color = playerControllerScript.currentShirtColor;
+        characterAnimation.currentShirtColor = HexToColor("#2F4F4F");
+        if(shirtColorButton != null)
+        {
+            shirtColorButton.color = characterAnimation.currentShirtColor;
+        }
     }
 
     public void SetShirtColor11()
     {
-        if(playerControllerScript.throatSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.throatSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.throatSprite.color = HexToColor("#FF34F4");
+            characterAnimation.throatSprite.color = HexToColor("#FF34F4");
         };
-        if(playerControllerScript.collarSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.collarSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.collarSprite.color = HexToColor("#FF34F4");
+            characterAnimation.collarSprite.color = HexToColor("#FF34F4");
         };
-        if(playerControllerScript.torsoSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.torsoSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.torsoSprite.color = HexToColor("#FF34F4");
+            characterAnimation.torsoSprite.color = HexToColor("#FF34F4");
         };
-        if(playerControllerScript.waistSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.waistSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.waistSprite.color = HexToColor("#FF34F4");
+            characterAnimation.waistSprite.color = HexToColor("#FF34F4");
         };
-        if(playerControllerScript.longSleeveSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.longSleeveSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.longSleeveSprite.color = HexToColor("#FF34F4");
+            characterAnimation.longSleeveSprite.color = HexToColor("#FF34F4");
         };
-        if(playerControllerScript.shortSleeveSprite.color == playerControllerScript.currentShirtColor)
+        if(characterAnimation.shortSleeveSprite.color == characterAnimation.currentShirtColor)
         {
-            playerControllerScript.shortSleeveSprite.color = HexToColor("#FF34F4");
+            characterAnimation.shortSleeveSprite.color = HexToColor("#FF34F4");
         };
-        playerControllerScript.currentShirtColor = HexToColor("#FF34F4");
-        shirtColorButton.color = playerControllerScript.currentShirtColor;
+        characterAnimation.currentShirtColor = HexToColor("#FF34F4");
+        if(shirtColorButton != null)
+        {
+            shirtColorButton.color = characterAnimation.currentShirtColor;
+        }
     }
 
 
 
 
-public void SetPantsColor1()
-{
-    playerControllerScript.dressSprite.color = HexToColor("#2C3E50");
-    if (playerControllerScript.waistShortsSprite.color == playerControllerScript.currentPantsColor)
+    public void SetPantsColor1()
     {
-        playerControllerScript.waistShortsSprite.color = HexToColor("#2C3E50");
+        characterAnimation.dressSprite.color = HexToColor("#2C3E50");
+        if (characterAnimation.waistShortsSprite.color == characterAnimation.currentPantsColor)
+        {
+            characterAnimation.waistShortsSprite.color = HexToColor("#2C3E50");
+        }
+        if (characterAnimation.waistSprite.color == characterAnimation.currentPantsColor)
+        {
+            characterAnimation.waistSprite.color = HexToColor("#2C3E50");
+        }
+        if (characterAnimation.kneesShinsSprite.color == characterAnimation.currentPantsColor)
+        {
+            characterAnimation.kneesShinsSprite.color = HexToColor("#2C3E50");
+        }
+        if (characterAnimation.anklesSprite.color == characterAnimation.currentPantsColor)
+        {
+            characterAnimation.anklesSprite.color = HexToColor("#2C3E50");
+        }
+        characterAnimation.currentPantsColor = HexToColor("#2C3E50");
+        if(pantsColorButton != null)
+        {
+            pantsColorButton.color = characterAnimation.currentPantsColor;
+        }
     }
-    if (playerControllerScript.waistSprite.color == playerControllerScript.currentPantsColor)
-    {
-        playerControllerScript.waistSprite.color = HexToColor("#2C3E50");
-    }
-    if (playerControllerScript.kneesShinsSprite.color == playerControllerScript.currentPantsColor)
-    {
-        playerControllerScript.kneesShinsSprite.color = HexToColor("#2C3E50");
-    }
-    if (playerControllerScript.anklesSprite.color == playerControllerScript.currentPantsColor)
-    {
-        playerControllerScript.anklesSprite.color = HexToColor("#2C3E50");
-    }
-    playerControllerScript.currentPantsColor = HexToColor("#2C3E50");
-    pantsColorButton.color = playerControllerScript.currentPantsColor;
-}
 
-public void SetPantsColor2()
-{
-    playerControllerScript.dressSprite.color = HexToColor("#A0522D");
-    if (playerControllerScript.waistShortsSprite.color == playerControllerScript.currentPantsColor)
+    public void SetPantsColor2()
     {
-        playerControllerScript.waistShortsSprite.color = HexToColor("#A0522D");
+        characterAnimation.dressSprite.color = HexToColor("#A0522D");
+        if (characterAnimation.waistShortsSprite.color == characterAnimation.currentPantsColor)
+        {
+            characterAnimation.waistShortsSprite.color = HexToColor("#A0522D");
+        }
+        if (characterAnimation.waistSprite.color == characterAnimation.currentPantsColor)
+        {
+            characterAnimation.waistSprite.color = HexToColor("#A0522D");
+        }
+        if (characterAnimation.kneesShinsSprite.color == characterAnimation.currentPantsColor)
+        {
+            characterAnimation.kneesShinsSprite.color = HexToColor("#A0522D");
+        }
+        if (characterAnimation.anklesSprite.color == characterAnimation.currentPantsColor)
+        {
+            characterAnimation.anklesSprite.color = HexToColor("#A0522D");
+        }
+        characterAnimation.currentPantsColor = HexToColor("#A0522D");
+        if(pantsColorButton != null)
+        {
+            pantsColorButton.color = characterAnimation.currentPantsColor;
+        }
     }
-    if (playerControllerScript.waistSprite.color == playerControllerScript.currentPantsColor)
-    {
-        playerControllerScript.waistSprite.color = HexToColor("#A0522D");
-    }
-    if (playerControllerScript.kneesShinsSprite.color == playerControllerScript.currentPantsColor)
-    {
-        playerControllerScript.kneesShinsSprite.color = HexToColor("#A0522D");
-    }
-    if (playerControllerScript.anklesSprite.color == playerControllerScript.currentPantsColor)
-    {
-        playerControllerScript.anklesSprite.color = HexToColor("#A0522D");
-    }
-    playerControllerScript.currentPantsColor = HexToColor("#A0522D");
-    pantsColorButton.color = playerControllerScript.currentPantsColor;
-}
 
-public void SetPantsColor3()
-{
-    playerControllerScript.dressSprite.color = HexToColor("#808080");
-    if (playerControllerScript.waistShortsSprite.color == playerControllerScript.currentPantsColor)
+    public void SetPantsColor3()
     {
-        playerControllerScript.waistShortsSprite.color = HexToColor("#808080");
+        characterAnimation.dressSprite.color = HexToColor("#808080");
+        if (characterAnimation.waistShortsSprite.color == characterAnimation.currentPantsColor)
+        {
+            characterAnimation.waistShortsSprite.color = HexToColor("#808080");
+        }
+        if (characterAnimation.waistSprite.color == characterAnimation.currentPantsColor)
+        {
+            characterAnimation.waistSprite.color = HexToColor("#808080");
+        }
+        if (characterAnimation.kneesShinsSprite.color == characterAnimation.currentPantsColor)
+        {
+            characterAnimation.kneesShinsSprite.color = HexToColor("#808080");
+        }
+        if (characterAnimation.anklesSprite.color == characterAnimation.currentPantsColor)
+        {
+            characterAnimation.anklesSprite.color = HexToColor("#808080");
+        }
+        characterAnimation.currentPantsColor = HexToColor("#808080");
+        if(pantsColorButton != null)
+        {
+            pantsColorButton.color = characterAnimation.currentPantsColor;
+        }
     }
-    if (playerControllerScript.waistSprite.color == playerControllerScript.currentPantsColor)
-    {
-        playerControllerScript.waistSprite.color = HexToColor("#808080");
-    }
-    if (playerControllerScript.kneesShinsSprite.color == playerControllerScript.currentPantsColor)
-    {
-        playerControllerScript.kneesShinsSprite.color = HexToColor("#808080");
-    }
-    if (playerControllerScript.anklesSprite.color == playerControllerScript.currentPantsColor)
-    {
-        playerControllerScript.anklesSprite.color = HexToColor("#808080");
-    }
-    playerControllerScript.currentPantsColor = HexToColor("#808080");
-    pantsColorButton.color = playerControllerScript.currentPantsColor;
-}
 
-public void SetPantsColor4()
-{
-    playerControllerScript.dressSprite.color = HexToColor("#556B2F");
-    if (playerControllerScript.waistShortsSprite.color == playerControllerScript.currentPantsColor)
+    public void SetPantsColor4()
     {
-        playerControllerScript.waistShortsSprite.color = HexToColor("#556B2F");
+        characterAnimation.dressSprite.color = HexToColor("#556B2F");
+        if (characterAnimation.waistShortsSprite.color == characterAnimation.currentPantsColor)
+        {
+            characterAnimation.waistShortsSprite.color = HexToColor("#556B2F");
+        }
+        if (characterAnimation.waistSprite.color == characterAnimation.currentPantsColor)
+        {
+            characterAnimation.waistSprite.color = HexToColor("#556B2F");
+        }
+        if (characterAnimation.kneesShinsSprite.color == characterAnimation.currentPantsColor)
+        {
+            characterAnimation.kneesShinsSprite.color = HexToColor("#556B2F");
+        }
+        if (characterAnimation.anklesSprite.color == characterAnimation.currentPantsColor)
+        {
+            characterAnimation.anklesSprite.color = HexToColor("#556B2F");
+        }
+        characterAnimation.currentPantsColor = HexToColor("#556B2F");
+        if(pantsColorButton != null)
+        {
+            pantsColorButton.color = characterAnimation.currentPantsColor;
+        }
     }
-    if (playerControllerScript.waistSprite.color == playerControllerScript.currentPantsColor)
-    {
-        playerControllerScript.waistSprite.color = HexToColor("#556B2F");
-    }
-    if (playerControllerScript.kneesShinsSprite.color == playerControllerScript.currentPantsColor)
-    {
-        playerControllerScript.kneesShinsSprite.color = HexToColor("#556B2F");
-    }
-    if (playerControllerScript.anklesSprite.color == playerControllerScript.currentPantsColor)
-    {
-        playerControllerScript.anklesSprite.color = HexToColor("#556B2F");
-    }
-    playerControllerScript.currentPantsColor = HexToColor("#556B2F");
-    pantsColorButton.color = playerControllerScript.currentPantsColor;
-}
 
-public void SetPantsColor5()
-{
-    playerControllerScript.dressSprite.color = HexToColor("#B0C4DE");
-    if (playerControllerScript.waistShortsSprite.color == playerControllerScript.currentPantsColor)
+    public void SetPantsColor5()
     {
-        playerControllerScript.waistShortsSprite.color = HexToColor("#B0C4DE");
+        characterAnimation.dressSprite.color = HexToColor("#B0C4DE");
+        if (characterAnimation.waistShortsSprite.color == characterAnimation.currentPantsColor)
+        {
+            characterAnimation.waistShortsSprite.color = HexToColor("#B0C4DE");
+        }
+        if (characterAnimation.waistSprite.color == characterAnimation.currentPantsColor)
+        {
+            characterAnimation.waistSprite.color = HexToColor("#B0C4DE");
+        }
+        if (characterAnimation.kneesShinsSprite.color == characterAnimation.currentPantsColor)
+        {
+            characterAnimation.kneesShinsSprite.color = HexToColor("#B0C4DE");
+        }
+        if (characterAnimation.anklesSprite.color == characterAnimation.currentPantsColor)
+        {
+            characterAnimation.anklesSprite.color = HexToColor("#B0C4DE");
+        }
+        characterAnimation.currentPantsColor = HexToColor("#B0C4DE");
+        if(pantsColorButton != null)
+        {
+            pantsColorButton.color = characterAnimation.currentPantsColor;
+        }
     }
-    if (playerControllerScript.waistSprite.color == playerControllerScript.currentPantsColor)
-    {
-        playerControllerScript.waistSprite.color = HexToColor("#B0C4DE");
-    }
-    if (playerControllerScript.kneesShinsSprite.color == playerControllerScript.currentPantsColor)
-    {
-        playerControllerScript.kneesShinsSprite.color = HexToColor("#B0C4DE");
-    }
-    if (playerControllerScript.anklesSprite.color == playerControllerScript.currentPantsColor)
-    {
-        playerControllerScript.anklesSprite.color = HexToColor("#B0C4DE");
-    }
-    playerControllerScript.currentPantsColor = HexToColor("#B0C4DE");
-    pantsColorButton.color = playerControllerScript.currentPantsColor;
-}
 
-public void SetPantsColor6()
-{
-    playerControllerScript.dressSprite.color = HexToColor("#4B0082");
-    if (playerControllerScript.waistShortsSprite.color == playerControllerScript.currentPantsColor)
+    public void SetPantsColor6()
     {
-        playerControllerScript.waistShortsSprite.color = HexToColor("#4B0082");
+        characterAnimation.dressSprite.color = HexToColor("#4B0082");
+        if (characterAnimation.waistShortsSprite.color == characterAnimation.currentPantsColor)
+        {
+            characterAnimation.waistShortsSprite.color = HexToColor("#4B0082");
+        }
+        if (characterAnimation.waistSprite.color == characterAnimation.currentPantsColor)
+        {
+            characterAnimation.waistSprite.color = HexToColor("#4B0082");
+        }
+        if (characterAnimation.kneesShinsSprite.color == characterAnimation.currentPantsColor)
+        {
+            characterAnimation.kneesShinsSprite.color = HexToColor("#4B0082");
+        }
+        if (characterAnimation.anklesSprite.color == characterAnimation.currentPantsColor)
+        {
+            characterAnimation.anklesSprite.color = HexToColor("#4B0082");
+        }
+        characterAnimation.currentPantsColor = HexToColor("#4B0082");
+        if(pantsColorButton != null)
+        {
+            pantsColorButton.color = characterAnimation.currentPantsColor;
+        }
     }
-    if (playerControllerScript.waistSprite.color == playerControllerScript.currentPantsColor)
-    {
-        playerControllerScript.waistSprite.color = HexToColor("#4B0082");
-    }
-    if (playerControllerScript.kneesShinsSprite.color == playerControllerScript.currentPantsColor)
-    {
-        playerControllerScript.kneesShinsSprite.color = HexToColor("#4B0082");
-    }
-    if (playerControllerScript.anklesSprite.color == playerControllerScript.currentPantsColor)
-    {
-        playerControllerScript.anklesSprite.color = HexToColor("#4B0082");
-    }
-    playerControllerScript.currentPantsColor = HexToColor("#4B0082");
-    pantsColorButton.color = playerControllerScript.currentPantsColor;
-}
 
-public void SetPantsColor7()
-{
-    playerControllerScript.dressSprite.color = HexToColor("#8B4513");
-    if (playerControllerScript.waistShortsSprite.color == playerControllerScript.currentPantsColor)
+    public void SetPantsColor7()
     {
-        playerControllerScript.waistShortsSprite.color = HexToColor("#8B4513");
+        characterAnimation.dressSprite.color = HexToColor("#8B4513");
+        if (characterAnimation.waistShortsSprite.color == characterAnimation.currentPantsColor)
+        {
+            characterAnimation.waistShortsSprite.color = HexToColor("#8B4513");
+        }
+        if (characterAnimation.waistSprite.color == characterAnimation.currentPantsColor)
+        {
+            characterAnimation.waistSprite.color = HexToColor("#8B4513");
+        }
+        if (characterAnimation.kneesShinsSprite.color == characterAnimation.currentPantsColor)
+        {
+            characterAnimation.kneesShinsSprite.color = HexToColor("#8B4513");
+        }
+        if (characterAnimation.anklesSprite.color == characterAnimation.currentPantsColor)
+        {
+            characterAnimation.anklesSprite.color = HexToColor("#8B4513");
+        }
+        characterAnimation.currentPantsColor = HexToColor("#8B4513");
+        if(pantsColorButton != null)
+        {
+            pantsColorButton.color = characterAnimation.currentPantsColor;
+        }
     }
-    if (playerControllerScript.waistSprite.color == playerControllerScript.currentPantsColor)
-    {
-        playerControllerScript.waistSprite.color = HexToColor("#8B4513");
-    }
-    if (playerControllerScript.kneesShinsSprite.color == playerControllerScript.currentPantsColor)
-    {
-        playerControllerScript.kneesShinsSprite.color = HexToColor("#8B4513");
-    }
-    if (playerControllerScript.anklesSprite.color == playerControllerScript.currentPantsColor)
-    {
-        playerControllerScript.anklesSprite.color = HexToColor("#8B4513");
-    }
-    playerControllerScript.currentPantsColor = HexToColor("#8B4513");
-    pantsColorButton.color = playerControllerScript.currentPantsColor;
-}
 
-public void SetPantsColor8()
-{
-    playerControllerScript.dressSprite.color = HexToColor("#696969");
-    if (playerControllerScript.waistShortsSprite.color == playerControllerScript.currentPantsColor)
+    public void SetPantsColor8()
     {
-        playerControllerScript.waistShortsSprite.color = HexToColor("#696969");
+        characterAnimation.dressSprite.color = HexToColor("#696969");
+        if (characterAnimation.waistShortsSprite.color == characterAnimation.currentPantsColor)
+        {
+            characterAnimation.waistShortsSprite.color = HexToColor("#696969");
+        }
+        if (characterAnimation.waistSprite.color == characterAnimation.currentPantsColor)
+        {
+            characterAnimation.waistSprite.color = HexToColor("#696969");
+        }
+        if (characterAnimation.kneesShinsSprite.color == characterAnimation.currentPantsColor)
+        {
+            characterAnimation.kneesShinsSprite.color = HexToColor("#696969");
+        }
+        if (characterAnimation.anklesSprite.color == characterAnimation.currentPantsColor)
+        {
+            characterAnimation.anklesSprite.color = HexToColor("#696969");
+        }
+        characterAnimation.currentPantsColor = HexToColor("#696969");
+        if(pantsColorButton != null)
+        {
+            pantsColorButton.color = characterAnimation.currentPantsColor;
+        }
     }
-    if (playerControllerScript.waistSprite.color == playerControllerScript.currentPantsColor)
-    {
-        playerControllerScript.waistSprite.color = HexToColor("#696969");
-    }
-    if (playerControllerScript.kneesShinsSprite.color == playerControllerScript.currentPantsColor)
-    {
-        playerControllerScript.kneesShinsSprite.color = HexToColor("#696969");
-    }
-    if (playerControllerScript.anklesSprite.color == playerControllerScript.currentPantsColor)
-    {
-        playerControllerScript.anklesSprite.color = HexToColor("#696969");
-    }
-    playerControllerScript.currentPantsColor = HexToColor("#696969");
-    pantsColorButton.color = playerControllerScript.currentPantsColor;
-}
 
-public void SetPantsColor9()
-{
-    playerControllerScript.dressSprite.color = HexToColor("#4682B4");
-    if (playerControllerScript.waistShortsSprite.color == playerControllerScript.currentPantsColor)
+    public void SetPantsColor9()
     {
-        playerControllerScript.waistShortsSprite.color = HexToColor("#4682B4");
+        characterAnimation.dressSprite.color = HexToColor("#4682B4");
+        if (characterAnimation.waistShortsSprite.color == characterAnimation.currentPantsColor)
+        {
+            characterAnimation.waistShortsSprite.color = HexToColor("#4682B4");
+        }
+        if (characterAnimation.waistSprite.color == characterAnimation.currentPantsColor)
+        {
+            characterAnimation.waistSprite.color = HexToColor("#4682B4");
+        }
+        if (characterAnimation.kneesShinsSprite.color == characterAnimation.currentPantsColor)
+        {
+            characterAnimation.kneesShinsSprite.color = HexToColor("#4682B4");
+        }
+        if (characterAnimation.anklesSprite.color == characterAnimation.currentPantsColor)
+        {
+            characterAnimation.anklesSprite.color = HexToColor("#4682B4");
+        }
+        characterAnimation.currentPantsColor = HexToColor("#4682B4");
+        if(pantsColorButton != null)
+        {
+            pantsColorButton.color = characterAnimation.currentPantsColor;
+        }
     }
-    if (playerControllerScript.waistSprite.color == playerControllerScript.currentPantsColor)
-    {
-        playerControllerScript.waistSprite.color = HexToColor("#4682B4");
-    }
-    if (playerControllerScript.kneesShinsSprite.color == playerControllerScript.currentPantsColor)
-    {
-        playerControllerScript.kneesShinsSprite.color = HexToColor("#4682B4");
-    }
-    if (playerControllerScript.anklesSprite.color == playerControllerScript.currentPantsColor)
-    {
-        playerControllerScript.anklesSprite.color = HexToColor("#4682B4");
-    }
-    playerControllerScript.currentPantsColor = HexToColor("#4682B4");
-    pantsColorButton.color = playerControllerScript.currentPantsColor;
-}
 
-public void SetPantsColor10()
-{
-    playerControllerScript.dressSprite.color = HexToColor("#000000");
-    if (playerControllerScript.waistShortsSprite.color == playerControllerScript.currentPantsColor)
+    public void SetPantsColor10()
     {
-        playerControllerScript.waistShortsSprite.color = HexToColor("#000000");
+        characterAnimation.dressSprite.color = HexToColor("#000000");
+        if (characterAnimation.waistShortsSprite.color == characterAnimation.currentPantsColor)
+        {
+            characterAnimation.waistShortsSprite.color = HexToColor("#000000");
+        }
+        if (characterAnimation.waistSprite.color == characterAnimation.currentPantsColor)
+        {
+            characterAnimation.waistSprite.color = HexToColor("#000000");
+        }
+        if (characterAnimation.kneesShinsSprite.color == characterAnimation.currentPantsColor)
+        {
+            characterAnimation.kneesShinsSprite.color = HexToColor("#000000");
+        }
+        if (characterAnimation.anklesSprite.color == characterAnimation.currentPantsColor)
+        {
+            characterAnimation.anklesSprite.color = HexToColor("#000000");
+        }
+        characterAnimation.currentPantsColor = HexToColor("#000000");
+        if(pantsColorButton != null)
+        {
+            pantsColorButton.color = characterAnimation.currentPantsColor;
+        }
     }
-    if (playerControllerScript.waistSprite.color == playerControllerScript.currentPantsColor)
-    {
-        playerControllerScript.waistSprite.color = HexToColor("#000000");
-    }
-    if (playerControllerScript.kneesShinsSprite.color == playerControllerScript.currentPantsColor)
-    {
-        playerControllerScript.kneesShinsSprite.color = HexToColor("#000000");
-    }
-    if (playerControllerScript.anklesSprite.color == playerControllerScript.currentPantsColor)
-    {
-        playerControllerScript.anklesSprite.color = HexToColor("#000000");
-    }
-    playerControllerScript.currentPantsColor = HexToColor("#000000");
-    pantsColorButton.color = playerControllerScript.currentPantsColor;
-}
 
 
     public void SetJakettoColor1()
     {
-        playerControllerScript.currentJakettoColor = HexToColor("#556B2F");  // Dark Olive
-        jackettoColorButton.color = playerControllerScript.currentJakettoColor;
+        characterAnimation.currentJakettoColor = HexToColor("#556B2F");  // Dark Olive
+        if(jackettoColorButton != null)
+        {
+            jackettoColorButton.color = characterAnimation.currentJakettoColor;
+        }
         UpdateJaketto();
     }
 
     public void SetJakettoColor2()
     {
-        playerControllerScript.currentJakettoColor = HexToColor("#800020");  // Deep Burgundy
-        jackettoColorButton.color = playerControllerScript.currentJakettoColor;
+        characterAnimation.currentJakettoColor = HexToColor("#800020");  // Deep Burgundy
+        if(jackettoColorButton != null)
+        {
+            jackettoColorButton.color = characterAnimation.currentJakettoColor;
+        }
         UpdateJaketto();
     }
 
     public void SetJakettoColor3()
     {
-        playerControllerScript.currentJakettoColor = HexToColor("#6A5ACD");  // Slate Blue
-        jackettoColorButton.color = playerControllerScript.currentJakettoColor;
+        characterAnimation.currentJakettoColor = HexToColor("#6A5ACD");  // Slate Blue
+        if(jackettoColorButton != null)
+        {
+            jackettoColorButton.color = characterAnimation.currentJakettoColor;
+        }
         UpdateJaketto();
     }
 
     public void SetJakettoColor4()
     {
-        playerControllerScript.currentJakettoColor = HexToColor("#FFDB58");  // Mustard Yellow
-        jackettoColorButton.color = playerControllerScript.currentJakettoColor;
+        characterAnimation.currentJakettoColor = HexToColor("#FFDB58");  // Mustard Yellow
+        if(jackettoColorButton != null)
+        {
+            jackettoColorButton.color = characterAnimation.currentJakettoColor;
+        }
         UpdateJaketto();
     }
 
     public void SetJakettoColor5()
     {
-        playerControllerScript.currentJakettoColor = HexToColor("#36454F");  // Charcoal
-        jackettoColorButton.color = playerControllerScript.currentJakettoColor;
+        characterAnimation.currentJakettoColor = HexToColor("#36454F");  // Charcoal
+        if(jackettoColorButton != null)
+        {
+            jackettoColorButton.color = characterAnimation.currentJakettoColor;
+        }
         UpdateJaketto();
     }
 
     public void SetJakettoColor6()
     {
-        playerControllerScript.currentJakettoColor = HexToColor("#228B22");  // Forest Green
-        jackettoColorButton.color = playerControllerScript.currentJakettoColor;
+        characterAnimation.currentJakettoColor = HexToColor("#228B22");  // Forest Green
+        if(jackettoColorButton != null)
+        {
+            jackettoColorButton.color = characterAnimation.currentJakettoColor;
+        }
         UpdateJaketto();
     }
 
     public void SetJakettoColor7()
     {
-        playerControllerScript.currentJakettoColor = HexToColor("#000080");  // Navy Blue
-        jackettoColorButton.color = playerControllerScript.currentJakettoColor;
+        characterAnimation.currentJakettoColor = HexToColor("#000080");  // Navy Blue
+        if(jackettoColorButton != null)
+        {
+            jackettoColorButton.color = characterAnimation.currentJakettoColor;
+        }
         UpdateJaketto();
     }
 
     public void SetJakettoColor8()
     {
-        playerControllerScript.currentJakettoColor = HexToColor("#8B4513");  // Chocolate Brown
-        jackettoColorButton.color = playerControllerScript.currentJakettoColor;
+        characterAnimation.currentJakettoColor = HexToColor("#8B4513");  // Chocolate Brown
+        if(jackettoColorButton != null)
+        {
+            jackettoColorButton.color = characterAnimation.currentJakettoColor;
+        }
         UpdateJaketto();
     }
 
     public void SetJakettoColor9()
     {
-        playerControllerScript.currentJakettoColor = HexToColor("#008080");  // Teal
-        jackettoColorButton.color = playerControllerScript.currentJakettoColor;
+        characterAnimation.currentJakettoColor = HexToColor("#008080");  // Teal
+        if(jackettoColorButton != null)
+        {
+            jackettoColorButton.color = characterAnimation.currentJakettoColor;
+        }
         UpdateJaketto();
     }
 
     public void SetJakettoColor10()
     {
-        playerControllerScript.currentJakettoColor = HexToColor("#800000");  // Maroon
-        jackettoColorButton.color = playerControllerScript.currentJakettoColor;
+        characterAnimation.currentJakettoColor = HexToColor("#800000");  // Maroon
+        if(jackettoColorButton != null)
+        {
+            jackettoColorButton.color = characterAnimation.currentJakettoColor;
+        }
         UpdateJaketto();
     }
 

@@ -5,7 +5,7 @@ using UnityEngine;
 public class FloraWalkThrough : MonoBehaviour
 {
     [SerializeField] GameObject Player;
-    PlayerAnimationAndMovement playerMovement;
+    CharacterMovement playerMovement;
     [SerializeField] BoxCollider2D playerCollider;
     public Animator animator;
 
@@ -14,7 +14,7 @@ public class FloraWalkThrough : MonoBehaviour
     void Start()
     {
         Player = GameObject.FindGameObjectWithTag("Player");
-        playerMovement = Player.GetComponent<PlayerAnimationAndMovement>();        
+        playerMovement = Player.GetComponent<CharacterMovement>();        
         playerCollider = Player.GetComponent<BoxCollider2D>();
         StartCoroutine(RandomSway());
     }
@@ -102,10 +102,10 @@ public class FloraWalkThrough : MonoBehaviour
 
     private bool isPlayerCrossingUp()
     {
-        return GameObject.FindWithTag("Player").GetComponent<PlayerAnimationAndMovement>().change.y > 0;
+        return GameObject.FindWithTag("Player").GetComponent<CharacterMovement>().change.y > 0;
     }
     private bool isPlayerCrossingLeft()
     {
-        return GameObject.FindWithTag("Player").GetComponent<PlayerAnimationAndMovement>().change.x < 0;
+        return GameObject.FindWithTag("Player").GetComponent<CharacterMovement>().change.x < 0;
     }
 }

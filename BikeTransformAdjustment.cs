@@ -5,7 +5,7 @@ using UnityEngine;
 public class BikeTransformAdjustment : MonoBehaviour
 {
 
-    PlayerAnimationAndMovement playerMovement;
+    CharacterAnimation characterAnimation;
     [SerializeField] GameObject Player;
     [SerializeField] GameObject bike;
 
@@ -18,7 +18,7 @@ public class BikeTransformAdjustment : MonoBehaviour
     public void Start()
     {
         Player = GameObject.FindGameObjectWithTag("Player");
-        playerMovement = Player.GetComponent<PlayerAnimationAndMovement>();  
+        characterAnimation = Player.GetComponent<CharacterAnimation>();  
 
         bike = transform.Find("bike").gameObject;
         initialBikeTransformPosition = bike.transform.localPosition;   
@@ -33,34 +33,34 @@ public class BikeTransformAdjustment : MonoBehaviour
 //   public int upLeftAnim;
     public void SetBikeTransformPosition()
     {
-        if(playerMovement.bodyTypeNumber == 1 || playerMovement.bodyTypeNumber == 2)
+        if(characterAnimation.bodyTypeNumber == 1 || characterAnimation.bodyTypeNumber == 2)
         {
-            if(playerMovement.currentAnimationDirection == playerMovement.rightDownAnim)
+            if(characterAnimation.currentAnimationDirection == characterAnimation.rightDownAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(0f, 0, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.leftDownAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.leftDownAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(0f, 0, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.rightAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.rightAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(0f, 0, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.leftAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.leftAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(0f, 0, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.upRightAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.upRightAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(2f, 0, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.upLeftAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.upLeftAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(-2f, 0, 0);
             }
@@ -68,596 +68,596 @@ public class BikeTransformAdjustment : MonoBehaviour
 
 
 
-        else if(playerMovement.bodyTypeNumber == 3 || playerMovement.bodyTypeNumber == 4)
+        else if(characterAnimation.bodyTypeNumber == 3 || characterAnimation.bodyTypeNumber == 4)
         {
-            if(playerMovement.currentAnimationDirection == playerMovement.rightDownAnim)
+            if(characterAnimation.currentAnimationDirection == characterAnimation.rightDownAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(1f, 0, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.leftDownAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.leftDownAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(-1f, 0, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.rightAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.rightAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(1f, 0, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.leftAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.leftAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(-1f, 0, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.upRightAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.upRightAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(2f, 0, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.upLeftAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.upLeftAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(-2f, 0, 0);
             }
         }
         
    
-        else if(playerMovement.bodyTypeNumber == 5)
+        else if(characterAnimation.bodyTypeNumber == 5)
         {
-            if(playerMovement.currentAnimationDirection == playerMovement.rightDownAnim)
+            if(characterAnimation.currentAnimationDirection == characterAnimation.rightDownAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(0, -1f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.leftDownAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.leftDownAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(0f, -1f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.rightAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.rightAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(0, -1f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.leftAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.leftAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(0f, -1f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.upRightAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.upRightAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(2f, -1, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.upLeftAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.upLeftAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(-2f, -1f, 0);
             }
         }
 
-        else if(playerMovement.bodyTypeNumber == 6)
+        else if(characterAnimation.bodyTypeNumber == 6)
         {
-            if(playerMovement.currentAnimationDirection == playerMovement.rightDownAnim)
+            if(characterAnimation.currentAnimationDirection == characterAnimation.rightDownAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(0, -1f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.leftDownAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.leftDownAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(0f, -1f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.rightAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.rightAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(0, -1f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.leftAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.leftAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(0f, -1f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.upRightAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.upRightAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(1f, -1, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.upLeftAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.upLeftAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(-1f, -1f, 0);
             }
         }
         
-        else if(playerMovement.bodyTypeNumber == 7 || playerMovement.bodyTypeNumber == 8)
+        else if(characterAnimation.bodyTypeNumber == 7 || characterAnimation.bodyTypeNumber == 8)
         {
-            if(playerMovement.currentAnimationDirection == playerMovement.rightDownAnim)
+            if(characterAnimation.currentAnimationDirection == characterAnimation.rightDownAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(1, -1f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.leftDownAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.leftDownAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(-1f, -1f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.rightAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.rightAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(1f, -1f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.leftAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.leftAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(-1f, -1f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.upRightAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.upRightAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(1f, -1f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.upLeftAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.upLeftAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(-1f, -1f, 0);
             }
         }
        
-        else if(playerMovement.bodyTypeNumber == 9)
+        else if(characterAnimation.bodyTypeNumber == 9)
         {
-            if(playerMovement.currentAnimationDirection == playerMovement.rightDownAnim)
+            if(characterAnimation.currentAnimationDirection == characterAnimation.rightDownAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(1f, 0f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.leftDownAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.leftDownAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(-1f, 0f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.rightAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.rightAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(1f, 0f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.leftAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.leftAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(-1f, 0f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.upRightAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.upRightAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(2f, 1f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.upLeftAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.upLeftAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(-2f, 1f, 0);
             }
         }
   
-        else if(playerMovement.bodyTypeNumber == 10  || playerMovement.bodyTypeNumber == 11 || playerMovement.bodyTypeNumber == 12)
+        else if(characterAnimation.bodyTypeNumber == 10  || characterAnimation.bodyTypeNumber == 11 || characterAnimation.bodyTypeNumber == 12)
         {
-            if(playerMovement.currentAnimationDirection == playerMovement.rightDownAnim)
+            if(characterAnimation.currentAnimationDirection == characterAnimation.rightDownAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(1f, 0f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.leftDownAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.leftDownAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(-1f, 0f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.rightAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.rightAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(1f, 0f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.leftAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.leftAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(-1f, 0f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.upRightAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.upRightAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(1f, 1f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.upLeftAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.upLeftAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(-1f, 1f, 0);
             }
         }
         
-        else if(playerMovement.bodyTypeNumber == 13)
+        else if(characterAnimation.bodyTypeNumber == 13)
         {
-            if(playerMovement.currentAnimationDirection == playerMovement.rightDownAnim)
+            if(characterAnimation.currentAnimationDirection == characterAnimation.rightDownAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(0f, 0f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.leftDownAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.leftDownAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(0f, 0f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.rightAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.rightAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(0f, 0f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.leftAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.leftAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(0f, 0f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.upRightAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.upRightAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(2f, 0f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.upLeftAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.upLeftAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(-2f, 0f, 0);
             }
         }
         
-        else if(playerMovement.bodyTypeNumber == 14 || playerMovement.bodyTypeNumber == 15 || playerMovement.bodyTypeNumber == 16)
+        else if(characterAnimation.bodyTypeNumber == 14 || characterAnimation.bodyTypeNumber == 15 || characterAnimation.bodyTypeNumber == 16)
         {
-            if(playerMovement.currentAnimationDirection == playerMovement.rightDownAnim)
+            if(characterAnimation.currentAnimationDirection == characterAnimation.rightDownAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(0f, 0f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.leftDownAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.leftDownAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(0f, 0f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.rightAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.rightAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(0f, 0f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.leftAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.leftAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(0f, 0f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.upRightAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.upRightAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(1f, 0f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.upLeftAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.upLeftAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(-1f, 0f, 0);
             }
         }
         
-        else if(playerMovement.bodyTypeNumber == 17)
+        else if(characterAnimation.bodyTypeNumber == 17)
         {
-            if(playerMovement.currentAnimationDirection == playerMovement.rightDownAnim)
+            if(characterAnimation.currentAnimationDirection == characterAnimation.rightDownAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(0f, -2f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.leftDownAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.leftDownAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(0f, -2f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.rightAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.rightAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(0f, -2f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.leftAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.leftAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(0f, -2f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.upRightAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.upRightAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(2f, -2f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.upLeftAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.upLeftAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(-2f, -2f, 0);
             }
         }
         
-        else if(playerMovement.bodyTypeNumber == 18 || playerMovement.bodyTypeNumber == 19 || playerMovement.bodyTypeNumber == 20)
+        else if(characterAnimation.bodyTypeNumber == 18 || characterAnimation.bodyTypeNumber == 19 || characterAnimation.bodyTypeNumber == 20)
         {
-            if(playerMovement.currentAnimationDirection == playerMovement.rightDownAnim)
+            if(characterAnimation.currentAnimationDirection == characterAnimation.rightDownAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(0f, -2f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.leftDownAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.leftDownAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(0f, -2f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.rightAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.rightAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(0f, -2f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.leftAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.leftAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(0f, -2f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.upRightAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.upRightAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(1f, -2f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.upLeftAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.upLeftAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(-1f, -2f, 0);
             }
         }
         
-        else if(playerMovement.bodyTypeNumber == 21)
+        else if(characterAnimation.bodyTypeNumber == 21)
         {
-            if(playerMovement.currentAnimationDirection == playerMovement.rightDownAnim)
+            if(characterAnimation.currentAnimationDirection == characterAnimation.rightDownAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(1f, 1f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.leftDownAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.leftDownAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(-1f, 1f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.rightAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.rightAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(1f, 1f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.leftAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.leftAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(-1f, 1f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.upRightAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.upRightAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(2f, 1f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.upLeftAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.upLeftAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(-2f, 1f, 0);
             }
         }
         
-        else if(playerMovement.bodyTypeNumber == 22 || playerMovement.bodyTypeNumber == 23 || playerMovement.bodyTypeNumber == 24)
+        else if(characterAnimation.bodyTypeNumber == 22 || characterAnimation.bodyTypeNumber == 23 || characterAnimation.bodyTypeNumber == 24)
         {
-            if(playerMovement.currentAnimationDirection == playerMovement.rightDownAnim)
+            if(characterAnimation.currentAnimationDirection == characterAnimation.rightDownAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(0f, 1f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.leftDownAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.leftDownAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(0f, 1f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.rightAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.rightAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(0f, 1f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.leftAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.leftAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(0f, 1f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.upRightAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.upRightAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(1f, 1f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.upLeftAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.upLeftAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(-1f, 1f, 0);
             }
         }
         
-        else if(playerMovement.bodyTypeNumber == 25)
+        else if(characterAnimation.bodyTypeNumber == 25)
         {
-            if(playerMovement.currentAnimationDirection == playerMovement.rightDownAnim)
+            if(characterAnimation.currentAnimationDirection == characterAnimation.rightDownAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(0f, -1f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.leftDownAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.leftDownAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(0f, -1f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.rightAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.rightAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(0f, -1f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.leftAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.leftAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(0f, -1f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.upRightAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.upRightAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(2f, -1f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.upLeftAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.upLeftAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(-2f, -1f, 0);
             }
         }
         
-        else if(playerMovement.bodyTypeNumber == 26 || playerMovement.bodyTypeNumber == 27 || playerMovement.bodyTypeNumber == 28)
+        else if(characterAnimation.bodyTypeNumber == 26 || characterAnimation.bodyTypeNumber == 27 || characterAnimation.bodyTypeNumber == 28)
         {
-            if(playerMovement.currentAnimationDirection == playerMovement.rightDownAnim)
+            if(characterAnimation.currentAnimationDirection == characterAnimation.rightDownAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(0f, -1f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.leftDownAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.leftDownAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(0f, -1f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.rightAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.rightAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(0f, -1f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.leftAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.leftAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(0f, -1f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.upRightAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.upRightAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(1f, -1f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.upLeftAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.upLeftAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(-1f, -1f, 0);
             }
         }
         
-        else if(playerMovement.bodyTypeNumber == 29)
+        else if(characterAnimation.bodyTypeNumber == 29)
         {
-            if(playerMovement.currentAnimationDirection == playerMovement.rightDownAnim)
+            if(characterAnimation.currentAnimationDirection == characterAnimation.rightDownAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(0f, -2f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.leftDownAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.leftDownAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(0f, -2f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.rightAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.rightAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(0f, -2f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.leftAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.leftAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(0f, -2f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.upRightAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.upRightAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(2f, -1f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.upLeftAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.upLeftAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(-2f, -1f, 0);
             }
         }
         
-        else if(playerMovement.bodyTypeNumber == 30 || playerMovement.bodyTypeNumber == 31 || playerMovement.bodyTypeNumber == 32)
+        else if(characterAnimation.bodyTypeNumber == 30 || characterAnimation.bodyTypeNumber == 31 || characterAnimation.bodyTypeNumber == 32)
         {
-            if(playerMovement.currentAnimationDirection == playerMovement.rightDownAnim)
+            if(characterAnimation.currentAnimationDirection == characterAnimation.rightDownAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(0f, -2f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.leftDownAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.leftDownAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(0f, -2f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.rightAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.rightAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(0f, -2f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.leftAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.leftAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(0f, -2f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.upRightAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.upRightAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(1f, -1f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.upLeftAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.upLeftAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(-1f, -1f, 0);
             }
         }
         
-        else if(playerMovement.bodyTypeNumber == 33)
+        else if(characterAnimation.bodyTypeNumber == 33)
         {
-            if(playerMovement.currentAnimationDirection == playerMovement.rightDownAnim)
+            if(characterAnimation.currentAnimationDirection == characterAnimation.rightDownAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(0f, -1f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.leftDownAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.leftDownAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(0f, -1f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.rightAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.rightAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(0f, -1f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.leftAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.leftAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(0f, -1f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.upRightAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.upRightAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(2f, 0f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.upLeftAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.upLeftAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(-2f, 0f, 0);
             }
         }
         
-        else if(playerMovement.bodyTypeNumber == 34 || playerMovement.bodyTypeNumber == 35 || playerMovement.bodyTypeNumber == 36)
+        else if(characterAnimation.bodyTypeNumber == 34 || characterAnimation.bodyTypeNumber == 35 || characterAnimation.bodyTypeNumber == 36)
         {
-            if(playerMovement.currentAnimationDirection == playerMovement.rightDownAnim)
+            if(characterAnimation.currentAnimationDirection == characterAnimation.rightDownAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(0f, -1f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.leftDownAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.leftDownAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(0f, -1f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.rightAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.rightAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(0f, -1f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.leftAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.leftAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(0f, -1f, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.upRightAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.upRightAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(1f, 0, 0);
             }
 
-            else if(playerMovement.currentAnimationDirection == playerMovement.upLeftAnim)
+            else if(characterAnimation.currentAnimationDirection == characterAnimation.upLeftAnim)
             {
                 bike.transform.localPosition = initialBikeTransformPosition + new Vector3(-1f, 0, 0);
             }

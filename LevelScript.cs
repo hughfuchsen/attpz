@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class LevelScript : MonoBehaviour
 {
-    PlayerAnimationAndMovement playerMovement;
+    CharacterMovement playerMovement;
     [SerializeField] GameObject Player;
     private float perspectiveAngle = Mathf.Atan(0.5f);
     public List<LevelScript> levelsAbove = new List<LevelScript>();
@@ -40,7 +40,7 @@ public class LevelScript : MonoBehaviour
 
 
         Player = GameObject.FindGameObjectWithTag("Player");
-        playerMovement = Player.GetComponent<PlayerAnimationAndMovement>();
+        playerMovement = Player.GetComponent<CharacterMovement>();
                 
     }
     void Start()

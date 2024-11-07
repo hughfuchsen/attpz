@@ -5,7 +5,7 @@ using UnityEngine;
 public class BuildingThreshColliderScript : MonoBehaviour
 {
     public BuildingScript building;
-    PlayerAnimationAndMovement playerMovement;
+    CharacterMovement characterMovement;
     [SerializeField] GameObject Player;
     public bool backOfBuilding;
     public bool rooftopLadder;
@@ -16,31 +16,31 @@ public class BuildingThreshColliderScript : MonoBehaviour
     void Start()
     {
         Player = GameObject.FindGameObjectWithTag("Player");
-        playerMovement = Player.GetComponent<PlayerAnimationAndMovement>(); 
+        characterMovement = Player.GetComponent<CharacterMovement>(); 
         soundtrackScript = GameObject.FindGameObjectWithTag("SoundtrackScript").GetComponent<SoundtrackScript>();
 
     }
 
     void OnTriggerEnter2D()
     {
-        playerMovement.playerOnThresh = true;
+        characterMovement.playerOnThresh = true;
 
         if(rooftopLadder)
         {
             // if(isPlayerCrossingUp())
             // {
-                if (!playerMovement.playerIsOutside)
+                if (!characterMovement.playerIsOutside)
                 {           
                     // Debug.Log("exiting");     
                     building.ExitBuilding(0.3f, 0.3f, false);
-                    playerMovement.playerIsOutside = true;  
+                    characterMovement.playerIsOutside = true;  
                 }
             // }
         }
     }
     void OnTriggerExit2D()
     {
-        playerMovement.playerOnThresh = false;
+        characterMovement.playerOnThresh = false;
 
         if(!rooftopLadder)
         { 
@@ -48,13 +48,13 @@ public class BuildingThreshColliderScript : MonoBehaviour
             {
                 if (backOfBuilding)
                 {
-                    if (playerMovement.playerIsInside())
+                    if (!characterMovement.playerIsInside())
                     {   
                         if(this.GetComponent<RoomThresholdColliderScript>().roomAbove == null)
                         {           
                             building.GoBehindBuilding(); // go outside behind the buildinng
                             soundtrackScript.FadeOutIn(soundtrackScript.track2, soundtrackScript.track1);
-                            playerMovement.playerIsOutside = true;
+                            characterMovement.playerIsOutside = true;
                         }
                     }
                     else
@@ -62,29 +62,29 @@ public class BuildingThreshColliderScript : MonoBehaviour
                         if(this.GetComponent<RoomThresholdColliderScript>().roomAbove != null)
                         {                          
                             building.EnterBuilding();
-                            playerMovement.playerIsOutside = false;
+                            characterMovement.playerIsOutside = false;
                         }
                     }
                 }
                 else
                 {
-                        if(playerMovement.playerIsOutside) 
+                        if(characterMovement.playerIsOutside) 
                         {     
                             building.EnterBuilding();
                         }                
-                        playerMovement.playerIsOutside = false;            
+                        characterMovement.playerIsOutside = false;            
                 }
             }
             else //if player crossing down
             {
                     if (backOfBuilding)   // entering the building from the back
                     {   
-                        if(playerMovement.playerIsOutside) 
+                        if(characterMovement.playerIsOutside) 
                         {     
                             if(this.GetComponent<RoomThresholdColliderScript>().roomBelow != null)
                             {
                                 building.EnterBuilding();
-                                playerMovement.playerIsOutside = false;  
+                                characterMovement.playerIsOutside = false;  
                             }          
                         }
                         else
@@ -93,7 +93,7 @@ public class BuildingThreshColliderScript : MonoBehaviour
                             {
                                 building.GoBehindBuilding(); // go outside behind the buildinng
                                 soundtrackScript.FadeOutIn(soundtrackScript.track2, soundtrackScript.track1);
-                                playerMovement.playerIsOutside = true;  
+                                characterMovement.playerIsOutside = true;  
                             }          
                         }
                     }
@@ -107,7 +107,7 @@ public class BuildingThreshColliderScript : MonoBehaviour
                         {
                             building.ExitBuilding(0.3f, 0.3f, false); //
                         }
-                        playerMovement.playerIsOutside = true;
+                        characterMovement.playerIsOutside = true;
                     }
                 
             }
@@ -116,18 +116,18 @@ public class BuildingThreshColliderScript : MonoBehaviour
         {
             // if(!isPlayerCrossingUp() && !(isPlayerCrossingLeft() && isPlayerCrossingLeft()))
             // {
-                if (playerMovement.playerIsOutside)
+                if (characterMovement.playerIsOutside)
                 {
-                    if(!isPlayerCrossingUp() && playerMovement.change.x == 0)
+                    if(!isPlayerCrossingUp() && characterMovement.change.x == 0)
                     {
                         building.EnterBuilding();
-                        playerMovement.playerIsOutside = false;  
+                        characterMovement.playerIsOutside = false;  
                     }                
                 }
-                else if (!playerMovement.playerIsOutside)
+                else if (!characterMovement.playerIsOutside)
                 {
                     building.ExitBuilding(0.3f, 0.3f, false);
-                    playerMovement.playerIsOutside = true;  
+                    characterMovement.playerIsOutside = true;  
                 }
             // }
 
@@ -136,10 +136,10 @@ public class BuildingThreshColliderScript : MonoBehaviour
     
     private bool isPlayerCrossingUp()
     {
-        return playerMovement.change.y > 0;
+        return characterMovement.change.y > 0;
     }
     private bool isPlayerCrossingLeft()
     {
-        return playerMovement.change.x < 0;
+        return characterMovement.change.x < 0;
     }
 }

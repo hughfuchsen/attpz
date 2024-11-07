@@ -22,14 +22,14 @@ public class EdgeTriggerEndHit : MonoBehaviour
     Vector2 rightEnd;
     Vector2 centerPoint;
 
-    PlayerAnimationAndMovement playerMovement;
+    CharacterMovement playerMovement;
 
     void Start()
     {
         // Get references for player, player movement, and player collider
         edgeCollider = GetComponent<EdgeCollider2D>();
         player = GameObject.FindWithTag("Player");
-        playerMovement = player.GetComponent<PlayerAnimationAndMovement>();
+        playerMovement = player.GetComponent<CharacterMovement>();
         playerCollider = player.GetComponent<BoxCollider2D>();
 
         leftEnd = transform.TransformPoint(edgeCollider.points[0]);

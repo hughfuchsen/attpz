@@ -34,7 +34,7 @@ public class CombinationGenerator : MonoBehaviour
         return string.Join(",", new int[]
         {
             random.Next(0, 3),   // feet (0-1)
-            random.Next(0, 3),   // pants (0-2)
+            random.Next(0, 4),   // pants (0-3)//with dresso
             random.Next(0, 2),   // waist (0-1)
             random.Next(0, 10),  // hairCol (1-10)
             random.Next(1, 10),  // shirt (1-9)

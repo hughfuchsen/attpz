@@ -6,7 +6,7 @@ public class BehindBuildingSwitchColliderScript : MonoBehaviour
 {
     public BuildingScript building;
 
-    PlayerAnimationAndMovement playerMovement;
+    CharacterMovement playerMovement;
     [SerializeField] GameObject Player;
     private Coroutine fadeCoroutine;
 
@@ -14,7 +14,7 @@ public class BehindBuildingSwitchColliderScript : MonoBehaviour
     void Awake()
     { 
         Player = GameObject.FindGameObjectWithTag("Player");
-        playerMovement = Player.GetComponent<PlayerAnimationAndMovement>(); 
+        playerMovement = Player.GetComponent<CharacterMovement>(); 
     }  
     void OnTriggerEnter2D()
     {

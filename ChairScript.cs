@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ChairScript : MonoBehaviour
 {
-    PlayerAnimationAndMovement playerMovement;
+    CharacterMovement playerMovement;
     CameraMovement cameraMovement;
     [SerializeField] GameObject Player;
     [SerializeField] GameObject chairScriptAnchorPoint;
@@ -22,7 +22,7 @@ public class ChairScript : MonoBehaviour
         Player = GameObject.FindGameObjectWithTag("Player");
         cameraMovement = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraMovement>();
         chairScriptAnchorPoint = transform.Find("chairScriptAnchorPoint").gameObject;
-        playerMovement = Player.GetComponent<PlayerAnimationAndMovement>();
+        playerMovement = Player.GetComponent<CharacterMovement>();
         currentSeatAnchorPoint = chairScriptAnchorPoint.transform.position;
     }
 

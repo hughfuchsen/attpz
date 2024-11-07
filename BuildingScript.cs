@@ -9,7 +9,7 @@ public class BuildingScript : MonoBehaviour
     public GameObject outerBuilding;
     [SerializeField] public List<GameObject> gameObjectsToShowWhileOutside = new List<GameObject>();
     BalconyManager balconyManager;
-    PlayerAnimationAndMovement playerMovement;
+    CharacterMovement playerMovement;
     [SerializeField] GameObject Player;
     public List<GameObject> gameObjectsToShowWhileOutsideSpriteList = new List<GameObject>();
     // private List<GameObject> gameObjectsToHideWhileInsideSpriteList = new List<GameObject>();
@@ -33,7 +33,7 @@ public class BuildingScript : MonoBehaviour
     public void Awake()
     { 
         Player = GameObject.FindGameObjectWithTag("Player");
-        playerMovement = Player.GetComponent<PlayerAnimationAndMovement>(); 
+        playerMovement = Player.GetComponent<CharacterMovement>(); 
         balconyManager = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<BalconyManager>(); 
 
         soundtrackScript = GameObject.FindGameObjectWithTag("SoundtrackScript").GetComponent<SoundtrackScript>();

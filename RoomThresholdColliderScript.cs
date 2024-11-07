@@ -15,7 +15,7 @@ public class RoomThresholdColliderScript : MonoBehaviour
     public RoomScript roomAbove;
     public RoomScript roomBelow;
     LevelThreshColliderScript levelThreshColliderScript;
-    PlayerAnimationAndMovement playerMovement;
+    CharacterMovement playerMovement;
     [SerializeField] GameObject Player;
     [SerializeField] BoxCollider2D playerCollider;
     public bool itsALadder;
@@ -46,7 +46,7 @@ public class RoomThresholdColliderScript : MonoBehaviour
     void Awake()
     {
         Player = GameObject.FindGameObjectWithTag("Player");
-        playerMovement = Player.GetComponent<PlayerAnimationAndMovement>(); 
+        playerMovement = Player.GetComponent<CharacterMovement>(); 
         playerCollider = Player.GetComponent<BoxCollider2D>();
 
         
@@ -340,7 +340,7 @@ public class RoomThresholdColliderScript : MonoBehaviour
     }
     private bool isPlayerCrossingUp()
     {
-        return GameObject.FindWithTag("Player").GetComponent<PlayerAnimationAndMovement>().change.y > 0;
+        return GameObject.FindWithTag("Player").GetComponent<CharacterMovement>().change.y > 0;
     }
 
 

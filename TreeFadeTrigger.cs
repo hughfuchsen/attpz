@@ -5,7 +5,7 @@ using UnityEngine;
 public class TreeFadeTrigger : MonoBehaviour
 
 {
-  PlayerAnimationAndMovement PlayerAnimationAndMovement;
+  CharacterMovement CharacterMovement;
   [SerializeField] GameObject Player;  
   public GameObject obj;
   public float defaultFadeAlphaFloat = 0.15f;
@@ -22,7 +22,7 @@ public class TreeFadeTrigger : MonoBehaviour
   void Awake()
   {
     Player = GameObject.FindGameObjectWithTag("Player");
-    PlayerAnimationAndMovement = Player.GetComponent<PlayerAnimationAndMovement>(); 
+    CharacterMovement = Player.GetComponent<CharacterMovement>(); 
     
 
     if (obj != null)
@@ -40,7 +40,7 @@ public class TreeFadeTrigger : MonoBehaviour
     setTreeAlpha(objListToFade, fadedAlphaFloatList);
 
 
-    if(PlayerAnimationAndMovement.playerOnThresh == false) // if player is not on building threshold
+    if(CharacterMovement.playerOnThresh == false) // if player is not on building threshold
     {
       // fadeCoro = StartCoroutine(treeFade(objListToFade, fadedAlphaFloatList));
       setTreeAlpha(objListToFade, fadedAlphaFloatList);
@@ -56,7 +56,7 @@ public class TreeFadeTrigger : MonoBehaviour
   {
     // StopAllCoros();
 
-    if(PlayerAnimationAndMovement.playerOnThresh == false)
+    if(CharacterMovement.playerOnThresh == false)
     {
       // fadeCoro = StartCoroutine(treeFade(objListToFade, initialAlphaFloatList));
       setTreeAlpha(objListToFade, initialAlphaFloatList);

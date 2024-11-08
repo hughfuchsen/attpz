@@ -32,6 +32,8 @@ public class LoadCSVData : MonoBehaviour
     public GameObject creationUI;
     public GameObject thanxMsgUI;
 
+    public List<GameObject> npcList = new List<GameObject>();
+
 
     // Add a public reference to the warning text UI element
 
@@ -77,7 +79,7 @@ public class LoadCSVData : MonoBehaviour
         List<string> companionOptions = new List<string> { "companion", "pony", "chook", "pig", "cat", "dog", "none" };
         companionDropdown.AddOptions(companionOptions);
 
-
+        AddNPCToList();
 
 
         // Initialize paths and references
@@ -129,7 +131,20 @@ public class LoadCSVData : MonoBehaviour
         yield return new WaitForEndOfFrame();
 
         DisplayRandomRow();
-        SpawnPerson();
+        // SpawnRandomPerson();
+        // SpawnRandomPerson();
+        // SpawnRandomPerson();
+        // SpawnRandomPerson();
+        // SpawnRandomPerson();
+        // SpawnRandomPerson();
+        // SpawnRandomPerson();
+        // SpawnRandomPerson();
+        // SpawnRandomPerson();
+        foreach (GameObject npc in npcList)
+        {
+            UpdateNPC(npc);
+        }
+
 
     }
 
@@ -204,7 +219,7 @@ public class LoadCSVData : MonoBehaviour
         // Get character characterCustomization parameters and format them
         string charParams = GetCharacterCustomizationParams();
 
-        // Create the new row for the CSV
+        // Create the new column for the CSV
         StringBuilder newRow = new StringBuilder();
         // Check for commas in fields and wrap them in quotes if necessary
         newRow.Append(WrapIfNeeded(name)).Append(",")
@@ -227,7 +242,7 @@ public class LoadCSVData : MonoBehaviour
             newRow.Append(selectedCompanion).Append(",");
         }
 
-        // Append character parameters to the row
+        // Append character parameters to the column
         newRow.Append(charParams);
 
         // hopfully one day can get convos for player-made characters
@@ -238,7 +253,7 @@ public class LoadCSVData : MonoBehaviour
         // hopfully one day can get convos for player-made characters
 
 
-        // Append the row to the CSV file
+        // Append the column to the CSV file
         AppendRowToCSV(newRow.ToString());
 
         // Reload the CSV to reflect the newly added entry
@@ -275,7 +290,18 @@ public class LoadCSVData : MonoBehaviour
     }
 
 
+    private void AddNPCToList()
+    {
+        GameObject[] npcs = GameObject.FindGameObjectsWithTag("NPC");
 
+        // Clear the list first if you want to refresh it each time you call this method
+        npcList.Clear();
+
+        foreach (GameObject npc in npcs)
+        {
+            npcList.Add(npc);
+        }
+    }
 
 
 
@@ -304,10 +330,10 @@ public class LoadCSVData : MonoBehaviour
         return "\"" + string.Join(",", customizationParams) + "\"";
     }
 
-    private void AppendRowToCSV(string row)
+    private void AppendRowToCSV(string column)
     {
-        File.AppendAllText(csvFilePath, "\n" + row);
-        Debug.Log($"New row added: {row}");
+        File.AppendAllText(csvFilePath, "\n" + column);
+        Debug.Log($"New column added: {column}");
     }
 
     // Load CSV data for search functionality
@@ -335,22 +361,22 @@ public class LoadCSVData : MonoBehaviour
         foreach (string line in lines)
         {
             // Split by commas but ignore commas inside quotes
-            string[] row = Regex.Split(line, csvPattern);
+            string[] column = Regex.Split(line, csvPattern);
 
             // Trim quotes and spaces from each element
-            for (int i = 0; i < row.Length; i++)
+            for (int i = 0; i < column.Length; i++)
             {
-                row[i] = row[i].Trim(' ', '"');
+                column[i] = column[i].Trim(' ', '"');
             }
 
-            // Ensure that we are working with a 11-column row
-            if (row.Length == 11) 
+            // Ensure that we are working with a 11-column column
+            if (column.Length == 11) 
             {
-                dataRows.Add(row); // Add each valid row to dataRows
+                dataRows.Add(column); // Add each valid column to dataRows
             }
             else
             {
-                Debug.LogWarning($"Skipped row with {row.Length} columns instead of 11.");
+                Debug.LogWarning($"Skipped column with {column.Length} columns instead of 11.");
             }
         }
     }
@@ -362,9 +388,9 @@ public class LoadCSVData : MonoBehaviour
         ClearSuggestions();
         if (string.IsNullOrEmpty(currentText)) return;
 
-        foreach (var row in dataRows)
+        foreach (var column in dataRows)
         {
-            string name = row[0];
+            string name = column[0];
             if (name.ToLower().StartsWith(currentText.ToLower()))
             {
                 GameObject suggestionItem = Instantiate(suggestionPrefab, suggestionPanel);
@@ -393,178 +419,202 @@ public class LoadCSVData : MonoBehaviour
         if (!string.IsNullOrEmpty(currentText)) uiText.text = "";
     }
 
-    // public void DisplayDetailsForName(string name)
-    // {
-    //     foreach (var row in dataRows)
-    //     {
-    //         if (row[0].Equals(name, System.StringComparison.OrdinalIgnoreCase))
-    //         {
-    //             StringBuilder displayText = new StringBuilder();
-
-    //             if (!string.IsNullOrWhiteSpace(row[0])) displayText.Append($"<color=#FF5733>{row[0]}</color>");
-    //             if (!string.IsNullOrWhiteSpace(row[1])) displayText.Append($"{He/She/They} remember{s/null} {row[1]}.\n\n");
-    //             if (!string.IsNullOrWhiteSpace(row[2])) displayText.Append($"{He/She/They} like{s/null} {row[2]}.\n\n");
-    //             if (!string.IsNullOrWhiteSpace(row[3])) displayText.Append($"{He/She/They} dislike{s/null} {row[3]}\n\n");
-    //             if (!string.IsNullOrWhiteSpace(row[4])) displayText.Append($"<color=#FFD700>Fav Quote:</color>\n{row[4]}\n");
-    //             if (!string.IsNullOrWhiteSpace(row[5])) displayText.Append($"<color=#8A2BE2>Companion:</color>\n{row[5]}\n");
-
-    //             uiText.text = displayText.ToString();
-
-    //             // Handle character characterCustomization params
-    //             string[] intParams = row[6].Split(',').Where(param => !string.IsNullOrWhiteSpace(param)).ToArray();
-    //             if (intParams.Length == 14)
-    //             {
-    //                 List<int> parameters = intParams.Select(param => int.Parse(param.Trim())).ToList();
-    //                 characterCustomization.UpdateSpecific(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4],
-    //                                             parameters[5], parameters[6], parameters[7], parameters[8], parameters[9],
-    //                                             parameters[10], parameters[11], parameters[12], parameters[13]);
-    //             }
-    //         }
-    //     }
-    // }
-
 
     public void DisplayDetailsForName(string name)
     {
-    // Synonyms or similar phrases to 'remembers'
-    string[] memoryPhrases = { 
-        "remembers", "recollects", "recalls", "thinks back to", "has memories of", 
-        "reflects on", "smiles upon the memory of", "holds dear", "keeps close to heart", 
-        "often thinks of", "cherishes the memory of", "looks back fondly on", 
-        "can vividly picture", "reflects warmly on", "keeps alive in memory", 
-        "relives the moment of", "fondly recalls"
-    };
-    string memoryVerb = memoryPhrases[Random.Range(0, memoryPhrases.Length)];
+        // Synonyms or similar phrases to 'remembers'
+        string[] memoryPhrases = { 
+            "remembers", "recollects", "recalls", "thinks back to", "has memories of", 
+            "reflects on", "smiles upon the memory of", "holds dear", "keeps close to heart", 
+            "often thinks of", "cherishes the memory of", "looks back fondly on", 
+            "can vividly picture", "reflects warmly on", "keeps alive in memory", 
+            "relives the moment of", "fondly recalls"
+        };
+        string memoryVerb = memoryPhrases[Random.Range(0, memoryPhrases.Length)];
 
-    string[] heSheLikesPhrases = { 
-        "likes", "enjoys", "appreciates", "is fond of", "cherishes", "has a liking for", 
-        "is drawn to", "has a soft spot for", "is enthusiastic about", "takes pleasure in", 
-        "finds joy in", "relishes in", "thrives on", "values", 
-        "feels passionate about", "is captivated by", "is keen on", "finds delight in"
-    };
-    string heSheLikesVerb = heSheLikesPhrases[Random.Range(0, heSheLikesPhrases.Length)];
+        string[] heSheLikesPhrases = { 
+            "likes", "enjoys", "appreciates", "is fond of", "cherishes", "has a liking for", 
+            "is drawn to", "has a soft spot for", "is enthusiastic about", "takes pleasure in", 
+            "finds joy in", "relishes in", "thrives on", "values", 
+            "feels passionate about", "is captivated by", "is keen on", "finds delight in"
+        };
+        string heSheLikesVerb = heSheLikesPhrases[Random.Range(0, heSheLikesPhrases.Length)];
 
-    string[] theyLikePhrases = { 
-        "like", "enjoy", "appreciate", "are fond of", "cherishe", "have a liking for", 
-        "are drawn to", "have a soft spot for", "are enthusiastic about", "take pleasure in", 
-        "find joy in", "relish in", "thrive on", "value", 
-        "feel passionate about", "are captivated by", "are keen on", "find delight in"
-    };
-    string theyLikeVerb = theyLikePhrases[Random.Range(0, theyLikePhrases.Length)];
+        string[] theyLikePhrases = { 
+            "like", "enjoy", "appreciate", "are fond of", "cherishe", "have a liking for", 
+            "are drawn to", "have a soft spot for", "are enthusiastic about", "take pleasure in", 
+            "find joy in", "relish in", "thrive on", "value", 
+            "feel passionate about", "are captivated by", "are keen on", "find delight in"
+        };
+        string theyLikeVerb = theyLikePhrases[Random.Range(0, theyLikePhrases.Length)];
 
-    string[] heSheDislikesPhrases = { 
-        "dislikes", "avoids", "has a distaste for", "is not fond of", "feels uneasy about", 
-        "is put off by", "steers clear of", "is wary of", 
-        "feels aversion towards", "tends to shun", "is turned off by", "feels discomfort around", 
-        "prefers to avoid", "finds it hard to enjoy", "is bothered by", "gets annoyed with", 
-        "is irritated by"
-    };
-    string heSheDislikesVerb = heSheDislikesPhrases[Random.Range(0, heSheDislikesPhrases.Length)];
+        string[] heSheDislikesPhrases = { 
+            "dislikes", "avoids", "has a distaste for", "is not fond of", "feels uneasy about", 
+            "is put off by", "steers clear of", "is wary of", 
+            "feels aversion towards", "tends to shun", "is turned off by", "feels discomfort around", 
+            "prefers to avoid", "finds it hard to enjoy", "is bothered by", "gets annoyed with", 
+            "is irritated by"
+        };
+        string heSheDislikesVerb = heSheDislikesPhrases[Random.Range(0, heSheDislikesPhrases.Length)];
 
-    string[] theyDislikePhrases = { 
-        "dislike", "avoid", "have a distaste for", "are not fond of", "feel uneasy about", 
-        "are put off by", "steer clear of", "are wary of", 
-        "feel aversion towards", "tend to shun", "are turned off by", "feel discomfort around", 
-        "prefer to avoid", "find it hard to enjoy", "are bothered by", "get annoyed with", 
-        "are irritated by"
-    };
-    string theyDislikeVerb = theyDislikePhrases[Random.Range(0, theyDislikePhrases.Length)];
+        string[] theyDislikePhrases = { 
+            "dislike", "avoid", "have a distaste for", "are not fond of", "feel uneasy about", 
+            "are put off by", "steer clear of", "are wary of", 
+            "feel aversion towards", "tend to shun", "are turned off by", "feel discomfort around", 
+            "prefer to avoid", "find it hard to enjoy", "are bothered by", "get annoyed with", 
+            "are irritated by"
+        };
+        string theyDislikeVerb = theyDislikePhrases[Random.Range(0, theyDislikePhrases.Length)];
 
 
-    foreach (var row in dataRows)
-    {
-        if (row[0].Equals(name, System.StringComparison.OrdinalIgnoreCase))
+        foreach (var column in dataRows)
         {
-            StringBuilder displayText = new StringBuilder();
-
-            string pronounSubject = "They";
-            string memoryText = row[1];
-            string likesText = row[2];
-            string dislikesText = row[3];
-
-            // Pronoun determination
-            if (Regex.IsMatch(memoryText, @"\b(his|he)\b", RegexOptions.IgnoreCase) ||
-                Regex.IsMatch(likesText, @"\b(his|he)\b", RegexOptions.IgnoreCase) ||
-                Regex.IsMatch(dislikesText, @"\b(his|he)\b", RegexOptions.IgnoreCase))
+            if (column[0].Equals(name, System.StringComparison.OrdinalIgnoreCase))
             {
-                pronounSubject = "He";
-            }
-            else if (Regex.IsMatch(memoryText, @"\b(her|she)\b", RegexOptions.IgnoreCase) ||
-                        Regex.IsMatch(likesText, @"\b(her|she)\b", RegexOptions.IgnoreCase) ||
-                        Regex.IsMatch(dislikesText, @"\b(her|she)\b", RegexOptions.IgnoreCase))
-            {
-                pronounSubject = "She";
-            }
+                StringBuilder displayText = new StringBuilder();
 
-            if(pronounSubject == "They")
-            {
-                likesVerb = theyLikeVerb;
-                dislikesVerb = theyDislikeVerb;
-            }
-            else if(pronounSubject == "He" || pronounSubject == "She")
-            {
-                likesVerb = heSheLikesVerb;
-                dislikesVerb = heSheDislikesVerb;
-            }
+                string pronounSubject = "They";
+                string memoryText = column[1];
+                string likesText = column[2];
+                string dislikesText = column[3];
+                string dialogueText1 = column[7];
+                string dialogueText2 = column[8];
+                string dialogueText3 = column[9];
+                string dialogueText4 = column[10];
+
+                // Pronoun determination
+                if (Regex.IsMatch(memoryText, @"\b(his|he)\b", RegexOptions.IgnoreCase) ||
+                    Regex.IsMatch(likesText, @"\b(his|he)\b", RegexOptions.IgnoreCase) ||
+                    Regex.IsMatch(dislikesText, @"\b(his|he)\b", RegexOptions.IgnoreCase))
+                {
+                    pronounSubject = "He";
+                }
+                else if (Regex.IsMatch(memoryText, @"\b(her|she)\b", RegexOptions.IgnoreCase) ||
+                            Regex.IsMatch(likesText, @"\b(her|she)\b", RegexOptions.IgnoreCase) ||
+                            Regex.IsMatch(dislikesText, @"\b(her|she)\b", RegexOptions.IgnoreCase))
+                {
+                    pronounSubject = "She";
+                }
+
+                if(pronounSubject == "They")
+                {
+                    likesVerb = theyLikeVerb;
+                    dislikesVerb = theyDislikeVerb;
+                }
+                else if(pronounSubject == "He" || pronounSubject == "She")
+                {
+                    likesVerb = heSheLikesVerb;
+                    dislikesVerb = heSheDislikesVerb;
+                }
 
 
 
-            // Start building the display text
-            if (!string.IsNullOrWhiteSpace(row[0]))
-                displayText.Append($"<color=#FF5733>{TrimFullStop(row[0])}</color> ");
+                // Start building the display text
+                if (!string.IsNullOrWhiteSpace(column[0]))
+                    displayText.Append($"<color=#FF5733>{TrimFullStop(column[0])}</color> ");
 
-            if (!string.IsNullOrWhiteSpace(row[1]))
-                displayText.Append($"\n{memoryVerb} {TrimFullStop(row[1])}\n");
+                if (!string.IsNullOrWhiteSpace(column[1]))
+                    displayText.Append($"\n{memoryVerb} {TrimFullStop(column[1])}\n");
 
-            if (!string.IsNullOrWhiteSpace(row[2]))
-                displayText.Append($"\n{pronounSubject} {likesVerb} {TrimFullStop(row[2])}\n");
+                if (!string.IsNullOrWhiteSpace(column[2]))
+                    displayText.Append($"\n{pronounSubject} {likesVerb} {TrimFullStop(column[2])}\n");
 
-            if (!string.IsNullOrWhiteSpace(row[3]))
-                displayText.Append($"\n{pronounSubject} {dislikesVerb} {TrimFullStop(row[3])}\n");
+                if (!string.IsNullOrWhiteSpace(column[3]))
+                    displayText.Append($"\n{pronounSubject} {dislikesVerb} {TrimFullStop(column[3])}\n");
 
-            if (!string.IsNullOrWhiteSpace(row[4]))
-                displayText.Append($"\n<color=#FFD700>Fav Quote:</color>\n{TrimFullStop(row[4])}\n");
+                if (!string.IsNullOrWhiteSpace(column[4]))
+                    displayText.Append($"\n<color=#FFD700>Fav Quote:</color>\n{TrimFullStop(column[4])}\n");
 
-            if (!string.IsNullOrWhiteSpace(row[5]))
-                displayText.Append($"\n<color=#8A2BE2>Companion:</color>\n{TrimFullStop(row[5])}");
+                if (!string.IsNullOrWhiteSpace(column[5]))
+                    displayText.Append($"\n<color=#8A2BE2>Companion:</color>\n{TrimFullStop(column[5])}");
 
-            uiText.text = displayText.ToString();
+                uiText.text = displayText.ToString();
 
-            // Handle character characterCustomization params
-            string[] intParams = row[6].Split(',').Where(param => !string.IsNullOrWhiteSpace(param)).ToArray();
-            if (intParams.Length == 14)
-            {
-                List<int> parameters = intParams.Select(param => int.Parse(param.Trim())).ToList();
-                chosenDataRow = parameters;
-                characterCustomization.UpdateSpecific(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4],
-                                            parameters[5], parameters[6], parameters[7], parameters[8], parameters[9],
-                                            parameters[10], parameters[11], parameters[12], parameters[13]);
+                // Handle character characterCustomization params
+                string[] intParams = column[6].Split(',').Where(param => !string.IsNullOrWhiteSpace(param)).ToArray();
+                if (intParams.Length == 14)
+                {
+                    List<int> parameters = intParams.Select(param => int.Parse(param.Trim())).ToList();
+                    chosenDataRow = parameters;
+                    characterCustomization.UpdateSpecific(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4],
+                                                parameters[5], parameters[6], parameters[7], parameters[8], parameters[9],
+                                                parameters[10], parameters[11], parameters[12], parameters[13]);
+                }
             }
         }
     }
-    }
 
-    public void UpdateNPC(List<int> parameters, GameObject obj)
+    public void UpdateNPC(GameObject obj)
     {
-        obj.GetComponent<CharacterCustomization>().UpdateSpecific(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4],
-                            parameters[5], parameters[6], parameters[7], parameters[8], parameters[9],
-                            parameters[10], parameters[11], parameters[12], parameters[13]);
+        int randomIndex = Random.Range(0, 650);
+
+        var row = dataRows[randomIndex];
         
+        string nameText = row[0];
+
+        // Handle character characterCustomization params
+        string[] intParams = row[6].Split(',').Where(param => !string.IsNullOrWhiteSpace(param)).ToArray();
+        if (intParams.Length == 14)
+        {
+            List<int> parameters = intParams.Select(param => int.Parse(param.Trim())).ToList();
+            obj.GetComponent<CharacterCustomization>().UpdateSpecific(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4],
+                    parameters[5], parameters[6], parameters[7], parameters[8], parameters[9],
+                    parameters[10], parameters[11], parameters[12], parameters[13]);
+        }
+    
+        string dialogueText1 = row[7];
+        string dialogueText2 = row[8];
+        string dialogueText3 = row[9];
+        string dialogueText4 = row[10];
+        
+        obj.GetComponent<CharacterDialogueScript>().nameText = nameText;
+        obj.GetComponent<CharacterDialogueScript>().dialogueText1 = dialogueText1;
+        obj.GetComponent<CharacterDialogueScript>().dialogueText2 = dialogueText2;
+        obj.GetComponent<CharacterDialogueScript>().dialogueText3 = dialogueText3;
+        obj.GetComponent<CharacterDialogueScript>().dialogueText4 = dialogueText4;
+
+        obj.GetComponent<CharacterDialogueScript>().dialogues[0] = dialogueText1;
+        obj.GetComponent<CharacterDialogueScript>().dialogues[1] = dialogueText2;
+        obj.GetComponent<CharacterDialogueScript>().dialogues[2] = dialogueText3;
+        obj.GetComponent<CharacterDialogueScript>().dialogues[3] = dialogueText4;
     }
 
-    public void SpawnPerson()
-    {
-        // at the current dataRows[i] there is a list of indices that we want to get and pass to an NPC controller script.
-        npc= Instantiate(npcPrefab, new Vector3(-1608, 84, 0), Quaternion.identity); 
-        UpdateNPC(chosenDataRow, npc);
-    }
+    // public void UpdateNPC(GameObject obj)
+    // {
+    //     int randomIndex = Random.Range(0, 650);
+
+    //     var row = dataRows[randomIndex];
+        
+    //     string nameText = row[0];
+
+    //     // Handle character characterCustomization params
+    //     string[] intParams = row[6].Split(',').Where(param => !string.IsNullOrWhiteSpace(param)).ToArray();
+    //     if (intParams.Length == 14)
+    //     {
+    //         List<int> parameters = intParams.Select(param => int.Parse(param.Trim())).ToList();
+    //         obj.GetComponent<CharacterCustomization>().UpdateSpecific(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4],
+    //                 parameters[5], parameters[6], parameters[7], parameters[8], parameters[9],
+    //                 parameters[10], parameters[11], parameters[12], parameters[13]);
+    //     }
+    
+    //     string dialogueText1 = row[7];
+    //     string dialogueText2 = row[8];
+    //     string dialogueText3 = row[9];
+    //     string dialogueText4 = row[10];
+        
+    //     obj.GetComponent<CharacterDialogueScript>().nameText = nameText;
+    //     obj.GetComponent<CharacterDialogueScript>().dialogueText1 = dialogueText1;
+    //     obj.GetComponent<CharacterDialogueScript>().dialogueText2 = dialogueText2;
+    //     obj.GetComponent<CharacterDialogueScript>().dialogueText3 = dialogueText3;
+    //     obj.GetComponent<CharacterDialogueScript>().dialogueText4 = dialogueText4;
+    // }
+
     public void SpawnRandomPerson()
     {
         // at the current dataRows[i] there is a list of indices that we want to get and pass to an NPC controller script.
         npc= Instantiate(npcPrefab, new Vector3(-1608, 84, 0), Quaternion.identity); 
-        UpdateNPC(chosenDataRow, npc);
+        UpdateNPC(npc);
     }
-
 
 
     public void DisplayRandomRow()

@@ -21,116 +21,125 @@ public class BuildingThreshColliderScript : MonoBehaviour
 
     }
 
-    void OnTriggerEnter2D()
+    void OnTriggerEnter2D(Collider2D other)
     {
-        characterMovement.playerOnThresh = true;
-
-        if(rooftopLadder)
+        if(other.CompareTag("Player"))
         {
-            // if(isPlayerCrossingUp())
-            // {
-                if (!characterMovement.playerIsOutside)
-                {           
-                    // Debug.Log("exiting");     
-                    building.ExitBuilding(0.3f, 0.3f, false);
-                    characterMovement.playerIsOutside = true;  
-                }
-            // }
+            characterMovement.playerOnThresh = true;
+
+            if(rooftopLadder)
+            {
+                // if(isPlayerCrossingUp())
+                // {
+                    if (!characterMovement.playerIsOutside)
+                    {           
+                        // Debug.Log("exiting");     
+                        building.ExitBuilding(0.3f, 0.3f, false);
+                        characterMovement.playerIsOutside = true;  
+                    }
+                // }
+            }
         }
     }
-    void OnTriggerExit2D()
+    void OnTriggerExit2D(Collider2D other)
     {
-        characterMovement.playerOnThresh = false;
+        if(other.CompareTag("Player"))
+        {
+            Debug.Log("exited thresh");   
 
-        if(!rooftopLadder)
-        { 
-            if(isPlayerCrossingUp()) //if player crossing up
-            {
-                if (backOfBuilding)
+            characterMovement.playerOnThresh = false;
+
+            if(!rooftopLadder)
+            { 
+                if(isPlayerCrossingUp()) //if player crossing up
                 {
-                    if (!characterMovement.playerIsInside())
-                    {   
-                        if(this.GetComponent<RoomThresholdColliderScript>().roomAbove == null)
-                        {           
-                            building.GoBehindBuilding(); // go outside behind the buildinng
-                            soundtrackScript.FadeOutIn(soundtrackScript.track2, soundtrackScript.track1);
-                            characterMovement.playerIsOutside = true;
+                    if (backOfBuilding)
+                    {
+                        if (!characterMovement.playerIsOutside)
+                        {   
+                            if(this.GetComponent<RoomThresholdColliderScript>().roomAbove == null)
+                            {        
+                                Debug.Log("working");   
+                                building.GoBehindBuilding(); // go outside behind the buildinng
+                                soundtrackScript.FadeOutIn(soundtrackScript.track2, soundtrackScript.track1);
+                                characterMovement.playerIsOutside = true;
+                            }
+                        }
+                        else
+                        {
+                            if(this.GetComponent<RoomThresholdColliderScript>().roomAbove != null)
+                            {                          
+                                building.EnterBuilding();
+                                characterMovement.playerIsOutside = false;
+                            }
                         }
                     }
                     else
                     {
-                        if(this.GetComponent<RoomThresholdColliderScript>().roomAbove != null)
-                        {                          
-                            building.EnterBuilding();
-                            characterMovement.playerIsOutside = false;
-                        }
-                    }
-                }
-                else
-                {
-                        if(characterMovement.playerIsOutside) 
-                        {     
-                            building.EnterBuilding();
-                        }                
-                        characterMovement.playerIsOutside = false;            
-                }
-            }
-            else //if player crossing down
-            {
-                    if (backOfBuilding)   // entering the building from the back
-                    {   
-                        if(characterMovement.playerIsOutside) 
-                        {     
-                            if(this.GetComponent<RoomThresholdColliderScript>().roomBelow != null)
-                            {
+                            if(characterMovement.playerIsOutside) 
+                            {     
                                 building.EnterBuilding();
-                                characterMovement.playerIsOutside = false;  
-                            }          
-                        }
-                        else
-                        {
-                            if(this.GetComponent<RoomThresholdColliderScript>().roomBelow == null)
+                            }                
+                            characterMovement.playerIsOutside = false;            
+                    }
+                }
+                else //if player crossing down
+                {
+                        if (backOfBuilding)   // entering the building from the back
+                        {   
+                            if(characterMovement.playerIsOutside) 
+                            {     
+                                if(this.GetComponent<RoomThresholdColliderScript>().roomBelow != null)
+                                {
+                                    building.EnterBuilding();
+                                    characterMovement.playerIsOutside = false;  
+                                }          
+                            }
+                            else
                             {
-                                building.GoBehindBuilding(); // go outside behind the buildinng
-                                soundtrackScript.FadeOutIn(soundtrackScript.track2, soundtrackScript.track1);
-                                characterMovement.playerIsOutside = true;  
-                            }          
+                                if(this.GetComponent<RoomThresholdColliderScript>().roomBelow == null)
+                                {
+                                    building.GoBehindBuilding(); // go outside behind the buildinng
+                                    soundtrackScript.FadeOutIn(soundtrackScript.track2, soundtrackScript.track1);
+                                    characterMovement.playerIsOutside = true;  
+                                }          
+                            }
                         }
-                    }
-                    else // entering the building from the front
-                    {
-                        if (LayerMask.LayerToName(this.gameObject.layer) != "Default") // if player is not exiting building on the ground level
+                        else // entering the building from the front
                         {
-                            building.ExitBuilding(0.3f, 0.3f, false);
+                            if (LayerMask.LayerToName(this.gameObject.layer) != "Default") // if player is not exiting building on the ground level
+                            {
+                                building.ExitBuilding(0.3f, 0.3f, false);
+                            }
+                            else      // if player is exiting building on the ground level
+                            {
+                                building.ExitBuilding(0.3f, 0.3f, false); //
+                            }
+                            characterMovement.playerIsOutside = true;
                         }
-                        else      // if player is exiting building on the ground level
-                        {
-                            building.ExitBuilding(0.3f, 0.3f, false); //
-                        }
-                        characterMovement.playerIsOutside = true;
-                    }
-                
+                    
+                }
             }
-        }
-        else
-        {
-            // if(!isPlayerCrossingUp() && !(isPlayerCrossingLeft() && isPlayerCrossingLeft()))
-            // {
-                if (characterMovement.playerIsOutside)
-                {
-                    if(!isPlayerCrossingUp() && characterMovement.change.x == 0)
+            else
+            {
+                // if(!isPlayerCrossingUp() && !(isPlayerCrossingLeft() && isPlayerCrossingLeft()))
+                // {
+                    if (characterMovement.playerIsOutside)
                     {
-                        building.EnterBuilding();
-                        characterMovement.playerIsOutside = false;  
-                    }                
-                }
-                else if (!characterMovement.playerIsOutside)
-                {
-                    building.ExitBuilding(0.3f, 0.3f, false);
-                    characterMovement.playerIsOutside = true;  
-                }
-            // }
+                        if(!isPlayerCrossingUp() && characterMovement.change.x == 0)
+                        {
+                            building.EnterBuilding();
+                            characterMovement.playerIsOutside = false;  
+                        }                
+                    }
+                    else if (!characterMovement.playerIsOutside)
+                    {
+                        building.ExitBuilding(0.3f, 0.3f, false);
+                        characterMovement.playerIsOutside = true;  
+                    }
+                // }
 
+            }
         }
     }
     

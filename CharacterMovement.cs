@@ -36,7 +36,7 @@ public class CharacterMovement : MonoBehaviour
   [HideInInspector] public bool fixedDirectionLeftDiagonal;
   [HideInInspector] public bool fixedDirectionRightDiagonal;
 
-  [HideInInspector] public bool playerIsOutside = false;
+  public bool playerIsOutside = false;
 
   [HideInInspector] public bool facingLeft;
 
@@ -499,6 +499,8 @@ public class CharacterMovement : MonoBehaviour
 
   public IEnumerator MoveCharacterRandomly()
   {
+    yield return new WaitForSeconds(Random.Range(3,7));
+
     change.x = Random.Range(-10,10);
     change.y = Random.Range(-10,10);
 
@@ -506,9 +508,9 @@ public class CharacterMovement : MonoBehaviour
 
     change = Vector3.zero;
 
-    yield return new WaitForSeconds(Random.Range(5,15));
+    yield return new WaitForSeconds(Random.Range(5,10));
 
-    StartCoroutine(MoveCharacterRandomly());  
+    npcRandomMovementCoro = StartCoroutine(MoveCharacterRandomly()); 
   }
 
 

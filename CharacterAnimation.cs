@@ -416,7 +416,7 @@ public class CharacterAnimation : MonoBehaviour
       {
         if (characterMovement.change != Vector3.zero)
           {
-           Walk();
+          Walk();
           }
       }
 

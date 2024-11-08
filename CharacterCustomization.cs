@@ -9,22 +9,22 @@ public class CharacterCustomization : MonoBehaviour
 {
     // CharacterMovement playerMovement;
     // CharacterMovement characterAnimation;
-    public CharacterAnimation characterAnimation;
+    [HideInInspector] public CharacterAnimation characterAnimation;
 
     // PlayerCntrlerScript characterAnimation;
 
 
 
-    public bool lockedSkinColor = false;
-    public bool lockedBodyType = false;
-    public bool lockedHeight = false;
-    public bool lockedWidth = false;
-    public bool lockedHair = false;
-    public bool lockedShirt = false;
-    public bool lockedWaist = false;
-    public bool lockedPants = false;
-    public bool lockedJaketto = false;
-    public bool lockedShoes = false;
+    [HideInInspector] public bool lockedSkinColor = false;
+    [HideInInspector] public bool lockedBodyType = false;
+    [HideInInspector] public bool lockedHeight = false;
+    [HideInInspector] public bool lockedWidth = false;
+    [HideInInspector] public bool lockedHair = false;
+    [HideInInspector] public bool lockedShirt = false;
+    [HideInInspector] public bool lockedWaist = false;
+    [HideInInspector] public bool lockedPants = false;
+    [HideInInspector] public bool lockedJaketto = false;
+    [HideInInspector] public bool lockedShoes = false;
 
     // Declare Image components for each locked attribute
     private Image lockBodyImgComponent;
@@ -43,27 +43,27 @@ public class CharacterCustomization : MonoBehaviour
     private Sprite unlockedImage;
 
     // public Image skinColorButton;
-    public Image skinColorButton2;
-    public Image hairColorButton;
-    public Image shirtColorButton;
-    public Image pantsColorButton;
-    public Image jackettoColorButton;
+    [HideInInspector] public Image skinColorButton2;
+    [HideInInspector] public Image hairColorButton;
+    [HideInInspector] public Image shirtColorButton;
+    [HideInInspector] public Image pantsColorButton;
+    [HideInInspector] public Image jackettoColorButton;
 
 
-    public int currentBodyTypeIndex = 0; // Index to track current body type
-    public int currentHeightIndex = 0;   // Index to track current height
-    public int currentWidthIndex = 0;    // Index to track current currentWidthIndex
-    public int currentHairStyleIndex = 0;    //"" "" "" 
-    public int currentHairColorIndex = 0;    //"" "" "" 
-    public int currentShirtIndex = 0;    //"" "" "" 
-    public int currentWaistIndex = 0;   
-    public int currentPantsIndex = 0;   
-    public int currentFeetIndex = 0;    
-    public int currentJakettoIndex = 0;    
-    public int currentSkinColorIndex = 0;   
-    public int currentShirtColorIndex = 0;   
-    public int currentPantsColorIndex = 0;   
-    public int currentJakettoColorIndex = 0;   
+    [HideInInspector] public int currentBodyTypeIndex = 0; // Index to track current body type
+    [HideInInspector] public int currentHeightIndex = 0;   // Index to track current height
+    [HideInInspector] public int currentWidthIndex = 0;    // Index to track current currentWidthIndex
+    [HideInInspector] public int currentHairStyleIndex = 0;    //"" "" "" 
+    [HideInInspector] public int currentHairColorIndex = 0;    //"" "" "" 
+    [HideInInspector] public int currentShirtIndex = 0;    //"" "" "" 
+    [HideInInspector] public int currentWaistIndex = 0;   
+    [HideInInspector] public int currentPantsIndex = 0;   
+    [HideInInspector] public int currentFeetIndex = 0;    
+    [HideInInspector] public int currentJakettoIndex = 0;    
+    [HideInInspector] public int currentSkinColorIndex = 0;   
+    [HideInInspector] public int currentShirtColorIndex = 0;   
+    [HideInInspector] public int currentPantsColorIndex = 0;   
+    [HideInInspector] public int currentJakettoColorIndex = 0;   
 
 
 

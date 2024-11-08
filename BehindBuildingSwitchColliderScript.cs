@@ -16,49 +16,55 @@ public class BehindBuildingSwitchColliderScript : MonoBehaviour
         Player = GameObject.FindGameObjectWithTag("Player");
         playerMovement = Player.GetComponent<CharacterMovement>(); 
     }  
-    void OnTriggerEnter2D()
+    void OnTriggerEnter2D(Collider2D other)
     {
-        if(building != null)
+        if (other.CompareTag("Player"))
         {
-            if (playerMovement.fixedDirectionLeftDiagonal || playerMovement.fixedDirectionRightDiagonal)
+            if(building != null)
             {
-                // do nuttin
-            }
-            else if(!playerMovement.playerIsOutside)
-            {
-                for (int i = 0; i < building.outerBuildingSpriteList.Count; i++)
+                if (playerMovement.fixedDirectionLeftDiagonal || playerMovement.fixedDirectionRightDiagonal)
                 {
-                    building.SetTreeAlpha(building.outerBuildingSpriteList[i], 0.35f);
-                }                   
-            }
-            else
-            {
-                building.GoBehindBuilding();     
+                    // do nuttin
+                }
+                else if(!playerMovement.playerIsOutside)
+                {
+                    for (int i = 0; i < building.outerBuildingSpriteList.Count; i++)
+                    {
+                        building.SetTreeAlpha(building.outerBuildingSpriteList[i], 0.35f);
+                    }                   
+                }
+                else
+                {
+                    building.GoBehindBuilding();     
+                }
             }
         }
     }
-    void OnTriggerExit2D()
+    void OnTriggerExit2D(Collider2D other)
     {
-        if(building != null)
+        if (other.CompareTag("Player"))
         {
-            if ((playerMovement.fixedDirectionLeftDiagonal || playerMovement.fixedDirectionRightDiagonal))
+            if(building != null)
             {
-                // do nuttin
-            }
-            else if(!playerMovement.playerIsOutside)
-            {
-                for (int i = 0; i < building.gameObjectsToShowWhileOutsideSpriteList.Count; i++)
+                if ((playerMovement.fixedDirectionLeftDiagonal || playerMovement.fixedDirectionRightDiagonal))
                 {
-                    building.SetTreeAlpha(building.gameObjectsToShowWhileOutsideSpriteList[i], building.gameObjectsToShowWhileOutsideColorList[i].a);
-                }              
-                for (int i = 0; i < building.outerBuildingSpriteList.Count; i++)
+                    // do nuttin
+                }
+                else if(!playerMovement.playerIsOutside)
                 {
-                    building.SetTreeAlpha(building.outerBuildingSpriteList[i], building.outerBuildingInitialColorList[i].a);
-                }              
-            }
-            else
-            {   
-                building.ExitBuilding(0.1f, 0.1f, true);
+                    for (int i = 0; i < building.gameObjectsToShowWhileOutsideSpriteList.Count; i++)
+                    {
+                        building.SetTreeAlpha(building.gameObjectsToShowWhileOutsideSpriteList[i], building.gameObjectsToShowWhileOutsideColorList[i].a);
+                    }              
+                    for (int i = 0; i < building.outerBuildingSpriteList.Count; i++)
+                    {
+                        building.SetTreeAlpha(building.outerBuildingSpriteList[i], building.outerBuildingInitialColorList[i].a);
+                    }              
+                }
+                else
+                {   
+                    building.ExitBuilding(0.1f, 0.1f, true);
+                }
             }
         }        
     }

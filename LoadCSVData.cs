@@ -649,4 +649,5 @@ public class LoadCSVData : MonoBehaviour
     {
         return text.EndsWith(".") ? text.Substring(0, text.Length - 1) : text;
     }
+
 }

@@ -48,6 +48,7 @@ public class CharacterMovement : MonoBehaviour
   [HideInInspector] public Coroutine npcRandomMovementCoro;
 
 
+  [HideInInspector] public bool playerIsCustomizing = false;
   [HideInInspector] public bool playerSitting = false;
 
   [HideInInspector] public int currentAnimationDirection;
@@ -173,6 +174,10 @@ public class CharacterMovement : MonoBehaviour
       if(playerSitting == true)
       {
         // AnimateMovement(sit, 1, currentAnimationDirection, bodyTypeNumber);
+      }
+      else if(playerIsCustomizing) // not optimal
+      {
+        characterAnimation.Animate(characterAnimation.idle, 1, characterAnimation.currentAnimationDirection, characterAnimation.bodyTypeNumber);
       }
       else if(!playerOnBike) // not optimal
       {

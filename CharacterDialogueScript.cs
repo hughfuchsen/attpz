@@ -50,11 +50,18 @@ public class CharacterDialogueScript : MonoBehaviour
     void Update()
     {
         // Check if the player is in range and the space key is pressed
-        if (isPlayerInRange && Input.GetKeyDown(KeyCode.Space))
+        if (isPlayerInRange)
         {
-            ShowNextDialogue();
-            dialogueBGrndImage.color = Color.white;
-            // dialogueBGrndImage.SetActive(true);
+            if (Input.GetKeyDown(KeyCode.Space) || 
+                    Input.GetKeyDown(KeyCode.JoystickButton0) ||  // A button
+                    Input.GetKeyDown(KeyCode.JoystickButton1) ||  // B button
+                    Input.GetKeyDown(KeyCode.JoystickButton2) ||  // X button
+                    Input.GetKeyDown(KeyCode.JoystickButton3))            
+            {  
+                ShowNextDialogue();
+                dialogueBGrndImage.color = Color.white;
+                // dialogueBGrndImage.SetActive(true);
+            }
         }
     }
 
@@ -62,7 +69,6 @@ public class CharacterDialogueScript : MonoBehaviour
     {
         // Display the current dialogue in the TextMeshPro component
         dialogueDisplay.text = dialogues[currentDialogueIndex];
-        Debug.Log(dialogues[currentDialogueIndex]);
         dialogueNameDisplay.text = nameText + ":";
 
         // Move to the next dialogue, reset if at the end

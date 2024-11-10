@@ -131,23 +131,17 @@ public class LoadCSVData : MonoBehaviour
         yield return new WaitForEndOfFrame();
 
         DisplayRandomRow();
-        // SpawnRandomPerson();
-        // SpawnRandomPerson();
-        // SpawnRandomPerson();
-        // SpawnRandomPerson();
-        // SpawnRandomPerson();
-        // SpawnRandomPerson();
-        // SpawnRandomPerson();
-        // SpawnRandomPerson();
-        // SpawnRandomPerson();
+        
+        UpdateAllNPCS();
+    }
+
+    public void UpdateAllNPCS()
+    {
         foreach (GameObject npc in npcList)
         {
             UpdateNPC(npc);
         }
-
-
-    }
-
+    }   
     private void ValidateInputFields()
     {
         // Get the current ColorBlock of the submit button
@@ -551,6 +545,7 @@ public class LoadCSVData : MonoBehaviour
         var row = dataRows[randomIndex];
         
         string nameText = row[0];
+        string chrctrAppearance = row[6];
 
         // Handle character characterCustomization params
         string[] intParams = row[6].Split(',').Where(param => !string.IsNullOrWhiteSpace(param)).ToArray();
@@ -568,6 +563,7 @@ public class LoadCSVData : MonoBehaviour
         string dialogueText4 = row[10];
         
         obj.GetComponent<CharacterDialogueScript>().nameText = nameText;
+        obj.GetComponent<CharacterCustomization>().chrctrAppearance = chrctrAppearance;
         obj.GetComponent<CharacterDialogueScript>().dialogueText1 = dialogueText1;
         obj.GetComponent<CharacterDialogueScript>().dialogueText2 = dialogueText2;
         obj.GetComponent<CharacterDialogueScript>().dialogueText3 = dialogueText3;

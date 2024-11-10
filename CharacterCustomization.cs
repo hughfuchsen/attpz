@@ -12,6 +12,7 @@ public class CharacterCustomization : MonoBehaviour
     [HideInInspector] public CharacterAnimation characterAnimation;
 
     // PlayerCntrlerScript characterAnimation;
+    public string chrctrAppearance;
 
 
 
@@ -1088,13 +1089,23 @@ private void UpdateLockImage()
             // currentJakettoIndex = jaketto;
             // UpdateJakettoColor();
 
-      
-
-        
     }
 
 
-
+    public void ResetAppearance()
+    {
+        if(chrctrAppearance != null)
+        {
+            string[] intParams = chrctrAppearance.Split(',').Where(param => !string.IsNullOrWhiteSpace(param)).ToArray();
+            if (intParams.Length == 14)
+            {
+                List<int> parameters = intParams.Select(param => int.Parse(param.Trim())).ToList();
+                UpdateSpecific(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4],
+                        parameters[5], parameters[6], parameters[7], parameters[8], parameters[9],
+                        parameters[10], parameters[11], parameters[12], parameters[13]);
+            }
+        }
+    }
 
 
 

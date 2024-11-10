@@ -15,7 +15,7 @@ public class RoomThresholdColliderScript : MonoBehaviour
     public RoomScript roomAbove;
     public RoomScript roomBelow;
     LevelThreshColliderScript levelThreshColliderScript;
-    CharacterMovement playerMovement;
+    CharacterMovement characterMovement;
     [SerializeField] GameObject Player;
     [SerializeField] BoxCollider2D playerCollider;
     public bool itsALadder;
@@ -46,7 +46,7 @@ public class RoomThresholdColliderScript : MonoBehaviour
     void Awake()
     {
         Player = GameObject.FindGameObjectWithTag("Player");
-        playerMovement = Player.GetComponent<CharacterMovement>(); 
+        characterMovement = Player.GetComponent<CharacterMovement>(); 
         playerCollider = Player.GetComponent<BoxCollider2D>();
 
         
@@ -65,6 +65,7 @@ public class RoomThresholdColliderScript : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D collision)
     {
+    
         if (collision.gameObject.tag == "Player")
         {    
             StopAllCoros();
@@ -88,13 +89,13 @@ public class RoomThresholdColliderScript : MonoBehaviour
                 //     // Execute your desired code here for top-right of the trigger object
                 //     if(plyrCrsngLeft) 
                 //     {
-                //         // playerMovement.fixedDirectionLeftDiagonal = true; // fix the player in \ left diag way while inside the collider
-                //         // playerMovement.fixedDirectionRightDiagonal = false; // fix the player in \ left diag way while inside the collider
+                //         // characterMovement.fixedDirectionLeftDiagonal = true; // fix the player in \ left diag way while inside the collider
+                //         // characterMovement.fixedDirectionRightDiagonal = false; // fix the player in \ left diag way while inside the collider
                 //     }
                 //     else if (!plyrCrsngLeft)
                 //     {
-                //         // playerMovement.fixedDirectionRightDiagonal = true; // fix the player in / right diag way while inside the collider
-                //         // playerMovement.fixedDirectionLeftDiagonal = false; // fix the player in / right diag way while inside the collider
+                //         // characterMovement.fixedDirectionRightDiagonal = true; // fix the player in / right diag way while inside the collider
+                //         // characterMovement.fixedDirectionLeftDiagonal = false; // fix the player in / right diag way while inside the collider
                 //     }
                 // }
                 // // Check if the contact point is within the top-left quarter of the other object's collider
@@ -123,7 +124,7 @@ public class RoomThresholdColliderScript : MonoBehaviour
 
                 // moveToCldrCenterCoro = StartCoroutine(MovePlayerToCenter(collision.transform, worldCenter));
 
-                playerMovement.motionDirection = "normal";
+                characterMovement.motionDirection = "normal";
 
 
     //   if (angle > 292.5f && angle <= 337.5f)    { change = new Vector3(-1f,0.5f,0f); currentAnimationDirection = upLeftAnim;}
@@ -141,37 +142,37 @@ public class RoomThresholdColliderScript : MonoBehaviour
 
                 if(plyrCrsngLeft) 
                 {
-                    // playerMovement.fixedDirectionLeftDiagonal = true; // fix the player in \ left diag way while inside the collider
-                    // playerMovement.fixedDirectionRightDiagonal = false; // fix the player in \ left diag way while inside the collider
+                    // characterMovement.fixedDirectionLeftDiagonal = true; // fix the player in \ left diag way while inside the collider
+                    // characterMovement.fixedDirectionRightDiagonal = false; // fix the player in \ left diag way while inside the collider
 
-                    playerMovement.controlDirectionToPlayerDirection[Direction.Left] = Direction.UpLeft;
-                    playerMovement.controlDirectionToPlayerDirection[Direction.UpLeft] = Direction.UpLeft;
-                    playerMovement.controlDirectionToPlayerDirection[Direction.UpFacingLeft] = Direction.UpLeft;
-                    playerMovement.controlDirectionToPlayerDirection[Direction.UpFacingRight] = Direction.UpLeft;
-                    playerMovement.controlDirectionToPlayerDirection[Direction.UpRight] = Direction.UpLeft;
-                    playerMovement.controlDirectionToPlayerDirection[Direction.Right] = Direction.RightDown;
-                    playerMovement.controlDirectionToPlayerDirection[Direction.RightDown] = Direction.RightDown;
-                    playerMovement.controlDirectionToPlayerDirection[Direction.DownFacingRight] = Direction.RightDown;
-                    playerMovement.controlDirectionToPlayerDirection[Direction.DownFacingLeft] = Direction.RightDown;
-                    playerMovement.controlDirectionToPlayerDirection[Direction.DownLeft] = Direction.RightDown;
+                    characterMovement.controlDirectionToPlayerDirection[Direction.Left] = Direction.UpLeft;
+                    characterMovement.controlDirectionToPlayerDirection[Direction.UpLeft] = Direction.UpLeft;
+                    characterMovement.controlDirectionToPlayerDirection[Direction.UpFacingLeft] = Direction.UpLeft;
+                    characterMovement.controlDirectionToPlayerDirection[Direction.UpFacingRight] = Direction.UpLeft;
+                    characterMovement.controlDirectionToPlayerDirection[Direction.UpRight] = Direction.UpLeft;
+                    characterMovement.controlDirectionToPlayerDirection[Direction.Right] = Direction.RightDown;
+                    characterMovement.controlDirectionToPlayerDirection[Direction.RightDown] = Direction.RightDown;
+                    characterMovement.controlDirectionToPlayerDirection[Direction.DownFacingRight] = Direction.RightDown;
+                    characterMovement.controlDirectionToPlayerDirection[Direction.DownFacingLeft] = Direction.RightDown;
+                    characterMovement.controlDirectionToPlayerDirection[Direction.DownLeft] = Direction.RightDown;
 
 
                 }
                 else if (!plyrCrsngLeft)
                 {
-                    // playerMovement.fixedDirectionRightDiagonal = true; // fix the player in / right diag way while inside the collider
-                    // playerMovement.fixedDirectionLeftDiagonal = false; // fix the player in / right diag way while inside the collider
+                    // characterMovement.fixedDirectionRightDiagonal = true; // fix the player in / right diag way while inside the collider
+                    // characterMovement.fixedDirectionLeftDiagonal = false; // fix the player in / right diag way while inside the collider
 
-                    playerMovement.controlDirectionToPlayerDirection[Direction.Left] = Direction.DownLeft;
-                    playerMovement.controlDirectionToPlayerDirection[Direction.UpLeft] = Direction.UpRight;
-                    playerMovement.controlDirectionToPlayerDirection[Direction.UpFacingLeft] = Direction.UpRight;
-                    playerMovement.controlDirectionToPlayerDirection[Direction.UpFacingRight] = Direction.UpRight;
-                    playerMovement.controlDirectionToPlayerDirection[Direction.UpRight] = Direction.UpRight;
-                    playerMovement.controlDirectionToPlayerDirection[Direction.Right] = Direction.UpRight;
-                    playerMovement.controlDirectionToPlayerDirection[Direction.RightDown] = Direction.DownLeft;
-                    playerMovement.controlDirectionToPlayerDirection[Direction.DownFacingRight] = Direction.DownLeft;
-                    playerMovement.controlDirectionToPlayerDirection[Direction.DownFacingLeft] = Direction.DownLeft;
-                    playerMovement.controlDirectionToPlayerDirection[Direction.DownLeft] = Direction.DownLeft;
+                    characterMovement.controlDirectionToPlayerDirection[Direction.Left] = Direction.DownLeft;
+                    characterMovement.controlDirectionToPlayerDirection[Direction.UpLeft] = Direction.UpRight;
+                    characterMovement.controlDirectionToPlayerDirection[Direction.UpFacingLeft] = Direction.UpRight;
+                    characterMovement.controlDirectionToPlayerDirection[Direction.UpFacingRight] = Direction.UpRight;
+                    characterMovement.controlDirectionToPlayerDirection[Direction.UpRight] = Direction.UpRight;
+                    characterMovement.controlDirectionToPlayerDirection[Direction.Right] = Direction.UpRight;
+                    characterMovement.controlDirectionToPlayerDirection[Direction.RightDown] = Direction.DownLeft;
+                    characterMovement.controlDirectionToPlayerDirection[Direction.DownFacingRight] = Direction.DownLeft;
+                    characterMovement.controlDirectionToPlayerDirection[Direction.DownFacingLeft] = Direction.DownLeft;
+                    characterMovement.controlDirectionToPlayerDirection[Direction.DownLeft] = Direction.DownLeft;
                 }
 
                 if (isPlayerCrossingUp())
@@ -209,130 +210,140 @@ public class RoomThresholdColliderScript : MonoBehaviour
                 }
             }
         }
+        else
+        { // for npc random movement
+            if(collision.GetComponent<CharacterMovement>() != null && collision == collision.GetComponent<CharacterMovement>().boxCollider)
+            {
+                collision.GetComponent<CharacterMovement>().ReverseDirection();
+            }
+        }
     }
 
-    void OnTriggerExit2D()
+    void OnTriggerExit2D(Collider2D collision)
     {
-        StopAllCoros();
-        if(!itsALadder)
-        {
-            // playerMovement.fixedDirectionLeftDiagonal = false;
-            // playerMovement.fixedDirectionRightDiagonal = false; // un-fix the player in \/ left/right diag way upon collider exit. 
-            playerMovement.ResetPlayerMovement(); 
-
-                //ON EXIT CROSSING UP
-            if (isPlayerCrossingUp())
+        if (collision.gameObject.tag == "Player")
+        {    
+            StopAllCoros();
+            if(!itsALadder)
             {
-                if (ThisThresholdIsAnEntranceToTheBuildingOrIsStairs())
+                // characterMovement.fixedDirectionLeftDiagonal = false;
+                // characterMovement.fixedDirectionRightDiagonal = false; // un-fix the player in \/ left/right diag way upon collider exit. 
+                characterMovement.ResetPlayerMovement(); 
+
+                    //ON EXIT CROSSING UP
+                if (isPlayerCrossingUp())
                 {
-                    if (roomBelow != null && roomAbove == null) // if player is exiting the back of the building
-                    { 
-                        roomBelow.ResetRoomPositions(); 
-                        roomBelow.ExitRoomAndSetDoorwayInstances(); 
+                    if (ThisThresholdIsAnEntranceToTheBuildingOrIsStairs())
+                    {
+                        if (roomBelow != null && roomAbove == null) // if player is exiting the back of the building
+                        { 
+                            roomBelow.ResetRoomPositions(); 
+                            roomBelow.ExitRoomAndSetDoorwayInstances(); 
+                            SetOpenDoorToZeroAlpha();
+                            SetClosedDoorToInitialAlpha();
+                        }  
+                        else if (roomAbove != null) // if player is entering the building from the fro
+                        {
+                            SetClosedDoorToInitialAlpha();
+                            roomAbove.EnterRoom(true, 0.3f); 
+                        }
+                    }
+                    else // if this threshold is just the entrance to a room and not a building entrance
+                    {               
+                        SetClosedDoorToInitialAlpha(); 
+                        if (roomBelow != null && roomAbove == null) // if there is no room above the thresh i.e. if 
+                                                                    // the player is leaving the level and the rooms need to go in their original pos.
+                        {
+                            roomBelow.ResetRoomPositions(); 
+                        }
+                        else if (roomAbove != null) 
+                        {
+                            roomAbove.EnterRoom(false, 0f);
+                        }
+
+                        if (roomBelow != null)
+                        {
+                            roomBelow.ExitRoomAndSetDoorwayInstances();
+                        }
+                    }
+                    
+                    aboveCollider = true;
+                }
+                    
+                else //ON EXIT CROSSING DOWN
+                {
+                    if (roomAbove != null)
+                    {
+                        roomAbove.ExitRoomAndSetDoorwayInstances();
                         SetOpenDoorToZeroAlpha();
                         SetClosedDoorToInitialAlpha();
-                    }  
-                    else if (roomAbove != null) // if player is entering the building from the fro
-                    {
-                        SetClosedDoorToInitialAlpha();
-                        roomAbove.EnterRoom(true, 0.3f); 
-                    }
-                }
-                else // if this threshold is just the entrance to a room and not a building entrance
-                {               
-                    SetClosedDoorToInitialAlpha(); 
-                    if (roomBelow != null && roomAbove == null) // if there is no room above the thresh i.e. if 
-                                                                // the player is leaving the level and the rooms need to go in their original pos.
-                    {
-                        roomBelow.ResetRoomPositions(); 
-                    }
-                    else if (roomAbove != null) 
-                    {
-                        roomAbove.EnterRoom(false, 0f);
                     }
 
-                    if (roomBelow != null)
+                    if (ThisThresholdIsAnEntranceToTheBuildingOrIsStairs())
                     {
-                        roomBelow.ExitRoomAndSetDoorwayInstances();
-                    }
-                }
-                
-                aboveCollider = true;
-            }
-                
-            else //ON EXIT CROSSING DOWN
-            {
-                if (roomAbove != null)
-                {
-                    roomAbove.ExitRoomAndSetDoorwayInstances();
-                    SetOpenDoorToZeroAlpha();
-                    SetClosedDoorToInitialAlpha();
-                }
+                        if (roomBelow == null && roomAbove != null) // if the player IS inside bulding and ABOVE collider prior to collider exit
+                        {
+                            roomAbove.ResetRoomPositions();
+                            roomAbove.ExitRoomAndSetDoorwayInstances();
+                        }   
+                        else
+                        if (!characterMovement.playerIsOutside && roomBelow != null) // if the player IS inside bulding and ABOVE collider, going down stairs and entering room downstairs
+                        {
+                            roomBelow.EnterRoom(false, 0f);
 
-                if (ThisThresholdIsAnEntranceToTheBuildingOrIsStairs())
-                {
-                    if (roomBelow == null && roomAbove != null) // if the player IS inside bulding and ABOVE collider prior to collider exit
-                    {
-                        roomAbove.ResetRoomPositions();
-                        roomAbove.ExitRoomAndSetDoorwayInstances();
-                    }   
-                    else
-                    if (playerMovement.playerIsInside() && roomBelow != null) // if the player IS inside bulding and ABOVE collider, going down stairs and entering room downstairs
+                            SetClosedDoorToInitialAlpha();
+                            for (int i = 0; i < openDoorSpriteList.Count; i++)
+                            { 
+                                SetTreeAlpha(this.FindSiblingWithTag("OpenDoor"), 0);
+                            }  
+                        }    
+                    }
+                    else if (roomBelow != null) // entering a room going down while inside building
                     {
                         roomBelow.EnterRoom(false, 0f);
 
-                        SetClosedDoorToInitialAlpha();
-                        for (int i = 0; i < openDoorSpriteList.Count; i++)
-                        { 
-                            SetTreeAlpha(this.FindSiblingWithTag("OpenDoor"), 0);
-                        }  
-                    }    
-                }
-                else if (roomBelow != null) // entering a room going down while inside building
-                {
-                    roomBelow.EnterRoom(false, 0f);
+                        if (!characterMovement.playerIsOutside && aboveCollider) // if player is inside 
+                        {
+                            initialSortingLayer = Player.transform.Find("head").GetComponent<SpriteRenderer>().sortingLayerName;
 
-                    if (playerMovement.playerIsInside() && aboveCollider) // if player is inside 
-                    {
-                        initialSortingLayer = Player.transform.Find("head").GetComponent<SpriteRenderer>().sortingLayerName;
-
-                        thresholdSortingSequenceCoro = StartCoroutine(ThresholdLayerSortingSequence(0.3f, Player, "ThresholdSequence"));
+                            thresholdSortingSequenceCoro = StartCoroutine(ThresholdLayerSortingSequence(0.3f, Player, "ThresholdSequence"));
+                        }
                     }
-                }
-                            
-                aboveCollider = false;
+                                
+                    aboveCollider = false;
 
+                }
+
+                SetPlayerIsInDoorway(false);
             }
-
-            SetPlayerIsInDoorway(false);
-        }
-        else // if it is a ladder
-        {
-            if(isPlayerCrossingUp())
+            else // if it is a ladder
             {
-                if(playerMovement.playerIsOutside)
+                if(isPlayerCrossingUp())
                 {
-                    if (roomBelow != null || roomAbove != null)
+                    if(characterMovement.playerIsOutside)
                     {
-                        roomBelow.ResetRoomPositions(); 
-                    }
-                }   
-            }  
-            else
-            {
-                if(!playerMovement.playerIsOutside)
-                {
-                    if (roomBelow != null || roomAbove != null)
-                    {
-                        // roomAbove.EnterRoom(true, 0.3f); 
-                        roomBelow.EnterRoom(true, 0.3f); 
-                    }
-                }
+                        if (roomBelow != null || roomAbove != null)
+                        {
+                            roomBelow.ResetRoomPositions(); 
+                        }
+                    }   
+                }  
                 else
                 {
-                    if (roomBelow != null || roomAbove != null)
+                    if(!characterMovement.playerIsOutside)
                     {
-                        roomBelow.ResetRoomPositions(); 
+                        if (roomBelow != null || roomAbove != null)
+                        {
+                            // roomAbove.EnterRoom(true, 0.3f); 
+                            roomBelow.EnterRoom(true, 0.3f); 
+                        }
+                    }
+                    else
+                    {
+                        if (roomBelow != null || roomAbove != null)
+                        {
+                            roomBelow.ResetRoomPositions(); 
+                        }
                     }
                 }
             }
@@ -603,7 +614,7 @@ public class RoomThresholdColliderScript : MonoBehaviour
 
             }  
         }
-        else if (playerMovement.playerIsOutside) {
+        else if (characterMovement.playerIsOutside) {
             if(this.FindSiblingWithTag("OpenDoor") != null)
             {
                 for (int i = 0; i < this.openDoorSpriteList.Count; i++)

@@ -38,8 +38,11 @@ public class InclineMovement : MonoBehaviour
 
             if (!itsALadder) // if it's not a ladder
             {
+                characterMovement.motionDirection = "normal";  
+
                 if(plyrCrsngLeft == true)
                 {
+                    // fixed direction left
                     characterMovement.controlDirectionToPlayerDirection[Direction.Left] = Direction.UpLeft;
                     characterMovement.controlDirectionToPlayerDirection[Direction.UpLeft] = Direction.UpLeft;
                     characterMovement.controlDirectionToPlayerDirection[Direction.UpFacingLeft] = Direction.UpLeft;
@@ -53,6 +56,7 @@ public class InclineMovement : MonoBehaviour
                 }
                 else
                 {
+                    // fixed direction right
                     characterMovement.controlDirectionToPlayerDirection[Direction.Left] = Direction.DownLeft;
                     characterMovement.controlDirectionToPlayerDirection[Direction.UpLeft] = Direction.UpRight;
                     characterMovement.controlDirectionToPlayerDirection[Direction.UpFacingLeft] = Direction.UpRight;
@@ -65,17 +69,17 @@ public class InclineMovement : MonoBehaviour
                     characterMovement.controlDirectionToPlayerDirection[Direction.DownLeft] = Direction.DownLeft;
                 }
 
-                //alter the motion direction
-                if((isPlayerCrossingUp() && characterMovement.motionDirection == "normal" && !topOfStairCase) 
-                    || (!isPlayerCrossingUp() && characterMovement.motionDirection == "normal" && topOfStairCase))
-                {
-                    characterMovement.motionDirection = motionDirection;  
-                }
-                else if((isPlayerCrossingUp() && characterMovement.motionDirection != "normal" && topOfStairCase) 
-                    || (!isPlayerCrossingUp() && characterMovement.motionDirection != "normal" && !topOfStairCase))
-                {
-                    characterMovement.motionDirection = "normal";  
-                }
+                // //alter the motion direction
+                // if((isPlayerCrossingUp() && characterMovement.motionDirection == "normal" && !topOfStairCase) 
+                //     || (!isPlayerCrossingUp() && characterMovement.motionDirection == "normal" && topOfStairCase))
+                // {
+                //     characterMovement.motionDirection = motionDirection;  
+                // }
+                // else if((isPlayerCrossingUp() && characterMovement.motionDirection != "normal" && topOfStairCase) 
+                //     || (!isPlayerCrossingUp() && characterMovement.motionDirection != "normal" && !topOfStairCase))
+                // {
+                //     characterMovement.motionDirection = "normal";  
+                // }
 
                 // alter the collider layer and sprite sorting layer that is active with the player
                 if(isPlayerCrossingUp() && topOfStairCase)

@@ -20,7 +20,15 @@ public class CharacterDialogueScript : MonoBehaviour
     private bool isPlayerInRange = false;
     private Color zeroAlphaColor;
 
+    private Coroutine npcStareAtPlayerCoro;
+    private Coroutine stopNpcStareAtPlayerCoro;
+    private bool staring = false;
+
+    public CharacterAnimation characterAnimation;
+
     private CharacterMovement characterMovement;
+    private Transform myCharacterTransform;
+
 
    
     void Start()
@@ -34,6 +42,10 @@ public class CharacterDialogueScript : MonoBehaviour
         dialogues = new List<string> { dialogueText1, dialogueText2, dialogueText3, dialogueText4 };
 
         characterMovement = GetComponent<CharacterMovement>();
+        characterAnimation = GetComponent<CharacterAnimation>();
+
+        myCharacterTransform = GameObject.FindWithTag("Player").transform;
+
     
 
         dialogueNameDisplay.text = ""; // Clear the name display on start
@@ -89,6 +101,24 @@ public class CharacterDialogueScript : MonoBehaviour
                 characterMovement.change = Vector3.zero;
                 characterMovement.npcRandomMovementCoro = null;
             }
+
+
+            staring = true; //initiate staring;
+            if (stopNpcStareAtPlayerCoro != null)
+            {
+                StopCoroutine(StopNpcStareAtPlayer());
+                stopNpcStareAtPlayerCoro = null;
+            }
+            if (npcStareAtPlayerCoro != null)
+            {
+                StopCoroutine(NpcStareAtPlayer());
+                npcStareAtPlayerCoro = null;
+            }
+            
+            if (npcStareAtPlayerCoro == null)
+            {
+                npcStareAtPlayerCoro = StartCoroutine(NpcStareAtPlayer());
+            }
         }
     }
 
@@ -102,12 +132,66 @@ public class CharacterDialogueScript : MonoBehaviour
             // dialogueBGrndImage.SetActive(false);
             
             dialogueBGrndImage.color = zeroAlphaColor;
+            
+            // initiate the stopping of the staring at the player
+            stopNpcStareAtPlayerCoro = StartCoroutine(StopNpcStareAtPlayer());
 
-            // Restart the NPC movement coroutine when the player leaves
-            if (characterMovement.npcRandomMovementCoro == null)
-            {
-                characterMovement.npcRandomMovementCoro = characterMovement.StartCoroutine(characterMovement.MoveCharacterRandomly());
-            }
         }
     }
+
+
+    private IEnumerator NpcStareAtPlayer()
+    {
+        while (staring)  // Keep looping
+        {
+            Vector2 directionToPlayer = myCharacterTransform.position - transform.position;
+            float angle = (Mathf.Atan2(directionToPlayer.y, directionToPlayer.x) * Mathf.Rad2Deg + 90) % 360;
+            if (angle < 0) angle += 360; // Normalize angle to 0-360 range
+
+            // Determine the appropriate direction based on the angle
+            if (angle >= 0 && angle < 60)
+            {
+                characterAnimation.currentAnimationDirection = characterAnimation.rightDownAnim;
+            }
+            else if (angle >= 60 && angle < 120)
+            {
+                characterAnimation.currentAnimationDirection = characterAnimation.rightAnim;
+            }
+            else if (angle >= 120 && angle < 180)
+            {
+                characterAnimation.currentAnimationDirection = characterAnimation.upRightAnim;
+            }
+            else if (angle >= 180 && angle < 240)
+            {
+                characterAnimation.currentAnimationDirection = characterAnimation.upLeftAnim;
+            }
+            else if (angle >= 240 && angle < 300)
+            {
+                characterAnimation.currentAnimationDirection = characterAnimation.leftAnim;
+            }
+            else if (angle >= 300 && angle < 360)
+            {
+                characterAnimation.currentAnimationDirection = characterAnimation.leftDownAnim;
+            }
+
+            yield return null; // Wait until the next frame
+        }
+    }
+
+    private IEnumerator StopNpcStareAtPlayer()
+    {
+        yield return new WaitForSeconds(Random.Range(6,10)); // Wait a random time
+            
+        // Restart the NPC movement coroutine when the player leaves
+        if (characterMovement.npcRandomMovementCoro == null)
+        {
+            characterMovement.npcRandomMovementCoro = characterMovement.StartCoroutine(characterMovement.MoveCharacterRandomly());
+        }
+        if(isPlayerInRange == false)
+        {
+            staring = false;
+        }
+    }
+
+
 }

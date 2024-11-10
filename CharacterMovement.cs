@@ -21,11 +21,15 @@ public enum Direction
 public class CharacterMovement : MonoBehaviour
 {
   CharacterAnimation characterAnimation;
+
+  CharacterCustomization characterCustomization;
   [HideInInspector] public List<GameObject> playerSpriteList = new List<GameObject>();
   [HideInInspector] public List<Color> initialPlayerColorList = new List<Color>();
   public int movementSpeed = 10;
   [HideInInspector] public int initialMovementSpeed;
   [HideInInspector] public Rigidbody2D myRigidbody; 
+
+  public BoxCollider2D boxCollider;
 
   [HideInInspector] public string motionDirection = "normal";
   [HideInInspector] public Vector3 change;
@@ -51,29 +55,20 @@ public class CharacterMovement : MonoBehaviour
   [HideInInspector] public bool playerIsCustomizing = false;
   [HideInInspector] public bool playerSitting = false;
 
-  [HideInInspector] public int currentAnimationDirection;
 
   [HideInInspector] public TMP_InputField[] inputFields;
 
+  public GameObject roomToSpawnIn; // The GameObject you want to make the parent of this object
+
+
   // public bool thisIsAnNPC;
 
-
-
-
-
-  public bool playerIsInside()
-  {
-    if (!playerIsOutside)
-    {
-      return true;
-    }
-    return false;
-  }
 
   // Start is called before the first frame update
   void Start()    
     {
       myRigidbody = GetComponent<Rigidbody2D>();
+      boxCollider = GetComponent<BoxCollider2D>();
 
       // Find all input fields in the scene
       inputFields = FindObjectsOfType<TMP_InputField>();
@@ -81,11 +76,25 @@ public class CharacterMovement : MonoBehaviour
       initialMovementSpeed = movementSpeed;
 
       characterAnimation = GetComponent<CharacterAnimation>();
+      characterCustomization = GetComponent<CharacterCustomization>();
       
       if(this.gameObject.tag != "Player")
       {
-        npcRandomMovementCoro = StartCoroutine(MoveCharacterRandomly());
+        if(!playerIsOutside)
+        {
+          // characterCustomization.ResetAppearance();
+          SetTreeSortingLayer(this.gameObject, "Level0");
+          characterAnimation.StartCoroutine(characterAnimation.SetAlphaToZeroForAllSprites());
+        }
+        else
+        {
+          npcRandomMovementCoro = StartCoroutine(MoveCharacterRandomly());
+        }
       }
+
+
+      StartCoroutine(LateStartSpawnInsideCoro());
+
 
     }
 
@@ -207,38 +216,63 @@ public class CharacterMovement : MonoBehaviour
   else if (angle > 180f && angle <= 225f)   { change = new Vector3(0.7f,-1f,0f); characterAnimation.currentAnimationDirection = characterAnimation.rightDownAnim; facingLeft = false; }  // Inverted left-down to right-down
   else if ((angle == 180f)) { change = new Vector3(0.7f,-1f,0f); characterAnimation.currentAnimationDirection = characterAnimation.rightDownAnim; facingLeft = false; }
 
-  else if (angle > 225f && angle <= 270f)   { change = new Vector3(0.7f,-1f,0f); currentAnimationDirection = characterAnimation.rightAnim; facingLeft = false; }  // Inverted left-down to right-down
-  else if ((angle > 270f && angle <= 360f)) { change = new Vector3(1f,0.5f,0f); currentAnimationDirection = characterAnimation.upRightAnim; facingLeft = false; } // Up
-  else if ((angle == 0f)) { change = new Vector3(-0.7f,1f,0f); currentAnimationDirection = characterAnimation.upLeftAnim; facingLeft = true; }
+  else if (angle > 225f && angle <= 270f)   { change = new Vector3(0.7f,-1f,0f); characterAnimation.currentAnimationDirection = characterAnimation.rightAnim; facingLeft = false; }  // Inverted left-down to right-down
+  else if ((angle > 270f && angle <= 360f)) { change = new Vector3(1f,0.5f,0f); characterAnimation.currentAnimationDirection = characterAnimation.upRightAnim; facingLeft = false; } // Up
+  else if ((angle == 0f)) { change = new Vector3(-0.7f,1f,0f); characterAnimation.currentAnimationDirection = characterAnimation.upLeftAnim; facingLeft = true; }
 
+  characterAnimation.Animate(characterAnimation.movementStartIndex, characterAnimation.movementFrameCount, characterAnimation.currentAnimationDirection, characterAnimation.bodyTypeNumber);
   myRigidbody.MovePosition(transform.position + change * movementSpeed * Time.deltaTime);
   }
 
   void MoveCharacterVerticalInclineRightAway() // needs updating
   {
-    if(!fixedDirectionRightDiagonal)
-    {
-      if (change == Vector3.right+Vector3.up)   { change = new Vector3(0.7f,1f,0f); characterAnimation.Animate(characterAnimation.movementStartIndex, characterAnimation.movementFrameCount, characterAnimation.upRightAnim, characterAnimation.bodyTypeNumber); }
-      if (change == Vector3.left+Vector3.up)    { change = new Vector3(-1f,0.5f,0f); characterAnimation.Animate(characterAnimation.movementStartIndex, characterAnimation.movementFrameCount, characterAnimation.upLeftAnim, characterAnimation.bodyTypeNumber);}
-      if (change == Vector3.up)                 { change = new Vector3(-1f,0.5f,0f); characterAnimation.Animate(characterAnimation.movementStartIndex, characterAnimation.movementFrameCount, characterAnimation.upLeftAnim, characterAnimation.bodyTypeNumber);}
-      if (change == Vector3.right)              { change = new Vector3(0.7f,1f,0f); characterAnimation.Animate(characterAnimation.movementStartIndex, characterAnimation.movementFrameCount, characterAnimation.upRightAnim, characterAnimation.bodyTypeNumber);}
-      if (change == Vector3.right+Vector3.down) { change = new Vector3(0.7f,-1f,0f); characterAnimation.Animate(characterAnimation.movementStartIndex, characterAnimation.movementFrameCount, characterAnimation.rightDownAnim, characterAnimation.bodyTypeNumber);}
-      if (change == Vector3.left+Vector3.down)  { change = new Vector3(-0.7f,-1f,0f); characterAnimation.Animate(characterAnimation.movementStartIndex, characterAnimation.movementFrameCount, characterAnimation.leftDownAnim, characterAnimation.bodyTypeNumber);}
-      if (change == Vector3.down)               { change = new Vector3(1f,-0.5f,0f); characterAnimation.Animate(characterAnimation.movementStartIndex, characterAnimation.movementFrameCount, characterAnimation.rightDownAnim, characterAnimation.bodyTypeNumber);}
-      if (change == Vector3.left)               { change = new Vector3(-0.7f,-1f,0f); characterAnimation.Animate(characterAnimation.movementStartIndex, characterAnimation.movementFrameCount, characterAnimation.leftAnim, characterAnimation.bodyTypeNumber);}
+
+    // Calculate the angle in degrees (-180 to 180 degrees)
+    float angle = Mathf.Atan2(change.y, change.x) * Mathf.Rad2Deg;
+
+    // Adjust by 90 degrees to align 0 degrees with "up"
+    angle -= 90f;
+
+    // Convert negative angles to positive angles (0 to 360 degrees)
+    if (angle < 0) angle += 360;  
+
+    // Map the angle to movement directions and animations
+    if (angle > 0f && angle < 90f)           { change = new Vector3(-1f,0.5f,0f); characterAnimation.currentAnimationDirection = characterAnimation.upLeftAnim; facingLeft = true; } // Inverted right-up to left-up      
+    else if (angle >= 90f && angle <= 135f)    { change = new Vector3(-0.7f,-1f,0f); characterAnimation.currentAnimationDirection = characterAnimation.leftAnim; facingLeft = true; } // Inverted right to left
+    else if (angle > 135f && angle < 180)    { change = new Vector3(-0.7f,-1f,0f); characterAnimation.currentAnimationDirection = characterAnimation.leftDownAnim; facingLeft = true; } // Inverted right-down to left-down
+    else if (angle > 180f && angle <= 225f)   { change = new Vector3(1f,-0.5f,0f); characterAnimation.currentAnimationDirection = characterAnimation.rightAnim; facingLeft = false; }  // Inverted left-down to right-down
+    else if ((angle == 180f)) { change = new Vector3(-0.7f,-1f,0f); characterAnimation.currentAnimationDirection = characterAnimation.leftDownAnim; facingLeft = true; }
+
+    else if (angle > 225f && angle < 270f)   { change = new Vector3(1f,-0.5f,0f); characterAnimation.currentAnimationDirection = characterAnimation.rightDownAnim; facingLeft = false; }  // Inverted left-down to right-down
+    else if ((angle >= 270f && angle <= 360f)) { change = new Vector3(0.7f,1f,0f); characterAnimation.currentAnimationDirection = characterAnimation.upRightAnim; facingLeft = false; } // Up
+    else if ((angle == 0f)) { change = new Vector3(0.7f,1f,0f); characterAnimation.currentAnimationDirection = characterAnimation.upRightAnim; facingLeft = false; }
+
+    characterAnimation.Animate(characterAnimation.movementStartIndex, characterAnimation.movementFrameCount, characterAnimation.currentAnimationDirection, characterAnimation.bodyTypeNumber);
+    myRigidbody.MovePosition(transform.position + change * movementSpeed * Time.deltaTime);    
+    
+    // if(!fixedDirectionRightDiagonal)
+    // {
+    //   if (change == Vector3.right+Vector3.up)   { change = new Vector3(0.7f,1f,0f); characterAnimation.Animate(characterAnimation.movementStartIndex, characterAnimation.movementFrameCount, characterAnimation.upRightAnim, characterAnimation.bodyTypeNumber); }
+    //   if (change == Vector3.left+Vector3.up)    { change = new Vector3(-1f,0.5f,0f); characterAnimation.Animate(characterAnimation.movementStartIndex, characterAnimation.movementFrameCount, characterAnimation.upLeftAnim, characterAnimation.bodyTypeNumber);}
+    //   if (change == Vector3.up)                 { change = new Vector3(-1f,0.5f,0f); characterAnimation.Animate(characterAnimation.movementStartIndex, characterAnimation.movementFrameCount, characterAnimation.upLeftAnim, characterAnimation.bodyTypeNumber);}
+    //   if (change == Vector3.right)              { change = new Vector3(0.7f,1f,0f); characterAnimation.Animate(characterAnimation.movementStartIndex, characterAnimation.movementFrameCount, characterAnimation.upRightAnim, characterAnimation.bodyTypeNumber);}
+    //   if (change == Vector3.right+Vector3.down) { change = new Vector3(0.7f,-1f,0f); characterAnimation.Animate(characterAnimation.movementStartIndex, characterAnimation.movementFrameCount, characterAnimation.rightDownAnim, characterAnimation.bodyTypeNumber);}
+    //   if (change == Vector3.left+Vector3.down)  { change = new Vector3(-0.7f,-1f,0f); characterAnimation.Animate(characterAnimation.movementStartIndex, characterAnimation.movementFrameCount, characterAnimation.leftDownAnim, characterAnimation.bodyTypeNumber);}
+    //   if (change == Vector3.down)               { change = new Vector3(1f,-0.5f,0f); characterAnimation.Animate(characterAnimation.movementStartIndex, characterAnimation.movementFrameCount, characterAnimation.rightDownAnim, characterAnimation.bodyTypeNumber);}
+    //   if (change == Vector3.left)               { change = new Vector3(-0.7f,-1f,0f); characterAnimation.Animate(characterAnimation.movementStartIndex, characterAnimation.movementFrameCount, characterAnimation.leftAnim, characterAnimation.bodyTypeNumber);}
 
 
-      // if (change == Vector3.right+Vector3.up)   { change = new Vector3(0.7f,1f,0f); }
-      // if (change == Vector3.left+Vector3.up)    { change = new Vector3(-1f,0.5f,0f); }
-      // if (change == Vector3.up)                 { change = new Vector3(-1f,0.5f,0f); }
-      // if (change == Vector3.right)              { change = new Vector3(0.7f,1f,0f); }
-      // if (change == Vector3.right+Vector3.down) { change = new Vector3(0.7f,-1f,0f); }
-      // if (change == Vector3.left+Vector3.down)  { change = new Vector3(-0.7f,-1f,0f); }
-      // if (change == Vector3.down)               { change = new Vector3(1f,-0.5f,0f); }
-      // if (change == Vector3.left)               { change = new Vector3(-0.7f,-1f,0f);}
-      myRigidbody.MovePosition(transform.position + change * movementSpeed * Time.deltaTime);
+    //   // if (change == Vector3.right+Vector3.up)   { change = new Vector3(0.7f,1f,0f); }
+    //   // if (change == Vector3.left+Vector3.up)    { change = new Vector3(-1f,0.5f,0f); }
+    //   // if (change == Vector3.up)                 { change = new Vector3(-1f,0.5f,0f); }
+    //   // if (change == Vector3.right)              { change = new Vector3(0.7f,1f,0f); }
+    //   // if (change == Vector3.right+Vector3.down) { change = new Vector3(0.7f,-1f,0f); }
+    //   // if (change == Vector3.left+Vector3.down)  { change = new Vector3(-0.7f,-1f,0f); }
+    //   // if (change == Vector3.down)               { change = new Vector3(1f,-0.5f,0f); }
+    //   // if (change == Vector3.left)               { change = new Vector3(-0.7f,-1f,0f);}
+    //   myRigidbody.MovePosition(transform.position + change * movementSpeed * Time.deltaTime);
       
-    }
+    // }
     // else
     // {
     //   if (change == Vector3.right+Vector3.up)   { change = new Vector3(0.7f,1f,0f); AnimateMovement(movementStartIndex, movementFrameCount, upRightAnim, bodyTypeNumber); }
@@ -509,15 +543,38 @@ public class CharacterMovement : MonoBehaviour
     change.x = Random.Range(-10,10);
     change.y = Random.Range(-10,10);
 
-    yield return new WaitForSeconds(Random.Range(1,2));
+    yield return new WaitForSeconds(Random.Range(1,4));
 
     change = Vector3.zero;
 
-    yield return new WaitForSeconds(Random.Range(5,10));
+    yield return new WaitForSeconds(Random.Range(5,8));
 
     npcRandomMovementCoro = StartCoroutine(MoveCharacterRandomly()); 
   }
 
+  private void OnCollisionEnter2D(Collision2D collision)
+    {
+        // Ensure collision is detected by this NPC’s BoxCollider2D and not self-triggered
+        if (collision.otherCollider == boxCollider && this.gameObject.tag != "Player")
+        {
+            ReverseDirection();
+        }
+    }
+
+    // private void OnTriggerEnter2D(Collider2D other)
+    // {
+    //     // Ensure the trigger is detected by this NPC’s BoxCollider2D and not self-triggered
+    //     if (other == boxCollider && !other.CompareTag("Player"))
+    //     {
+    //         ReverseDirection();
+    //     }
+    // }
+
+  public void ReverseDirection()
+  {
+    // Reverse the direction when a collision occurs
+    change *= -1;
+  }
 
   public IEnumerator DeactivateSpaceBar()
   {
@@ -566,5 +623,35 @@ public class CharacterMovement : MonoBehaviour
           return Color.black; // Return black if conversion fails
       }
   }  
+
+  IEnumerator LateStartSpawnInsideCoro()
+  {
+      // Wait until the end of the current frame
+      yield return new WaitForEndOfFrame();
+      SetAsChild();
+
+  }
+
+  public void SetAsChild()
+    {
+        if (roomToSpawnIn != null)
+        {
+            // Set this GameObject as a child of the specified parent
+            transform.SetParent(roomToSpawnIn.transform);
+            Debug.Log($"{gameObject.name} is now a child of {roomToSpawnIn.name}");
+        }
+    }
+
+
+  public static void SetTreeSortingLayer(GameObject gameObject, string sortingLayerName)
+  {
+      if(gameObject.GetComponent<SpriteRenderer>() != null) {
+        gameObject.GetComponent<SpriteRenderer>().sortingLayerName = sortingLayerName;
+      }
+      foreach (Transform child in gameObject.transform)
+      {
+          CharacterMovement.SetTreeSortingLayer(child.gameObject, sortingLayerName);
+      }
+  } 
 }
 

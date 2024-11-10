@@ -27,45 +27,48 @@ public class LevelThreshColliderScript : MonoBehaviour
         playerMovement = Player.GetComponent<CharacterMovement>();
     }
 
-    private void OnTriggerEnter2D()
+    private void OnTriggerEnter2D(Collider2D other)
     {
-        if(isPlayerCrossingUp())
+        if(other.CompareTag("Player"))
         {
-            aboveCollider = false;
-        }
-        else // player crossing down
-        {
-            aboveCollider = true;
-        }
+            if(isPlayerCrossingUp())
+            {
+                aboveCollider = false;
+            }
+            else // player crossing down
+            {
+                aboveCollider = true;
+            }
 
-        if(plyrCrsngLeft) // is player going this \ (left diag) way or
-         // is player going this / (right diag) way :-)
-        {
-            // playerMovement.fixedDirectionLeftDiagonal = true; // fix the player in \ left diag way while inside the collider
-            playerMovement.controlDirectionToPlayerDirection[Direction.Left] = Direction.UpLeft;
-            playerMovement.controlDirectionToPlayerDirection[Direction.UpLeft] = Direction.UpLeft;
-            playerMovement.controlDirectionToPlayerDirection[Direction.UpFacingLeft] = Direction.UpLeft;
-            playerMovement.controlDirectionToPlayerDirection[Direction.UpFacingRight] = Direction.UpLeft;
-            playerMovement.controlDirectionToPlayerDirection[Direction.UpRight] = Direction.UpLeft;
-            playerMovement.controlDirectionToPlayerDirection[Direction.Right] = Direction.RightDown;
-            playerMovement.controlDirectionToPlayerDirection[Direction.RightDown] = Direction.RightDown;
-            playerMovement.controlDirectionToPlayerDirection[Direction.DownFacingRight] = Direction.RightDown;
-            playerMovement.controlDirectionToPlayerDirection[Direction.DownFacingLeft] = Direction.RightDown;
-            playerMovement.controlDirectionToPlayerDirection[Direction.DownLeft] = Direction.RightDown;
-        }
-        else
-        {
-            // playerMovement.fixedDirectionRightDiagonal = true; // fix the player in / right diag way while inside the collider
-        playerMovement.controlDirectionToPlayerDirection[Direction.Left] = Direction.DownLeft;
-        playerMovement.controlDirectionToPlayerDirection[Direction.UpLeft] = Direction.UpRight;
-        playerMovement.controlDirectionToPlayerDirection[Direction.UpFacingLeft] = Direction.UpRight;
-        playerMovement.controlDirectionToPlayerDirection[Direction.UpFacingRight] = Direction.UpRight;
-        playerMovement.controlDirectionToPlayerDirection[Direction.UpRight] = Direction.UpRight;
-        playerMovement.controlDirectionToPlayerDirection[Direction.Right] = Direction.UpRight;
-        playerMovement.controlDirectionToPlayerDirection[Direction.RightDown] = Direction.DownLeft;
-        playerMovement.controlDirectionToPlayerDirection[Direction.DownFacingRight] = Direction.DownLeft;
-        playerMovement.controlDirectionToPlayerDirection[Direction.DownFacingLeft] = Direction.DownLeft;
-        playerMovement.controlDirectionToPlayerDirection[Direction.DownLeft] = Direction.DownLeft;
+            if(plyrCrsngLeft) // is player going this \ (left diag) way or
+            // is player going this / (right diag) way :-)
+            {
+                // playerMovement.fixedDirectionLeftDiagonal = true; // fix the player in \ left diag way while inside the collider
+                playerMovement.controlDirectionToPlayerDirection[Direction.Left] = Direction.UpLeft;
+                playerMovement.controlDirectionToPlayerDirection[Direction.UpLeft] = Direction.UpLeft;
+                playerMovement.controlDirectionToPlayerDirection[Direction.UpFacingLeft] = Direction.UpLeft;
+                playerMovement.controlDirectionToPlayerDirection[Direction.UpFacingRight] = Direction.UpLeft;
+                playerMovement.controlDirectionToPlayerDirection[Direction.UpRight] = Direction.UpLeft;
+                playerMovement.controlDirectionToPlayerDirection[Direction.Right] = Direction.RightDown;
+                playerMovement.controlDirectionToPlayerDirection[Direction.RightDown] = Direction.RightDown;
+                playerMovement.controlDirectionToPlayerDirection[Direction.DownFacingRight] = Direction.RightDown;
+                playerMovement.controlDirectionToPlayerDirection[Direction.DownFacingLeft] = Direction.RightDown;
+                playerMovement.controlDirectionToPlayerDirection[Direction.DownLeft] = Direction.RightDown;
+            }
+            else
+            {
+                // playerMovement.fixedDirectionRightDiagonal = true; // fix the player in / right diag way while inside the collider
+            playerMovement.controlDirectionToPlayerDirection[Direction.Left] = Direction.DownLeft;
+            playerMovement.controlDirectionToPlayerDirection[Direction.UpLeft] = Direction.UpRight;
+            playerMovement.controlDirectionToPlayerDirection[Direction.UpFacingLeft] = Direction.UpRight;
+            playerMovement.controlDirectionToPlayerDirection[Direction.UpFacingRight] = Direction.UpRight;
+            playerMovement.controlDirectionToPlayerDirection[Direction.UpRight] = Direction.UpRight;
+            playerMovement.controlDirectionToPlayerDirection[Direction.Right] = Direction.UpRight;
+            playerMovement.controlDirectionToPlayerDirection[Direction.RightDown] = Direction.DownLeft;
+            playerMovement.controlDirectionToPlayerDirection[Direction.DownFacingRight] = Direction.DownLeft;
+            playerMovement.controlDirectionToPlayerDirection[Direction.DownFacingLeft] = Direction.DownLeft;
+            playerMovement.controlDirectionToPlayerDirection[Direction.DownLeft] = Direction.DownLeft;
+            }
         }
         // fixing the player's movement inside the collider ensures the correct conditions are met upon collider exit
 
@@ -95,7 +98,7 @@ public class LevelThreshColliderScript : MonoBehaviour
                 }
 
             }
-            else if(this.transform.parent.GetComponentInChildren<BuildingThreshColliderScript>() != null && playerMovement.playerIsInside())
+            else if(this.transform.parent.GetComponentInChildren<BuildingThreshColliderScript>() != null && !playerMovement.playerIsOutside)
             {
                 if(levelAboveOrEntering != null)
                 {
@@ -154,7 +157,7 @@ public class LevelThreshColliderScript : MonoBehaviour
                     }
                 }   
             }
-            else if(this.transform.parent.GetComponentInChildren<BuildingThreshColliderScript>() != null && aboveCollider && playerMovement.playerIsInside()) 
+            else if(this.transform.parent.GetComponentInChildren<BuildingThreshColliderScript>() != null && aboveCollider && !playerMovement.playerIsOutside) 
             {
                 if(levelAboveOrEntering != null)
                 {

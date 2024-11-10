@@ -37,14 +37,7 @@ public class BuildingScript : MonoBehaviour
         balconyManager = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<BalconyManager>(); 
 
         soundtrackScript = GameObject.FindGameObjectWithTag("SoundtrackScript").GetComponent<SoundtrackScript>();
-    }  
 
-    // Start is called before the first frame update
-    void Start() 
-    {
-        innerBuilding.SetActive(true);
-        outerBuilding.SetActive(true);
-        // GetSpritesAndAddToLists(GameObject obj, List<GameObject> spriteList, List<GameObject> excludeList, List<Color> colorList)
         GetSpritesAndAddToLists(innerBuilding, innerBuildingSpriteList, gameObjectsToShowWhileOutside, innerBuildingInitialColorList);
         GetSpritesAndAddToLists(outerBuilding, outerBuildingSpriteList, new List<GameObject>(), outerBuildingInitialColorList);
         foreach(GameObject obj in gameObjectsToShowWhileOutside) {
@@ -55,6 +48,18 @@ public class BuildingScript : MonoBehaviour
         TagChildrenOfTaggedParents("OpenDoor");
         TagChildrenOfTaggedParents("ClosedDoor");
         TagChildrenOfTaggedParents("AlphaZeroEntExt");
+    }  
+
+    // Start is called before the first frame update
+    void Start() 
+    {
+        // StartCoroutine(LateStartCoro());
+
+
+        innerBuilding.SetActive(true);
+        outerBuilding.SetActive(true);
+        // GetSpritesAndAddToLists(GameObject obj, List<GameObject> spriteList, List<GameObject> excludeList, List<Color> colorList)
+
         this.ExitBuilding(0f, 0f, false);
     }
 
@@ -614,6 +619,13 @@ public class BuildingScript : MonoBehaviour
             }              
               
         // }   
+    }
+
+    IEnumerator LateStartCoro()
+    {
+        // Wait until the end of the current frame
+        yield return new WaitForEndOfFrame();
+
     }
 
     static void SetTreeSortingLayer(GameObject gameObject, string sortingLayerName)

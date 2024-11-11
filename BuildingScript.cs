@@ -28,6 +28,11 @@ public class BuildingScript : MonoBehaviour
     private Coroutine backdropFadeCoroutine;
     private string[] tagsToExludeEntExt = { "OpenDoor", "AlphaZeroEntExt" };
 
+    public List<GameObject> npcList = new List<GameObject>();
+    public List<GameObject> npcSpriteList = new List<GameObject>();
+    public List<Color> npcColorList = new List<Color>();
+
+
     SoundtrackScript soundtrackScript;
 
     public void Awake()
@@ -38,22 +43,26 @@ public class BuildingScript : MonoBehaviour
 
         soundtrackScript = GameObject.FindGameObjectWithTag("SoundtrackScript").GetComponent<SoundtrackScript>();
 
-        GetSpritesAndAddToLists(innerBuilding, innerBuildingSpriteList, gameObjectsToShowWhileOutside, innerBuildingInitialColorList);
-        GetSpritesAndAddToLists(outerBuilding, outerBuildingSpriteList, new List<GameObject>(), outerBuildingInitialColorList);
+        GetSpritesAndAddToLists(innerBuilding, innerBuildingSpriteList, gameObjectsToShowWhileOutside, new List<GameObject>(), innerBuildingInitialColorList);
+        GetSpritesAndAddToLists(outerBuilding, outerBuildingSpriteList, new List<GameObject>(), new List<GameObject>(), outerBuildingInitialColorList);
         foreach(GameObject obj in gameObjectsToShowWhileOutside) {
-            GetSpritesAndAddToLists(obj, gameObjectsToShowWhileOutsideSpriteList, new List<GameObject>(), gameObjectsToShowWhileOutsideColorList);
+            GetSpritesAndAddToLists(obj, gameObjectsToShowWhileOutsideSpriteList, new List<GameObject>(), new List<GameObject>(), gameObjectsToShowWhileOutsideColorList);
         }
+
+     
         GetIsoSpriteSortComponentsAndAddToLists(innerBuilding, innerSpriteSortingScriptObj, gameObjectsToShowWhileOutside);
         GetIsoSpriteSortComponentsAndAddToLists(outerBuilding, outerSpriteSortingScriptObj, new List<GameObject>());
+        
         TagChildrenOfTaggedParents("OpenDoor");
         TagChildrenOfTaggedParents("ClosedDoor");
         TagChildrenOfTaggedParents("AlphaZeroEntExt");
+
     }  
 
     // Start is called before the first frame update
     void Start() 
     {
-        // StartCoroutine(LateStartCoro());
+        StartCoroutine(LateStartCoro());
 
 
         innerBuilding.SetActive(true);
@@ -61,13 +70,25 @@ public class BuildingScript : MonoBehaviour
         // GetSpritesAndAddToLists(GameObject obj, List<GameObject> spriteList, List<GameObject> excludeList, List<Color> colorList)
 
         this.ExitBuilding(0f, 0f, false);
+
+        foreach(GameObject npc in npcList)
+        {
+        //     npc.GetComponent<CharacterCustomization>().ResetAppearance();
+        //     npc.GetComponent<CharacterAnimation>().SetAlphaToZeroForAllSprites();
+            SetTreeSortingLayer(npc, "Level0");
+        }
     }
 
     public void EnterBuilding()
     {
         soundtrackScript.FadeOutIn(soundtrackScript.track1, soundtrackScript.track2);
 
-
+        // foreach(GameObject npc in npcList)
+        // {
+        //     npc.GetComponent<CharacterCustomization>().ResetAppearance();
+        //     // npc.GetComponent<CharacterAnimation>().SetAlphaToZeroForAllSprites();
+        //     // npc.GetComponent<CharacterAnimation>().SetTreeSortingLayer(npc.gameObject, "Level0");
+        // }
 
 
         if(this.innerBuildingFadeCoroutine != null)
@@ -124,6 +145,7 @@ public class BuildingScript : MonoBehaviour
         {
             StopCoroutine(this.outerBuildingFadeCoroutine);
         }
+
         if (exitingFromBehindAlreadyOutside)
         {
             // do nutting
@@ -132,6 +154,7 @@ public class BuildingScript : MonoBehaviour
         {
             StopCoroutine(this.backdropFadeCoroutine);
         }
+
         if(this.gameObjectsToHideWhileInsideFadeCoroutine != null)
         {
             StopCoroutine(this.gameObjectsToHideWhileInsideFadeCoroutine);
@@ -232,11 +255,47 @@ public class BuildingScript : MonoBehaviour
                 {
                     SetTreeAlpha(gameObjectsToShowWhileOutsideSpriteList[i], gameObjectsToShowWhileOutsideColorList[i].a);
                 }
-            }      
+            }  
+
+            for (int i = 0; i < npcSpriteList.Count; i++)
+            {  
+                SetTreeAlpha(npcSpriteList[i], 0f);
+                if(npcSpriteList[i].GetComponent<SpriteRenderer>().sortingLayerName == "Level0")
+                {
+                    SetTreeSortingLayer(npcSpriteList[i], "Default");
+                } 
+            } 
+            for (int i = 0; i < npcList.Count; i++)
+            {
+                npcList[i].GetComponent<IsoSpriteSorting>().dontSort = true;
+            }
+
+
             // Your code after the wait time elapses
         }
         else if (exitingBehindBuilding)
         {
+            for (int i = 0; i < npcSpriteList.Count; i++)
+            {  
+                SetTreeAlpha(npcSpriteList[i], 0f); 
+                if(npcSpriteList[i].GetComponent<SpriteRenderer>().sortingLayerName == "Level0")
+                {
+                    SetTreeSortingLayer(npcSpriteList[i], "Default");
+                }
+            }  
+            for (int i = 0; i < npcList.Count; i++)
+            {
+                npcList[i].GetComponent<IsoSpriteSorting>().dontSort = true;
+                npcList[i].GetComponent<CharacterMovement>().npcRandomMovementCoro = StartCoroutine(npcList[i].GetComponent<CharacterMovement>().MoveCharacterRandomly());
+                if (characterMovement.npcRandomMovementCoro != null)
+                {
+                    characterMovement.StopCoroutine(characterMovement.npcRandomMovementCoro);
+                    characterMovement.change = Vector3.zero;
+                    characterMovement.npcRandomMovementCoro = null;
+                }
+            } 
+
+
             for (int i = 0; i < innerBuildingSpriteList.Count; i++)
             {     
                 SetTreeSortingLayer(innerBuildingSpriteList[i], "Default");
@@ -263,6 +322,23 @@ public class BuildingScript : MonoBehaviour
         }
         else// if entering the building
         {
+            for (int i = 0; i < npcSpriteList.Count; i++)
+            {
+                SetTreeAlpha(npcSpriteList[i], npcColorList[i].a);
+                if(npcSpriteList[i].GetComponent<SpriteRenderer>().sortingLayerName == "Default")
+                {
+                    SetTreeSortingLayer(npcSpriteList[i], "Level0");
+                }
+            }
+            for (int i = 0; i < npcList.Count; i++)
+            {
+                npcList[i].GetComponent<IsoSpriteSorting>().dontSort = false;
+                npcList[i].GetComponent<CharacterMovement>().npcRandomMovementCoro = StartCoroutine(npcList[i].GetComponent<CharacterMovement>().MoveCharacterRandomly());
+            }
+
+
+
+
             for (int i = 0; i < innerBuildingSpriteList.Count; i++)
             {                                       
                 if (LayerMask.LayerToName(innerBuildingSpriteList[i].layer) == "Default")
@@ -317,9 +393,7 @@ public class BuildingScript : MonoBehaviour
                     // sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, colorList[i].a);
                     // // Alternatively, you can directly assign the color from the list
                     sr.color = colorList[i];
-                } 
-              
-
+                }               
             }  
         }   
 
@@ -347,37 +421,10 @@ public class BuildingScript : MonoBehaviour
             for (int i = 0; i < balconyManager.balconyList.Count; i++)
             { 
 
-                    // Get the SpriteRenderer component
                     SpriteRenderer spriteRenderer = balconyManager.balconyList[i].GetComponent<SpriteRenderer>();
                     spriteRenderer.color = balconyManager.balconyInitialColorList[i];
-                    
-                    // // Check if the sorting layer name is not "Default"
-                    // if (spriteRenderer.sortingLayerName != "Default")
-                    // {
-
-                    //     // Set the alpha value from the initial color
-                    //     Color newColor = spriteRenderer.color;
-                    //     newColor.a = initialColor.a;
-                        
-                    //     // Assign the modified color back to the sprite's color
-                    //     spriteRenderer.color = newColor;
-                    // }
             }
-                // for (int j = 0; j < buildingsWithBalconies[i].gameObjectsToShowWhileOutsideSpriteList.Count; j++)
-                // {
-                //     // if(buildingsWithBalconies[i].gameObjectsToShowWhileOutsideSpriteList[j].CompareTag("ClosedDoor"))
-                //     // {
-                //         // Get the SpriteRenderer component
-                //         SpriteRenderer spriteRenderer = buildingsWithBalconies[i].gameObjectsToShowWhileOutsideSpriteList[j].GetComponent<SpriteRenderer>();
 
-                //         // Create a new color with modified alpha value
-                //         Color newColor = spriteRenderer.color;
-                //         newColor.a = buildingsWithBalconies[i].gameObjectsToShowWhileOutsideColorList[j].a;
-                        
-                //         // Assign the modified color back to the sprite's color
-                //         spriteRenderer.color = newColor;
-                //     // }
-                // }
 
         }
         else // if entering set the alphas to 0
@@ -390,45 +437,6 @@ public class BuildingScript : MonoBehaviour
                 Color color = spriteRenderer.color;  // Get the current color
                 color.a = 0f;                        // Modify the alpha channel
                 spriteRenderer.color = color;        // Assign the modified color back
-
-
-                // gameObjectsToHideWhileInsideFadeCoroutine = StartCoroutine(treeFade());
-
-                // for (int j = 0; j < buildingsWithBalconies[i].outerBuildingSpriteList.Count; j++)
-                // {
-                //     // Get the SpriteRenderer component
-                //     SpriteRenderer spriteRenderer = buildingsWithBalconies[i].outerBuildingSpriteList[j].GetComponent<SpriteRenderer>();
-                    
-                //     // Check if the sorting layer name is not "Default"
-                //     if (spriteRenderer.sortingLayerName != "Default")
-                //     {
-                //         // Get the initial color from the outerBuildingInitialColorList
-                //         Color initialColor = buildingsWithBalconies[i].outerBuildingInitialColorList[j];
-
-                //         // Set the alpha value to 0
-                //         Color newColor = new Color(initialColor.r, initialColor.g, initialColor.b, 0);
-                        
-                //         // Assign the modified color back to the sprite's color
-                //         spriteRenderer.color = newColor;
-                //     }
-                // }
-                // for (int j = 0; j < buildingsWithBalconies[i].gameObjectsToShowWhileOutsideSpriteList.Count; j++)
-                // {
-                //     SpriteRenderer spriteRenderer = buildingsWithBalconies[i].gameObjectsToShowWhileOutsideSpriteList[j].GetComponent<SpriteRenderer>();
-
-                //     if(buildingsWithBalconies[i].gameObjectsToShowWhileOutsideSpriteList[j].CompareTag("ClosedDoor")
-                //         && spriteRenderer.sortingLayerName != "Default")
-                //     {
-                //         // Get the SpriteRenderer component
-
-                //         // Create a new color with modified alpha value
-                //         Color newColor = spriteRenderer.color;
-                //         newColor.a = 0;
-                        
-                //         // Assign the modified color back to the sprite's color
-                //         spriteRenderer.color = newColor;
-                //     }
-                // }
 
             }
         }
@@ -464,22 +472,6 @@ public class BuildingScript : MonoBehaviour
         sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, alpha);
     }
 
-    // public IEnumerator treeFade(
-    //   GameObject obj,
-    //   float fadeTo,
-    //   float fadeSpeed) 
-    // {
-    //     float fadeFrom = obj.GetComponent<SpriteRenderer>().color.a;
-
-    //     for (float t = 0.0f; t < 1f; t += Time.deltaTime) 
-    //     {
-    //         float currentAlpha = Mathf.Lerp(fadeFrom, fadeTo, t * fadeSpeed);
-    //         SetTreeAlpha(obj, currentAlpha);
-    //         yield return null;
-    //     }
-    // }
-
-
     private IEnumerator FadeThenSetDontSort
                                             ( 
                                             bool exitingBuilding,  
@@ -505,6 +497,18 @@ public class BuildingScript : MonoBehaviour
             SetDontSort(issList, setDontSort);
             yield return BuildingSequence(exitingBuilding, exitingBehindBuilding, shouldWait, waitTime.Value, behindBuilding, spriteList, colorList, alpha, tagsToExclude);
         }
+        
+        // for (int i = 0; i < npcList.Count; i++)
+        // {
+        //     SetTreeAlpha(npcSpriteList[i], npcColorList[i].a);
+        // //     npc.GetComponent<CharacterAnimation>().SetAlphaToZeroForAllSprites();
+        //     // SetTreeSortingLayer(npc.gameObject, "Level0");
+        // }
+        // for (int i = 0; i < npcList.Count; i++)
+        // {
+        //     SetTreeAlpha(npcSpriteList[i], npcColorList[i].a);
+        //     // npcList[i].GetComponent<CharacterCustomization>().ResetAppearance();
+        // }
     }
 
 
@@ -513,7 +517,7 @@ public class BuildingScript : MonoBehaviour
 
 
 
-    private void GetSpritesAndAddToLists(GameObject obj, List<GameObject> spriteList, List<GameObject> excludeList, List<Color> colorList)
+    private void GetSpritesAndAddToLists(GameObject obj, List<GameObject> spriteList, List<GameObject> excludeList, List<GameObject> excludeList2, List<Color> colorList)
     {
         Stack<GameObject> stack = new Stack<GameObject>();
         stack.Push(obj);
@@ -532,7 +536,7 @@ public class BuildingScript : MonoBehaviour
 
             foreach (Transform child in currentNode.transform)
             {
-                if (!excludeList.Contains(child.gameObject)) {
+                if (!excludeList.Contains(child.gameObject) && !excludeList2.Contains(child.gameObject)) {
                     stack.Push(child.gameObject);
                 }
             }
@@ -625,6 +629,13 @@ public class BuildingScript : MonoBehaviour
     {
         // Wait until the end of the current frame
         yield return new WaitForEndOfFrame();
+        // yield return new WaitForSeconds(5);
+
+        // FindAllChildrenWithTagAndAddToList(this.gameObject, "NPC");
+        
+        foreach(GameObject obj in npcList) {
+            GetSpritesAndAddToLists(obj, npcSpriteList, new List<GameObject>(), new List<GameObject>(), npcColorList);
+        }
 
     }
 
@@ -656,6 +667,28 @@ public class BuildingScript : MonoBehaviour
             SetTreeAlpha(child.gameObject, alpha);
         }
     }
+    // Recursive function to find a child with the specified tag
+    void FindAllChildrenWithTagAndAddToList(GameObject parent, string tag)
+    {
+        Stack<Transform> stack = new Stack<Transform>();
+        stack.Push(parent.transform);
 
+        while (stack.Count > 0)
+        {
+            Transform current = stack.Pop();
+            
+            // Check if the current object has the desired tag
+            if (current.CompareTag(tag))
+            {
+                npcList.Add(current.gameObject);
+            }
+            
+            // Add all children of the current object to the stack
+            foreach (Transform child in current)
+            {
+                stack.Push(child);
+            }
+        }
+    }
 
 }

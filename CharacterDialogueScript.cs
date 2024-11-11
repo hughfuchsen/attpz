@@ -183,14 +183,15 @@ public class CharacterDialogueScript : MonoBehaviour
         yield return new WaitForSeconds(Random.Range(6,10)); // Wait a random time
             
         // Restart the NPC movement coroutine when the player leaves
-        if (characterMovement.npcRandomMovementCoro == null)
+        if (characterMovement.npcRandomMovementCoro == null && isPlayerInRange == false)
         {
             characterMovement.npcRandomMovementCoro = characterMovement.StartCoroutine(characterMovement.MoveCharacterRandomly());
-        }
-        if(isPlayerInRange == false)
-        {
             staring = false;
         }
+        // if(isPlayerInRange == false)
+        // {
+        //     staring = false;
+        // }
     }
 
 

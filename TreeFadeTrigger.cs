@@ -34,40 +34,46 @@ public class TreeFadeTrigger : MonoBehaviour
 
   }
 
-  void OnTriggerEnter2D()
+  void OnTriggerEnter2D(Collider2D other)
   {
-    // StopAllCoros();
-    setTreeAlpha(objListToFade, fadedAlphaFloatList);
-
-
-    if(CharacterMovement.playerOnThresh == false) // if player is not on building threshold
+    if(other.CompareTag("Player"))
     {
-      // fadeCoro = StartCoroutine(treeFade(objListToFade, fadedAlphaFloatList));
+      // StopAllCoros();
       setTreeAlpha(objListToFade, fadedAlphaFloatList);
 
-    }
-    else
-    {
-      obj.tag = "AlphaZeroEntExt";
-      TagChildrenOfTaggedParents("AlphaZeroEntExt");
+
+      if(CharacterMovement.playerOnThresh == false) // if player is not on building threshold
+      {
+        // fadeCoro = StartCoroutine(treeFade(objListToFade, fadedAlphaFloatList));
+        setTreeAlpha(objListToFade, fadedAlphaFloatList);
+
+      }
+      else
+      {
+        obj.tag = "AlphaZeroEntExt";
+        TagChildrenOfTaggedParents("AlphaZeroEntExt");
+      }
     }
   }
-  void OnTriggerExit2D()
+  void OnTriggerExit2D(Collider2D other)
   {
-    // StopAllCoros();
+    if(other.CompareTag("Player"))
+    {  
+      // StopAllCoros();
 
-    if(CharacterMovement.playerOnThresh == false)
-    {
-      // fadeCoro = StartCoroutine(treeFade(objListToFade, initialAlphaFloatList));
-      setTreeAlpha(objListToFade, initialAlphaFloatList);
-      obj.tag = "Untagged";
-      TagChildrenOfTaggedParents("Untagged");
-    }
-    else
-    {
-      obj.tag = "AlphaZeroEntExt";
-      TagChildrenOfTaggedParents("AlphaZeroEntExt");
-      resetTagsCoro = StartCoroutine(resetTagsToUntaggedAfterWait()); //maybe something to do with balcony door?
+      if(CharacterMovement.playerOnThresh == false)
+      {
+        // fadeCoro = StartCoroutine(treeFade(objListToFade, initialAlphaFloatList));
+        setTreeAlpha(objListToFade, initialAlphaFloatList);
+        obj.tag = "Untagged";
+        TagChildrenOfTaggedParents("Untagged");
+      }
+      else
+      {
+        obj.tag = "AlphaZeroEntExt";
+        TagChildrenOfTaggedParents("AlphaZeroEntExt");
+        resetTagsCoro = StartCoroutine(resetTagsToUntaggedAfterWait()); //maybe something to do with balcony door?
+      }
     }
   }
 

@@ -45,8 +45,6 @@ public class BuildingThreshColliderScript : MonoBehaviour
     {
         if(other.CompareTag("Player"))
         {
-            Debug.Log("exited thresh");   
-
             characterMovement.playerOnThresh = false;
 
             if(!rooftopLadder)

@@ -83,8 +83,8 @@ public class CharacterMovement : MonoBehaviour
         if(!playerIsOutside)
         {
           // characterCustomization.ResetAppearance();
-          SetTreeSortingLayer(this.gameObject, "Level0");
-          characterAnimation.StartCoroutine(characterAnimation.SetAlphaToZeroForAllSprites());
+          // SetTreeSortingLayer(this.gameObject, "Level0");
+          // characterAnimation.SetAlphaToZeroForAllSprites();
         }
         else
         {
@@ -628,19 +628,19 @@ public class CharacterMovement : MonoBehaviour
   {
       // Wait until the end of the current frame
       yield return new WaitForEndOfFrame();
-      SetAsChild();
+      // SetAsChild();
 
   }
 
-  public void SetAsChild()
-    {
-        if (roomToSpawnIn != null)
-        {
-            // Set this GameObject as a child of the specified parent
-            transform.SetParent(roomToSpawnIn.transform);
-            Debug.Log($"{gameObject.name} is now a child of {roomToSpawnIn.name}");
-        }
-    }
+  // public void SetAsChild()
+  //   {
+  //       if (roomToSpawnIn != null)
+  //       {
+  //           // Set this GameObject as a child of the specified parent
+  //           transform.SetParent(roomToSpawnIn.transform);
+  //           Debug.Log($"{gameObject.name} is now a child of {roomToSpawnIn.name}");
+  //       }
+  //   }
 
 
   public static void SetTreeSortingLayer(GameObject gameObject, string sortingLayerName)

@@ -222,6 +222,7 @@ public class CharacterAnimation : MonoBehaviour
     currentPantsColor = (HexToColor("#00B6FF"));
     currentShoeColor = (HexToColor("#AB4918"));
     currentJakettoColor = (HexToColor("#AB4918"));
+    eyeSprite.color = HexToColor("#000000");
 
   }
 
@@ -459,31 +460,31 @@ public class CharacterAnimation : MonoBehaviour
       }
   } 
 
-  public IEnumerator SetAlphaToZeroForAllSprites()
-  {
-    yield return new WaitForEndOfFrame();
-    yield return new WaitForEndOfFrame();
-      // List all SpriteRenderer components you want to modify
-      SpriteRenderer[] spriteRenderers = new SpriteRenderer[] {
-          headSprite, eyeSprite, throatSprite, collarSprite, torsoSprite, waistSprite, waistShortsSprite, 
-          kneesShinsSprite, anklesSprite, feetSprite, jakettoSprite, dressSprite, longSleeveSprite, 
-          handSprite, shortSleeveSprite, mohawk5TopSprite, mohawk5BottomSprite, hair0TopSprite, 
-          hair0BottomSprite, hair1TopSprite, hair7TopSprite, hair8TopSprite, hair1BottomSprite, 
-          hair2BottomSprite, hair3BottomSprite, hair4BottomSprite, hair6BottomSprite, hair7BottomSprite, 
-          hair8BottomSprite, hairFringe1Sprite, hairFringe2Sprite
-      };
+  // public IEnumerator SetAlphaToZeroForAllSprites()
+  // {
+  //   yield return new WaitForEndOfFrame();
+  //   yield return new WaitForEndOfFrame();
+  //     // List all SpriteRenderer components you want to modify
+  //     SpriteRenderer[] spriteRenderers = new SpriteRenderer[] {
+  //         headSprite, eyeSprite, throatSprite, collarSprite, torsoSprite, waistSprite, waistShortsSprite, 
+  //         kneesShinsSprite, anklesSprite, feetSprite, jakettoSprite, dressSprite, longSleeveSprite, 
+  //         handSprite, shortSleeveSprite, mohawk5TopSprite, mohawk5BottomSprite, hair0TopSprite, 
+  //         hair0BottomSprite, hair1TopSprite, hair7TopSprite, hair8TopSprite, hair1BottomSprite, 
+  //         hair2BottomSprite, hair3BottomSprite, hair4BottomSprite, hair6BottomSprite, hair7BottomSprite, 
+  //         hair8BottomSprite, hairFringe1Sprite, hairFringe2Sprite
+  //     };
 
-      // Loop through each SpriteRenderer and set its alpha to zero
-      foreach (SpriteRenderer spriteRenderer in spriteRenderers)
-      {
-          if (spriteRenderer != null) // Check if SpriteRenderer is assigned
-          {
-              Color color = spriteRenderer.color;
-              color.a = 0f; // Set alpha to zero
-              spriteRenderer.color = color;
-          }
-      }
-  }
+  //     // Loop through each SpriteRenderer and set its alpha to zero
+  //     foreach (SpriteRenderer spriteRenderer in spriteRenderers)
+  //     {
+  //         if (spriteRenderer != null) // Check if SpriteRenderer is assigned
+  //         {
+  //             Color color = spriteRenderer.color;
+  //             color.a = 0f; // Set alpha to zero
+  //             spriteRenderer.color = color;
+  //         }
+  //     }
+  // }
 
 }
 

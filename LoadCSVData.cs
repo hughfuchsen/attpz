@@ -131,7 +131,7 @@ public class LoadCSVData : MonoBehaviour
         yield return new WaitForEndOfFrame();
 
         DisplayRandomRow();
-        
+
         UpdateAllNPCS();
     }
 

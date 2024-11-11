@@ -1096,6 +1096,7 @@ private void UpdateLockImage()
     {
         if(chrctrAppearance != null)
         {
+            Debug.Log("it exists");
             string[] intParams = chrctrAppearance.Split(',').Where(param => !string.IsNullOrWhiteSpace(param)).ToArray();
             if (intParams.Length == 14)
             {

@@ -142,8 +142,8 @@ public class RoomThresholdColliderScript : MonoBehaviour
 
                 if(plyrCrsngLeft) 
                 {
-                    // characterMovement.fixedDirectionLeftDiagonal = true; // fix the player in \ left diag way while inside the collider
-                    // characterMovement.fixedDirectionRightDiagonal = false; // fix the player in \ left diag way while inside the collider
+                    characterMovement.fixedDirectionLeftDiagonal = true; // fix the player in \ left diag way while inside the collider
+                    characterMovement.fixedDirectionRightDiagonal = false; // fix the player in \ left diag way while inside the collider
 
                     characterMovement.controlDirectionToPlayerDirection[Direction.Left] = Direction.UpLeft;
                     characterMovement.controlDirectionToPlayerDirection[Direction.UpLeft] = Direction.UpLeft;
@@ -160,8 +160,8 @@ public class RoomThresholdColliderScript : MonoBehaviour
                 }
                 else if (!plyrCrsngLeft)
                 {
-                    // characterMovement.fixedDirectionRightDiagonal = true; // fix the player in / right diag way while inside the collider
-                    // characterMovement.fixedDirectionLeftDiagonal = false; // fix the player in / right diag way while inside the collider
+                    characterMovement.fixedDirectionRightDiagonal = true; // fix the player in / right diag way while inside the collider
+                    characterMovement.fixedDirectionLeftDiagonal = false; // fix the player in / right diag way while inside the collider
 
                     characterMovement.controlDirectionToPlayerDirection[Direction.Left] = Direction.DownLeft;
                     characterMovement.controlDirectionToPlayerDirection[Direction.UpLeft] = Direction.UpRight;
@@ -226,8 +226,8 @@ public class RoomThresholdColliderScript : MonoBehaviour
             StopAllCoros();
             if(!itsALadder)
             {
-                // characterMovement.fixedDirectionLeftDiagonal = false;
-                // characterMovement.fixedDirectionRightDiagonal = false; // un-fix the player in \/ left/right diag way upon collider exit. 
+                characterMovement.fixedDirectionLeftDiagonal = false;
+                characterMovement.fixedDirectionRightDiagonal = false; // un-fix the player in \/ left/right diag way upon collider exit. 
                 characterMovement.ResetPlayerMovement(); 
 
                     //ON EXIT CROSSING UP

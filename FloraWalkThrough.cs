@@ -5,17 +5,17 @@ using UnityEngine;
 public class FloraWalkThrough : MonoBehaviour
 {
     [SerializeField] GameObject Player;
-    CharacterMovement playerMovement;
-    [SerializeField] BoxCollider2D playerCollider;
+    CharacterMovement characterMovement;
+    [SerializeField] BoxCollider2D characterCollider;
     public Animator animator;
 
 
     // Start is called before the first frame update
     void Start()
     {
-        Player = GameObject.FindGameObjectWithTag("Player");
-        playerMovement = Player.GetComponent<CharacterMovement>();        
-        playerCollider = Player.GetComponent<BoxCollider2D>();
+        // Player = GameObject.FindGameObjectWithTag("Player");
+        // characterMovement = Player.GetComponent<CharacterMovement>();        
+        // characterCollider = Player.GetComponent<BoxCollider2D>();
         StartCoroutine(RandomSway());
     }
 
@@ -32,10 +32,10 @@ public class FloraWalkThrough : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.tag == "Player")
+        if (collision.gameObject.tag == "PlayerCollider" || collision.gameObject.tag == "NPCCollider" )
         {
 
-            Bounds playerBounds = playerCollider.bounds;
+            Bounds playerBounds = collision.bounds;
 
             // Find the point of contact
             Vector2 contactPoint = collision.ClosestPoint(transform.position);
@@ -69,15 +69,15 @@ public class FloraWalkThrough : MonoBehaviour
                 // Execute your desired code here for bottom-right
                 Animate("BendRight");
             }
-        }
+        } 
     }
 
     void OnTriggerExit2D(Collider2D collision)
     {
-        if (collision.gameObject.tag == "Player")
-        {
+        // if (collision.gameObject.tag == "Player")
+        // {
             Animate("Idle");
-        }
+        // }
     }
 
 

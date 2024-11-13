@@ -9,11 +9,11 @@ public class BuildingScript : MonoBehaviour
     public GameObject outerBuilding;
     [SerializeField] public List<GameObject> gameObjectsToShowWhileOutside = new List<GameObject>();
     BalconyManager balconyManager;
-    CharacterMovement playerMovement;
+    CharacterMovement myCharacterMovement;
     [SerializeField] GameObject Player;
-    public List<GameObject> gameObjectsToShowWhileOutsideSpriteList = new List<GameObject>();
+    [HideInInspector] public List<GameObject> gameObjectsToShowWhileOutsideSpriteList = new List<GameObject>();
     // private List<GameObject> gameObjectsToHideWhileInsideSpriteList = new List<GameObject>();
-    public List<Color> gameObjectsToShowWhileOutsideColorList = new List<Color>();
+    [HideInInspector] public List<Color> gameObjectsToShowWhileOutsideColorList = new List<Color>();
     // private List<Color> gameObjectsToHideWhileInsideColorList = new List<Color>();
     private List<GameObject> innerBuildingSpriteList = new List<GameObject>();
     public List<GameObject> outerBuildingSpriteList = new List<GameObject>();
@@ -28,9 +28,12 @@ public class BuildingScript : MonoBehaviour
     private Coroutine backdropFadeCoroutine;
     private string[] tagsToExludeEntExt = { "OpenDoor", "AlphaZeroEntExt" };
 
+    public List<RoomScript> roomScripts; 
+    public List<LevelScript> levelScripts; 
+
     public List<GameObject> npcList = new List<GameObject>();
-    public List<GameObject> npcSpriteList = new List<GameObject>();
-    public List<Color> npcColorList = new List<Color>();
+    [HideInInspector] public List<GameObject> npcSpriteList = new List<GameObject>();
+    [HideInInspector] public List<Color> npcColorList = new List<Color>();
 
 
     SoundtrackScript soundtrackScript;
@@ -38,20 +41,25 @@ public class BuildingScript : MonoBehaviour
     public void Awake()
     { 
         Player = GameObject.FindGameObjectWithTag("Player");
-        playerMovement = Player.GetComponent<CharacterMovement>(); 
+        myCharacterMovement = Player.GetComponent<CharacterMovement>(); 
         balconyManager = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<BalconyManager>(); 
 
         soundtrackScript = GameObject.FindGameObjectWithTag("SoundtrackScript").GetComponent<SoundtrackScript>();
 
-        GetSpritesAndAddToLists(innerBuilding, innerBuildingSpriteList, gameObjectsToShowWhileOutside, new List<GameObject>(), innerBuildingInitialColorList);
-        GetSpritesAndAddToLists(outerBuilding, outerBuildingSpriteList, new List<GameObject>(), new List<GameObject>(), outerBuildingInitialColorList);
         foreach(GameObject obj in gameObjectsToShowWhileOutside) {
-            GetSpritesAndAddToLists(obj, gameObjectsToShowWhileOutsideSpriteList, new List<GameObject>(), new List<GameObject>(), gameObjectsToShowWhileOutsideColorList);
+            GetSpritesAndAddToLists(obj, gameObjectsToShowWhileOutsideSpriteList, new List<GameObject>(), gameObjectsToShowWhileOutsideColorList);
         }
+
+        GetSpritesAndAddToLists(innerBuilding, innerBuildingSpriteList, gameObjectsToShowWhileOutside, innerBuildingInitialColorList);
+        GetSpritesAndAddToLists(outerBuilding, outerBuildingSpriteList, new List<GameObject>(), outerBuildingInitialColorList);
+
 
      
         GetIsoSpriteSortComponentsAndAddToLists(innerBuilding, innerSpriteSortingScriptObj, gameObjectsToShowWhileOutside);
         GetIsoSpriteSortComponentsAndAddToLists(outerBuilding, outerSpriteSortingScriptObj, new List<GameObject>());
+
+        FindChildrenByRoomScriptComponent();
+        FindChildrenByLevelScriptComponent();
         
         TagChildrenOfTaggedParents("OpenDoor");
         TagChildrenOfTaggedParents("ClosedDoor");
@@ -62,7 +70,7 @@ public class BuildingScript : MonoBehaviour
     // Start is called before the first frame update
     void Start() 
     {
-        StartCoroutine(LateStartCoro());
+        StartCoroutine(LateStartCoroForNonPlayerCharacters());
 
 
         innerBuilding.SetActive(true);
@@ -71,12 +79,6 @@ public class BuildingScript : MonoBehaviour
 
         this.ExitBuilding(0f, 0f, false);
 
-        foreach(GameObject npc in npcList)
-        {
-        //     npc.GetComponent<CharacterCustomization>().ResetAppearance();
-        //     npc.GetComponent<CharacterAnimation>().SetAlphaToZeroForAllSprites();
-            SetTreeSortingLayer(npc, "Level0");
-        }
     }
 
     public void EnterBuilding()
@@ -250,10 +252,10 @@ public class BuildingScript : MonoBehaviour
             }
             for (int i = 0; i < gameObjectsToShowWhileOutsideSpriteList.Count; i++)
             {
-                if (!gameObjectsToShowWhileOutsideSpriteList[i].CompareTag("OpenDoor") 
-                || !gameObjectsToShowWhileOutsideSpriteList[i].CompareTag("AlphaZeroEntExt"))        
+                if (gameObjectsToShowWhileOutsideSpriteList[i].CompareTag("OpenDoor") 
+                || gameObjectsToShowWhileOutsideSpriteList[i].CompareTag("AlphaZeroEntExt"))        
                 {
-                    SetTreeAlpha(gameObjectsToShowWhileOutsideSpriteList[i], gameObjectsToShowWhileOutsideColorList[i].a);
+                    SetTreeAlpha(gameObjectsToShowWhileOutsideSpriteList[i], 0);
                 }
             }  
 
@@ -268,6 +270,12 @@ public class BuildingScript : MonoBehaviour
             for (int i = 0; i < npcList.Count; i++)
             {
                 npcList[i].GetComponent<IsoSpriteSorting>().dontSort = true;
+                // if (npcList[i].GetComponent<CharacterMovement>().npcRandomMovementCoro != null)
+                // {
+                //     npcList[i].GetComponent<CharacterMovement>().StopCoroutine(npcList[i].GetComponent<CharacterMovement>().npcRandomMovementCoro);
+                //     npcList[i].GetComponent<CharacterMovement>().change = Vector3.zero;
+                //     npcList[i].GetComponent<CharacterMovement>().npcRandomMovementCoro = null;
+                // }
             }
 
 
@@ -286,13 +294,12 @@ public class BuildingScript : MonoBehaviour
             for (int i = 0; i < npcList.Count; i++)
             {
                 npcList[i].GetComponent<IsoSpriteSorting>().dontSort = true;
-                npcList[i].GetComponent<CharacterMovement>().npcRandomMovementCoro = StartCoroutine(npcList[i].GetComponent<CharacterMovement>().MoveCharacterRandomly());
-                if (characterMovement.npcRandomMovementCoro != null)
-                {
-                    characterMovement.StopCoroutine(characterMovement.npcRandomMovementCoro);
-                    characterMovement.change = Vector3.zero;
-                    characterMovement.npcRandomMovementCoro = null;
-                }
+                // if (npcList[i].GetComponent<CharacterMovement>().npcRandomMovementCoro != null)
+                // {
+                //     npcList[i].GetComponent<CharacterMovement>().StopCoroutine(npcList[i].GetComponent<CharacterMovement>().npcRandomMovementCoro);
+                //     npcList[i].GetComponent<CharacterMovement>().change = Vector3.zero;
+                //     npcList[i].GetComponent<CharacterMovement>().npcRandomMovementCoro = null;
+                // }
             } 
 
 
@@ -320,6 +327,12 @@ public class BuildingScript : MonoBehaviour
             }        
             // Your code after the wait time elapses
         }
+
+
+
+
+
+
         else// if entering the building
         {
             for (int i = 0; i < npcSpriteList.Count; i++)
@@ -333,7 +346,10 @@ public class BuildingScript : MonoBehaviour
             for (int i = 0; i < npcList.Count; i++)
             {
                 npcList[i].GetComponent<IsoSpriteSorting>().dontSort = false;
-                npcList[i].GetComponent<CharacterMovement>().npcRandomMovementCoro = StartCoroutine(npcList[i].GetComponent<CharacterMovement>().MoveCharacterRandomly());
+                // if (npcList[i].GetComponent<CharacterMovement>().npcRandomMovementCoro == null)
+                // {
+                //     npcList[i].GetComponent<CharacterMovement>().npcRandomMovementCoro = StartCoroutine(npcList[i].GetComponent<CharacterMovement>().MoveCharacterRandomly());
+                // }
             }
 
 
@@ -363,8 +379,12 @@ public class BuildingScript : MonoBehaviour
             }
             for (int i = 0; i < gameObjectsToShowWhileOutsideSpriteList.Count; i++)
             {
-                if (!gameObjectsToShowWhileOutsideSpriteList[i].CompareTag("OpenDoor") 
-                || !gameObjectsToShowWhileOutsideSpriteList[i].CompareTag("AlphaZeroEntExt"))        
+                if (gameObjectsToShowWhileOutsideSpriteList[i].CompareTag("OpenDoor") 
+                || gameObjectsToShowWhileOutsideSpriteList[i].CompareTag("AlphaZeroEntExt"))        
+                {
+                    SetTreeAlpha(gameObjectsToShowWhileOutsideSpriteList[i], 0);
+                }
+                else
                 {
                     SetTreeAlpha(gameObjectsToShowWhileOutsideSpriteList[i], gameObjectsToShowWhileOutsideColorList[i].a);
                 }
@@ -387,7 +407,7 @@ public class BuildingScript : MonoBehaviour
                         sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, alpha.Value);
                     }
                 }
-                else if (playerMovement.playerIsOutside) 
+                else if (myCharacterMovement.playerIsOutside) 
                 {
                     // // Set alpha value from the color list instantly without lerping
                     // sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, colorList[i].a);
@@ -407,7 +427,6 @@ public class BuildingScript : MonoBehaviour
                 sr.color = gameObjectsToShowWhileOutsideColorList[i];
             }     
         }
-
         yield return null;
     }
 
@@ -517,7 +536,7 @@ public class BuildingScript : MonoBehaviour
 
 
 
-    private void GetSpritesAndAddToLists(GameObject obj, List<GameObject> spriteList, List<GameObject> excludeList, List<GameObject> excludeList2, List<Color> colorList)
+    private void GetSpritesAndAddToLists(GameObject obj, List<GameObject> spriteList, List<GameObject> excludeList, List<Color> colorList)
     {
         Stack<GameObject> stack = new Stack<GameObject>();
         stack.Push(obj);
@@ -536,7 +555,7 @@ public class BuildingScript : MonoBehaviour
 
             foreach (Transform child in currentNode.transform)
             {
-                if (!excludeList.Contains(child.gameObject) && !excludeList2.Contains(child.gameObject)) {
+                if (!excludeList.Contains(child.gameObject)){
                     stack.Push(child.gameObject);
                 }
             }
@@ -625,7 +644,7 @@ public class BuildingScript : MonoBehaviour
         // }   
     }
 
-    IEnumerator LateStartCoro()
+    IEnumerator LateStartCoroForNonPlayerCharacters()
     {
         // Wait until the end of the current frame
         yield return new WaitForEndOfFrame();
@@ -634,9 +653,19 @@ public class BuildingScript : MonoBehaviour
         // FindAllChildrenWithTagAndAddToList(this.gameObject, "NPC");
         
         foreach(GameObject obj in npcList) {
-            GetSpritesAndAddToLists(obj, npcSpriteList, new List<GameObject>(), new List<GameObject>(), npcColorList);
+            GetSpritesAndAddToLists(obj, npcSpriteList, new List<GameObject>(), npcColorList);
         }
 
+
+        for (int i = 0; i < npcSpriteList.Count; i++)
+        {  
+            SetTreeAlpha(npcSpriteList[i], 0f);
+        } 
+
+        for (int i = 0; i < npcList.Count; i++)
+        {  
+            SetZToZero(npcList[i]);
+        } 
     }
 
     static void SetTreeSortingLayer(GameObject gameObject, string sortingLayerName)
@@ -691,4 +720,62 @@ public class BuildingScript : MonoBehaviour
         }
     }
 
+    public void FindChildrenByRoomScriptComponent()
+    {
+        Stack<Transform> stack = new Stack<Transform>();
+        stack.Push(transform);
+
+        while (stack.Count > 0)
+        {
+            Transform current = stack.Pop();
+            RoomScript roomScript = current.GetComponent<RoomScript>();
+            
+            if (roomScript != null)
+            {
+                roomScripts.Add(roomScript);
+            }
+
+            // Push each child of the current transform onto the stack
+            foreach (Transform child in current)
+            {
+                stack.Push(child);
+            }
+        }
+    }
+    public void FindChildrenByLevelScriptComponent()
+    {
+        Stack<Transform> stack = new Stack<Transform>();
+        stack.Push(transform);
+
+        while (stack.Count > 0)
+        {
+            Transform current = stack.Pop();
+            LevelScript levelScript = current.GetComponent<LevelScript>();
+            
+            if (levelScript != null)
+            {
+                levelScripts.Add(levelScript);
+            }
+
+            // Push each child of the current transform onto the stack
+            foreach (Transform child in current)
+            {
+                stack.Push(child);
+            }
+        }
+    }
+
+    public void SetZToZero(GameObject obj)
+    {
+        // Set the object's z position to zero
+        Vector3 newPosition = obj.transform.position;
+        newPosition.z = 0;
+        obj.transform.position = newPosition;
+
+        // Recursively set z position for all children
+        foreach (Transform child in obj.transform)
+        {
+            SetZToZero(child.gameObject);
+        }
+    }
 }

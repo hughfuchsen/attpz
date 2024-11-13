@@ -25,6 +25,9 @@ public class LevelScript : MonoBehaviour
     private Coroutine currentMotionCoroutine;
     private Coroutine currentColliderMotionCoroutine;
 
+    public List<LevelScript> roomScripts; 
+
+
 
     void Awake()
     {

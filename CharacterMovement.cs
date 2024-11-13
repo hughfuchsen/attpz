@@ -21,6 +21,7 @@ public enum Direction
 public class CharacterMovement : MonoBehaviour
 {
   CharacterAnimation characterAnimation;
+  CharacterMovement myCharacterMovement;
 
   CharacterCustomization characterCustomization;
   [HideInInspector] public List<GameObject> playerSpriteList = new List<GameObject>();
@@ -68,8 +69,8 @@ public class CharacterMovement : MonoBehaviour
   void Start()    
     {
       myRigidbody = GetComponent<Rigidbody2D>();
-      boxCollider = GetComponent<BoxCollider2D>();
-
+      myCharacterMovement = GameObject.FindGameObjectWithTag("Player").GetComponent<CharacterMovement>();
+      boxCollider = GetComponentInChildren<BoxCollider2D>();
       // Find all input fields in the scene
       inputFields = FindObjectsOfType<TMP_InputField>();
 
@@ -80,16 +81,7 @@ public class CharacterMovement : MonoBehaviour
       
       if(this.gameObject.tag != "Player")
       {
-        if(!playerIsOutside)
-        {
-          // characterCustomization.ResetAppearance();
-          // SetTreeSortingLayer(this.gameObject, "Level0");
-          // characterAnimation.SetAlphaToZeroForAllSprites();
-        }
-        else
-        {
           npcRandomMovementCoro = StartCoroutine(MoveCharacterRandomly());
-        }
       }
 
 
@@ -538,12 +530,15 @@ public class CharacterMovement : MonoBehaviour
 
   public IEnumerator MoveCharacterRandomly()
   {
-    yield return new WaitForSeconds(Random.Range(3,7));
+    // if(!myCharacterMovement.playerOnThresh)
+    // {
+      yield return new WaitForSeconds(Random.Range(5,7));
 
-    change.x = Random.Range(-10,10);
-    change.y = Random.Range(-10,10);
+      change.x = Random.Range(-10,10);
+      change.y = Random.Range(-10,10);
 
-    yield return new WaitForSeconds(Random.Range(1,4));
+      yield return new WaitForSeconds(Random.Range(1,4));
+    // }
 
     change = Vector3.zero;
 
@@ -555,10 +550,14 @@ public class CharacterMovement : MonoBehaviour
   private void OnCollisionEnter2D(Collision2D collision)
     {
         // Ensure collision is detected by this NPC’s BoxCollider2D and not self-triggered
-        if (collision.otherCollider == boxCollider && this.gameObject.tag != "Player")
+        if(playerIsOutside)
         {
-            ReverseDirection();
+          if (collision.otherCollider == boxCollider && this.gameObject.tag != "Player")
+          {
+              ReverseDirection(false);
+          }
         }
+        else{ change = Vector3.zero; }
     }
 
     // private void OnTriggerEnter2D(Collider2D other)
@@ -570,10 +569,14 @@ public class CharacterMovement : MonoBehaviour
     //     }
     // }
 
-  public void ReverseDirection()
+  public void ReverseDirection(bool isTrigger = false)
   {
     // Reverse the direction when a collision occurs
     change *= -1;
+    if(isTrigger)
+    {
+      npcRandomMovementCoro = StartCoroutine(MoveCharacterRandomly()); 
+    }
   }
 
   public IEnumerator DeactivateSpaceBar()

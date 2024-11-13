@@ -205,39 +205,39 @@ public class CharacterCustomization : MonoBehaviour
         // adjust the box collider on playa
         if(currentWidthIndex == 0)
         {
-            Vector2 newSize = GetComponent<BoxCollider2D>().size;
+            Vector2 newSize = GetComponentInChildren<BoxCollider2D>().size;
             newSize.x = 6f + currentWidthIndex;
-            GetComponent<BoxCollider2D>().size = newSize;
-            Vector2 newOffset = GetComponent<BoxCollider2D>().offset;
+            GetComponentInChildren<BoxCollider2D>().size = newSize;
+            Vector2 newOffset = GetComponentInChildren<BoxCollider2D>().offset;
             // newOffset = new Vector2(16f, -43.5f);
-            GetComponent<BoxCollider2D>().offset = newOffset;
+            GetComponentInChildren<BoxCollider2D>().offset = newOffset;
         }
         if(currentWidthIndex == 1)
         {
-            Vector2 newSize = GetComponent<BoxCollider2D>().size;
+            Vector2 newSize = GetComponentInChildren<BoxCollider2D>().size;
             newSize.x = 6f + currentWidthIndex;
-            GetComponent<BoxCollider2D>().size = newSize;
-            Vector2 newOffset = GetComponent<BoxCollider2D>().offset;
+            GetComponentInChildren<BoxCollider2D>().size = newSize;
+            Vector2 newOffset = GetComponentInChildren<BoxCollider2D>().offset;
             // newOffset = new Vector2(16f, -43.5f);
-            GetComponent<BoxCollider2D>().offset = newOffset;
+            GetComponentInChildren<BoxCollider2D>().offset = newOffset;
         }
         if(currentWidthIndex == 2)
         {
-            Vector2 newSize = GetComponent<BoxCollider2D>().size;
+            Vector2 newSize = GetComponentInChildren<BoxCollider2D>().size;
             newSize.x = 6f + currentWidthIndex;
-            GetComponent<BoxCollider2D>().size = newSize;
-            Vector2 newOffset = GetComponent<BoxCollider2D>().offset;
+            GetComponentInChildren<BoxCollider2D>().size = newSize;
+            Vector2 newOffset = GetComponentInChildren<BoxCollider2D>().offset;
             // newOffset = new Vector2(16f, -43.5f);
-            GetComponent<BoxCollider2D>().offset = newOffset;
+            GetComponentInChildren<BoxCollider2D>().offset = newOffset;
         }
         if(currentWidthIndex == 3)
         {
-            Vector2 newSize = GetComponent<BoxCollider2D>().size;
+            Vector2 newSize = GetComponentInChildren<BoxCollider2D>().size;
             newSize.x = 6f + currentWidthIndex;
-            GetComponent<BoxCollider2D>().size = newSize;
-            Vector2 newOffset = GetComponent<BoxCollider2D>().offset;
+            GetComponentInChildren<BoxCollider2D>().size = newSize;
+            Vector2 newOffset = GetComponentInChildren<BoxCollider2D>().offset;
             // newOffset = new Vector2(16f, -43.5f);
-            GetComponent<BoxCollider2D>().offset = newOffset;
+            GetComponentInChildren<BoxCollider2D>().offset = newOffset;
         }
     }
 

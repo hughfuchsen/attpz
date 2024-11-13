@@ -39,7 +39,7 @@ public class LoadCSVData : MonoBehaviour
 
     // CSV management
     private string csvFilePath;
-    private CharacterCustomization characterCustomization;
+    private CharacterCustomization myCharacterCustomization;
     
     private CharacterMovement characterMovement;
     private TMP_InputField[] inputFields;
@@ -85,7 +85,7 @@ public class LoadCSVData : MonoBehaviour
         // Initialize paths and references
         csvFilePath = Path.Combine(Application.persistentDataPath, "CharacterProfilesPrototype7.csv");
         GameObject customizationMenu = GameObject.FindGameObjectWithTag("CharacterCustomizationMenu");
-        characterCustomization = GameObject.FindGameObjectWithTag("Player").GetComponent<CharacterCustomization>();
+        myCharacterCustomization = GameObject.FindGameObjectWithTag("Player").GetComponent<CharacterCustomization>();
         characterMovement = GameObject.FindGameObjectWithTag("Player").GetComponent<CharacterMovement>();
 
 
@@ -210,7 +210,7 @@ public class LoadCSVData : MonoBehaviour
             return; // Exit the method to prevent form submission
         }
 
-        // Get character characterCustomization parameters and format them
+        // Get character myCharacterCustomization parameters and format them
         string charParams = GetCharacterCustomizationParams();
 
         // Create the new column for the CSV
@@ -310,14 +310,14 @@ public class LoadCSVData : MonoBehaviour
 
     private string GetCharacterCustomizationParams()
     {
-        // Join the characterCustomization parameters with commas and wrap them in quotes
+        // Join the myCharacterCustomization parameters with commas and wrap them in quotes
         int[] customizationParams = new int[]
         {
-            characterCustomization.currentFeetIndex, characterCustomization.currentPantsIndex, characterCustomization.currentWaistIndex,
-            characterCustomization.currentHairColorIndex, characterCustomization.currentShirtIndex, characterCustomization.currentHeightIndex,
-            characterCustomization.currentBodyTypeIndex, characterCustomization.currentWidthIndex, characterCustomization.currentPantsColorIndex,
-            characterCustomization.currentShirtColorIndex, characterCustomization.currentHairStyleIndex, characterCustomization.currentJakettoIndex,
-            characterCustomization.currentJakettoColorIndex, characterCustomization.currentSkinColorIndex
+            myCharacterCustomization.currentFeetIndex, myCharacterCustomization.currentPantsIndex, myCharacterCustomization.currentWaistIndex,
+            myCharacterCustomization.currentHairColorIndex, myCharacterCustomization.currentShirtIndex, myCharacterCustomization.currentHeightIndex,
+            myCharacterCustomization.currentBodyTypeIndex, myCharacterCustomization.currentWidthIndex, myCharacterCustomization.currentPantsColorIndex,
+            myCharacterCustomization.currentShirtColorIndex, myCharacterCustomization.currentHairStyleIndex, myCharacterCustomization.currentJakettoIndex,
+            myCharacterCustomization.currentJakettoColorIndex, myCharacterCustomization.currentSkinColorIndex
         };
 
         // Join parameters as a comma-separated string and wrap them in double quotes
@@ -524,13 +524,13 @@ public class LoadCSVData : MonoBehaviour
 
                 uiText.text = displayText.ToString();
 
-                // Handle character characterCustomization params
+                // Handle character myCharacterCustomization params
                 string[] intParams = column[6].Split(',').Where(param => !string.IsNullOrWhiteSpace(param)).ToArray();
                 if (intParams.Length == 14)
                 {
                     List<int> parameters = intParams.Select(param => int.Parse(param.Trim())).ToList();
                     chosenDataRow = parameters;
-                    characterCustomization.UpdateSpecific(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4],
+                    myCharacterCustomization.UpdateSpecific(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4],
                                                 parameters[5], parameters[6], parameters[7], parameters[8], parameters[9],
                                                 parameters[10], parameters[11], parameters[12], parameters[13]);
                 }
@@ -547,7 +547,7 @@ public class LoadCSVData : MonoBehaviour
         string nameText = row[0];
         string chrctrAppearance = row[6];
 
-        // Handle character characterCustomization params
+        // Handle character myCharacterCustomization params
         string[] intParams = row[6].Split(',').Where(param => !string.IsNullOrWhiteSpace(param)).ToArray();
         if (intParams.Length == 14)
         {
@@ -583,7 +583,7 @@ public class LoadCSVData : MonoBehaviour
         
     //     string nameText = row[0];
 
-    //     // Handle character characterCustomization params
+    //     // Handle character myCharacterCustomization params
     //     string[] intParams = row[6].Split(',').Where(param => !string.IsNullOrWhiteSpace(param)).ToArray();
     //     if (intParams.Length == 14)
     //     {

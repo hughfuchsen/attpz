@@ -9,11 +9,13 @@ public class ActivateCharacterUITrigger : MonoBehaviour
     [SerializeField] GameObject backdrop;
     [SerializeField] GameObject Player;
     [SerializeField] GameObject platform;
+    [SerializeField] LoadCSVData loadCSVData;
 
     private Coroutine backdropFadeCoroutine;
 
     private bool fadeFirst;
 
+    private bool playerInRange = false;
 
 
 
@@ -33,10 +35,27 @@ public class ActivateCharacterUITrigger : MonoBehaviour
 
         backdrop = GameObject.FindGameObjectWithTag("InnerBuildingBackdrop");
 
+        loadCSVData = GameObject.FindGameObjectWithTag("CharacterCustomizationMenu").GetComponent<LoadCSVData>();
+
+        
+
 
 
         // playerMovement = player.GetComponent<PlayerMovement>();
     }
+
+    void Update()
+    {
+        if (playerInRange)
+        {
+            if (Input.GetKeyDown(KeyCode.Space) || 
+                Input.GetKeyDown(KeyCode.JoystickButton0)) // A button
+            {
+                loadCSVData.DisplayRandomRow();
+            }
+        }
+    }
+
 
     IEnumerator LateStart() 
     {
@@ -48,12 +67,14 @@ public class ActivateCharacterUITrigger : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D player)
     {
-        if(player.CompareTag("Player"))
+        if(player.CompareTag("PlayerCollider"))
         {
             if(backdropFadeCoroutine != null)
             {
                 StopCoroutine(this.backdropFadeCoroutine);
             }
+
+            playerInRange = true;
 
             backdropFadeCoroutine = StartCoroutine(FadeBackdropAndSetSortingLayersEtc(false, 1f));
 
@@ -62,14 +83,33 @@ public class ActivateCharacterUITrigger : MonoBehaviour
         }
     }
 
+    // void OnTriggerStay2D(Collider2D player)
+    // {
+    //     if(player.CompareTag("PlayerCollider"))
+    //     {
+
+    //         if ((Input.GetKeyDown(KeyCode.Space) || 
+    //         Input.GetKeyDown(KeyCode.JoystickButton0) // A button
+    //         //   Input.GetKeyUp(KeyCode.JoystickButton1) ||  // B button
+    //         //   Input.GetKeyUp(KeyCode.JoystickButton2) ||  // X button
+    //         //   Input.GetKeyUp(KeyCode.JoystickButton3)
+    //         ))
+    //         {
+    //             loadCSVData.DisplayRandomRow();   
+    //         }
+    //     }
+    // }
+
     void OnTriggerExit2D(Collider2D player)
     {
-        if(player.CompareTag("Player"))
+        if(player.CompareTag("PlayerCollider"))
         {
             if(backdropFadeCoroutine != null)
             {
                 StopCoroutine(this.backdropFadeCoroutine);
             }
+
+            playerInRange = false;
 
             backdropFadeCoroutine = StartCoroutine(FadeBackdropAndSetSortingLayersEtc(true,0f));
 

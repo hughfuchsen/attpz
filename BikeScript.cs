@@ -40,15 +40,16 @@ public class BikeScript : MonoBehaviour
 
     public void OnTriggerStay2D(Collider2D other)
     {
-        if(other.CompareTag("Player"))
+        if(other.CompareTag("PlayerCollider"))
         {    
             if (characterMovement.spaceBarDeactivated == false)
             {
                   if ((Input.GetKey(KeyCode.Space) || 
                       Input.GetKey(KeyCode.JoystickButton0) ||  // A button
                       Input.GetKey(KeyCode.JoystickButton1) ||  // B button
-                      Input.GetKey(KeyCode.JoystickButton2) ||  // X button
-                      Input.GetKey(KeyCode.JoystickButton3)) && characterMovement.playerIsOutside && !characterMovement.playerOnBike)
+                      Input.GetKey(KeyCode.JoystickButton2)  // X button
+                      // Input.GetKey(KeyCode.JoystickButton3)
+                      ) && characterMovement.playerIsOutside && !characterMovement.playerOnBike)
                 {
                     characterMovement.StartDeactivateSpaceBar(); // Use centralized method
 

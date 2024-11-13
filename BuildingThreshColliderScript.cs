@@ -23,7 +23,7 @@ public class BuildingThreshColliderScript : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        if(other.CompareTag("Player"))
+        if(other.CompareTag("PlayerCollider"))
         {
             characterMovement.playerOnThresh = true;
 
@@ -43,7 +43,7 @@ public class BuildingThreshColliderScript : MonoBehaviour
     }
     void OnTriggerExit2D(Collider2D other)
     {
-        if(other.CompareTag("Player"))
+        if(other.CompareTag("PlayerCollider"))
         {
             characterMovement.playerOnThresh = false;
 
@@ -57,7 +57,6 @@ public class BuildingThreshColliderScript : MonoBehaviour
                         {   
                             if(this.GetComponent<RoomThresholdColliderScript>().roomAbove == null)
                             {        
-                                Debug.Log("working");   
                                 building.GoBehindBuilding(); // go outside behind the buildinng
                                 soundtrackScript.FadeOutIn(soundtrackScript.track2, soundtrackScript.track1);
                                 characterMovement.playerIsOutside = true;

@@ -36,7 +36,7 @@ public class TreeFadeTrigger : MonoBehaviour
 
   void OnTriggerEnter2D(Collider2D other)
   {
-    if(other.CompareTag("Player"))
+    if(other.CompareTag("PlayerCollider"))
     {
       // StopAllCoros();
       setTreeAlpha(objListToFade, fadedAlphaFloatList);
@@ -57,7 +57,7 @@ public class TreeFadeTrigger : MonoBehaviour
   }
   void OnTriggerExit2D(Collider2D other)
   {
-    if(other.CompareTag("Player"))
+    if(other.CompareTag("PlayerCollider"))
     {  
       // StopAllCoros();
 

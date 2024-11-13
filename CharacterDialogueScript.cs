@@ -27,6 +27,7 @@ public class CharacterDialogueScript : MonoBehaviour
     public CharacterAnimation characterAnimation;
 
     private CharacterMovement characterMovement;
+    private CharacterMovement myCharacterMovement;
     private Transform myCharacterTransform;
 
 
@@ -42,6 +43,7 @@ public class CharacterDialogueScript : MonoBehaviour
         dialogues = new List<string> { dialogueText1, dialogueText2, dialogueText3, dialogueText4 };
 
         characterMovement = GetComponent<CharacterMovement>();
+        myCharacterMovement = GameObject.FindWithTag("Player").GetComponent<CharacterMovement>();
         characterAnimation = GetComponent<CharacterAnimation>();
 
         myCharacterTransform = GameObject.FindWithTag("Player").transform;
@@ -64,15 +66,19 @@ public class CharacterDialogueScript : MonoBehaviour
         // Check if the player is in range and the space key is pressed
         if (isPlayerInRange)
         {
-            if (Input.GetKeyDown(KeyCode.Space) || 
-                    Input.GetKeyDown(KeyCode.JoystickButton0) ||  // A button
-                    Input.GetKeyDown(KeyCode.JoystickButton1) ||  // B button
-                    Input.GetKeyDown(KeyCode.JoystickButton2) ||  // X button
-                    Input.GetKeyDown(KeyCode.JoystickButton3))            
-            {  
-                ShowNextDialogue();
-                dialogueBGrndImage.color = Color.white;
-                // dialogueBGrndImage.SetActive(true);
+            if((characterMovement.playerIsOutside && myCharacterMovement.playerIsOutside)
+                || !characterMovement.playerIsOutside && !myCharacterMovement.playerIsOutside)
+            {
+                if (Input.GetKeyDown(KeyCode.Space) || 
+                        Input.GetKeyDown(KeyCode.JoystickButton0) ||  // A button
+                        Input.GetKeyDown(KeyCode.JoystickButton1) ||  // B button
+                        Input.GetKeyDown(KeyCode.JoystickButton2) ||  // X button
+                        Input.GetKeyDown(KeyCode.JoystickButton3))            
+                {  
+                    ShowNextDialogue();
+                    dialogueBGrndImage.color = Color.white;
+                    // dialogueBGrndImage.SetActive(true);
+                }
             }
         }
     }
@@ -89,7 +95,7 @@ public class CharacterDialogueScript : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("Player"))
+        if (other.CompareTag("PlayerCollider"))
         {
             isPlayerInRange = true;
             currentDialogueIndex = Random.Range(0,4); // Reset dialogue index on re-entry
@@ -124,7 +130,7 @@ public class CharacterDialogueScript : MonoBehaviour
 
     private void OnTriggerExit2D(Collider2D other)
     {
-        if (other.CompareTag("Player"))
+        if (other.CompareTag("PlayerCollider"))
         {
             isPlayerInRange = false;
             dialogueNameDisplay.text = ""; // Clear the name display when player leaves

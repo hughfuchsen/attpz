@@ -34,7 +34,6 @@ public class InclineMovement : MonoBehaviour
     {
         if (collision.tag == "PlayerCollider")
         {
-            Debug.Log("Crossed");
             myCharacterMovement.playerOnThresh = true;
 
             if (!itsALadder) // if it's not a ladder

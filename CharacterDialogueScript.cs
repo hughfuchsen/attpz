@@ -72,8 +72,9 @@ public class CharacterDialogueScript : MonoBehaviour
                 if (Input.GetKeyDown(KeyCode.Space) || 
                         Input.GetKeyDown(KeyCode.JoystickButton0) ||  // A button
                         Input.GetKeyDown(KeyCode.JoystickButton1) ||  // B button
-                        Input.GetKeyDown(KeyCode.JoystickButton2) ||  // X button
-                        Input.GetKeyDown(KeyCode.JoystickButton3))            
+                        Input.GetKeyDown(KeyCode.JoystickButton2)   // X button
+                        // Input.GetKeyDown(KeyCode.JoystickButton3)
+                        )            
                 {  
                     ShowNextDialogue();
                     dialogueBGrndImage.color = Color.white;

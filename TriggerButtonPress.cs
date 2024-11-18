@@ -14,10 +14,12 @@ public class TriggerButtonPress : MonoBehaviour
     private float time = 0f; // The current time for the sine wave animation
     private bool spacebarReleased = true; // Flag to track if spacebar was released
 
+    public bool isOutside = false;
+
     [SerializeField] GameObject Player;
 
-    CharacterMovement playerMovement;
-
+    CharacterMovement myCharacterMovement;
+    CharacterAnimation myCharacterAnimation;
 
     // public List<GameObject> colliders = new List<GameObject>();
 
@@ -25,7 +27,8 @@ public class TriggerButtonPress : MonoBehaviour
     void Awake()
     {
         Player = GameObject.FindGameObjectWithTag("Player");
-        playerMovement = Player.GetComponent<CharacterMovement>(); 
+        myCharacterMovement = Player.GetComponent<CharacterMovement>(); 
+        myCharacterAnimation = Player.GetComponent<CharacterAnimation>(); 
 
         for (int i = 0; i < treeObjects.Count; i++)
         {
@@ -51,36 +54,39 @@ public class TriggerButtonPress : MonoBehaviour
 
     private void OnTriggerStay2D(Collider2D other)
     {
-        if (other.CompareTag("Player") && !playerMovement.playerIsOutside)
+        if(!isOutside)
         {
-            OscillateVValue();
-
-            if (Input.GetKey(KeyCode.Space))
+            if (other.CompareTag("PlayerCollider") && !myCharacterMovement.playerIsOutside)
             {
-                for (int i = 0; i < sprites.Count; i++)
+                OscillateVValue();
+
+                if (Input.GetKey(KeyCode.Space))
                 {
-                    SetAlpha(sprites[i], 1);
-                }
+                    for (int i = 0; i < sprites.Count; i++)
+                    {
+                        SetAlpha(sprites[i], 1);
+                    }
 
-                for (int i = 0; i < playerMovement.playerSpriteList.Count; i++)
-                {            
-                    playerMovement.SetAlpha(playerMovement.playerSpriteList[i], 0.15f);
-                }
+                    for (int i = 0; i < myCharacterAnimation.characterSpriteList.Count; i++)
+                    {            
+                        myCharacterAnimation.SetAlpha(myCharacterAnimation.characterSpriteList[i], 0.15f);
+                    }
 
-                spacebarReleased = false; // Spacebar is being held down
-            }
-            else if (!Input.GetKey(KeyCode.Space) && !spacebarReleased) // Check if spacebar was released
-            {
-                for (int i = 0; i < sprites.Count; i++)
+                    spacebarReleased = false; // Spacebar is being held down
+                }
+                else if (!Input.GetKey(KeyCode.Space) && !spacebarReleased) // Check if spacebar was released
                 {
-                    SetAlpha(sprites[i], 0); // Reset alpha value to 0
-                }
-                for (int i = 0; i < playerMovement.playerSpriteList.Count; i++)
-                {            
-                    playerMovement.SetAlpha(playerMovement.playerSpriteList[i], playerMovement.initialPlayerColorList[i].a);
-                }
+                    for (int i = 0; i < sprites.Count; i++)
+                    {
+                        SetAlpha(sprites[i], 0); // Reset alpha value to 0
+                    }
+                    for (int i = 0; i < myCharacterAnimation.characterSpriteList.Count; i++)
+                    {            
+                        myCharacterAnimation.SetAlpha(myCharacterAnimation.characterSpriteList[i], myCharacterAnimation.initialChrctrColorList[i].a);
+                    }
 
-                spacebarReleased = true; // Spacebar is released
+                    spacebarReleased = true; // Spacebar is released
+                }
             }
         }
     }
@@ -89,21 +95,24 @@ public class TriggerButtonPress : MonoBehaviour
 
     private void OnTriggerExit2D(Collider2D other)
     {
-        if (other.CompareTag("Player") && !playerMovement.playerIsOutside)
+        if(!isOutside)
         {
-            for (int i = 0; i < sprites.Count; i++)
+            if (other.CompareTag("PlayerCollider") && !myCharacterMovement.playerIsOutside)
             {
-                SetAlpha(sprites[i], 0);
-            }
-            
-            for (int i = 0; i < vSprites.Count; i++)
-            {
-                SetColor(vSprites[i], initialVValue[i]);
-            }  
+                for (int i = 0; i < sprites.Count; i++)
+                {
+                    SetAlpha(sprites[i], 0);
+                }
+                
+                for (int i = 0; i < vSprites.Count; i++)
+                {
+                    SetColor(vSprites[i], initialVValue[i]);
+                }  
 
-            for (int i = 0; i < playerMovement.playerSpriteList.Count; i++)
-            {            
-                playerMovement.SetAlpha(playerMovement.playerSpriteList[i], playerMovement.initialPlayerColorList[i].a);
+                for (int i = 0; i < myCharacterAnimation.characterSpriteList.Count; i++)
+                {            
+                    myCharacterAnimation.SetAlpha(myCharacterAnimation.characterSpriteList[i], myCharacterAnimation.initialChrctrColorList[i].a);
+                }
             }
         }
     }

@@ -1890,58 +1890,58 @@ private void UpdateLockImage()
             skinColorButton2.color = characterAnimation.currentSkinColor;
         }
     }
-
+//7d4e34
     public void SetSkinColor7()
     {
         if (characterAnimation.headSprite.color == characterAnimation.currentSkinColor)
         {
-            characterAnimation.headSprite.color = HexToColor("#E1B24B");
+            characterAnimation.headSprite.color = HexToColor("#7d4e34");
         }
         if (characterAnimation.throatSprite.color == characterAnimation.currentSkinColor)
         {
-            characterAnimation.throatSprite.color = HexToColor("#E1B24B");
+            characterAnimation.throatSprite.color = HexToColor("#7d4e34");
         }
         if (characterAnimation.collarSprite.color == characterAnimation.currentSkinColor)
         {
-            characterAnimation.collarSprite.color = HexToColor("#E1B24B");
+            characterAnimation.collarSprite.color = HexToColor("#7d4e34");
         }
         if (characterAnimation.torsoSprite.color == characterAnimation.currentSkinColor)
         {
-            characterAnimation.torsoSprite.color = HexToColor("#E1B24B");
+            characterAnimation.torsoSprite.color = HexToColor("#7d4e34");
         }
         if (characterAnimation.waistSprite.color == characterAnimation.currentSkinColor)
         {
-            characterAnimation.waistSprite.color = HexToColor("#E1B24B");
+            characterAnimation.waistSprite.color = HexToColor("#7d4e34");
         }
         if (characterAnimation.waistShortsSprite.color == characterAnimation.currentSkinColor)
         {
-            characterAnimation.waistShortsSprite.color = HexToColor("#E1B24B");
+            characterAnimation.waistShortsSprite.color = HexToColor("#7d4e34");
         }
         if (characterAnimation.kneesShinsSprite.color == characterAnimation.currentSkinColor)
         {
-            characterAnimation.kneesShinsSprite.color = HexToColor("#E1B24B");
+            characterAnimation.kneesShinsSprite.color = HexToColor("#7d4e34");
         }
         if (characterAnimation.anklesSprite.color == characterAnimation.currentSkinColor)
         {
-            characterAnimation.anklesSprite.color = HexToColor("#E1B24B");
+            characterAnimation.anklesSprite.color = HexToColor("#7d4e34");
         }
         if (characterAnimation.feetSprite.color == characterAnimation.currentSkinColor)
         {
-            characterAnimation.feetSprite.color = HexToColor("#E1B24B");
+            characterAnimation.feetSprite.color = HexToColor("#7d4e34");
         }
         if (characterAnimation.longSleeveSprite.color == characterAnimation.currentSkinColor)
         {
-            characterAnimation.longSleeveSprite.color = HexToColor("#E1B24B");
+            characterAnimation.longSleeveSprite.color = HexToColor("#7d4e34");
         }
         if (characterAnimation.handSprite.color == characterAnimation.currentSkinColor)
         {
-            characterAnimation.handSprite.color = HexToColor("#E1B24B");
+            characterAnimation.handSprite.color = HexToColor("#7d4e34");
         }
         if (characterAnimation.shortSleeveSprite.color == characterAnimation.currentSkinColor)
         {
-            characterAnimation.shortSleeveSprite.color = HexToColor("#E1B24B");
+            characterAnimation.shortSleeveSprite.color = HexToColor("#7d4e34");
         }
-        characterAnimation.currentSkinColor = HexToColor("#E1B24B");
+        characterAnimation.currentSkinColor = HexToColor("#7d4e34");
         if(skinColorButton2 != null)
         {
             skinColorButton2.color = characterAnimation.currentSkinColor;

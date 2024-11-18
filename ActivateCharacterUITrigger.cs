@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class ActivateCharacterUITrigger : MonoBehaviour
 {
-    public GameObject chrctrCuzzyObj;
+    public GameObject browseChrctrObj;
+    public GameObject createChrctrObj;
 
     [SerializeField] GameObject backdrop;
     [SerializeField] GameObject Player;
@@ -15,7 +16,9 @@ public class ActivateCharacterUITrigger : MonoBehaviour
 
     private bool fadeFirst;
 
-    private bool playerInRange = false;
+    public bool playerInRange = false;
+
+    // public List<BuildingScript> buildingScripts = new List<BuildingScript>();
 
 
 
@@ -37,7 +40,8 @@ public class ActivateCharacterUITrigger : MonoBehaviour
 
         loadCSVData = GameObject.FindGameObjectWithTag("CharacterCustomizationMenu").GetComponent<LoadCSVData>();
 
-        
+        // buildingScripts.AddRange(FindObjectsOfType<BuildingScript>());
+
 
 
 
@@ -48,11 +52,22 @@ public class ActivateCharacterUITrigger : MonoBehaviour
     {
         if (playerInRange)
         {
-            if (Input.GetKeyDown(KeyCode.Space) || 
-                Input.GetKeyDown(KeyCode.JoystickButton0)) // A button
-            {
-                loadCSVData.DisplayRandomRow();
-            }
+            // if (Input.GetKeyDown(KeyCode.Space) || 
+            //     Input.GetKeyDown(KeyCode.JoystickButton0)) // A button
+            // {
+            //     loadCSVData.DisplayRandomRow();
+            // }
+
+            if ((Input.GetKeyDown(KeyCode.Space) || 
+                        Input.GetKeyDown(KeyCode.JoystickButton0) ||  // A button
+                        Input.GetKeyDown(KeyCode.JoystickButton1) ||  // B button
+                        Input.GetKeyDown(KeyCode.JoystickButton2)   // X button
+                        // Input.GetKeyDown(KeyCode.JoystickButton3)
+                        ) && !Player.GetComponent<CharacterMovement>().IsInputFieldFocused())            
+                {  
+                    loadCSVData.DisplayRandomRow();
+            
+                }
         }
     }
 
@@ -62,7 +77,8 @@ public class ActivateCharacterUITrigger : MonoBehaviour
         yield return new WaitForEndOfFrame();
         yield return new WaitForEndOfFrame(); // wait for children to switch off separately
         
-        chrctrCuzzyObj.SetActive(false);
+        browseChrctrObj.SetActive(false);
+        createChrctrObj.SetActive(false);
     }
 
     void OnTriggerEnter2D(Collider2D player)
@@ -113,8 +129,17 @@ public class ActivateCharacterUITrigger : MonoBehaviour
 
             backdropFadeCoroutine = StartCoroutine(FadeBackdropAndSetSortingLayersEtc(true,0f));
 
+
+            loadCSVData.UpdateAllNPCSDuringPlay();
+
             // cameraMovement.smoothing = 1000f;
             // cameraMovement.target = player.transform;
+            // foreach(BuildingScript building in buildingScripts)
+            // {   
+            //     building.ExitBuilding(0f, 0f, false);
+            // }
+
+
         }
     }
 
@@ -131,14 +156,15 @@ public class ActivateCharacterUITrigger : MonoBehaviour
 
             if(fadeFirst == false)
             {
-                // chrctrCuzzyObj.SetActive(true);
+                // browseChrctrObj.SetActive(true);
                 steppedOnTrigger = true;
 
                 SetTreeSortingLayer(backdrop, "UI1");
                 SetTreeSortingLayer(Player, "UI2");
                 SetTreeSortingLayer(platform, "UI2");
 
-                chrctrCuzzyObj.SetActive(true);
+                browseChrctrObj.SetActive(true);
+                createChrctrObj.SetActive(false);
 
                 while (elapsedTime < duration)
                 {
@@ -162,9 +188,10 @@ public class ActivateCharacterUITrigger : MonoBehaviour
             }
             else
             {
-                if(chrctrCuzzyObj != null)
+                if(browseChrctrObj != null)
                 {
-                    chrctrCuzzyObj.SetActive(false);
+                    browseChrctrObj.SetActive(false);
+                    createChrctrObj.SetActive(false);
                 }
                 while (elapsedTime < duration)
                 {

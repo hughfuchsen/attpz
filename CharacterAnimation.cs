@@ -10,6 +10,10 @@ public class CharacterAnimation : MonoBehaviour
   [HideInInspector] public float initialAnimationSpeed;
   [HideInInspector] public float animationSpeed = 0.09f; // Time between frames
 
+  [HideInInspector] public List<GameObject> characterSpriteList = new List<GameObject>();
+  [HideInInspector] public List<Color> initialChrctrColorList = new List<Color>();
+
+
   IsoSpriteSorting IsoSpriteSorting; 
 
   [HideInInspector] public int animDirectionAdjustorInt = 26, rightDownAnim, leftDownAnim, rightAnim, leftAnim, 
@@ -79,11 +83,15 @@ public class CharacterAnimation : MonoBehaviour
   void Awake()    
   {
     characterMovement = GetComponent<CharacterMovement>();
-    // GetSpritesAndAddToLists(this.gameObject, characterSpriteList, initialChrctrColorList);
     IsoSpriteSorting = GetComponent<IsoSpriteSorting>();
     characterCustomization = GetComponent<CharacterCustomization>();
     bikeTransformAdjustment = GetComponent<BikeTransformAdjustment>();
 
+
+    if(this.gameObject.CompareTag("Player"))
+    {
+      GetSpritesAndAddToLists(this.gameObject, characterSpriteList, new List<GameObject>(), initialChrctrColorList);
+    }
 
     // Find all input fields in the scene
     inputFields = FindObjectsOfType<TMP_InputField>();
@@ -251,7 +259,9 @@ public class CharacterAnimation : MonoBehaviour
       Input.GetKey(KeyCode.JoystickButton0) ||  // A button
       Input.GetKey(KeyCode.JoystickButton1) ||  // B button
       Input.GetKey(KeyCode.JoystickButton2) ||  // X button
-      Input.GetKey(KeyCode.JoystickButton3))  && !characterMovement.playerOnThresh && characterMovement.playerIsOutside && characterMovement.change != Vector3.zero)
+      Input.GetKey(KeyCode.JoystickButton3))  && 
+      // !characterMovement.playerOnThresh && 
+      characterMovement.playerIsOutside && characterMovement.change != Vector3.zero)
       {
       Run();
       }
@@ -270,8 +280,9 @@ public class CharacterAnimation : MonoBehaviour
           if ((Input.GetKey(KeyCode.Space) || 
       Input.GetKey(KeyCode.JoystickButton0) ||  // A button
       Input.GetKey(KeyCode.JoystickButton1) ||  // B button
-      Input.GetKey(KeyCode.JoystickButton2) ||  // X button
-      Input.GetKey(KeyCode.JoystickButton3)) && characterMovement.playerIsOutside && characterMovement.playerOnBike)
+      Input.GetKey(KeyCode.JoystickButton2)  // X button
+      // Input.GetKey(KeyCode.JoystickButton3)
+      ) && characterMovement.playerIsOutside && characterMovement.playerOnBike)
           {
               // StopBikeFunction
               characterMovement.StartDeactivateSpaceBar();
@@ -460,6 +471,45 @@ public class CharacterAnimation : MonoBehaviour
       }
   } 
 
+  private void GetSpritesAndAddToLists(GameObject obj, List<GameObject> spriteList, List<GameObject> excludeList, List<Color> colorList)
+  {
+      Stack<GameObject> stack = new Stack<GameObject>();
+      stack.Push(obj);
+
+      while (stack.Count > 0)
+      {
+          GameObject currentNode = stack.Pop();
+          SpriteRenderer sr = currentNode.GetComponent<SpriteRenderer>();
+
+          if (sr != null)
+          {
+              Color col = sr.color;
+              spriteList.Add(currentNode);
+              colorList.Add(col);
+          }
+
+          foreach (Transform child in currentNode.transform)
+          {
+              if (!excludeList.Contains(child.gameObject)){
+                  stack.Push(child.gameObject);
+              }
+          }
+      }
+  }
+
+
+  public void SetAlpha(GameObject treeNode, float alpha) // opening cupboards
+  {
+    SpriteRenderer sr = treeNode.GetComponent<SpriteRenderer>();
+
+    if(treeNode != transform.Find("bike"))
+    {
+      if(sr.color.a != 0)
+      {
+        sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, alpha);
+      }
+    }
+  }  
   // public IEnumerator SetAlphaToZeroForAllSprites()
   // {
   //   yield return new WaitForEndOfFrame();

@@ -16,16 +16,15 @@ public enum Direction
   DownFacingLeft,
   DownFacingRight,
   DownLeft,
+  Nothing,
 }
-
+ 
 public class CharacterMovement : MonoBehaviour
 {
   CharacterAnimation characterAnimation;
   CharacterMovement myCharacterMovement;
 
   CharacterCustomization characterCustomization;
-  [HideInInspector] public List<GameObject> playerSpriteList = new List<GameObject>();
-  [HideInInspector] public List<Color> initialPlayerColorList = new List<Color>();
   public int movementSpeed = 10;
   [HideInInspector] public int initialMovementSpeed;
   [HideInInspector] public Rigidbody2D myRigidbody; 
@@ -82,6 +81,7 @@ public class CharacterMovement : MonoBehaviour
       if(this.gameObject.tag != "Player")
       {
           npcRandomMovementCoro = StartCoroutine(MoveCharacterRandomly());
+          // npcRandomMovementCoro = null;
       }
 
 
@@ -102,8 +102,18 @@ public class CharacterMovement : MonoBehaviour
           Input.GetKeyUp(KeyCode.JoystickButton2) ||  // X button
           Input.GetKeyUp(KeyCode.JoystickButton3)))
       {
-        spaceBarDeactivated = false;    
+        spaceBarDeactivated = false;   
       }
+
+      // if ((Input.GetKeyDown(KeyCode.Space) || 
+      //     Input.GetKeyDown(KeyCode.JoystickButton0) ||  // A button
+      //     Input.GetKeyDown(KeyCode.JoystickButton1) ||  // B button
+      //     Input.GetKeyDown(KeyCode.JoystickButton2) ||  // X button
+      //     Input.GetKeyDown(KeyCode.JoystickButton3)))
+      // {
+      //   if(playerSitting)
+      //   {}  
+      // }
     }
   }
   void FixedUpdate()
@@ -174,7 +184,7 @@ public class CharacterMovement : MonoBehaviour
     {
       if(playerSitting == true)
       {
-        // AnimateMovement(sit, 1, currentAnimationDirection, bodyTypeNumber);
+        characterAnimation.Animate(characterAnimation.sit, 1, characterAnimation.currentAnimationDirection, characterAnimation.bodyTypeNumber);
       }
       else if(playerIsCustomizing) // not optimal
       {
@@ -373,6 +383,7 @@ public class CharacterMovement : MonoBehaviour
     {Direction.DownFacingLeft, Direction.DownFacingLeft},
     {Direction.DownFacingRight, Direction.DownFacingRight},
     {Direction.DownLeft, Direction.DownLeft},
+    {Direction.Nothing, Direction.Nothing},
   };
 
 
@@ -388,6 +399,7 @@ public class CharacterMovement : MonoBehaviour
     controlDirectionToPlayerDirection[Direction.DownFacingRight] = Direction.DownFacingRight;
     controlDirectionToPlayerDirection[Direction.DownFacingLeft] = Direction.DownFacingLeft;
     controlDirectionToPlayerDirection[Direction.DownLeft] = Direction.DownLeft;
+    controlDirectionToPlayerDirection[Direction.Nothing] = Direction.Nothing;
   }
 
   public void MoveCharacterNormalDirection()
@@ -501,6 +513,7 @@ public class CharacterMovement : MonoBehaviour
     else if (playerDirection == Direction.DownLeft) { change = new Vector3(-1f,-0.5f,0f); characterAnimation.currentAnimationDirection = characterAnimation.leftDownAnim; facingLeft = true; }
     else if (playerDirection == Direction.Left) { change = new Vector3(-1f,0f,0f); characterAnimation.currentAnimationDirection = characterAnimation.leftAnim; facingLeft = true; }
     else if (playerDirection == Direction.UpLeft) { change = new Vector3(-1f,0.5f,0f); characterAnimation.currentAnimationDirection = characterAnimation.upLeftAnim; facingLeft = true; }
+    else if (playerDirection == Direction.Nothing) { change = Vector3.zero; }
   }
 
   public bool IsInputFieldFocused()
@@ -530,6 +543,10 @@ public class CharacterMovement : MonoBehaviour
 
   public IEnumerator MoveCharacterRandomly()
   {
+    yield return new WaitForSeconds(0.3f);
+
+    change = Vector3.zero;
+
     // if(!myCharacterMovement.playerOnThresh)
     // {
       yield return new WaitForSeconds(Random.Range(5,7));
@@ -545,19 +562,23 @@ public class CharacterMovement : MonoBehaviour
     yield return new WaitForSeconds(Random.Range(5,8));
 
     npcRandomMovementCoro = StartCoroutine(MoveCharacterRandomly()); 
+    // npcRandomMovementCoro = null;
   }
 
   private void OnCollisionEnter2D(Collision2D collision)
     {
         // Ensure collision is detected by this NPC’s BoxCollider2D and not self-triggered
-        if(playerIsOutside)
+        if(this.gameObject.tag != "Player")
         {
-          if (collision.otherCollider == boxCollider && this.gameObject.tag != "Player")
+          if(playerIsOutside)
           {
-              ReverseDirection(false);
+            if (collision.otherCollider == boxCollider)
+            {
+                ReverseDirection(false); // isTrigger is false
+            }
           }
+          else{ change = Vector3.zero; }
         }
-        else{ change = Vector3.zero; }
     }
 
     // private void OnTriggerEnter2D(Collider2D other)
@@ -575,7 +596,12 @@ public class CharacterMovement : MonoBehaviour
     change *= -1;
     if(isTrigger)
     {
+      if(this.npcRandomMovementCoro != null)
+      {
+          StopCoroutine(this.npcRandomMovementCoro);
+      }
       npcRandomMovementCoro = StartCoroutine(MoveCharacterRandomly()); 
+      // npcRandomMovementCoro = null;
     }
   }
 

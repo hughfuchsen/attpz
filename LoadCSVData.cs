@@ -142,6 +142,16 @@ public class LoadCSVData : MonoBehaviour
             UpdateNPC(npc);
         }
     }   
+    public void UpdateAllNPCSDuringPlay()
+    {
+        foreach (GameObject npc in npcList)
+        {
+            if(npc.GetComponent<CharacterMovement>().playerIsOutside)
+            {
+                UpdateNPC(npc);
+            }
+        }
+    }   
     private void ValidateInputFields()
     {
         // Get the current ColorBlock of the submit button

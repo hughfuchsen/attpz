@@ -10,7 +10,8 @@ public class ActivateCharacterUITrigger : MonoBehaviour
     [SerializeField] GameObject backdrop;
     [SerializeField] GameObject Player;
     [SerializeField] GameObject platform;
-    [SerializeField] LoadCSVData loadCSVData;
+    [SerializeField] LoadCSVDataWeb loadCSVData;
+    // [SerializeField] LoadCSVData loadCSVData;
 
     private Coroutine backdropFadeCoroutine;
 
@@ -20,10 +21,6 @@ public class ActivateCharacterUITrigger : MonoBehaviour
 
     // public List<BuildingScript> buildingScripts = new List<BuildingScript>();
 
-
-
-
-    public bool steppedOnTrigger;
 
 
 
@@ -38,7 +35,8 @@ public class ActivateCharacterUITrigger : MonoBehaviour
 
         backdrop = GameObject.FindGameObjectWithTag("InnerBuildingBackdrop");
 
-        loadCSVData = GameObject.FindGameObjectWithTag("CharacterCustomizationMenu").GetComponent<LoadCSVData>();
+        loadCSVData = GameObject.FindGameObjectWithTag("CharacterCustomizationMenu").GetComponent<LoadCSVDataWeb>();
+        // loadCSVData = GameObject.FindGameObjectWithTag("CharacterCustomizationMenu").GetComponent<LoadCSVData>();
 
         // buildingScripts.AddRange(FindObjectsOfType<BuildingScript>());
 
@@ -57,20 +55,20 @@ public class ActivateCharacterUITrigger : MonoBehaviour
             // {
             //     loadCSVData.DisplayRandomRow();
             // }
-
+        
             if ((Input.GetKeyDown(KeyCode.Space) || 
                         Input.GetKeyDown(KeyCode.JoystickButton0) ||  // A button
                         Input.GetKeyDown(KeyCode.JoystickButton1) ||  // B button
                         Input.GetKeyDown(KeyCode.JoystickButton2)   // X button
                         // Input.GetKeyDown(KeyCode.JoystickButton3)
-                        ) && !Player.GetComponent<CharacterMovement>().IsInputFieldFocused())            
+                        ) && !Player.GetComponent<CharacterMovement>().IsInputFieldFocused())           
                 {  
+                    
                     loadCSVData.DisplayRandomRow();
             
                 }
         }
     }
-
 
     IEnumerator LateStart() 
     {
@@ -83,7 +81,7 @@ public class ActivateCharacterUITrigger : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D player)
     {
-        if(player.CompareTag("PlayerCollider"))
+        if(player.CompareTag("PlayerCollider") && !Player.GetComponent<CharacterMovement>().playerOnBike)
         {
             if(backdropFadeCoroutine != null)
             {
@@ -157,11 +155,10 @@ public class ActivateCharacterUITrigger : MonoBehaviour
             if(fadeFirst == false)
             {
                 // browseChrctrObj.SetActive(true);
-                steppedOnTrigger = true;
 
                 SetTreeSortingLayer(backdrop, "UI1");
                 SetTreeSortingLayer(Player, "UI2");
-                SetTreeSortingLayer(platform, "UI2");
+                // SetTreeSortingLayer(platform, "UI2");
 
                 browseChrctrObj.SetActive(true);
                 createChrctrObj.SetActive(false);
@@ -209,11 +206,10 @@ public class ActivateCharacterUITrigger : MonoBehaviour
 
 
 
-                steppedOnTrigger = false;
 
                 SetTreeSortingLayer(backdrop, "Backdrop");
                 SetTreeSortingLayer(Player, "Default");
-                SetTreeSortingLayer(platform, "Default");
+                // SetTreeSortingLayer(platform, "Default");
 
 
 

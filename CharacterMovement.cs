@@ -44,7 +44,7 @@ public class CharacterMovement : MonoBehaviour
 
   [HideInInspector] public bool facingLeft;
 
-  [HideInInspector] public bool playerOnBike;
+  [HideInInspector] public bool playerOnBike = false;
 
   [HideInInspector] public bool spaceBarDeactivated;
 
@@ -53,7 +53,7 @@ public class CharacterMovement : MonoBehaviour
 
 
   [HideInInspector] public bool playerIsCustomizing = false;
-  [HideInInspector] public bool playerSitting = false;
+  [HideInInspector] public bool playerOnFurniture = false;
 
 
   [HideInInspector] public TMP_InputField[] inputFields;
@@ -111,7 +111,7 @@ public class CharacterMovement : MonoBehaviour
       //     Input.GetKeyDown(KeyCode.JoystickButton2) ||  // X button
       //     Input.GetKeyDown(KeyCode.JoystickButton3)))
       // {
-      //   if(playerSitting)
+      //   if(playerOnFurniture)
       //   {}  
       // }
     }
@@ -128,7 +128,7 @@ public class CharacterMovement : MonoBehaviour
     if(this.gameObject.tag == "Player")
     {
       change = Vector3.zero;
-      if (IsInputFieldFocused())
+      if (IsInputFieldFocused() || playerOnFurniture)
       {
         change = Vector3.zero;
       }
@@ -182,13 +182,9 @@ public class CharacterMovement : MonoBehaviour
     }
     else // if change == 0 :^)
     {
-      if(playerSitting == true)
+      if(playerOnFurniture == true)
       {
         characterAnimation.Animate(characterAnimation.sit, 1, characterAnimation.currentAnimationDirection, characterAnimation.bodyTypeNumber);
-      }
-      else if(playerIsCustomizing) // not optimal
-      {
-        characterAnimation.Animate(characterAnimation.idle, 1, characterAnimation.currentAnimationDirection, characterAnimation.bodyTypeNumber);
       }
       else if(!playerOnBike) // not optimal
       {

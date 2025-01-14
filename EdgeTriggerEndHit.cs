@@ -15,14 +15,14 @@ public class EdgeTriggerEndHit : MonoBehaviour
     private Vector2 playerOffset = new Vector2(8f, -28f);  // Offset for player's position (X: 8, Y: -28)
     private Vector2 playerPositionWithCollisionPointOffest;
     Vector2 collisionPointOffset;
-    public bool aboveThreshold;
+    public bool aboveThreshold;  
     public bool leftDiagThreshold;
 
     Vector2 leftEnd;
     Vector2 rightEnd;
     Vector2 centerPoint;
 
-    CharacterMovement playerMovement;
+    CharacterMovement playerMovement; 
 
     void Start()
     {
@@ -46,7 +46,7 @@ public class EdgeTriggerEndHit : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("Player"))
+        if (other.CompareTag("PlayerCollider"))
         {
             // playerMovement.ResetPlayerMovement();  // Reset movement restrictions
 
@@ -71,15 +71,17 @@ public class EdgeTriggerEndHit : MonoBehaviour
 
     void OnTriggerExit2D(Collider2D other)
     {
-        if (other.CompareTag("Player"))
+        if (other.CompareTag("PlayerCollider"))
         {
             if (checkCenterCoroutine != null)
             {
                 StopCoroutine(checkCenterCoroutine);
                 checkCenterCoroutine = null;
             }
-
-            playerMovement.ResetPlayerMovement();  // Reset movement restrictions
+            if(!playerMovement.playerOnThresh)
+            {
+                playerMovement.ResetPlayerMovement();  // Reset movement restrictions
+            }
         }
     }
 
@@ -100,28 +102,49 @@ public class EdgeTriggerEndHit : MonoBehaviour
         }
     }
 
+    // private IEnumerator CheckIfPlayerIsAtCenter()
+    // {
+    //     while (true)
+    //     {
+    //         // Update the player's position during runtime
+    //         playerPosition = (Vector2)player.transform.position + playerOffset;            
+    //         float distanceToCenter = Vector2.Distance(playerPosition.x, centerPoint);
+    //         Debug.Log("dist to center:" + distanceToCenter);
+    //         Debug.Log("playerPos:" + playerPosition);
+
+    //         if (distanceToCenter <= centerThreshold)
+    //         {
+    //             // Debug.Log("Player is at the center of the edge collider.");
+    //             playerMovement.ResetPlayerMovement();  // Reset restrictions once at center
+    //             yield break;
+    //         }
+
+    //         yield return new WaitForSeconds(checkInterval);
+    //     }
+    // }
+
+
     private IEnumerator CheckIfPlayerIsAtCenter()
     {
         while (true)
         {
             // Update the player's position during runtime
-            playerPosition = (Vector2)player.transform.position + playerOffset;            
-            // Vector2 adjustedPlayerOffset = playerPosition + collisionPointOffset;
-            float distanceToCenter = Vector2.Distance(playerPosition, centerPoint);
-            // float distanceToCenter = Mathf.Abs(playerPosition.x - centerPoint.x);
-            // Debug.Log("dist to center:" + distanceToCenter);
-            // Debug.Log("playerPos:" + playerPosition);
+            playerPosition = (Vector2)player.transform.position + playerOffset;
+            float distanceToCenterX = Mathf.Abs(playerPosition.x - centerPoint.x); // Check X distance only
+            Debug.Log("Distance to center (X): " + distanceToCenterX);
+            Debug.Log("Player position: " + playerPosition);
 
-            if (distanceToCenter <= centerThreshold)
+            if (distanceToCenterX <= centerThreshold)
             {
-                // Debug.Log("Player is at the center of the edge collider.");
-                playerMovement.ResetPlayerMovement();  // Reset restrictions once at center
+                Debug.Log("Player is at the center of the edge collider in X direction.");
+                playerMovement.ResetPlayerMovement(); // Reset restrictions once at center
                 yield break;
             }
 
             yield return new WaitForSeconds(checkInterval);
         }
     }
+
 
     private void HandleMovementRestrictions(Vector2 playerPosition, Vector2 centerPoint)
     {

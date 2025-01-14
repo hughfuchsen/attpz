@@ -20,7 +20,7 @@ public class CharacterAnimation : MonoBehaviour
                           upRightAnim, upLeftAnim, ladderAnimDirectionIndex;
 
 
-  [HideInInspector] public int idle = 0, walk = 1, run = 5, sit = 9, climb = 11, rideBike = 15;
+  [HideInInspector] public int idle = 0, walk = 1, run = 5, sit = 10, climb = 11, rideBike = 15;
 
 
 
@@ -55,12 +55,15 @@ public class CharacterAnimation : MonoBehaviour
   [HideInInspector] public Coroutine allowTimeForSpaceBarCoro;
 
 
-  [HideInInspector] public bool playerSitting = false;
+  [HideInInspector] public bool playerOnFurniture = false;
 
 
   [HideInInspector] public float timer;
   [HideInInspector] public int currentFrame, movementStartIndex, movementFrameCount, currentAnimationDirection = 0,
-                      bodyTypeNumber, bodyTypeIndexMultiplier = 156;
+                      // bodyTypeNumber, 
+                      bodyTypeIndexMultiplier = 156;
+
+                      public int bodyTypeNumber;
 
   [HideInInspector] public int[] movementIndices;
 
@@ -78,6 +81,12 @@ public class CharacterAnimation : MonoBehaviour
 
 
   [HideInInspector] public TMP_InputField[] inputFields;
+  
+  
+  [HideInInspector] public FurnitureScript currentFurnitureScript;
+  [HideInInspector] public Vector3 initialWaistTransformPos;
+
+
 
 
   void Awake()    
@@ -95,6 +104,7 @@ public class CharacterAnimation : MonoBehaviour
 
     // Find all input fields in the scene
     inputFields = FindObjectsOfType<TMP_InputField>();
+
 
 
     // initialBCOffset = character.GetComponent<BoxCollider2D>().offset;
@@ -232,6 +242,10 @@ public class CharacterAnimation : MonoBehaviour
     currentJakettoColor = (HexToColor("#AB4918"));
     eyeSprite.color = HexToColor("#000000");
 
+
+    initialWaistTransformPos = waistSprite.transform.localPosition;
+
+
   }
 
 
@@ -247,10 +261,6 @@ public class CharacterAnimation : MonoBehaviour
       {
       RideBike();
       }
-      else if(playerSitting == true)
-      {
-      Sit();
-      }
       else if (characterMovement.motionDirection == "upDownLadder"|| characterMovement.motionDirection == "upLadder" || characterMovement.motionDirection == "downLadder")
       {
       ClimbLadder();
@@ -265,124 +275,78 @@ public class CharacterAnimation : MonoBehaviour
       {
       Run();
       }
-      else if (characterMovement.change != Vector3.zero)
+      else 
       {
       Walk();
       }
-      
-
 
       currentAnimationDirection = animationDirection;
 
-      // Check if space was released before this code
-      if(characterMovement.spaceBarDeactivated == false)
-      {
-          if ((Input.GetKey(KeyCode.Space) || 
-      Input.GetKey(KeyCode.JoystickButton0) ||  // A button
-      Input.GetKey(KeyCode.JoystickButton1) ||  // B button
-      Input.GetKey(KeyCode.JoystickButton2)  // X button
-      // Input.GetKey(KeyCode.JoystickButton3)
-      ) && characterMovement.playerIsOutside && characterMovement.playerOnBike)
-          {
-              // StopBikeFunction
-              characterMovement.StartDeactivateSpaceBar();
-              characterMovement.playerOnBike = false;
-              bikeScript.GetOffBoike();
-              bikeStatic.transform.position = transform.position + new Vector3(8, -22, 0);
-              currentBikeColor.a = 0f;
-          }
-      }
+      HandleGettingOffBikeOrSeat();
       
 
-      if(characterMovement.playerOnThresh && characterMovement.playerOnBike == true)
-      {
-          //StopBikeFunctionWhile Entering Building
 
-        if(characterMovement.change.x > 0 && characterMovement.change.y > 0)//up right
-        {  
-            bikeStatic.transform.position = transform.position + new Vector3(8,-22,0) + new Vector3(-16,-8,0);
-        }
-        if(characterMovement.change.x < 0 && characterMovement.change.y < 0)//down left
-        {  
-            bikeStatic.transform.position = transform.position + new Vector3(8,-22,0) + new Vector3(16,8,0);
-        }
-        if(characterMovement.change.x < 0 && characterMovement.change.y > 0)//up left
-        {  
-            bikeStatic.transform.position = transform.position + new Vector3(8,-22,0) + new Vector3(16,-8,0);
-        }
-        if(characterMovement.change.x > 0 && characterMovement.change.y < 0)// down right
-        {  
-            bikeStatic.transform.position = transform.position + new Vector3(8,-22,0) + new Vector3(-16,8,0);
-        }
-        
-        characterMovement.playerOnBike = false;
-        bikeScript.GetOffBoike();
-        currentBikeColor.a = 0f;
-      }
     }
-    else
+    else if (this.gameObject.tag == "NPC")
     {
       if (characterMovement.change != Vector3.zero)
-        {
-        Walk();
-        }
-    }
-
-      movementIndices = Enumerable.Range(movementStartIndex + animationDirection + ((bodyTypeNumber - 1) * bodyTypeIndexMultiplier), movementFrameCount).ToArray();
-      // Timer to control the animation frame rate
-      timer += Time.deltaTime;
-
-
-
-
-
-      // If enough time has passed, move to the next frame
-      if (timer >= animationSpeed)
       {
-          timer = 0f; // Reset timer
-
-          // Update the current frame
-          currentFrame++;
-
-          // If we've reached the end of the movementIndices array, loop back to the first sprite
-          if (currentFrame >= movementIndices.Length)
-          {
-              currentFrame = 0;
-          }
-
-          // Set the sprite to the current frame in the movementIndices array
-          headSprite.sprite = allHeadSprites[movementIndices[currentFrame]];
-          eyeSprite.sprite = allEyeSprites[movementIndices[currentFrame]];
-          throatSprite.sprite = allThroatSprites[movementIndices[currentFrame]];
-          collarSprite.sprite = allCollarSprites[movementIndices[currentFrame]];
-          torsoSprite.sprite = allTorsoSprites[movementIndices[currentFrame]];
-          waistSprite.sprite = allWaistSprites[movementIndices[currentFrame]];
-          waistShortsSprite.sprite = allWaistShortsSprites[movementIndices[currentFrame]];
-          kneesShinsSprite.sprite = allKneesShinsSprites[movementIndices[currentFrame]];
-          anklesSprite.sprite = allAnklesSprites[movementIndices[currentFrame]];
-          feetSprite.sprite = allFeetSprites[movementIndices[currentFrame]];
-          jakettoSprite.sprite = allJakettoSprites[movementIndices[currentFrame]];
-          dressSprite.sprite = allDressSprites[movementIndices[currentFrame]];
-          longSleeveSprite.sprite = allLongSleeveSprites[movementIndices[currentFrame]];
-          handSprite.sprite = allHandSprites[movementIndices[currentFrame]];
-          shortSleeveSprite.sprite = allShortSleeveSprites[movementIndices[currentFrame]];
-          mohawk5TopSprite.sprite = allMohawk5TopSprites[movementIndices[currentFrame]];
-          mohawk5BottomSprite.sprite = allMohawk5BottomSprites[movementIndices[currentFrame]];
-          hair0TopSprite.sprite = allHair0TopSprites[movementIndices[currentFrame]];
-          hair0BottomSprite.sprite = allHair0BottomSprites[movementIndices[currentFrame]];
-          hair1TopSprite.sprite = allHair1TopSprites[movementIndices[currentFrame]];
-          hair7TopSprite.sprite = allHair7TopSprites[movementIndices[currentFrame]];
-          hair8TopSprite.sprite = allHair8TopSprites[movementIndices[currentFrame]];
-          hair1BottomSprite.sprite = allHair1BottomSprites[movementIndices[currentFrame]];
-          hair2BottomSprite.sprite = allHair2BottomSprites[movementIndices[currentFrame]];
-          hair3BottomSprite.sprite = allHair3BottomSprites[movementIndices[currentFrame]];
-          hair4BottomSprite.sprite = allHair4BottomSprites[movementIndices[currentFrame]];
-          hair6BottomSprite.sprite = allHair6BottomSprites[movementIndices[currentFrame]];
-          hair7BottomSprite.sprite = allHair7BottomSprites[movementIndices[currentFrame]];
-          hair8BottomSprite.sprite = allHair8BottomSprites[movementIndices[currentFrame]];
-          hairFringe1Sprite.sprite = allHairFringe1Sprites[movementIndices[currentFrame]];
-          hairFringe2Sprite.sprite = allHairFringe2Sprites[movementIndices[currentFrame]];
+        Walk();
       }
+    }
+  
+
+    movementIndices = Enumerable.Range(movementStartIndex + animationDirection + ((bodyTypeNumber - 1) * bodyTypeIndexMultiplier), movementFrameCount).ToArray();
+    // Timer to control the animation frame rate
+    timer += Time.deltaTime;
+
+    // If enough time has passed, move to the next frame
+    if (timer >= animationSpeed)
+    {
+      timer = 0f; // Reset timer
+
+      // Update the current frame
+      currentFrame++;
+
+      // If we've reached the end of the movementIndices array, loop back to the first sprite
+      if (currentFrame >= movementIndices.Length)
+      {
+          currentFrame = 0;
+      }
+
+      // Set the sprite to the current frame in the movementIndices array
+      headSprite.sprite = allHeadSprites[movementIndices[currentFrame]];
+      eyeSprite.sprite = allEyeSprites[movementIndices[currentFrame]];
+      throatSprite.sprite = allThroatSprites[movementIndices[currentFrame]];
+      collarSprite.sprite = allCollarSprites[movementIndices[currentFrame]];
+      torsoSprite.sprite = allTorsoSprites[movementIndices[currentFrame]];
+      waistSprite.sprite = allWaistSprites[movementIndices[currentFrame]];
+      waistShortsSprite.sprite = allWaistShortsSprites[movementIndices[currentFrame]];
+      kneesShinsSprite.sprite = allKneesShinsSprites[movementIndices[currentFrame]];
+      anklesSprite.sprite = allAnklesSprites[movementIndices[currentFrame]];
+      feetSprite.sprite = allFeetSprites[movementIndices[currentFrame]];
+      jakettoSprite.sprite = allJakettoSprites[movementIndices[currentFrame]];
+      dressSprite.sprite = allDressSprites[movementIndices[currentFrame]];
+      longSleeveSprite.sprite = allLongSleeveSprites[movementIndices[currentFrame]];
+      handSprite.sprite = allHandSprites[movementIndices[currentFrame]];
+      shortSleeveSprite.sprite = allShortSleeveSprites[movementIndices[currentFrame]];
+      mohawk5TopSprite.sprite = allMohawk5TopSprites[movementIndices[currentFrame]];
+      mohawk5BottomSprite.sprite = allMohawk5BottomSprites[movementIndices[currentFrame]];
+      hair0TopSprite.sprite = allHair0TopSprites[movementIndices[currentFrame]];
+      hair0BottomSprite.sprite = allHair0BottomSprites[movementIndices[currentFrame]];
+      hair1TopSprite.sprite = allHair1TopSprites[movementIndices[currentFrame]];
+      hair7TopSprite.sprite = allHair7TopSprites[movementIndices[currentFrame]];
+      hair8TopSprite.sprite = allHair8TopSprites[movementIndices[currentFrame]];
+      hair1BottomSprite.sprite = allHair1BottomSprites[movementIndices[currentFrame]];
+      hair2BottomSprite.sprite = allHair2BottomSprites[movementIndices[currentFrame]];
+      hair3BottomSprite.sprite = allHair3BottomSprites[movementIndices[currentFrame]];
+      hair4BottomSprite.sprite = allHair4BottomSprites[movementIndices[currentFrame]];
+      hair6BottomSprite.sprite = allHair6BottomSprites[movementIndices[currentFrame]];
+      hair7BottomSprite.sprite = allHair7BottomSprites[movementIndices[currentFrame]];
+      hair8BottomSprite.sprite = allHair8BottomSprites[movementIndices[currentFrame]];
+      hairFringe1Sprite.sprite = allHairFringe1Sprites[movementIndices[currentFrame]];
+      hairFringe2Sprite.sprite = allHairFringe2Sprites[movementIndices[currentFrame]];
+    }
   }
 
   public void RideBike()
@@ -442,6 +406,78 @@ public class CharacterAnimation : MonoBehaviour
     movementStartIndex = walk;
     characterMovement.movementSpeed = characterMovement.initialMovementSpeed;
     animationSpeed = initialAnimationSpeed;
+  }
+
+  public void HandleGettingOffBikeOrSeat()
+  {
+      // Check if space was released before this code
+      if(characterMovement.spaceBarDeactivated == false)
+      {
+          if (Input.GetKey(KeyCode.Space) || 
+      Input.GetKey(KeyCode.JoystickButton0) ||  // A button
+      Input.GetKey(KeyCode.JoystickButton1) ||  // B button
+      Input.GetKey(KeyCode.JoystickButton2)  // X button
+      // Input.GetKey(KeyCode.JoystickButton3)
+      )
+          {
+            if(characterMovement.playerOnBike)
+            {
+              // StopBikeFunction
+              characterMovement.StartDeactivateSpaceBar();
+              characterMovement.playerOnBike = false;
+              bikeScript.GetOffBoike();
+              bikeStatic.transform.position = transform.position + new Vector3(8, -22, 0);
+              currentBikeColor.a = 0f;
+            }
+            else if(characterMovement.playerOnFurniture)
+            {
+              if(currentFurnitureScript != null)
+              {
+                CheckFurnitureType();
+                characterMovement.StartDeactivateSpaceBar();
+
+                // if(currentFurnitureScript.currentFurnitureType == currentFurnitureScript.toilet)
+                // {
+                //   characterCustomization.UpdatePants();
+                //   characterCustomization.UpdateWaist();
+                // }
+                // else if (currentFurnitureScript.currentFurnitureType == bed)
+                // {
+
+                // }
+
+                currentFurnitureScript.StopEngaging();
+              }
+
+            }
+          }
+      }
+      
+      //StopBikeFunctionWhile Entering Building 
+      if(characterMovement.playerOnThresh && characterMovement.playerOnBike == true)
+      {
+        if(characterMovement.change.x > 0 && characterMovement.change.y > 0)//up right
+        {  
+            bikeStatic.transform.position = transform.position + new Vector3(8,-22,0) + new Vector3(-16,-8,0);
+        }
+        if(characterMovement.change.x < 0 && characterMovement.change.y < 0)//down left
+        {  
+            bikeStatic.transform.position = transform.position + new Vector3(8,-22,0) + new Vector3(16,8,0);
+        }
+        if(characterMovement.change.x < 0 && characterMovement.change.y > 0)//up left
+        {  
+            bikeStatic.transform.position = transform.position + new Vector3(8,-22,0) + new Vector3(16,-8,0);
+        }
+        if(characterMovement.change.x > 0 && characterMovement.change.y < 0)// down right
+        {  
+            bikeStatic.transform.position = transform.position + new Vector3(8,-22,0) + new Vector3(-16,8,0);
+        }
+        
+        characterMovement.playerOnBike = false;
+        bikeScript.GetOffBoike();
+        currentBikeColor.a = 0f;
+      }
+      
   }
 
 
@@ -536,7 +572,33 @@ public class CharacterAnimation : MonoBehaviour
   //     }
   // }
 
+    void CheckFurnitureType()
+    {
+        switch (currentFurnitureScript.currentFurnitureType)
+        {
+            case FurnitureScript.FurnitureType.chair:
+                characterCustomization.UpdatePants();
+                characterCustomization.UpdateWaist();                
+              break;
+
+            case FurnitureScript.FurnitureType.toilet:
+                characterCustomization.UpdatePants();
+                characterCustomization.UpdateWaist();
+                break;
+
+            case FurnitureScript.FurnitureType.bed:
+                 currentFurnitureScript.HandleBedEngagement(currentFurnitureScript.Player, 1f);
+                // Add your bed-specific logic here
+                break;
+
+            default:
+                Debug.Log("Unknown furniture type.");
+                break;
+        }
+    }
 }
+
+
 
 
 

@@ -5,6 +5,7 @@ using UnityEngine;
 public class ThanksMessageScript : MonoBehaviour
 {
     public GameObject canvasObject; // Assign your canvas object here
+    public GameObject customiseCanvasObject; // Assign your canvas object here
     public CharacterMovement myCharacterMovement; // Reference to your CharacterMovement script
     private Coroutine dormancyCoroutine;
 
@@ -17,32 +18,30 @@ public class ThanksMessageScript : MonoBehaviour
     }
     private void Update()
     {
-        if (!activateCharacterUITrigger.playerInRange)  
-        {  
-            // Check for dormancy: no movement and no input from keyboard or mouse
-            if(Input.GetKey(KeyCode.JoystickButton9))
+        if (myCharacterMovement.change == Vector3.zero && !Input.anyKey)
+        {
+            if (dormancyCoroutine == null)
             {
-                canvasObject.SetActive(true); // Set canvas inactive when movement or input resumes
+                dormancyCoroutine = StartCoroutine(ActivateCanvasAfterDormancy());
+            }
 
-                return;
-            }
-            else if (myCharacterMovement.change == Vector3.zero && !Input.anyKey)
+    
+        }
+        else
+        {
+            // If there's movement or input, stop the dormancy timer and hide the canvas
+            if (dormancyCoroutine != null)
             {
-                if (dormancyCoroutine == null)
-                {
-                    dormancyCoroutine = StartCoroutine(ActivateCanvasAfterDormancy());
-                }
+                StopCoroutine(dormancyCoroutine);
+                dormancyCoroutine = null;
             }
-            else
+            
+            canvasObject.SetActive(false); // Set canvas inactive when movement or input resumes
+
+            if (!customiseCanvasObject.activeSelf)
             {
-                // If there's movement or input, stop the dormancy timer and hide the canvas
-                if (dormancyCoroutine != null)
-                {
-                    StopCoroutine(dormancyCoroutine);
-                    dormancyCoroutine = null;
-                }
-                canvasObject.SetActive(false); // Set canvas inactive when movement or input resumes
-            }
+                customiseCanvasObject.SetActive(true);
+            }    
         }
             
     }
@@ -56,6 +55,7 @@ public class ThanksMessageScript : MonoBehaviour
     {
         yield return new WaitForSeconds(12);
         canvasObject.SetActive(true);
+        customiseCanvasObject.SetActive(false);
     }
 }
 

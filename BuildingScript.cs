@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class BuildingScript : MonoBehaviour
 {
+    public List<BuildingScript> allOtherBuildings = new List<BuildingScript>();
+
     public GameObject innerBuilding;
     public GameObject outerBuilding;
     [SerializeField] public List<GameObject> gameObjectsToShowWhileOutside = new List<GameObject>();
@@ -19,13 +21,14 @@ public class BuildingScript : MonoBehaviour
     public List<GameObject> outerBuildingSpriteList = new List<GameObject>();
     private List<Color> innerBuildingInitialColorList = new List<Color>();
     public List<Color> outerBuildingInitialColorList = new List<Color>();
-    private List<IsoSpriteSorting> innerSpriteSortingScriptObj = new List<IsoSpriteSorting>();
-    private List<IsoSpriteSorting> outerSpriteSortingScriptObj = new List<IsoSpriteSorting>();
+    [HideInInspector] public List<IsoSpriteSorting> innerSpriteSortingScriptObj = new List<IsoSpriteSorting>();
+    [HideInInspector] public List<IsoSpriteSorting> outerSpriteSortingScriptObj = new List<IsoSpriteSorting>();
 
     private Coroutine innerBuildingFadeCoroutine;
     private Coroutine outerBuildingFadeCoroutine;
     private Coroutine gameObjectsToHideWhileInsideFadeCoroutine;
     private Coroutine backdropFadeCoroutine;
+    private Coroutine setDontSortForAllOuterBuildingsCoro;
     private string[] tagsToExludeEntExt = { "OpenDoor", "AlphaZeroEntExt" };
 
     public List<RoomScript> roomScripts; 
@@ -64,6 +67,18 @@ public class BuildingScript : MonoBehaviour
         TagChildrenOfTaggedParents("OpenDoor");
         TagChildrenOfTaggedParents("ClosedDoor");
         TagChildrenOfTaggedParents("AlphaZeroEntExt");
+
+        // Find all objects in the scene with the BuildingScript component
+        BuildingScript[] allBuildings = FindObjectsOfType<BuildingScript>();
+        
+        // Add all other BuildingScripts to the list, excluding this one
+        foreach (BuildingScript building in allBuildings)
+        {
+            if (building != this)
+            {
+                allOtherBuildings.Add(building);
+            }
+        }
 
     }  
 
@@ -109,6 +124,10 @@ public class BuildingScript : MonoBehaviour
         {
             StopCoroutine(this.gameObjectsToHideWhileInsideFadeCoroutine);
         }
+        if(this.setDontSortForAllOuterBuildingsCoro != null)
+        {
+            StopCoroutine(this.setDontSortForAllOuterBuildingsCoro);
+        }
 
         gameObjectsToHideWhileInsideFadeCoroutine = StartCoroutine(SetAlphaOfOuterItemsThatRNotDefaultSpriteLayer(false));
         
@@ -130,6 +149,8 @@ public class BuildingScript : MonoBehaviour
 
         innerBuildingFadeCoroutine = StartCoroutine(FadeThenSetDontSort(false, false, false, innerSpriteSortingScriptObj, false, false, 0f, false, innerBuildingSpriteList, innerBuildingInitialColorList, null, tagsToExludeEntExt));
         outerBuildingFadeCoroutine = StartCoroutine(FadeThenSetDontSort(false, false, true, outerSpriteSortingScriptObj, true, false, 0f, false, outerBuildingSpriteList, null, 0f));
+        setDontSortForAllOuterBuildingsCoro = StartCoroutine(SetDontSortForAllOtherOuterBuildings(true, true));
+
     }
     public void ExitBuilding(float waitTimeInside, float waitTimeOutside, bool exitingFromBehindAlreadyOutside)
     {
@@ -162,6 +183,11 @@ public class BuildingScript : MonoBehaviour
             StopCoroutine(this.gameObjectsToHideWhileInsideFadeCoroutine);
         }
 
+        if(this.setDontSortForAllOuterBuildingsCoro != null)
+        {
+            StopCoroutine(this.setDontSortForAllOuterBuildingsCoro);
+        }
+
          // FadeThenSetDontSort params
         //                                     ( 
             //                                  bool exitingBuilding,
@@ -182,6 +208,7 @@ public class BuildingScript : MonoBehaviour
 
         innerBuildingFadeCoroutine = StartCoroutine(FadeThenSetDontSort(true, false, true, innerSpriteSortingScriptObj, true, true, waitTimeInside, false, innerBuildingSpriteList, null, 0f));
         outerBuildingFadeCoroutine = StartCoroutine(FadeThenSetDontSort(true, false, false, outerSpriteSortingScriptObj, false, true, waitTimeOutside, false, outerBuildingSpriteList, outerBuildingInitialColorList, null, tagsToExludeEntExt));
+        setDontSortForAllOuterBuildingsCoro = StartCoroutine(SetDontSortForAllOtherOuterBuildings(false, false));
 
     }
     public void GoBehindBuilding()
@@ -197,6 +224,10 @@ public class BuildingScript : MonoBehaviour
         if(this.gameObjectsToHideWhileInsideFadeCoroutine != null)
         {
             StopCoroutine(this.gameObjectsToHideWhileInsideFadeCoroutine);
+        }
+        if(this.setDontSortForAllOuterBuildingsCoro != null)
+        {
+            StopCoroutine(this.setDontSortForAllOuterBuildingsCoro);
         }
         // FadeThenSetDontSort params
                 //                                     ( 
@@ -217,6 +248,7 @@ public class BuildingScript : MonoBehaviour
 
         innerBuildingFadeCoroutine = StartCoroutine(FadeThenSetDontSort(false, true, true, innerSpriteSortingScriptObj, true, true, 0.3f, true, innerBuildingSpriteList, null, 0f));
         outerBuildingFadeCoroutine = StartCoroutine(FadeThenSetDontSort(false, true, false, outerSpriteSortingScriptObj, false, true, 0.3f, true, outerBuildingSpriteList, null, 0.35f, tagsToExludeEntExt));
+        setDontSortForAllOuterBuildingsCoro = StartCoroutine(SetDontSortForAllOtherOuterBuildings(false, false));
         // innerBuildingFadeCoroutine = StartCoroutine(BuildingSequence(true, 0.3f, true, innerBuildingSpriteList, null, 0f));
         // outerBuildingFadeCoroutine = StartCoroutine(BuildingSequence(true, 0.3f, true, outerBuildingSpriteList, null, 0.35f, tagsToExludeEntExt));
     }
@@ -235,6 +267,12 @@ public class BuildingScript : MonoBehaviour
         }
         if (exitingBuilding)
         {
+            // for (int i = 0; i < allOtherBuildings.Count; i++)
+            // {     
+            //     // allOtherBuildings[i].SetDontSort(allOtherBuildings[i].innerSpriteSortingScriptObj, false);
+            //     allOtherBuildings[i].SetDontSort(allOtherBuildings[i].outerSpriteSortingScriptObj, false);
+            // }
+
             for (int i = 0; i < innerBuildingSpriteList.Count; i++)
             {     
                 SetTreeSortingLayer(innerBuildingSpriteList[i], "Default");
@@ -283,6 +321,12 @@ public class BuildingScript : MonoBehaviour
         }
         else if (exitingBehindBuilding)
         {
+            // for (int i = 0; i < allOtherBuildings.Count; i++)
+            // {     
+            //     // allOtherBuildings[i].SetDontSort(allOtherBuildings[i].innerSpriteSortingScriptObj, false);
+            //     allOtherBuildings[i].SetDontSort(allOtherBuildings[i].outerSpriteSortingScriptObj, false);            
+            // }
+
             for (int i = 0; i < npcSpriteList.Count; i++)
             {  
                 SetTreeAlpha(npcSpriteList[i], 0f); 
@@ -335,6 +379,13 @@ public class BuildingScript : MonoBehaviour
 
         else// if entering the building
         {
+            // for (int i = 0; i < allOtherBuildings.Count; i++)
+            // {     
+            //     // allOtherBuildings[i].SetDontSort(allOtherBuildings[i].innerSpriteSortingScriptObj, true);
+            //     allOtherBuildings[i].SetDontSort(allOtherBuildings[i].outerSpriteSortingScriptObj, true);            
+            // }
+
+
             for (int i = 0; i < npcSpriteList.Count; i++)
             {
                 SetTreeAlpha(npcSpriteList[i], npcColorList[i].a);
@@ -510,9 +561,46 @@ public class BuildingScript : MonoBehaviour
         {
             yield return BuildingSequence(exitingBuilding, exitingBehindBuilding, shouldWait, waitTime.Value, behindBuilding, spriteList, colorList, alpha, tagsToExclude);
             SetDontSort(issList, setDontSort);
+                            
+            yield return new WaitForSeconds(0.3f);
+
+            if(!exitingBuilding && !exitingBehindBuilding)
+            {
+                for (int i = 0; i < allOtherBuildings.Count; i++)
+                {     
+                    // allOtherBuildings[i].SetDontSort(allOtherBuildings[i].innerSpriteSortingScriptObj, false);
+                    allOtherBuildings[i].SetDontSort(allOtherBuildings[i].outerSpriteSortingScriptObj, true);
+                }
+            }
+            else
+            {
+                for (int i = 0; i < allOtherBuildings.Count; i++)
+                {     
+                    // allOtherBuildings[i].SetDontSort(allOtherBuildings[i].innerSpriteSortingScriptObj, false);
+                    allOtherBuildings[i].SetDontSort(allOtherBuildings[i].outerSpriteSortingScriptObj, false);
+                }
+            }
+
         }
         else
         {
+            // if(!exitingBuilding && !exitingBehindBuilding)
+            // {
+            //     for (int i = 0; i < allOtherBuildings.Count; i++)
+            //     {     
+            //         // allOtherBuildings[i].SetDontSort(allOtherBuildings[i].innerSpriteSortingScriptObj, false);
+            //         allOtherBuildings[i].SetDontSort(allOtherBuildings[i].outerSpriteSortingScriptObj, true);
+            //     }
+            // }
+            // else
+            // {
+            //     for (int i = 0; i < allOtherBuildings.Count; i++)
+            //     {     
+            //         // allOtherBuildings[i].SetDontSort(allOtherBuildings[i].innerSpriteSortingScriptObj, false);
+            //         allOtherBuildings[i].SetDontSort(allOtherBuildings[i].outerSpriteSortingScriptObj, false);
+            //     }
+            // }
+
             SetDontSort(issList, setDontSort);
             yield return BuildingSequence(exitingBuilding, exitingBehindBuilding, shouldWait, waitTime.Value, behindBuilding, spriteList, colorList, alpha, tagsToExclude);
         }
@@ -528,6 +616,27 @@ public class BuildingScript : MonoBehaviour
         //     SetTreeAlpha(npcSpriteList[i], npcColorList[i].a);
         //     // npcList[i].GetComponent<CharacterCustomization>().ResetAppearance();
         // }
+    }
+    private IEnumerator SetDontSortForAllOtherOuterBuildings(bool wait, bool setDontSort)
+    {
+        if(wait)
+        {                            
+            yield return new WaitForSeconds(0.5f);
+
+            for (int i = 0; i < allOtherBuildings.Count; i++)
+            {     
+                // allOtherBuildings[i].SetDontSort(allOtherBuildings[i].innerSpriteSortingScriptObj, false);
+                allOtherBuildings[i].SetDontSort(allOtherBuildings[i].outerSpriteSortingScriptObj, setDontSort);
+            }
+        }
+        else
+        {
+            for (int i = 0; i < allOtherBuildings.Count; i++)
+            {     
+                // allOtherBuildings[i].SetDontSort(allOtherBuildings[i].innerSpriteSortingScriptObj, false);
+                allOtherBuildings[i].SetDontSort(allOtherBuildings[i].outerSpriteSortingScriptObj, setDontSort);
+            }
+        }
     }
 
 
@@ -585,7 +694,7 @@ public class BuildingScript : MonoBehaviour
         }
     }
 
-    private void SetDontSort(List<IsoSpriteSorting> objList, bool dontSort)
+    public void SetDontSort(List<IsoSpriteSorting> objList, bool dontSort)
     {
         for (int i = 0; i < objList.Count; i++)
         {

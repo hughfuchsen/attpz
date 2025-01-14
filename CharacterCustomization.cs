@@ -44,11 +44,11 @@ public class CharacterCustomization : MonoBehaviour
     private Sprite unlockedImage;
 
     // public Image skinColorButton;
-    [HideInInspector] public Image skinColorButton2;
-    [HideInInspector] public Image hairColorButton;
-    [HideInInspector] public Image shirtColorButton;
-    [HideInInspector] public Image pantsColorButton;
-    [HideInInspector] public Image jackettoColorButton;
+    public Image skinColorButton2;
+    public Image hairColorButton;
+    public Image shirtColorButton;
+    public Image pantsColorButton;
+    public Image jackettoColorButton;
 
 
     [HideInInspector] public int currentBodyTypeIndex = 0; // Index to track current body type
@@ -1457,7 +1457,7 @@ private void UpdateLockImage()
         SetNoDress();
     }
 
-        public void SetPantsToDress()
+    public void SetPantsToDress()
     {
  
       characterAnimation.waistShortsSprite.color = characterAnimation.currentPantsColor;
@@ -1480,6 +1480,65 @@ private void UpdateLockImage()
         characterAnimation.dressSprite.color = color;
     }
 
+    public void SetPantsToToiletMode()
+    {
+        characterAnimation.waistShortsSprite.color = characterAnimation.currentSkinColor;
+        characterAnimation.kneesShinsSprite.color = characterAnimation.currentSkinColor;
+        characterAnimation.waistSprite.color = characterAnimation.currentPantsColor;
+        SetNoDress();
+    }
+
+
+    // public void SetPlayerToSleepMode(GameObject treeNode, float alpha)
+    // {
+    //     if (treeNode == null && treeNode.name.Contains("hair") && treeNode.name.Contains("head"))
+    //     {
+    //         return; // TODO: remove this
+    //     }
+    //     SpriteRenderer sr = treeNode.GetComponent<SpriteRenderer>();
+    //     if (sr != null)
+    //     {
+    //         sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, alpha);
+    //     }
+    //     foreach (Transform child in treeNode.transform)
+    //     {
+    //         SetTreeAlpha(child.gameObject, alpha);
+    //     }
+
+
+
+    //     // characterAnimation.headSprite
+    //     // characterAnimation.eyeSprite 
+    //     // characterAnimation.throatSprite
+    //     // characterAnimation.collarSprite
+    //     // characterAnimation.torsoSprite
+    //     // characterAnimation.waistSprite
+    //     // characterAnimation.waistShortsSprite
+    //     // characterAnimation.kneesShinsSprite
+    //     // characterAnimation.anklesSprite
+    //     // characterAnimation.feetSprite 
+    //     // characterAnimation.jakettoSprite
+    //     // characterAnimation.dressSprite
+    //     // characterAnimation.longSleeveSprite
+    //     // characterAnimation.handSprite
+    //     // characterAnimation.shortSleeveSprite
+    //     // characterAnimation.mohawk5TopSprite
+    //     // characterAnimation.mohawk5BottomSprite 
+    //     // characterAnimation.hair0TopSprite
+    //     // characterAnimation.hair0BottomSprite
+    //     // characterAnimation.hair1TopSprite
+    //     // characterAnimation.hair7TopSprite
+    //     // characterAnimation.hair8TopSprite
+    //     // characterAnimation.hair1BottomSprite
+    //     // characterAnimation.hair3BottomSprite
+    //     // characterAnimation.hair4BottomSprite
+    //     // characterAnimation.hair6BottomSprite
+    //     // characterAnimation.hair7BottomSprite
+    //     // characterAnimation.hair8BottomSprite
+    //     // characterAnimation.hairFringe1Sprite
+    //     // characterAnimation.hairFringe2Sprite
+    //     // characterAnimation.bikeSprite 
+    // }
 
     public void SetWaistToShirt()
     {

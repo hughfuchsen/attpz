@@ -18,6 +18,16 @@ public enum Direction
   DownLeft,
   Nothing,
 }
+
+// Define the enum outside of your class
+public enum ContactQuadrant
+{
+  TopRight,   // 0
+  TopLeft,    // 1
+  BottomLeft, // 2
+  BottomRight, // 3
+  None
+}
  
 public class CharacterMovement : MonoBehaviour
 {
@@ -54,14 +64,18 @@ public class CharacterMovement : MonoBehaviour
 
   [HideInInspector] public bool playerIsCustomizing = false;
   [HideInInspector] public bool playerOnFurniture = false;
+  [HideInInspector] public bool velocityLock = false;
 
 
   [HideInInspector] public TMP_InputField[] inputFields;
 
   public GameObject roomToSpawnIn; // The GameObject you want to make the parent of this object
 
+  Vector2 previousPosition;
+  Vector2 velocity;
 
-  // public bool thisIsAnNPC;
+  // Variable to store the contact quadrant
+  public ContactQuadrant currentContactQuadrant;
 
 
   // Start is called before the first frame update
@@ -84,6 +98,7 @@ public class CharacterMovement : MonoBehaviour
           // npcRandomMovementCoro = null;
       }
 
+      currentContactQuadrant = ContactQuadrant.BottomRight;
 
       StartCoroutine(LateStartSpawnInsideCoro());
 
@@ -105,15 +120,6 @@ public class CharacterMovement : MonoBehaviour
         spaceBarDeactivated = false;   
       }
 
-      // if ((Input.GetKeyDown(KeyCode.Space) || 
-      //     Input.GetKeyDown(KeyCode.JoystickButton0) ||  // A button
-      //     Input.GetKeyDown(KeyCode.JoystickButton1) ||  // B button
-      //     Input.GetKeyDown(KeyCode.JoystickButton2) ||  // X button
-      //     Input.GetKeyDown(KeyCode.JoystickButton3)))
-      // {
-      //   if(playerOnFurniture)
-      //   {}  
-      // }
     }
   }
   void FixedUpdate()
@@ -147,6 +153,19 @@ public class CharacterMovement : MonoBehaviour
         change.x = Input.GetAxis("Horizontal");
         change.y = Input.GetAxis("Vertical");
       }
+
+
+      // Calculate velocity based on position change
+      Vector2 currentPosition = transform.position;
+      velocity = (currentPosition - previousPosition) / Time.deltaTime;
+
+      // Update previous position for the next frame
+      previousPosition = currentPosition;
+
+      // Optional: Log velocity for debugging
+      // Debug.Log("Velocity: " + velocity);
+      // Debug.Log("Input: " + change);
+      // CheckDirection(velocity);
     }
       
 
@@ -186,7 +205,7 @@ public class CharacterMovement : MonoBehaviour
       {
         characterAnimation.Animate(characterAnimation.sit, 1, characterAnimation.currentAnimationDirection, characterAnimation.bodyTypeNumber);
       }
-      else if(!playerOnBike) // not optimal
+      else if(!playerOnBike ) // not optimal
       {
         characterAnimation.Animate(characterAnimation.idle, 1, characterAnimation.currentAnimationDirection, characterAnimation.bodyTypeNumber);
       }
@@ -406,6 +425,8 @@ public class CharacterMovement : MonoBehaviour
     // Adjust by 90 degrees to align 0 degrees with "up"
     angle -= 90f;
 
+    // Debug.Log(velocityLock);
+
     // Convert negative angles to positive angles (0 to 360 degrees)
     if (angle < 0) angle += 360;
 
@@ -451,39 +472,207 @@ public class CharacterMovement : MonoBehaviour
     {
         // Map the angle to control directions
         Direction controlDirection = Direction.Left; // Default value should never be used
-        if ((angle > 0f && angle <= 22.5f))   { controlDirection = Direction.UpFacingLeft; } // Up
+        if ((angle > 0f && angle <= 22.5f))   
+        { 
+          if(currentContactQuadrant == ContactQuadrant.TopRight && velocityLock == true)
+          {
+            controlDirection = Direction.UpLeft; 
+          }
+          else if(currentContactQuadrant == ContactQuadrant.TopLeft && velocityLock == true)
+          {
+            controlDirection = Direction.UpRight; 
+          }
+          else
+          {
+            controlDirection = Direction.UpFacingLeft;
+          }        
+        } // Up
         else if ((angle == 0f))   
                 {
                   if(facingLeft == true)
                   {
-                    controlDirection = Direction.UpFacingLeft;
+                    if(currentContactQuadrant == ContactQuadrant.TopRight && velocityLock == true)
+                    {
+                      controlDirection = Direction.UpLeft; 
+                    }
+                    else if(currentContactQuadrant == ContactQuadrant.TopLeft && velocityLock == true)
+                    {
+                      controlDirection = Direction.UpRight; 
+                    }
+                    else
+                    {
+                      controlDirection = Direction.UpFacingLeft;
+                    }
                   }
-                  else
+                  else //facing right
                   {
-                    controlDirection = Direction.UpFacingRight;
+                    if(currentContactQuadrant == ContactQuadrant.TopLeft && velocityLock == true)
+                    {
+                      controlDirection = Direction.UpRight; 
+                    }
+                    else if(currentContactQuadrant == ContactQuadrant.TopRight && velocityLock == true)
+                    {
+                      controlDirection = Direction.UpLeft; 
+                    }
+                    else
+                    {
+                      controlDirection = Direction.UpFacingRight;
+                    }                  
                   }
                 }
         
-        else if (angle > 22.5f && angle <= 67.5f)   { controlDirection = Direction.UpLeft; } // Inverted right-up to left-up
-        else if (angle > 67.5f && angle <= 112.5f)  { controlDirection = Direction.Left; } // Inverted right to left
-        else if (angle > 112.5f && angle <= 157.5f) { controlDirection = Direction.DownLeft; } // Inverted right-down to left-down
-        else if (angle > 157.5f && angle < 180f)   { controlDirection = Direction.DownFacingLeft; } // Down
+        else if (angle > 22.5f && angle <= 67.5f)   
+          { 
+            if(currentContactQuadrant == ContactQuadrant.TopLeft && velocityLock == true && playerOnThresh == false)
+            {
+              controlDirection = Direction.DownLeft; 
+            }
+            else
+            {
+              controlDirection = Direction.UpLeft; 
+            }
+          } // Inverted right-up to left-up
+        else if (angle > 67.5f && angle <= 112.5f)  
+          { 
+            if(currentContactQuadrant == ContactQuadrant.TopLeft && velocityLock == true)
+            {
+              controlDirection = Direction.DownLeft;
+            }
+            else if(currentContactQuadrant == ContactQuadrant.BottomLeft && velocityLock == true)
+            {
+              controlDirection = Direction.UpLeft;
+            }
+            else
+            {
+              controlDirection = Direction.Left; 
+            }
+          } // Inverted right to left
+        else if (angle > 112.5f && angle <= 157.5f) 
+        { 
+          if(currentContactQuadrant == ContactQuadrant.BottomLeft && velocityLock == true)
+          {
+            controlDirection = Direction.UpLeft; 
+          }
+          else
+          {
+            controlDirection = Direction.DownLeft; 
+          }
+        } // Inverted right-down to left-down
+        else if (angle > 157.5f && angle < 180f)   
+        { 
+          if(currentContactQuadrant == ContactQuadrant.BottomRight && velocityLock == true)
+          {
+            controlDirection = Direction.DownLeft; 
+          }
+          else if(currentContactQuadrant == ContactQuadrant.BottomLeft && velocityLock == true)
+          {
+            controlDirection = Direction.RightDown; 
+          }
+          else
+          {
+            controlDirection = Direction.DownFacingLeft;
+          }  
+        } // Down
         else if (angle == 180f)  
-                  {
-                  if(facingLeft == true)
-                  {
-                    controlDirection = Direction.DownFacingLeft;
-                  }
-                  else
-                  {
-                    controlDirection = Direction.DownFacingRight;
-                  }
-                }
-        else if (angle > 180f && angle <= 202.5f)   { controlDirection = Direction.DownFacingRight; } // Down
-        else if (angle > 202.5f && angle <= 247.5f) { controlDirection = Direction.RightDown; }  // Inverted left-down to right-down
-        else if (angle > 247.5f && angle <= 292.5f) { controlDirection = Direction.Right; } // Inverted left to right
-        else if (angle > 292.5f && angle <= 337.5f) { controlDirection = Direction.UpRight; }  // Inverted left-up to right-up
-        else if ((angle > 337.5f && angle <= 360f)) { controlDirection = Direction.UpFacingRight; } // Up
+          {
+            if(facingLeft == true)
+            {
+              if(currentContactQuadrant == ContactQuadrant.BottomRight && velocityLock == true)
+              {
+                controlDirection = Direction.DownLeft; 
+              }
+              else if(currentContactQuadrant == ContactQuadrant.BottomLeft && velocityLock == true)
+              {
+                controlDirection = Direction.RightDown; 
+              }
+              else
+              {
+                controlDirection = Direction.DownFacingLeft;
+              }                  
+            }
+            else
+            {
+              if(currentContactQuadrant == ContactQuadrant.BottomLeft && velocityLock == true)
+              {
+                controlDirection = Direction.RightDown; 
+              }
+              else if(currentContactQuadrant == ContactQuadrant.BottomRight && velocityLock == true)
+              {
+                controlDirection = Direction.DownLeft; 
+              }
+              else
+              {
+                controlDirection = Direction.DownFacingRight;
+              }                   
+            }
+          }
+        else if (angle > 180f && angle <= 202.5f)   
+        { 
+          if(currentContactQuadrant == ContactQuadrant.BottomLeft && velocityLock == true)
+          {
+            controlDirection = Direction.RightDown; 
+          }
+          else if(currentContactQuadrant == ContactQuadrant.BottomRight && velocityLock == true)
+          {
+            controlDirection = Direction.DownLeft; 
+          }
+          else
+          {
+            controlDirection = Direction.DownFacingRight;
+          } 
+        } // Down
+        else if (angle > 202.5f && angle <= 247.5f) 
+        { 
+          if(currentContactQuadrant == ContactQuadrant.BottomRight && velocityLock == true)
+          {
+            controlDirection = Direction.UpRight; 
+          }
+          else
+          {
+            controlDirection = Direction.RightDown;
+          } 
+        }  // Inverted left-down to right-down
+        else if (angle > 247.5f && angle <= 292.5f) 
+        { 
+          if(currentContactQuadrant == ContactQuadrant.TopRight && velocityLock == true)
+          {
+            controlDirection = Direction.RightDown;
+          }
+          else if(currentContactQuadrant == ContactQuadrant.BottomRight && velocityLock == true)
+          {
+            controlDirection = Direction.UpRight;
+          }
+          else
+          {
+            controlDirection = Direction.Right;         
+          }
+        } // Inverted left to right
+        else if (angle > 292.5f && angle <= 337.5f) 
+        { 
+          if(currentContactQuadrant == ContactQuadrant.TopRight && velocityLock == true && playerOnThresh == false)
+          {
+            controlDirection = Direction.RightDown; 
+          }
+          else
+          {
+            controlDirection = Direction.UpRight;
+          }
+        }  // Inverted left-up to right-up
+        else if ((angle > 337.5f && angle <= 360f)) 
+        { 
+          if(currentContactQuadrant == ContactQuadrant.TopLeft && velocityLock == true)
+          {
+            controlDirection = Direction.UpRight; 
+          }
+          else if(currentContactQuadrant == ContactQuadrant.TopRight && velocityLock == true)
+          {
+            controlDirection = Direction.UpLeft; 
+          }
+          else
+          {
+            controlDirection = Direction.UpFacingRight;
+          }                  
+        } // Up
         // Map control directions to player directions and animations
         UpdateCharacterDirection(controlDirection);
         // Handle animation and movement
@@ -561,30 +750,224 @@ public class CharacterMovement : MonoBehaviour
     // npcRandomMovementCoro = null;
   }
 
-  private void OnCollisionEnter2D(Collision2D collision)
-    {
-        // Ensure collision is detected by this NPC’s BoxCollider2D and not self-triggered
-        if(this.gameObject.tag != "Player")
-        {
-          if(playerIsOutside)
-          {
-            if (collision.otherCollider == boxCollider)
-            {
-                ReverseDirection(false); // isTrigger is false
-            }
-          }
-          else{ change = Vector3.zero; }
-        }
-    }
+  // private void OnCollisionEnter2D(Collision2D collision)
+  // {
+  //     if (!this.gameObject.CompareTag("Player"))
+  //     {
+  //         if (playerIsOutside && collision.otherCollider == boxCollider)
+  //         {
+  //             ReverseDirection(false); // isTrigger is false
+  //         }
+  //         else
+  //         {
+  //             change = Vector3.zero;
+  //         }
+  //     }
+  //     else if (this.gameObject.CompareTag("Player"))
+  //     {
+  //         // Get the player's box collider (child)
+  //         BoxCollider2D playerCollider = GetComponentInChildren<BoxCollider2D>();
+  //         if (playerCollider == null)
+  //         {
+  //             Debug.LogError("Player BoxCollider2D not found in child objects!");
+  //             return;
+  //         }
 
-    // private void OnTriggerEnter2D(Collider2D other)
-    // {
-    //     // Ensure the trigger is detected by this NPC’s BoxCollider2D and not self-triggered
-    //     if (other == boxCollider && !other.CompareTag("Player"))
-    //     {
-    //         ReverseDirection();
-    //     }
-    // }
+  //         // Get bounds and contact point relative to the player's box collider
+  //         Bounds playerBounds = playerCollider.bounds;
+  //         Vector2 contactPoint = collision.GetContact(0).point;
+
+  //         // Determine quadrant based on the player's box collider
+  //         currentContactQuadrant = DetermineContactQuadrant(contactPoint, playerBounds);
+  //         Debug.Log("Contact Quadrant: " + currentContactQuadrant);
+
+  //         velocityLock = true;
+  //     }
+  // }
+
+  // private ContactQuadrant DetermineContactQuadrant(Vector2 contactPoint, Bounds playerBounds)
+  // {
+  //     // Get the local center of the player's box collider
+  //     Vector2 center = playerBounds.center;
+
+  //     // Determine the quadrant in world space
+  //     if (contactPoint.x >= center.x && contactPoint.y >= center.y)
+  //         return ContactQuadrant.TopRight;
+  //     else if (contactPoint.x <= center.x && contactPoint.y >= center.y)
+  //         return ContactQuadrant.TopLeft;
+  //     else if (contactPoint.x <= center.x && contactPoint.y <= center.y)
+  //         return ContactQuadrant.BottomLeft;
+  //     else
+  //         return ContactQuadrant.BottomRight;
+  // }
+
+  //   private HashSet<Collider2D> activeCollisions = new HashSet<Collider2D>(); // Keeps track of active collisions
+
+
+  // private void OnCollisionEnter2D(Collision2D collision)
+  // {
+  //     if (!this.gameObject.CompareTag("Player"))
+  //     {
+  //         if (playerIsOutside && collision.otherCollider == boxCollider)
+  //         {
+  //             ReverseDirection(false); // isTrigger is false
+  //         }
+  //         else
+  //         {
+  //             change = Vector3.zero;
+  //         }
+  //     }
+  //     else if (this.gameObject.CompareTag("Player"))
+  //     {
+  //         // Get the player's box collider (child)
+  //         BoxCollider2D playerCollider = GetComponentInChildren<BoxCollider2D>();
+
+  //         // Get bounds and contact point
+  //         Bounds playerBounds = playerCollider.bounds;
+  //         Vector2 contactPoint = collision.GetContact(0).point;
+
+
+  //         // Transform the contact point and bounds center to the local space of the root GameObject
+  //         Vector2 localContactPoint = transform.InverseTransformPoint(contactPoint);
+  //         Vector2 localCenter = transform.InverseTransformPoint(playerBounds.center);
+
+  //         // Determine quadrant using local space
+  //         currentContactQuadrant = DetermineContactQuadrant(localContactPoint, localCenter);
+  //         Debug.Log($"Contact Quadrant: {currentContactQuadrant}, Contact Point (local): {localContactPoint}, Center (local): {localCenter}");
+
+
+  //         activeCollisions.Add(collision.collider); // Add the collider to active collisions
+
+
+  //         if(playerOnThresh)
+  //         {
+  //           velocityLock = false;
+  //         }
+  //         else
+  //         {
+  //           velocityLock = true;
+  //         }
+  //     }
+  // }
+
+  // private ContactQuadrant DetermineContactQuadrant(Vector2 contactPoint, Vector2 center)
+  // {
+  //     // Determine the quadrant in local space
+  //     if (contactPoint.x >= center.x && contactPoint.y >= center.y)
+  //         return ContactQuadrant.TopRight;
+  //     else if (contactPoint.x <= center.x && contactPoint.y >= center.y)
+  //         return ContactQuadrant.TopLeft;
+  //     else if (contactPoint.x <= center.x && contactPoint.y <= center.y)
+  //         return ContactQuadrant.BottomLeft;
+  //     else
+  //         return ContactQuadrant.BottomRight;
+  // }
+
+
+
+
+
+  // private void OnCollisionExit2D(Collision2D collision)
+  //   {
+  //       // Ensure collision is detected by this NPC’s BoxCollider2D and not self-triggered
+  //       if (this.gameObject.CompareTag("Player"))
+  //       {
+  //           activeCollisions.Remove(collision.collider); // Remove the collider from active collisions
+
+  //           // If there are no more active collisions, unlock velocity
+  //           if (activeCollisions.Count == 0)
+  //           {
+  //               velocityLock = false;
+  //           }
+  //       }
+  //   }
+
+  private HashSet<Collider2D> activeCollisions = new HashSet<Collider2D>(); // Keeps track of active collisions
+
+  private void OnCollisionEnter2D(Collision2D collision)
+  {
+      if (this.gameObject.CompareTag("Player"))
+      {
+          // Get the player's box collider (child)
+          BoxCollider2D playerCollider = GetComponentInChildren<BoxCollider2D>();
+
+          // Get bounds and contact point
+          Bounds playerBounds = playerCollider.bounds;
+          Vector2 contactPoint = collision.GetContact(0).point;
+
+          // Transform the contact point and bounds center to the local space of the root GameObject
+          Vector2 localContactPoint = transform.InverseTransformPoint(contactPoint);
+          Vector2 localCenter = transform.InverseTransformPoint(playerBounds.center);
+
+          // Determine quadrant using local space
+          currentContactQuadrant = DetermineContactQuadrant(localContactPoint, localCenter);
+          Debug.Log($"Contact Quadrant: {currentContactQuadrant}, Contact Point (local): {localContactPoint}, Center (local): {localCenter}");
+
+          activeCollisions.Add(collision.collider); // Add the collider to active collisions
+
+          if (playerOnThresh)
+          {
+              velocityLock = false;
+          }
+          else
+          {
+              velocityLock = true;
+          }
+      }
+  }
+
+  private void OnCollisionExit2D(Collision2D collision)
+  {
+      if (this.gameObject.CompareTag("Player"))
+      {
+          activeCollisions.Remove(collision.collider); // Remove the collider from active collisions
+
+          if (activeCollisions.Count > 0)
+          {
+              // Get the first remaining collision to update the quadrant point
+              Collider2D remainingCollider = null;
+              foreach (var col in activeCollisions)
+              {
+                  remainingCollider = col;
+                  break;
+              }
+
+              if (remainingCollider != null)
+              {
+                  // Update the quadrant based on the remaining collider
+                  BoxCollider2D playerCollider = GetComponentInChildren<BoxCollider2D>();
+                  Bounds playerBounds = playerCollider.bounds;
+                  Vector2 newContactPoint = remainingCollider.ClosestPoint(playerBounds.center);
+                  Vector2 localNewContactPoint = transform.InverseTransformPoint(newContactPoint);
+                  Vector2 localCenter = transform.InverseTransformPoint(playerBounds.center);
+
+                  currentContactQuadrant = DetermineContactQuadrant(localNewContactPoint, localCenter);
+                  Debug.Log($"Updated Contact Quadrant: {currentContactQuadrant}");
+              }
+          }
+          else
+          {
+              // No more active collisions, reset the quadrant or unlock velocity
+              currentContactQuadrant = ContactQuadrant.None; // Or some default value
+              Debug.Log("No active collisions. Quadrant reset.");
+              velocityLock = false; // Unlock velocity since there are no collisions
+          }
+      }
+  }
+
+  private ContactQuadrant DetermineContactQuadrant(Vector2 contactPoint, Vector2 center)
+  {
+      // Determine the quadrant in local space
+      if (contactPoint.x >= center.x && contactPoint.y >= center.y)
+          return ContactQuadrant.TopRight;
+      else if (contactPoint.x <= center.x && contactPoint.y >= center.y)
+          return ContactQuadrant.TopLeft;
+      else if (contactPoint.x <= center.x && contactPoint.y <= center.y)
+          return ContactQuadrant.BottomLeft;
+      else
+          return ContactQuadrant.BottomRight;
+  }
+
 
   public void ReverseDirection(bool isTrigger = false)
   {
@@ -677,6 +1060,6 @@ public class CharacterMovement : MonoBehaviour
       {
           CharacterMovement.SetTreeSortingLayer(child.gameObject, sortingLayerName);
       }
-  } 
+  }
 }
 

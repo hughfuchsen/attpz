@@ -48,7 +48,7 @@ public class EdgeTriggerEndHit : MonoBehaviour
     {
         if (other.CompareTag("PlayerCollider"))
         {
-            // playerMovement.ResetPlayerMovement();  // Reset movement restrictions
+            playerMovement.velocityLock = false;  // Reset movement restrictions
 
             if (checkCenterCoroutine != null)
             {
@@ -61,11 +61,19 @@ public class EdgeTriggerEndHit : MonoBehaviour
             // Debug.Log(GetColliderContactPoint(playerCollider));
             
             
-            // Start the coroutine to check if the player is at the center
-            checkCenterCoroutine = StartCoroutine(CheckIfPlayerIsAtCenter());
+            
+            if(!playerMovement.playerOnThresh)
+            {
+                playerMovement.ResetPlayerMovement();  // Reset movement restrictions
 
-            // Handle movement restrictions based on thresholds
-            HandleMovementRestrictions(playerPosition, centerPoint);
+                // Handle movement restrictions based on thresholds
+                HandleMovementRestrictions(playerPosition, centerPoint);
+
+                // Start the coroutine to check if the player is at the center
+                checkCenterCoroutine = StartCoroutine(CheckIfPlayerIsAtCenter());
+
+
+            }
         }
     }
 
@@ -89,7 +97,7 @@ public class EdgeTriggerEndHit : MonoBehaviour
     {
         ContactPoint2D[] contactPoints = new ContactPoint2D[10]; // Increased array size
         int contactCount = playerCollider.GetContacts(contactPoints);
-        Debug.Log(contactCount);
+        // Debug.Log(contactCount);
         if (contactCount > 0)
         {
             // Debug.Log("Contact Point: " + contactPoints[0].point);
@@ -131,13 +139,13 @@ public class EdgeTriggerEndHit : MonoBehaviour
             // Update the player's position during runtime
             playerPosition = (Vector2)player.transform.position + playerOffset;
             float distanceToCenterX = Mathf.Abs(playerPosition.x - centerPoint.x); // Check X distance only
-            Debug.Log("Distance to center (X): " + distanceToCenterX);
-            Debug.Log("Player position: " + playerPosition);
+            // Debug.Log("Distance to center (X): " + distanceToCenterX);
+            // Debug.Log("Player position: " + playerPosition);
 
             if (distanceToCenterX <= centerThreshold)
             {
-                Debug.Log("Player is at the center of the edge collider in X direction.");
-                playerMovement.ResetPlayerMovement(); // Reset restrictions once at center
+                // playerMovement.ResetPlayerMovement(); // Reset restrictions once at center
+                HandleMovementRestrictionsIntoThresh();
                 yield break;
             }
 
@@ -204,7 +212,7 @@ public class EdgeTriggerEndHit : MonoBehaviour
                     playerMovement.controlDirectionToPlayerDirection[Direction.Right] = Direction.RightDown;
                 }
             }
-            else
+            else // is right of centre
             {
                 if (aboveThreshold)
                 {
@@ -222,6 +230,35 @@ public class EdgeTriggerEndHit : MonoBehaviour
                     playerMovement.controlDirectionToPlayerDirection[Direction.UpFacingLeft] = Direction.UpLeft;
                 }
             }
+        }
+    }
+    private void HandleMovementRestrictionsIntoThresh()
+    {
+        if (leftDiagThreshold)
+        {
+            playerMovement.controlDirectionToPlayerDirection[Direction.Left] = Direction.UpLeft;
+            playerMovement.controlDirectionToPlayerDirection[Direction.UpLeft] = Direction.UpLeft;
+            playerMovement.controlDirectionToPlayerDirection[Direction.UpFacingLeft] = Direction.UpLeft;
+            playerMovement.controlDirectionToPlayerDirection[Direction.UpFacingRight] = Direction.UpLeft;
+            // playerMovement.controlDirectionToPlayerDirection[Direction.UpRight] = Direction.UpLeft;
+            playerMovement.controlDirectionToPlayerDirection[Direction.Right] = Direction.RightDown;
+            playerMovement.controlDirectionToPlayerDirection[Direction.RightDown] = Direction.RightDown;
+            playerMovement.controlDirectionToPlayerDirection[Direction.DownFacingRight] = Direction.RightDown;
+            playerMovement.controlDirectionToPlayerDirection[Direction.DownFacingLeft] = Direction.RightDown;
+            // playerMovement.controlDirectionToPlayerDirection[Direction.DownLeft] = Direction.RightDown;
+        }
+        else // right threshold direction
+        {
+            playerMovement.controlDirectionToPlayerDirection[Direction.Left] = Direction.DownLeft;
+            // playerMovement.controlDirectionToPlayerDirection[Direction.UpLeft] = Direction.UpRight;
+            playerMovement.controlDirectionToPlayerDirection[Direction.UpFacingLeft] = Direction.UpRight;
+            playerMovement.controlDirectionToPlayerDirection[Direction.UpFacingRight] = Direction.UpRight;
+            playerMovement.controlDirectionToPlayerDirection[Direction.UpRight] = Direction.UpRight;
+            playerMovement.controlDirectionToPlayerDirection[Direction.Right] = Direction.UpRight;
+            // playerMovement.controlDirectionToPlayerDirection[Direction.RightDown] = Direction.DownLeft;
+            playerMovement.controlDirectionToPlayerDirection[Direction.DownFacingRight] = Direction.DownLeft;
+            playerMovement.controlDirectionToPlayerDirection[Direction.DownFacingLeft] = Direction.DownLeft;
+            playerMovement.controlDirectionToPlayerDirection[Direction.DownLeft] = Direction.DownLeft;
         }
     }
 

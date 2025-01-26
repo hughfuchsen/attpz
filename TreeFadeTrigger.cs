@@ -41,7 +41,7 @@ public class TreeFadeTrigger : MonoBehaviour
       // StopAllCoros();
       setTreeAlpha(objListToFade, fadedAlphaFloatList);
 
-      if(myCharacterMovement.playerOnThresh == false) // if player is not on building threshold
+      if(myCharacterMovement.playerOnBuildingThresh == false) // if player is not on building threshold
       {
         // fadeCoro = StartCoroutine(treeFade(objListToFade, fadedAlphaFloatList));
         setTreeAlpha(objListToFade, fadedAlphaFloatList);
@@ -59,7 +59,7 @@ public class TreeFadeTrigger : MonoBehaviour
     if(other.CompareTag("PlayerCollider"))
     {  
       // StopAllCoros();
-        if(myCharacterMovement.playerOnThresh == false)
+        if(myCharacterMovement.playerOnBuildingThresh == false)
         {
           // fadeCoro = StartCoroutine(treeFade(objListToFade, initialAlphaFloatList));
           setTreeAlpha(objListToFade, initialAlphaFloatList);

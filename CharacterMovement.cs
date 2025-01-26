@@ -35,16 +35,17 @@ public class CharacterMovement : MonoBehaviour
   CharacterMovement myCharacterMovement;
 
   CharacterCustomization characterCustomization;
-  public int movementSpeed = 10;
+  [HideInInspector] public int movementSpeed = 30;
   [HideInInspector] public int initialMovementSpeed;
   [HideInInspector] public Rigidbody2D myRigidbody; 
 
-  public BoxCollider2D boxCollider;
+  [HideInInspector] public BoxCollider2D boxCollider;
 
   [HideInInspector] public string motionDirection = "normal";
   [HideInInspector] public Vector3 change;
 
   [HideInInspector] public bool playerOnThresh = false;
+  [HideInInspector] public bool playerOnBuildingThresh = false;
 
 
   [HideInInspector] public bool fixedDirectionLeftDiagonal;
@@ -69,13 +70,11 @@ public class CharacterMovement : MonoBehaviour
 
   [HideInInspector] public TMP_InputField[] inputFields;
 
-  public GameObject roomToSpawnIn; // The GameObject you want to make the parent of this object
-
   Vector2 previousPosition;
   Vector2 velocity;
 
   // Variable to store the contact quadrant
-  public ContactQuadrant currentContactQuadrant;
+  [HideInInspector] public ContactQuadrant currentContactQuadrant;
 
 
   // Start is called before the first frame update

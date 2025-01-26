@@ -25,7 +25,7 @@ public class BuildingThreshColliderScript : MonoBehaviour
     {
         if(other.CompareTag("PlayerCollider"))
         {
-            characterMovement.playerOnThresh = true;
+            characterMovement.playerOnBuildingThresh = true;
 
             if(rooftopLadder)
             {
@@ -45,7 +45,7 @@ public class BuildingThreshColliderScript : MonoBehaviour
     {
         if(other.CompareTag("PlayerCollider"))
         {
-            characterMovement.playerOnThresh = false;
+            characterMovement.playerOnBuildingThresh = false;
 
             if(!rooftopLadder)
             { 

@@ -62,7 +62,10 @@ public class TreeFadeTrigger : MonoBehaviour
         if(myCharacterMovement.playerOnBuildingThresh == false)
         {
           // fadeCoro = StartCoroutine(treeFade(objListToFade, initialAlphaFloatList));
-          setTreeAlpha(objListToFade, initialAlphaFloatList);
+          if(!myCharacterMovement.playerOnFurniture)
+          {
+            setTreeAlpha(objListToFade, initialAlphaFloatList);
+          }
           obj.tag = "Untagged";
           TagChildrenOfTaggedParents("Untagged");
         }

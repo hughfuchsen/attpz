@@ -12,7 +12,7 @@ public class GateScript : MonoBehaviour
 
 
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         // get the sprites and add them to the -> corresponding lists 
         GetSprites(FindSiblingWithTag("OpenDoor"), openGateSpriteList);
@@ -29,7 +29,7 @@ public class GateScript : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.tag == "Player")
+        if (collision.gameObject.tag == "PlayerCollider")
         {
             for (int i = 0; i < openGateSpriteList.Count; i++)
             {    
@@ -46,7 +46,7 @@ public class GateScript : MonoBehaviour
 
     void OnTriggerExit2D(Collider2D collision)
     {
-        if (collision.gameObject.tag == "Player")
+        if (collision.gameObject.tag == "PlayerCollider")
         {
             for (int i = 0; i < openGateSpriteList.Count; i++)
             {    

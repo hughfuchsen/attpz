@@ -46,6 +46,7 @@ public class CharacterMovement : MonoBehaviour
 
   [HideInInspector] public bool playerOnThresh = false;
   [HideInInspector] public bool playerOnBuildingThresh = false;
+  [HideInInspector] public bool movementAutopilot = false;
 
 
   [HideInInspector] public bool fixedDirectionLeftDiagonal;
@@ -65,7 +66,7 @@ public class CharacterMovement : MonoBehaviour
 
   [HideInInspector] public bool playerIsCustomizing = false;
   [HideInInspector] public bool playerOnFurniture = false;
-  [HideInInspector] public bool velocityLock = false;
+  [HideInInspector] public bool playerTouchingCollider = false;
 
 
   [HideInInspector] public TMP_InputField[] inputFields;
@@ -75,6 +76,9 @@ public class CharacterMovement : MonoBehaviour
 
   // Variable to store the contact quadrant
   [HideInInspector] public ContactQuadrant currentContactQuadrant;
+
+  // Map the angle to control directions
+  Direction controlDirection = Direction.Nothing; // Default value should never be used
 
 
   // Start is called before the first frame update
@@ -107,19 +111,16 @@ public class CharacterMovement : MonoBehaviour
   // Update is called once per frame
   public void Update()
   {
-      // Check if space is released
+    Debug.Log(movementAutopilot);
     if(this.gameObject.tag == "Player")
     {
-      if ((Input.GetKeyUp(KeyCode.Space) || 
-          Input.GetKeyUp(KeyCode.JoystickButton0) ||  // A button
-          Input.GetKeyUp(KeyCode.JoystickButton1) ||  // B button
-          Input.GetKeyUp(KeyCode.JoystickButton2) ||  // X button
-          Input.GetKeyUp(KeyCode.JoystickButton3)))
+      HandleSpaceBarReactivation();
+      if(movementAutopilot == true)
       {
-        spaceBarDeactivated = false;   
+        HandleMovementReactivation();
       }
-
     }
+    
   }
   void FixedUpdate()
     {
@@ -424,7 +425,7 @@ public class CharacterMovement : MonoBehaviour
     // Adjust by 90 degrees to align 0 degrees with "up"
     angle -= 90f;
 
-    // Debug.Log(velocityLock);
+    // Debug.Log(playerTouchingCollider);
 
     // Convert negative angles to positive angles (0 to 360 degrees)
     if (angle < 0) angle += 360;
@@ -469,15 +470,13 @@ public class CharacterMovement : MonoBehaviour
     }
     else
     {
-        // Map the angle to control directions
-        Direction controlDirection = Direction.Left; // Default value should never be used
         if ((angle > 0f && angle <= 22.5f))   
         { 
-          if(currentContactQuadrant == ContactQuadrant.TopRight && velocityLock == true)
+          if(currentContactQuadrant == ContactQuadrant.TopRight && playerTouchingCollider == true)
           {
             controlDirection = Direction.UpLeft; 
           }
-          else if(currentContactQuadrant == ContactQuadrant.TopLeft && velocityLock == true)
+          else if(currentContactQuadrant == ContactQuadrant.TopLeft && playerTouchingCollider == true)
           {
             controlDirection = Direction.UpRight; 
           }
@@ -490,11 +489,21 @@ public class CharacterMovement : MonoBehaviour
                 {
                   if(facingLeft == true)
                   {
-                    if(currentContactQuadrant == ContactQuadrant.TopRight && velocityLock == true)
+                    // if(movementAutopilot == true)
+                    // {
+                    //   HandleAutoPilot();
+                    // }
+                    // else if(activeCollisions.Count > 1 && currentContactQuadrant == ContactQuadrant.TopLeft && playerTouchingCollider == true)
+                    // {
+                    //   controlDirection = Direction.Left;
+                    //   movementAutopilot = true;
+                    // }
+                    // else 
+                    if(currentContactQuadrant == ContactQuadrant.TopRight && playerTouchingCollider == true)
                     {
                       controlDirection = Direction.UpLeft; 
                     }
-                    else if(currentContactQuadrant == ContactQuadrant.TopLeft && velocityLock == true)
+                    else if(currentContactQuadrant == ContactQuadrant.TopLeft && playerTouchingCollider == true)
                     {
                       controlDirection = Direction.UpRight; 
                     }
@@ -505,11 +514,21 @@ public class CharacterMovement : MonoBehaviour
                   }
                   else //facing right
                   {
-                    if(currentContactQuadrant == ContactQuadrant.TopLeft && velocityLock == true)
+                    // if(movementAutopilot == true)
+                    // {
+                    //   HandleAutoPilot();
+                    // }
+                    // else if(activeCollisions.Count > 1 && currentContactQuadrant ==  ContactQuadrant.TopRight && playerTouchingCollider == true)
+                    // {
+                    //   controlDirection = Direction.Right;
+                    //   movementAutopilot = true;
+                    // }
+                    // else 
+                    if(currentContactQuadrant == ContactQuadrant.TopLeft && playerTouchingCollider == true)
                     {
                       controlDirection = Direction.UpRight; 
                     }
-                    else if(currentContactQuadrant == ContactQuadrant.TopRight && velocityLock == true)
+                    else if(currentContactQuadrant == ContactQuadrant.TopRight && playerTouchingCollider == true)
                     {
                       controlDirection = Direction.UpLeft; 
                     }
@@ -522,7 +541,7 @@ public class CharacterMovement : MonoBehaviour
         
         else if (angle > 22.5f && angle <= 67.5f)   
           { 
-            if(currentContactQuadrant == ContactQuadrant.TopLeft && velocityLock == true && playerOnThresh == false)
+            if(currentContactQuadrant == ContactQuadrant.TopLeft && playerTouchingCollider == true && playerOnThresh == false)
             {
               controlDirection = Direction.DownLeft; 
             }
@@ -533,11 +552,19 @@ public class CharacterMovement : MonoBehaviour
           } // Inverted right-up to left-up
         else if (angle > 67.5f && angle <= 112.5f)  
           { 
-            if(currentContactQuadrant == ContactQuadrant.TopLeft && velocityLock == true)
+            // if(activeCollisions.Count > 1 
+            //   && (currentContactQuadrant ==  ContactQuadrant.TopLeft || currentContactQuadrant ==  ContactQuadrant.BottomLeft)
+            //   && playerTouchingCollider == true)
+            // {
+            //   controlDirection = Direction.Nothing;
+            //   movementAutopilot = true;
+            // }
+            // else 
+            if(currentContactQuadrant == ContactQuadrant.TopLeft && playerTouchingCollider == true)
             {
               controlDirection = Direction.DownLeft;
             }
-            else if(currentContactQuadrant == ContactQuadrant.BottomLeft && velocityLock == true)
+            else if(currentContactQuadrant == ContactQuadrant.BottomLeft && playerTouchingCollider == true)
             {
               controlDirection = Direction.UpLeft;
             }
@@ -548,7 +575,7 @@ public class CharacterMovement : MonoBehaviour
           } // Inverted right to left
         else if (angle > 112.5f && angle <= 157.5f) 
         { 
-          if(currentContactQuadrant == ContactQuadrant.BottomLeft && velocityLock == true)
+          if(currentContactQuadrant == ContactQuadrant.BottomLeft && playerTouchingCollider == true)
           {
             controlDirection = Direction.UpLeft; 
           }
@@ -559,11 +586,11 @@ public class CharacterMovement : MonoBehaviour
         } // Inverted right-down to left-down
         else if (angle > 157.5f && angle < 180f)   
         { 
-          if(currentContactQuadrant == ContactQuadrant.BottomRight && velocityLock == true)
+          if(currentContactQuadrant == ContactQuadrant.BottomRight && playerTouchingCollider == true)
           {
             controlDirection = Direction.DownLeft; 
           }
-          else if(currentContactQuadrant == ContactQuadrant.BottomLeft && velocityLock == true)
+          else if(currentContactQuadrant == ContactQuadrant.BottomLeft && playerTouchingCollider == true)
           {
             controlDirection = Direction.RightDown; 
           }
@@ -576,11 +603,17 @@ public class CharacterMovement : MonoBehaviour
           {
             if(facingLeft == true)
             {
-              if(currentContactQuadrant == ContactQuadrant.BottomRight && velocityLock == true)
+              // if(activeCollisions.Count > 1 && currentContactQuadrant ==  ContactQuadrant.BottomLeft && playerTouchingCollider == true)
+              // {
+              //   controlDirection = Direction.Nothing;
+              //   movementAutopilot = true;
+              // }
+              // else 
+              if(currentContactQuadrant == ContactQuadrant.BottomRight && playerTouchingCollider == true)
               {
                 controlDirection = Direction.DownLeft; 
               }
-              else if(currentContactQuadrant == ContactQuadrant.BottomLeft && velocityLock == true)
+              else if(currentContactQuadrant == ContactQuadrant.BottomLeft && playerTouchingCollider == true)
               {
                 controlDirection = Direction.RightDown; 
               }
@@ -591,11 +624,17 @@ public class CharacterMovement : MonoBehaviour
             }
             else
             {
-              if(currentContactQuadrant == ContactQuadrant.BottomLeft && velocityLock == true)
+              // if(activeCollisions.Count > 1 && currentContactQuadrant ==  ContactQuadrant.BottomRight && playerTouchingCollider == true)
+              // {
+              //   controlDirection = Direction.Nothing;
+              //   movementAutopilot = true;
+              // }
+              // else 
+              if(currentContactQuadrant == ContactQuadrant.BottomLeft && playerTouchingCollider == true)
               {
                 controlDirection = Direction.RightDown; 
               }
-              else if(currentContactQuadrant == ContactQuadrant.BottomRight && velocityLock == true)
+              else if(currentContactQuadrant == ContactQuadrant.BottomRight && playerTouchingCollider == true)
               {
                 controlDirection = Direction.DownLeft; 
               }
@@ -607,11 +646,11 @@ public class CharacterMovement : MonoBehaviour
           }
         else if (angle > 180f && angle <= 202.5f)   
         { 
-          if(currentContactQuadrant == ContactQuadrant.BottomLeft && velocityLock == true)
+          if(currentContactQuadrant == ContactQuadrant.BottomLeft && playerTouchingCollider == true)
           {
             controlDirection = Direction.RightDown; 
           }
-          else if(currentContactQuadrant == ContactQuadrant.BottomRight && velocityLock == true)
+          else if(currentContactQuadrant == ContactQuadrant.BottomRight && playerTouchingCollider == true)
           {
             controlDirection = Direction.DownLeft; 
           }
@@ -622,7 +661,7 @@ public class CharacterMovement : MonoBehaviour
         } // Down
         else if (angle > 202.5f && angle <= 247.5f) 
         { 
-          if(currentContactQuadrant == ContactQuadrant.BottomRight && velocityLock == true)
+          if(currentContactQuadrant == ContactQuadrant.BottomRight && playerTouchingCollider == true)
           {
             controlDirection = Direction.UpRight; 
           }
@@ -633,11 +672,19 @@ public class CharacterMovement : MonoBehaviour
         }  // Inverted left-down to right-down
         else if (angle > 247.5f && angle <= 292.5f) 
         { 
-          if(currentContactQuadrant == ContactQuadrant.TopRight && velocityLock == true)
+          // if(activeCollisions.Count > 1 
+          //     && (currentContactQuadrant ==  ContactQuadrant.TopRight || currentContactQuadrant ==  ContactQuadrant.BottomRight)
+          //     && playerTouchingCollider == true)
+          // {
+          //   controlDirection = Direction.Nothing;
+          //   movementAutopilot = true;
+          // }
+          // else 
+          if(currentContactQuadrant == ContactQuadrant.TopRight && playerTouchingCollider == true)
           {
             controlDirection = Direction.RightDown;
           }
-          else if(currentContactQuadrant == ContactQuadrant.BottomRight && velocityLock == true)
+          else if(currentContactQuadrant == ContactQuadrant.BottomRight && playerTouchingCollider == true)
           {
             controlDirection = Direction.UpRight;
           }
@@ -648,7 +695,7 @@ public class CharacterMovement : MonoBehaviour
         } // Inverted left to right
         else if (angle > 292.5f && angle <= 337.5f) 
         { 
-          if(currentContactQuadrant == ContactQuadrant.TopRight && velocityLock == true && playerOnThresh == false)
+          if(currentContactQuadrant == ContactQuadrant.TopRight && playerTouchingCollider == true && playerOnThresh == false)
           {
             controlDirection = Direction.RightDown; 
           }
@@ -659,11 +706,11 @@ public class CharacterMovement : MonoBehaviour
         }  // Inverted left-up to right-up
         else if ((angle > 337.5f && angle <= 360f)) 
         { 
-          if(currentContactQuadrant == ContactQuadrant.TopLeft && velocityLock == true)
+          if(currentContactQuadrant == ContactQuadrant.TopLeft && playerTouchingCollider == true)
           {
             controlDirection = Direction.UpRight; 
           }
-          else if(currentContactQuadrant == ContactQuadrant.TopRight && velocityLock == true)
+          else if(currentContactQuadrant == ContactQuadrant.TopRight && playerTouchingCollider == true)
           {
             controlDirection = Direction.UpLeft; 
           }
@@ -765,22 +812,22 @@ public class CharacterMovement : MonoBehaviour
   //     else if (this.gameObject.CompareTag("Player"))
   //     {
   //         // Get the player's box collider (child)
-  //         BoxCollider2D playerCollider = GetComponentInChildren<BoxCollider2D>();
-  //         if (playerCollider == null)
+  //         BoxCollider2D boxCollider = GetComponentInChildren<BoxCollider2D>();
+  //         if (boxCollider == null)
   //         {
   //             Debug.LogError("Player BoxCollider2D not found in child objects!");
   //             return;
   //         }
 
   //         // Get bounds and contact point relative to the player's box collider
-  //         Bounds playerBounds = playerCollider.bounds;
+  //         Bounds playerBounds = boxCollider.bounds;
   //         Vector2 contactPoint = collision.GetContact(0).point;
 
   //         // Determine quadrant based on the player's box collider
   //         currentContactQuadrant = DetermineContactQuadrant(contactPoint, playerBounds);
   //         Debug.Log("Contact Quadrant: " + currentContactQuadrant);
 
-  //         velocityLock = true;
+  //         playerTouchingCollider = true;
   //     }
   // }
 
@@ -819,10 +866,10 @@ public class CharacterMovement : MonoBehaviour
   //     else if (this.gameObject.CompareTag("Player"))
   //     {
   //         // Get the player's box collider (child)
-  //         BoxCollider2D playerCollider = GetComponentInChildren<BoxCollider2D>();
+  //         BoxCollider2D boxCollider = GetComponentInChildren<BoxCollider2D>();
 
   //         // Get bounds and contact point
-  //         Bounds playerBounds = playerCollider.bounds;
+  //         Bounds playerBounds = boxCollider.bounds;
   //         Vector2 contactPoint = collision.GetContact(0).point;
 
 
@@ -840,11 +887,11 @@ public class CharacterMovement : MonoBehaviour
 
   //         if(playerOnThresh)
   //         {
-  //           velocityLock = false;
+  //           playerTouchingCollider = false;
   //         }
   //         else
   //         {
-  //           velocityLock = true;
+  //           playerTouchingCollider = true;
   //         }
   //     }
   // }
@@ -876,41 +923,45 @@ public class CharacterMovement : MonoBehaviour
   //           // If there are no more active collisions, unlock velocity
   //           if (activeCollisions.Count == 0)
   //           {
-  //               velocityLock = false;
+  //               playerTouchingCollider = false;
   //           }
   //       }
   //   }
 
   private HashSet<Collider2D> activeCollisions = new HashSet<Collider2D>(); // Keeps track of active collisions
 
+  private ContactQuadrant lastContactQuadrant = ContactQuadrant.None;
+
   private void OnCollisionEnter2D(Collision2D collision)
   {
       if (this.gameObject.CompareTag("Player"))
       {
           // Get the player's box collider (child)
-          BoxCollider2D playerCollider = GetComponentInChildren<BoxCollider2D>();
 
           // Get bounds and contact point
-          Bounds playerBounds = playerCollider.bounds;
+          Bounds playerBounds = boxCollider.bounds;
           Vector2 contactPoint = collision.GetContact(0).point;
 
           // Transform the contact point and bounds center to the local space of the root GameObject
           Vector2 localContactPoint = transform.InverseTransformPoint(contactPoint);
           Vector2 localCenter = transform.InverseTransformPoint(playerBounds.center);
 
+          // Update the lastContactQuadrant
+          lastContactQuadrant = currentContactQuadrant;
+
           // Determine quadrant using local space
           currentContactQuadrant = DetermineContactQuadrant(localContactPoint, localCenter);
-          Debug.Log($"Contact Quadrant: {currentContactQuadrant}, Contact Point (local): {localContactPoint}, Center (local): {localCenter}");
+          // Debug.Log($"Contact Quadrant: {currentContactQuadrant}, Contact Point (local): {localContactPoint}, Center (local): {localCenter}");
 
           activeCollisions.Add(collision.collider); // Add the collider to active collisions
 
           if (playerOnThresh)
           {
-              velocityLock = false;
+              playerTouchingCollider = false;
           }
           else
           {
-              velocityLock = true;
+              playerTouchingCollider = true;
           }
       }
   }
@@ -919,11 +970,10 @@ public class CharacterMovement : MonoBehaviour
   {
       if (this.gameObject.CompareTag("Player"))
       {
-          activeCollisions.Remove(collision.collider); // Remove the collider from active collisions
+          activeCollisions.Remove(collision.collider);
 
           if (activeCollisions.Count > 0)
           {
-              // Get the first remaining collision to update the quadrant point
               Collider2D remainingCollider = null;
               foreach (var col in activeCollisions)
               {
@@ -933,26 +983,23 @@ public class CharacterMovement : MonoBehaviour
 
               if (remainingCollider != null)
               {
-                  // Update the quadrant based on the remaining collider
-                  BoxCollider2D playerCollider = GetComponentInChildren<BoxCollider2D>();
-                  Bounds playerBounds = playerCollider.bounds;
+                  Bounds playerBounds = boxCollider.bounds;
                   Vector2 newContactPoint = remainingCollider.ClosestPoint(playerBounds.center);
                   Vector2 localNewContactPoint = transform.InverseTransformPoint(newContactPoint);
                   Vector2 localCenter = transform.InverseTransformPoint(playerBounds.center);
 
                   currentContactQuadrant = DetermineContactQuadrant(localNewContactPoint, localCenter);
-                  Debug.Log($"Updated Contact Quadrant: {currentContactQuadrant}");
               }
           }
           else
           {
-              // No more active collisions, reset the quadrant or unlock velocity
-              currentContactQuadrant = ContactQuadrant.None; // Or some default value
-              Debug.Log("No active collisions. Quadrant reset.");
-              velocityLock = false; // Unlock velocity since there are no collisions
+              // No more active collisions
+              // currentContactQuadrant = ContactQuadrant.None;
+              playerTouchingCollider = false;
           }
       }
   }
+
 
   private ContactQuadrant DetermineContactQuadrant(Vector2 contactPoint, Vector2 center)
   {
@@ -1060,5 +1107,254 @@ public class CharacterMovement : MonoBehaviour
           CharacterMovement.SetTreeSortingLayer(child.gameObject, sortingLayerName);
       }
   }
+  private Vector2 previousJoystickDirection;
+  public void HandleMovementReactivation()
+  {
+    // Detect keyboard input
+    if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.LeftArrow) || 
+        Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.RightArrow) ||
+        Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.A) || 
+        Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.D))
+    {
+        movementAutopilot = false;
+    }
+
+    // Detect joystick direction change
+    Vector2 currentJoystickDirection = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+
+    if (currentJoystickDirection != previousJoystickDirection && currentJoystickDirection.magnitude > 0.1f)
+    {
+      movementAutopilot = false;
+    }
+
+    // Update the previous joystick direction
+    previousJoystickDirection = currentJoystickDirection; 
+  }
+  public void HandleSpaceBarReactivation()
+  {
+    if ((Input.GetKeyUp(KeyCode.Space) || 
+        Input.GetKeyUp(KeyCode.JoystickButton0) ||  // A button
+        Input.GetKeyUp(KeyCode.JoystickButton1) ||  // B button
+        Input.GetKeyUp(KeyCode.JoystickButton2) ||  // X button
+        Input.GetKeyUp(KeyCode.JoystickButton3)))
+    {
+      spaceBarDeactivated = false;   
+    }
+  }
+
+  // public void HandleAutoPilot()
+  // {
+  //   Debug.Log("handling");
+  //   if(activeCollisions.Count > 0)
+  //   {
+  //     // Direction controlDirection = Direction.Nothing; // Default value should never be used
+  //     if(controlDirection == Direction.Left)
+  //     {
+  //             if(currentContactQuadrant == ContactQuadrant.TopLeft)
+  //             {
+  //               controlDirection = Direction.DownLeft;
+  //             }
+  //             else if(currentContactQuadrant == ContactQuadrant.BottomLeft)
+  //             {
+  //               controlDirection = Direction.UpLeft;
+  //             }
+  //     }
+  //     else if (controlDirection == Direction.DownLeft)
+  //     {
+  //             if(currentContactQuadrant == ContactQuadrant.TopLeft)
+  //             {
+  //               controlDirection = Direction.DownLeft;
+  //             }
+  //             else if(currentContactQuadrant == ContactQuadrant.BottomLeft)
+  //             {
+  //               controlDirection = Direction.Left;
+  //             }
+  //     }
+  //     else if (controlDirection == Direction.DownFacingLeft)
+  //     {
+  //             if(currentContactQuadrant == ContactQuadrant.BottomLeft)
+  //             {
+  //               controlDirection = Direction.RightDown;
+  //             }
+  //             else if(currentContactQuadrant == ContactQuadrant.BottomRight)
+  //             {
+  //               controlDirection = Direction.DownLeft;
+  //             }
+  //     }
+  //     else if (controlDirection == Direction.DownFacingRight)
+  //     {
+  //             if(currentContactQuadrant == ContactQuadrant.BottomLeft)
+  //             {
+  //               controlDirection = Direction.RightDown;
+  //             }
+  //             else if(currentContactQuadrant == ContactQuadrant.BottomRight)
+  //             {
+  //               controlDirection = Direction.DownLeft;
+  //             }
+  //     }
+  //     else if (controlDirection == Direction.RightDown)
+  //     {
+  //             if(currentContactQuadrant == ContactQuadrant.BottomRight)
+  //             {
+  //               controlDirection = Direction.Right;
+  //             }
+  //             else if(currentContactQuadrant == ContactQuadrant.TopRight)
+  //             {
+  //               controlDirection = Direction.UpFacingRight;
+  //             }
+  //     }
+  //     else if (controlDirection == Direction.Right)
+  //     {
+  //             if(currentContactQuadrant == ContactQuadrant.BottomRight)
+  //             {
+  //               controlDirection = Direction.UpRight;
+  //             }
+  //             else if(currentContactQuadrant == ContactQuadrant.TopRight)
+  //             {
+  //               controlDirection = Direction.RightDown;
+  //             }
+  //     }
+  //     else if (controlDirection == Direction.UpRight)
+  //     {
+  //             if(currentContactQuadrant == ContactQuadrant.TopRight)
+  //             {
+  //               controlDirection = Direction.UpFacingRight;
+  //             }
+  //             else if(currentContactQuadrant == ContactQuadrant.TopLeft)
+  //             {
+  //               controlDirection = Direction.Left;
+  //             }
+  //     }
+  //     else if (controlDirection == Direction.UpFacingRight)
+  //     {
+  //             if(currentContactQuadrant == ContactQuadrant.TopRight)
+  //             {
+  //               controlDirection = Direction.UpFacingLeft;
+  //             }
+  //             else if(currentContactQuadrant == ContactQuadrant.TopLeft)
+  //             {
+  //               controlDirection = Direction.UpLeft;
+  //             }
+  //     }
+  //     else if (controlDirection == Direction.UpFacingLeft)
+  //     {
+  //             if(currentContactQuadrant == ContactQuadrant.TopRight)
+  //             {
+  //               controlDirection = Direction.UpLeft;
+  //             }
+  //             else if(currentContactQuadrant == ContactQuadrant.TopLeft)
+  //             {
+  //               controlDirection = Direction.UpFacingRight;
+  //             }
+  //     }
+  //     else if (controlDirection == Direction.UpLeft)
+  //     {
+  //             if(currentContactQuadrant == ContactQuadrant.TopRight)
+  //             {
+  //               controlDirection = Direction.UpLeft;
+  //             }
+  //             else if(currentContactQuadrant == ContactQuadrant.TopLeft)
+  //             {
+  //               controlDirection = Direction.UpFacingRight;
+  //             }
+  //     }
+  //   }
+  //   else if(activeCollisions.Count < 1)
+  //   {
+  //     Debug.Log(currentContactQuadrant);
+  //     if(controlDirection == Direction.Left)
+  //     {
+  //             controlDirection = Direction.UpLeft;
+  //     }
+  //     else 
+  //     if (controlDirection == Direction.DownLeft)
+  //     {
+  //             if(currentContactQuadrant == ContactQuadrant.TopLeft)
+  //             {
+  //               controlDirection = Direction.Left;
+  //             }
+  //             else if(lastContactQuadrant == ContactQuadrant.BottomRight)
+  //             {
+
+  //             }
+  //     }
+  //     // else if (controlDirection == Direction.DownFacingLeft)
+  //     // {
+  //     //         if(currentContactQuadrant == ContactQuadrant.BottomLeft)
+  //     //         {
+  //     //           controlDirection = Direction.RightDown;
+  //     //         }
+  //     //         else if(currentContactQuadrant == ContactQuadrant.BottomRight)
+  //     //         {
+  //     //           controlDirection = Direction.DownLeft;
+  //     //         }
+  //     // }
+  //     // else if (controlDirection == Direction.DownFacingRight)
+  //     // {
+  //     //         if(currentContactQuadrant == ContactQuadrant.BottomLeft)
+  //     //         {
+  //     //           controlDirection = Direction.RightDown;
+  //     //         }
+  //     //         else if(currentContactQuadrant == ContactQuadrant.BottomRight)
+  //     //         {
+  //     //           controlDirection = Direction.DownLeft;
+  //     //         }
+  //     // }
+  //     else if (controlDirection == Direction.RightDown)
+  //     { 
+  //             // if(lastContactQuadrant == ContactQuadrant.)
+  //               controlDirection = Direction.UpRight;
+  //     }
+  //     else if (controlDirection == Direction.Right)
+  //     {
+  //             if(currentContactQuadrant == ContactQuadrant.BottomRight)
+  //             {
+  //               controlDirection = Direction.UpRight;
+  //             }
+  //             else if(currentContactQuadrant == ContactQuadrant.TopRight)
+  //             {
+  //               controlDirection = Direction.RightDown;
+  //             }
+  //     }
+  //     else if (controlDirection == Direction.UpRight)
+  //     {
+  //             // controlDirection = Direction.
+  //     }
+  //     else if (controlDirection == Direction.UpFacingRight)
+  //     {
+  //             if(currentContactQuadrant == ContactQuadrant.TopRight)
+  //             {
+  //               controlDirection = Direction.UpFacingLeft;
+  //             }
+  //             else if(currentContactQuadrant == ContactQuadrant.TopLeft)
+  //             {
+  //               controlDirection = Direction.UpLeft;
+  //             }
+  //     }
+  //     else if (controlDirection == Direction.UpFacingLeft)
+  //     {
+  //             if(currentContactQuadrant == ContactQuadrant.TopRight)
+  //             {
+  //               controlDirection = Direction.UpLeft;
+  //             }
+  //             else if(currentContactQuadrant == ContactQuadrant.TopLeft)
+  //             {
+  //               controlDirection = Direction.UpFacingRight;
+  //             }
+  //     }
+  //     else if (controlDirection == Direction.UpLeft)
+  //     {
+  //             if(currentContactQuadrant == ContactQuadrant.TopRight)
+  //             {
+  //               controlDirection = Direction.UpFacingLeft;
+  //             }
+  //             else if(currentContactQuadrant == ContactQuadrant.TopLeft)
+  //             {
+  //               controlDirection = Direction.UpFacingRight;
+  //             }
+  //     }
+  //   }
+  // }
+  
 }
 

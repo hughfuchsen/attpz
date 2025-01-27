@@ -146,7 +146,6 @@ public class FurnitureScript : MonoBehaviour
 
             case FacingDirection.UpRight:
                 characterAnimation.currentAnimationDirection = characterAnimation.upRightAnim;
-                Debug.Log("UpRight");
                 break;
 
             case FacingDirection.DownLeft:

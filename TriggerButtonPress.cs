@@ -52,40 +52,66 @@ public class TriggerButtonPress : MonoBehaviour
         }  
     }
 
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        time = 1f;  // Reset time when entering the trigger
+
+        // if(!isOutside)
+        // {
+        //     if (other.CompareTag("PlayerCollider") && !myCharacterMovement.playerIsOutside)
+        //     {
+        //         for (int i = 0; i < vSprites.Count; i++)
+        //         {
+        //             SetVValue(vSprites[i], 0.01f);
+        //         }
+        //     }
+        // }
+    }
+
     private void OnTriggerStay2D(Collider2D other)
     {
         if(!isOutside)
         {
             if (other.CompareTag("PlayerCollider") && !myCharacterMovement.playerIsOutside)
-            {
-                OscillateVValue();
-
-                if (Input.GetKey(KeyCode.Space))
+            { 
+                if(!myCharacterMovement.playerOnThresh)
                 {
-                    for (int i = 0; i < sprites.Count; i++)
+                    OscillateVValue();
+
+                    if (Input.GetKey(KeyCode.Space))
                     {
-                        SetAlpha(sprites[i], 1);
-                    }
+                        for (int i = 0; i < sprites.Count; i++)
+                        {
+                            SetAlpha(sprites[i], 1);
+                        }
 
-                    for (int i = 0; i < myCharacterAnimation.characterSpriteList.Count; i++)
-                    {            
-                        myCharacterAnimation.SetAlpha(myCharacterAnimation.characterSpriteList[i], 0.15f);
-                    }
+                        for (int i = 0; i < myCharacterAnimation.characterSpriteList.Count; i++)
+                        {            
+                            myCharacterAnimation.SetAlpha(myCharacterAnimation.characterSpriteList[i], 0.15f);
+                        }
 
-                    spacebarReleased = false; // Spacebar is being held down
+                        spacebarReleased = false; // Spacebar is being held down
+                    }
+                    else if (!Input.GetKey(KeyCode.Space) && !spacebarReleased) // Check if spacebar was released
+                    {
+                        for (int i = 0; i < sprites.Count; i++)
+                        {
+                            SetAlpha(sprites[i], 0); // Reset alpha value to 0
+                        }
+                        for (int i = 0; i < myCharacterAnimation.characterSpriteList.Count; i++)
+                        {            
+                            myCharacterAnimation.SetAlpha(myCharacterAnimation.characterSpriteList[i], myCharacterAnimation.initialChrctrColorList[i].a);
+                        }
+
+                        spacebarReleased = true; // Spacebar is released
+                    }
                 }
-                else if (!Input.GetKey(KeyCode.Space) && !spacebarReleased) // Check if spacebar was released
+                else if(myCharacterMovement.playerOnThresh)
                 {
-                    for (int i = 0; i < sprites.Count; i++)
+                    for (int i = 0; i < vSprites.Count; i++)
                     {
-                        SetAlpha(sprites[i], 0); // Reset alpha value to 0
-                    }
-                    for (int i = 0; i < myCharacterAnimation.characterSpriteList.Count; i++)
-                    {            
-                        myCharacterAnimation.SetAlpha(myCharacterAnimation.characterSpriteList[i], myCharacterAnimation.initialChrctrColorList[i].a);
-                    }
-
-                    spacebarReleased = true; // Spacebar is released
+                        SetColor(vSprites[i], initialVValue[i]);
+                    }  
                 }
             }
         }

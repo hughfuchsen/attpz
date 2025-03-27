@@ -266,55 +266,7 @@ public class CharacterMovement : MonoBehaviour
 
     characterAnimation.Animate(characterAnimation.movementStartIndex, characterAnimation.movementFrameCount, characterAnimation.currentAnimationDirection, characterAnimation.bodyTypeNumber);
     myRigidbody.MovePosition(transform.position + change * movementSpeed * Time.deltaTime);    
-    
-    // if(!fixedDirectionRightDiagonal)
-    // {
-    //   if (change == Vector3.right+Vector3.up)   { change = new Vector3(0.7f,1f,0f); characterAnimation.Animate(characterAnimation.movementStartIndex, characterAnimation.movementFrameCount, characterAnimation.upRightAnim, characterAnimation.bodyTypeNumber); }
-    //   if (change == Vector3.left+Vector3.up)    { change = new Vector3(-1f,0.5f,0f); characterAnimation.Animate(characterAnimation.movementStartIndex, characterAnimation.movementFrameCount, characterAnimation.upLeftAnim, characterAnimation.bodyTypeNumber);}
-    //   if (change == Vector3.up)                 { change = new Vector3(-1f,0.5f,0f); characterAnimation.Animate(characterAnimation.movementStartIndex, characterAnimation.movementFrameCount, characterAnimation.upLeftAnim, characterAnimation.bodyTypeNumber);}
-    //   if (change == Vector3.right)              { change = new Vector3(0.7f,1f,0f); characterAnimation.Animate(characterAnimation.movementStartIndex, characterAnimation.movementFrameCount, characterAnimation.upRightAnim, characterAnimation.bodyTypeNumber);}
-    //   if (change == Vector3.right+Vector3.down) { change = new Vector3(0.7f,-1f,0f); characterAnimation.Animate(characterAnimation.movementStartIndex, characterAnimation.movementFrameCount, characterAnimation.rightDownAnim, characterAnimation.bodyTypeNumber);}
-    //   if (change == Vector3.left+Vector3.down)  { change = new Vector3(-0.7f,-1f,0f); characterAnimation.Animate(characterAnimation.movementStartIndex, characterAnimation.movementFrameCount, characterAnimation.leftDownAnim, characterAnimation.bodyTypeNumber);}
-    //   if (change == Vector3.down)               { change = new Vector3(1f,-0.5f,0f); characterAnimation.Animate(characterAnimation.movementStartIndex, characterAnimation.movementFrameCount, characterAnimation.rightDownAnim, characterAnimation.bodyTypeNumber);}
-    //   if (change == Vector3.left)               { change = new Vector3(-0.7f,-1f,0f); characterAnimation.Animate(characterAnimation.movementStartIndex, characterAnimation.movementFrameCount, characterAnimation.leftAnim, characterAnimation.bodyTypeNumber);}
 
-
-    //   // if (change == Vector3.right+Vector3.up)   { change = new Vector3(0.7f,1f,0f); }
-    //   // if (change == Vector3.left+Vector3.up)    { change = new Vector3(-1f,0.5f,0f); }
-    //   // if (change == Vector3.up)                 { change = new Vector3(-1f,0.5f,0f); }
-    //   // if (change == Vector3.right)              { change = new Vector3(0.7f,1f,0f); }
-    //   // if (change == Vector3.right+Vector3.down) { change = new Vector3(0.7f,-1f,0f); }
-    //   // if (change == Vector3.left+Vector3.down)  { change = new Vector3(-0.7f,-1f,0f); }
-    //   // if (change == Vector3.down)               { change = new Vector3(1f,-0.5f,0f); }
-    //   // if (change == Vector3.left)               { change = new Vector3(-0.7f,-1f,0f);}
-    //   myRigidbody.MovePosition(transform.position + change * movementSpeed * Time.deltaTime);
-      
-    // }
-    // else
-    // {
-    //   if (change == Vector3.right+Vector3.up)   { change = new Vector3(0.7f,1f,0f); AnimateMovement(movementStartIndex, movementFrameCount, upRightAnim, bodyTypeNumber); }
-    //   if (change == Vector3.left+Vector3.up)    { change = new Vector3(-1f,0.5f,0f); AnimateMovement(movementStartIndex, movementFrameCount, upLeftAnim, bodyTypeNumber);}
-    //   if (change == Vector3.up)                 { change = new Vector3(-1f,0.5f,0f); AnimateMovement(movementStartIndex, movementFrameCount, upLeftAnim, bodyTypeNumber);}
-    //   if (change == Vector3.right)              { change = new Vector3(0.7f,1f,0f); AnimateMovement(movementStartIndex, movementFrameCount, upRightAnim, bodyTypeNumber);}
-    //   if (change == Vector3.right+Vector3.down) { change = new Vector3(1f,-0.5f,0f); AnimateMovement(movementStartIndex, movementFrameCount, rightDownAnim, bodyTypeNumber);}
-    //   if (change == Vector3.left+Vector3.down)  { change = new Vector3(-0.7f,-1f,0f); AnimateMovement(movementStartIndex, movementFrameCount, leftDownAnim, bodyTypeNumber);}
-    //   if (change == Vector3.down)               { change = new Vector3(1f,-0.5f,0f); AnimateMovement(movementStartIndex, movementFrameCount, rightDownAnim, bodyTypeNumber);}
-    //   if (change == Vector3.left)               { change = new Vector3(-0.7f,-1f,0f); AnimateMovement(movementStartIndex, movementFrameCount, leftAnim, bodyTypeNumber);}
-
-
-
-
-    //   // if (change == Vector3.right+Vector3.up)   { change = new Vector3(0.7f,1f,0f); }
-    //   // if (change == Vector3.left+Vector3.up)    { change = new Vector3(0f,0f,0f); }
-    //   // if (change == Vector3.up)                 { change = new Vector3(0f,0f,0f); }
-    //   // if (change == Vector3.right)              { change = new Vector3(0.7f,1f,0f); }
-    //   // if (change == Vector3.right+Vector3.down) { change = new Vector3(0f,0f,0f); }
-    //   // if (change == Vector3.left+Vector3.down)  { change = new Vector3(-0.7f,-1f,0f); }
-    //   // if (change == Vector3.down)               { change = new Vector3(0f,0f,0f); }
-    //   // if (change == Vector3.left)               { change = new Vector3(-0.7f,-1f,0f); }
-    //   myRigidbody.MovePosition(transform.position + change * movementSpeed * Time.deltaTime);
-      
-    // }
   }
   void MoveCharacterVerticalInclineLeftToward()
   {
@@ -472,264 +424,152 @@ public class CharacterMovement : MonoBehaviour
     {
         if ((angle > 0f && angle <= 22.5f))   
         { 
-          if(currentContactQuadrant == ContactQuadrant.TopRight && playerTouchingCollider == true)
-          {
-            controlDirection = Direction.UpLeft; 
-          }
-          else if(currentContactQuadrant == ContactQuadrant.TopLeft && playerTouchingCollider == true)
-          {
-            controlDirection = Direction.UpRight; 
-          }
-          else
-          {
-            controlDirection = Direction.UpFacingLeft;
-          }        
+          controlDirection = Direction.UpFacingLeft;
         } // Up
         else if ((angle == 0f))   
-                {
-                  if(facingLeft == true)
-                  {
-                    // if(movementAutopilot == true)
-                    // {
-                    //   HandleAutoPilot();
-                    // }
-                    // else if(activeCollisions.Count > 1 && currentContactQuadrant == ContactQuadrant.TopLeft && playerTouchingCollider == true)
-                    // {
-                    //   controlDirection = Direction.Left;
-                    //   movementAutopilot = true;
-                    // }
-                    // else 
-                    if(currentContactQuadrant == ContactQuadrant.TopRight && playerTouchingCollider == true)
-                    {
-                      controlDirection = Direction.UpLeft; 
-                    }
-                    else if(currentContactQuadrant == ContactQuadrant.TopLeft && playerTouchingCollider == true)
-                    {
-                      controlDirection = Direction.UpRight; 
-                    }
-                    else
-                    {
-                      controlDirection = Direction.UpFacingLeft;
-                    }
-                  }
-                  else //facing right
-                  {
-                    // if(movementAutopilot == true)
-                    // {
-                    //   HandleAutoPilot();
-                    // }
-                    // else if(activeCollisions.Count > 1 && currentContactQuadrant ==  ContactQuadrant.TopRight && playerTouchingCollider == true)
-                    // {
-                    //   controlDirection = Direction.Right;
-                    //   movementAutopilot = true;
-                    // }
-                    // else 
-                    if(currentContactQuadrant == ContactQuadrant.TopLeft && playerTouchingCollider == true)
-                    {
-                      controlDirection = Direction.UpRight; 
-                    }
-                    else if(currentContactQuadrant == ContactQuadrant.TopRight && playerTouchingCollider == true)
-                    {
-                      controlDirection = Direction.UpLeft; 
-                    }
-                    else
-                    {
-                      controlDirection = Direction.UpFacingRight;
-                    }                  
-                  }
-                }
-        
+        {
+          if(facingLeft == true)
+          {
+              controlDirection = Direction.UpFacingLeft;
+          }
+          else //facing right
+          {
+              controlDirection = Direction.UpFacingRight;
+          }
+        }
         else if (angle > 22.5f && angle <= 67.5f)   
           { 
-            if(currentContactQuadrant == ContactQuadrant.TopLeft && playerTouchingCollider == true && playerOnThresh == false)
-            {
-              controlDirection = Direction.DownLeft; 
-            }
-            else
-            {
-              controlDirection = Direction.UpLeft; 
-            }
+            controlDirection = Direction.UpLeft; 
           } // Inverted right-up to left-up
         else if (angle > 67.5f && angle <= 112.5f)  
           { 
-            // if(activeCollisions.Count > 1 
-            //   && (currentContactQuadrant ==  ContactQuadrant.TopLeft || currentContactQuadrant ==  ContactQuadrant.BottomLeft)
-            //   && playerTouchingCollider == true)
-            // {
-            //   controlDirection = Direction.Nothing;
-            //   movementAutopilot = true;
-            // }
-            // else 
-            if(currentContactQuadrant == ContactQuadrant.TopLeft && playerTouchingCollider == true)
-            {
-              controlDirection = Direction.DownLeft;
-            }
-            else if(currentContactQuadrant == ContactQuadrant.BottomLeft && playerTouchingCollider == true)
-            {
-              controlDirection = Direction.UpLeft;
-            }
-            else
-            {
-              controlDirection = Direction.Left; 
-            }
+            controlDirection = Direction.Left; 
           } // Inverted right to left
         else if (angle > 112.5f && angle <= 157.5f) 
         { 
-          if(currentContactQuadrant == ContactQuadrant.BottomLeft && playerTouchingCollider == true)
-          {
-            controlDirection = Direction.UpLeft; 
-          }
-          else
-          {
-            controlDirection = Direction.DownLeft; 
-          }
+          controlDirection = Direction.DownLeft; 
         } // Inverted right-down to left-down
         else if (angle > 157.5f && angle < 180f)   
         { 
-          if(currentContactQuadrant == ContactQuadrant.BottomRight && playerTouchingCollider == true)
-          {
-            controlDirection = Direction.DownLeft; 
-          }
-          else if(currentContactQuadrant == ContactQuadrant.BottomLeft && playerTouchingCollider == true)
-          {
-            controlDirection = Direction.RightDown; 
-          }
-          else
-          {
-            controlDirection = Direction.DownFacingLeft;
-          }  
+          controlDirection = Direction.DownFacingLeft;
         } // Down
         else if (angle == 180f)  
+        {
+          if(facingLeft == true)
           {
-            if(facingLeft == true)
-            {
-              // if(activeCollisions.Count > 1 && currentContactQuadrant ==  ContactQuadrant.BottomLeft && playerTouchingCollider == true)
-              // {
-              //   controlDirection = Direction.Nothing;
-              //   movementAutopilot = true;
-              // }
-              // else 
-              if(currentContactQuadrant == ContactQuadrant.BottomRight && playerTouchingCollider == true)
-              {
-                controlDirection = Direction.DownLeft; 
-              }
-              else if(currentContactQuadrant == ContactQuadrant.BottomLeft && playerTouchingCollider == true)
-              {
-                controlDirection = Direction.RightDown; 
-              }
-              else
-              {
-                controlDirection = Direction.DownFacingLeft;
-              }                  
-            }
-            else
-            {
-              // if(activeCollisions.Count > 1 && currentContactQuadrant ==  ContactQuadrant.BottomRight && playerTouchingCollider == true)
-              // {
-              //   controlDirection = Direction.Nothing;
-              //   movementAutopilot = true;
-              // }
-              // else 
-              if(currentContactQuadrant == ContactQuadrant.BottomLeft && playerTouchingCollider == true)
-              {
-                controlDirection = Direction.RightDown; 
-              }
-              else if(currentContactQuadrant == ContactQuadrant.BottomRight && playerTouchingCollider == true)
-              {
-                controlDirection = Direction.DownLeft; 
-              }
-              else
-              {
-                controlDirection = Direction.DownFacingRight;
-              }                   
-            }
-          }
-        else if (angle > 180f && angle <= 202.5f)   
-        { 
-          if(currentContactQuadrant == ContactQuadrant.BottomLeft && playerTouchingCollider == true)
-          {
-            controlDirection = Direction.RightDown; 
-          }
-          else if(currentContactQuadrant == ContactQuadrant.BottomRight && playerTouchingCollider == true)
-          {
-            controlDirection = Direction.DownLeft; 
+            controlDirection = Direction.DownFacingLeft;
           }
           else
           {
             controlDirection = Direction.DownFacingRight;
-          } 
+          }
+        }
+        else if (angle > 180f && angle <= 202.5f)   
+        { 
+          controlDirection = Direction.DownFacingRight; 
         } // Down
         else if (angle > 202.5f && angle <= 247.5f) 
         { 
-          if(currentContactQuadrant == ContactQuadrant.BottomRight && playerTouchingCollider == true)
-          {
-            controlDirection = Direction.UpRight; 
-          }
-          else
-          {
-            controlDirection = Direction.RightDown;
-          } 
+          controlDirection = Direction.RightDown;
         }  // Inverted left-down to right-down
         else if (angle > 247.5f && angle <= 292.5f) 
         { 
-          // if(activeCollisions.Count > 1 
-          //     && (currentContactQuadrant ==  ContactQuadrant.TopRight || currentContactQuadrant ==  ContactQuadrant.BottomRight)
-          //     && playerTouchingCollider == true)
-          // {
-          //   controlDirection = Direction.Nothing;
-          //   movementAutopilot = true;
-          // }
-          // else 
-          if(currentContactQuadrant == ContactQuadrant.TopRight && playerTouchingCollider == true)
-          {
-            controlDirection = Direction.RightDown;
-          }
-          else if(currentContactQuadrant == ContactQuadrant.BottomRight && playerTouchingCollider == true)
-          {
-            controlDirection = Direction.UpRight;
-          }
-          else
-          {
-            controlDirection = Direction.Right;         
-          }
+          controlDirection = Direction.Right;         
         } // Inverted left to right
         else if (angle > 292.5f && angle <= 337.5f) 
         { 
-          if(currentContactQuadrant == ContactQuadrant.TopRight && playerTouchingCollider == true && playerOnThresh == false)
-          {
-            controlDirection = Direction.RightDown; 
-          }
-          else
-          {
-            controlDirection = Direction.UpRight;
-          }
+          controlDirection = Direction.UpRight;
         }  // Inverted left-up to right-up
         else if ((angle > 337.5f && angle <= 360f)) 
         { 
-          if(currentContactQuadrant == ContactQuadrant.TopLeft && playerTouchingCollider == true)
-          {
-            controlDirection = Direction.UpRight; 
-          }
-          else if(currentContactQuadrant == ContactQuadrant.TopRight && playerTouchingCollider == true)
-          {
-            controlDirection = Direction.UpLeft; 
-          }
-          else
-          {
-            controlDirection = Direction.UpFacingRight;
-          }                  
+          controlDirection = Direction.UpFacingRight;
         } // Up
+
+        Debug.Log(activeCollisions.Count);
+        Debug.Log(currentContactQuadrant);
+
+        if (activeCollisions.Count > 0 && !playerOnThresh) {
+          controlDirection = HandleQuadrantContact(controlDirection, currentContactQuadrant);
+        }
+
         // Map control directions to player directions and animations
         UpdateCharacterDirection(controlDirection);
         // Handle animation and movement
         characterAnimation.Animate(characterAnimation.movementStartIndex, characterAnimation.movementFrameCount, characterAnimation.currentAnimationDirection, characterAnimation.bodyTypeNumber);
         myRigidbody.MovePosition(transform.position + change * movementSpeed * Time.deltaTime);
     };
-
-
-
-
   } 
+
+  private Direction HandleQuadrantContact(Direction controlDirection, ContactQuadrant contactQuadrant)
+  {
+     if (controlDirection == Direction.UpFacingRight && contactQuadrant == ContactQuadrant.TopLeft)
+     {
+       return Direction.UpRight;
+     }
+     else if(controlDirection == Direction.UpFacingRight && currentContactQuadrant == ContactQuadrant.TopRight)
+     {
+      return Direction.UpLeft;
+     }
+     else if(controlDirection == Direction.UpRight && currentContactQuadrant == ContactQuadrant.TopRight)
+     {
+      return Direction.RightDown;
+     }
+     else if(controlDirection == Direction.Right && currentContactQuadrant == ContactQuadrant.TopRight)
+     {
+      return Direction.RightDown;
+     }
+     else if(controlDirection == Direction.Right && currentContactQuadrant == ContactQuadrant.BottomRight)
+     {
+      return Direction.UpRight;
+     }
+     else if(controlDirection == Direction.RightDown && currentContactQuadrant == ContactQuadrant.BottomRight)
+     {
+      return Direction.UpRight;
+     }
+     else if(controlDirection == Direction.DownFacingRight && currentContactQuadrant == ContactQuadrant.BottomLeft)
+     {
+      return Direction.RightDown;
+     }
+     else if(controlDirection == Direction.DownFacingRight && currentContactQuadrant == ContactQuadrant.BottomRight)
+     {
+      return Direction.DownLeft;
+     }
+     else if(controlDirection == Direction.DownFacingLeft && currentContactQuadrant == ContactQuadrant.BottomRight)
+     {
+      return Direction.DownLeft;
+     }
+     else if(controlDirection == Direction.DownFacingLeft && currentContactQuadrant == ContactQuadrant.BottomLeft)
+     {
+      return Direction.RightDown;
+     }
+     else if(controlDirection == Direction.DownLeft && currentContactQuadrant == ContactQuadrant.BottomLeft)
+     {
+      return Direction.UpLeft;
+     }
+     else if(controlDirection == Direction.Left && currentContactQuadrant == ContactQuadrant.TopLeft)
+     {
+      return Direction.DownLeft;
+     }
+     else if(controlDirection == Direction.Left && currentContactQuadrant == ContactQuadrant.BottomLeft)
+     {
+      return Direction.UpLeft;
+     }
+     else if(controlDirection == Direction.UpLeft && currentContactQuadrant == ContactQuadrant.TopLeft)
+     {
+      return Direction.DownLeft;
+     }
+     else if(controlDirection == Direction.UpFacingLeft && currentContactQuadrant == ContactQuadrant.TopLeft)
+     {
+      return Direction.UpRight;
+     }
+     else if(controlDirection == Direction.UpFacingLeft && currentContactQuadrant == ContactQuadrant.TopRight)
+     {
+      return Direction.UpLeft;
+     }
+
+    return controlDirection; // Keeps the same direction if no condition is met
+
+  }
 
   public void UpdateCharacterDirection(Direction controlDirection)
   {
@@ -796,139 +636,8 @@ public class CharacterMovement : MonoBehaviour
     // npcRandomMovementCoro = null;
   }
 
-  // private void OnCollisionEnter2D(Collision2D collision)
-  // {
-  //     if (!this.gameObject.CompareTag("Player"))
-  //     {
-  //         if (playerIsOutside && collision.otherCollider == boxCollider)
-  //         {
-  //             ReverseDirection(false); // isTrigger is false
-  //         }
-  //         else
-  //         {
-  //             change = Vector3.zero;
-  //         }
-  //     }
-  //     else if (this.gameObject.CompareTag("Player"))
-  //     {
-  //         // Get the player's box collider (child)
-  //         BoxCollider2D boxCollider = GetComponentInChildren<BoxCollider2D>();
-  //         if (boxCollider == null)
-  //         {
-  //             Debug.LogError("Player BoxCollider2D not found in child objects!");
-  //             return;
-  //         }
 
-  //         // Get bounds and contact point relative to the player's box collider
-  //         Bounds playerBounds = boxCollider.bounds;
-  //         Vector2 contactPoint = collision.GetContact(0).point;
-
-  //         // Determine quadrant based on the player's box collider
-  //         currentContactQuadrant = DetermineContactQuadrant(contactPoint, playerBounds);
-  //         Debug.Log("Contact Quadrant: " + currentContactQuadrant);
-
-  //         playerTouchingCollider = true;
-  //     }
-  // }
-
-  // private ContactQuadrant DetermineContactQuadrant(Vector2 contactPoint, Bounds playerBounds)
-  // {
-  //     // Get the local center of the player's box collider
-  //     Vector2 center = playerBounds.center;
-
-  //     // Determine the quadrant in world space
-  //     if (contactPoint.x >= center.x && contactPoint.y >= center.y)
-  //         return ContactQuadrant.TopRight;
-  //     else if (contactPoint.x <= center.x && contactPoint.y >= center.y)
-  //         return ContactQuadrant.TopLeft;
-  //     else if (contactPoint.x <= center.x && contactPoint.y <= center.y)
-  //         return ContactQuadrant.BottomLeft;
-  //     else
-  //         return ContactQuadrant.BottomRight;
-  // }
-
-  //   private HashSet<Collider2D> activeCollisions = new HashSet<Collider2D>(); // Keeps track of active collisions
-
-
-  // private void OnCollisionEnter2D(Collision2D collision)
-  // {
-  //     if (!this.gameObject.CompareTag("Player"))
-  //     {
-  //         if (playerIsOutside && collision.otherCollider == boxCollider)
-  //         {
-  //             ReverseDirection(false); // isTrigger is false
-  //         }
-  //         else
-  //         {
-  //             change = Vector3.zero;
-  //         }
-  //     }
-  //     else if (this.gameObject.CompareTag("Player"))
-  //     {
-  //         // Get the player's box collider (child)
-  //         BoxCollider2D boxCollider = GetComponentInChildren<BoxCollider2D>();
-
-  //         // Get bounds and contact point
-  //         Bounds playerBounds = boxCollider.bounds;
-  //         Vector2 contactPoint = collision.GetContact(0).point;
-
-
-  //         // Transform the contact point and bounds center to the local space of the root GameObject
-  //         Vector2 localContactPoint = transform.InverseTransformPoint(contactPoint);
-  //         Vector2 localCenter = transform.InverseTransformPoint(playerBounds.center);
-
-  //         // Determine quadrant using local space
-  //         currentContactQuadrant = DetermineContactQuadrant(localContactPoint, localCenter);
-  //         Debug.Log($"Contact Quadrant: {currentContactQuadrant}, Contact Point (local): {localContactPoint}, Center (local): {localCenter}");
-
-
-  //         activeCollisions.Add(collision.collider); // Add the collider to active collisions
-
-
-  //         if(playerOnThresh)
-  //         {
-  //           playerTouchingCollider = false;
-  //         }
-  //         else
-  //         {
-  //           playerTouchingCollider = true;
-  //         }
-  //     }
-  // }
-
-  // private ContactQuadrant DetermineContactQuadrant(Vector2 contactPoint, Vector2 center)
-  // {
-  //     // Determine the quadrant in local space
-  //     if (contactPoint.x >= center.x && contactPoint.y >= center.y)
-  //         return ContactQuadrant.TopRight;
-  //     else if (contactPoint.x <= center.x && contactPoint.y >= center.y)
-  //         return ContactQuadrant.TopLeft;
-  //     else if (contactPoint.x <= center.x && contactPoint.y <= center.y)
-  //         return ContactQuadrant.BottomLeft;
-  //     else
-  //         return ContactQuadrant.BottomRight;
-  // }
-
-
-
-
-
-  // private void OnCollisionExit2D(Collision2D collision)
-  //   {
-  //       // Ensure collision is detected by this NPC’s BoxCollider2D and not self-triggered
-  //       if (this.gameObject.CompareTag("Player"))
-  //       {
-  //           activeCollisions.Remove(collision.collider); // Remove the collider from active collisions
-
-  //           // If there are no more active collisions, unlock velocity
-  //           if (activeCollisions.Count == 0)
-  //           {
-  //               playerTouchingCollider = false;
-  //           }
-  //       }
-  //   }
-
-  private HashSet<Collider2D> activeCollisions = new HashSet<Collider2D>(); // Keeps track of active collisions
+  public HashSet<Collider2D> activeCollisions = new HashSet<Collider2D>(); // Keeps track of active collisions
 
   private ContactQuadrant lastContactQuadrant = ContactQuadrant.None;
 
@@ -955,14 +664,6 @@ public class CharacterMovement : MonoBehaviour
 
           activeCollisions.Add(collision.collider); // Add the collider to active collisions
 
-          if (playerOnThresh)
-          {
-              playerTouchingCollider = false;
-          }
-          else
-          {
-              playerTouchingCollider = true;
-          }
       }
   }
 
@@ -990,12 +691,6 @@ public class CharacterMovement : MonoBehaviour
 
                   currentContactQuadrant = DetermineContactQuadrant(localNewContactPoint, localCenter);
               }
-          }
-          else
-          {
-              // No more active collisions
-              // currentContactQuadrant = ContactQuadrant.None;
-              playerTouchingCollider = false;
           }
       }
   }
@@ -1085,16 +780,6 @@ public class CharacterMovement : MonoBehaviour
       // SetAsChild();
 
   }
-
-  // public void SetAsChild()
-  //   {
-  //       if (roomToSpawnIn != null)
-  //       {
-  //           // Set this GameObject as a child of the specified parent
-  //           transform.SetParent(roomToSpawnIn.transform);
-  //           Debug.Log($"{gameObject.name} is now a child of {roomToSpawnIn.name}");
-  //       }
-  //   }
 
 
   public static void SetTreeSortingLayer(GameObject gameObject, string sortingLayerName)

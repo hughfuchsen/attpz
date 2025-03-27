@@ -48,8 +48,6 @@ public class EdgeTriggerEndHit : MonoBehaviour
     {
         if (other.CompareTag("PlayerCollider"))
         {
-            playerMovement.playerTouchingCollider = false;  // Reset movement restrictions
-
             if (checkCenterCoroutine != null)
             {
                 StopCoroutine(checkCenterCoroutine);

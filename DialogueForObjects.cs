@@ -29,7 +29,7 @@ public class DialogueForObjects : MonoBehaviour
         // Find the TextMeshPro component in the scene (or assign it in the Inspector)
         dialogueDisplay = GameObject.Find("DialogueText").GetComponent<TextMeshProUGUI>();
         dialogueNameDisplay = GameObject.Find("NameTextForDialogueUI").GetComponent<TextMeshProUGUI>();
-        dialogueBGrndImage = GameObject.FindWithTag("DialogueBG").GetComponent<Image>();
+        dialogueBGrndImage = GameObject.Find("bgImageForDialogue").GetComponent<Image>();
 
         // Initialize the dialogue list
         dialogues = new List<string> { dialogueText1, dialogueText2, dialogueText3, dialogueText4 };

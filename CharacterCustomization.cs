@@ -2956,7 +2956,10 @@ private void UpdateLockImage()
 
     public void SetPantsColor1()
     {
-        characterAnimation.dressSprite.color = HexToColor("#2C3E50");
+        if (characterAnimation.dressSprite.color == characterAnimation.currentPantsColor)
+        {
+            characterAnimation.dressSprite.color = HexToColor("#2C3E50");            
+        }
         if (characterAnimation.waistShortsSprite.color == characterAnimation.currentPantsColor)
         {
             characterAnimation.waistShortsSprite.color = HexToColor("#2C3E50");
@@ -2982,7 +2985,10 @@ private void UpdateLockImage()
 
     public void SetPantsColor2()
     {
-        characterAnimation.dressSprite.color = HexToColor("#A0522D");
+        if (characterAnimation.dressSprite.color == characterAnimation.currentPantsColor)
+        {
+            characterAnimation.dressSprite.color = HexToColor("#A0522D");            
+        }
         if (characterAnimation.waistShortsSprite.color == characterAnimation.currentPantsColor)
         {
             characterAnimation.waistShortsSprite.color = HexToColor("#A0522D");
@@ -3008,7 +3014,10 @@ private void UpdateLockImage()
 
     public void SetPantsColor3()
     {
-        characterAnimation.dressSprite.color = HexToColor("#808080");
+        if (characterAnimation.dressSprite.color == characterAnimation.currentPantsColor)
+        {
+            characterAnimation.dressSprite.color = HexToColor("#808080");            
+        }
         if (characterAnimation.waistShortsSprite.color == characterAnimation.currentPantsColor)
         {
             characterAnimation.waistShortsSprite.color = HexToColor("#808080");
@@ -3034,7 +3043,10 @@ private void UpdateLockImage()
 
     public void SetPantsColor4()
     {
-        characterAnimation.dressSprite.color = HexToColor("#556B2F");
+        if (characterAnimation.dressSprite.color == characterAnimation.currentPantsColor)
+        {
+            characterAnimation.dressSprite.color = HexToColor("#556B2F");            
+        }
         if (characterAnimation.waistShortsSprite.color == characterAnimation.currentPantsColor)
         {
             characterAnimation.waistShortsSprite.color = HexToColor("#556B2F");
@@ -3060,7 +3072,10 @@ private void UpdateLockImage()
 
     public void SetPantsColor5()
     {
-        characterAnimation.dressSprite.color = HexToColor("#B0C4DE");
+        if (characterAnimation.dressSprite.color == characterAnimation.currentPantsColor)
+        {
+            characterAnimation.dressSprite.color = HexToColor("#B0C4DE");            
+        }
         if (characterAnimation.waistShortsSprite.color == characterAnimation.currentPantsColor)
         {
             characterAnimation.waistShortsSprite.color = HexToColor("#B0C4DE");
@@ -3086,7 +3101,11 @@ private void UpdateLockImage()
 
     public void SetPantsColor6()
     {
-        characterAnimation.dressSprite.color = HexToColor("#4B0082");
+        
+        if (characterAnimation.dressSprite.color == characterAnimation.currentPantsColor)
+        {
+            characterAnimation.dressSprite.color = HexToColor("#4B0082");            
+        }
         if (characterAnimation.waistShortsSprite.color == characterAnimation.currentPantsColor)
         {
             characterAnimation.waistShortsSprite.color = HexToColor("#4B0082");
@@ -3112,7 +3131,10 @@ private void UpdateLockImage()
 
     public void SetPantsColor7()
     {
-        characterAnimation.dressSprite.color = HexToColor("#8B4513");
+        if (characterAnimation.dressSprite.color == characterAnimation.currentPantsColor)
+        {
+            characterAnimation.dressSprite.color = HexToColor("#8B4513");
+        }
         if (characterAnimation.waistShortsSprite.color == characterAnimation.currentPantsColor)
         {
             characterAnimation.waistShortsSprite.color = HexToColor("#8B4513");
@@ -3138,7 +3160,10 @@ private void UpdateLockImage()
 
     public void SetPantsColor8()
     {
-        characterAnimation.dressSprite.color = HexToColor("#696969");
+        if (characterAnimation.dressSprite.color == characterAnimation.currentPantsColor)
+        {
+            characterAnimation.dressSprite.color = HexToColor("#696969");            
+        }
         if (characterAnimation.waistShortsSprite.color == characterAnimation.currentPantsColor)
         {
             characterAnimation.waistShortsSprite.color = HexToColor("#696969");
@@ -3164,7 +3189,10 @@ private void UpdateLockImage()
 
     public void SetPantsColor9()
     {
-        characterAnimation.dressSprite.color = HexToColor("#4682B4");
+        if (characterAnimation.dressSprite.color == characterAnimation.currentPantsColor)
+        {
+            characterAnimation.dressSprite.color = HexToColor("#4682B4");            
+        }
         if (characterAnimation.waistShortsSprite.color == characterAnimation.currentPantsColor)
         {
             characterAnimation.waistShortsSprite.color = HexToColor("#4682B4");
@@ -3190,7 +3218,10 @@ private void UpdateLockImage()
 
     public void SetPantsColor10()
     {
-        characterAnimation.dressSprite.color = HexToColor("#000000");
+        if (characterAnimation.dressSprite.color == characterAnimation.currentPantsColor)
+        {
+            characterAnimation.dressSprite.color = HexToColor("#000000");            
+        }
         if (characterAnimation.waistShortsSprite.color == characterAnimation.currentPantsColor)
         {
             characterAnimation.waistShortsSprite.color = HexToColor("#000000");

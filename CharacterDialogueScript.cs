@@ -37,7 +37,30 @@ public class CharacterDialogueScript : MonoBehaviour
         // Find the TextMeshPro component in the scene (or assign it in the Inspector)
         dialogueDisplay = GameObject.Find("DialogueText").GetComponent<TextMeshProUGUI>();
         dialogueNameDisplay = GameObject.Find("NameTextForDialogueUI").GetComponent<TextMeshProUGUI>();
-        dialogueBGrndImage = GameObject.FindWithTag("DialogueBG").GetComponent<Image>();
+        dialogueBGrndImage = GameObject.Find("bgImageForDialogue").GetComponent<Image>();
+
+        GameObject[] responseTextObj = GameObject.FindGameObjectsWithTag("ResponseText");
+        GameObject[] responseBGObjects = GameObject.FindGameObjectsWithTag("responseBGImage");
+        List<TextMeshProUGUI> responseTextList = new List<TextMeshProUGUI>();
+        List<Image> responseBGrndImages = new List<Image>();
+
+        foreach (GameObject obj in responseTextObj)
+        {
+            TextMeshProUGUI txt = obj.GetComponent<TextMeshProUGUI>();
+            if (txt != null)
+            {
+                responseTextList.Add(txt);
+            }
+        }
+
+        foreach (GameObject obj in responseBGObjects)
+        {
+            Image img = obj.GetComponent<Image>();
+            if (img != null)
+            {
+                responseBGrndImages.Add(img);
+            }
+        }
 
         // Initialize the dialogue list
         dialogues = new List<string> { dialogueText1, dialogueText2, dialogueText3, dialogueText4 };
@@ -53,12 +76,30 @@ public class CharacterDialogueScript : MonoBehaviour
         dialogueNameDisplay.text = ""; // Clear the name display on start
         dialogueDisplay.text = ""; // Clear the dialogue display on start
 
+        foreach (TextMeshProUGUI txt in responseTextList)
+        {
+            if (txt != null)
+            {
+                txt.text = "";
+            }
+        }
+
 
         zeroAlphaColor = Color.white;
         zeroAlphaColor.a = 0f;
 
         dialogueBGrndImage.color = zeroAlphaColor;
         // dialogueBGrndImage.SetActive(false);
+
+        foreach (Image img in responseBGrndImages)
+        {
+            if (img != null)
+            {
+                img.color = zeroAlphaColor;
+            }
+        }
+
+
     }
 
     void Update()

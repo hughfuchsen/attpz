@@ -408,6 +408,11 @@ public class CharacterAnimation : MonoBehaviour
     animationSpeed = initialAnimationSpeed;
   }
 
+  public void GoInBed()
+  {
+    
+  }
+
   public void HandleGettingOffBikeOrSeat()
   {
       // Check if space was released before this code
@@ -476,6 +481,8 @@ public class CharacterAnimation : MonoBehaviour
         characterMovement.playerOnBike = false;
         bikeScript.GetOffBoike();
         currentBikeColor.a = 0f;
+
+        characterMovement.activeCollisions.Clear();
       }
       
   }

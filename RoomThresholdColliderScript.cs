@@ -69,7 +69,6 @@ public class RoomThresholdColliderScript : MonoBehaviour
         if (collision.gameObject.tag == "PlayerCollider")
         {   
             myCharacterMovement.playerOnThresh = true;
-            myCharacterMovement.playerTouchingCollider = false;
 
             StopAllCoros();
             if (!itsALadder)
@@ -273,8 +272,7 @@ public class RoomThresholdColliderScript : MonoBehaviour
                     }
                     
                     aboveCollider = true;
-                }
-                    
+                }  
                 else //ON EXIT CROSSING DOWN
                 {
                     if (roomAbove != null)

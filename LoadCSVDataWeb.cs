@@ -539,16 +539,16 @@ public class LoadCSVDataWeb : MonoBehaviour
 
                 // Start building the display text
                 if (!string.IsNullOrWhiteSpace(column[0]))
-                    displayText.Append($"<color=#FF5733>{TrimFullStop(column[0])}</color> ");
-
-                if (!string.IsNullOrWhiteSpace(column[1]))
-                    displayText.Append($"\n{memoryVerb} {TrimFullStop(column[1])}\n");
+                    displayText.Append($"You are playing as \n<color=#FF5733>{TrimFullStop(column[0])}</color>. ");
 
                 if (!string.IsNullOrWhiteSpace(column[2]))
-                    displayText.Append($"\n{pronounSubject} {likesVerb} {TrimFullStop(column[2])}\n");
+                    displayText.Append($"\n\n{pronounSubject} {likesVerb} {TrimFullStop(column[2])}\n");
 
                 if (!string.IsNullOrWhiteSpace(column[3]))
                     displayText.Append($"\n{pronounSubject} {dislikesVerb} {TrimFullStop(column[3])}\n");
+
+                if (!string.IsNullOrWhiteSpace(column[1]))
+                displayText.Append($"\n{TrimFullStop(column[0])} {memoryVerb} {TrimFullStop(column[1])}\n");
 
                 if (!string.IsNullOrWhiteSpace(column[4]))
                     displayText.Append($"\n<color=#FFD700>Fav Quote:</color>\n{TrimFullStop(column[4])}\n");
@@ -649,6 +649,7 @@ public class LoadCSVDataWeb : MonoBehaviour
 
     public void DisplayRandomRow()
     {
+        // uiText.text = "";
         int randomIndex = UnityEngine.Random.Range(0, dataRows.Count);
         string randomName = dataRows[randomIndex][0];
         DisplayDetailsForName(randomName);

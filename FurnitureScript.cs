@@ -13,6 +13,8 @@ public class FurnitureScript : MonoBehaviour
     public Vector3 currentAnchorPoint;
     public bool itsAtoilet = false;
     public bool itsAbed = false;
+
+    public Color furnitureColor = Color.white;
     private Vector3 initialPlayerPosBeforeEngaging;
 
     private int currentLayerIndex;
@@ -962,11 +964,20 @@ public class FurnitureScript : MonoBehaviour
             {
                 return; // TODO: remove this
             }
+
             SpriteRenderer sr = treeNode.GetComponent<SpriteRenderer>();
-            if (sr != null)
+            if (sr != null )
             {
-                sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, alpha);
+                if(!treeNode.name.Contains("bedCoverSprite"))
+                {
+                    sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, alpha);
+                }
+                else
+                {
+                    sr.color = furnitureColor;
+                }
             }
+
             foreach (Transform child in treeNode.transform)
             {
                 HandleBedEngagement(child.gameObject, alpha);

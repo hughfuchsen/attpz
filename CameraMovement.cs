@@ -14,7 +14,7 @@ public class CameraMovement : MonoBehaviour
     private Vector3 targetPosition;
 
     private float[] zoomLevels = { 50f, 100f, 150f, 200f, 220f }; // Array of zoom levels
-    private int currentZoomLevelIndex = 0; // Keep track of the current zoom level
+    private int currentZoomLevelIndex = 2; // Keep track of the current zoom level
     private float zoomSize; // The current zoom size
 
     private bool isZoomingIn = true;

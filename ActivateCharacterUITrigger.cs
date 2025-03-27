@@ -10,6 +10,7 @@ public class ActivateCharacterUITrigger : MonoBehaviour
     [SerializeField] GameObject backdrop;
     [SerializeField] GameObject Player;
     [SerializeField] GameObject platform;
+    [SerializeField] GameObject thnxMessageUI;
     [SerializeField] LoadCSVDataWeb loadCSVData;
     // [SerializeField] LoadCSVData loadCSVData;
 
@@ -37,6 +38,8 @@ public class ActivateCharacterUITrigger : MonoBehaviour
 
         loadCSVData = GameObject.FindGameObjectWithTag("CharacterCustomizationMenu").GetComponent<LoadCSVDataWeb>();
         // loadCSVData = GameObject.FindGameObjectWithTag("CharacterCustomizationMenu").GetComponent<LoadCSVData>();
+        thnxMessageUI = GameObject.Find("Thnx Message");
+        thnxMessageUI.SetActive(true);
 
         // buildingScripts.AddRange(FindObjectsOfType<BuildingScript>());
 
@@ -63,8 +66,14 @@ public class ActivateCharacterUITrigger : MonoBehaviour
                         // Input.GetKeyDown(KeyCode.JoystickButton3)
                         ) && !Player.GetComponent<CharacterMovement>().IsInputFieldFocused())           
                 {  
-                    
-                    loadCSVData.DisplayRandomRow();
+                    if (GameObject.Find("creationUIWeb")?.activeSelf == true)
+                    {
+                        Player.GetComponent<CharacterCustomization>().UpdateRandom();
+                    }
+                    else
+                    {
+                        loadCSVData.DisplayRandomRow();
+                    }
             
                 }
         }
@@ -126,6 +135,7 @@ public class ActivateCharacterUITrigger : MonoBehaviour
             playerInRange = false;
 
             backdropFadeCoroutine = StartCoroutine(FadeBackdropAndSetSortingLayersEtc(true,0f));
+            
 
 
             loadCSVData.UpdateAllNPCSDuringPlay();
@@ -141,7 +151,7 @@ public class ActivateCharacterUITrigger : MonoBehaviour
         }
     }
 
-    private IEnumerator FadeBackdropAndSetSortingLayersEtc(bool fadeFirst, float alpha)
+    public IEnumerator FadeBackdropAndSetSortingLayersEtc(bool fadeFirst, float alpha)
     {
         // if (backdrop != null)
         // {
@@ -158,7 +168,9 @@ public class ActivateCharacterUITrigger : MonoBehaviour
 
                 SetTreeSortingLayer(backdrop, "UI1");
                 SetTreeSortingLayer(Player, "UI2");
-                // SetTreeSortingLayer(platform, "UI2");
+                SetTreeSortingLayer(platform, "UI2");
+
+                thnxMessageUI.SetActive(false);
 
                 browseChrctrObj.SetActive(true);
                 createChrctrObj.SetActive(false);
@@ -206,11 +218,11 @@ public class ActivateCharacterUITrigger : MonoBehaviour
 
 
 
-
                 SetTreeSortingLayer(backdrop, "Backdrop");
                 SetTreeSortingLayer(Player, "Default");
-                // SetTreeSortingLayer(platform, "Default");
+                SetTreeSortingLayer(platform, "Default");
 
+                thnxMessageUI.SetActive(true);
 
 
                 // Ensure the final alpha value is set

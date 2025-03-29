@@ -20,6 +20,10 @@ public class FurnitureScript : MonoBehaviour
     private int currentLayerIndex;
 
 
+
+    public BedCoverTransformAdjustmentScript bedCoverTransformAdjustmentScript;
+
+
     public enum FacingDirection
     {
         UpLeft,
@@ -27,9 +31,9 @@ public class FurnitureScript : MonoBehaviour
         DownLeft,
         DownRight
     }
-        // Selectable in the Unity Editor
-        [SerializeField]
-        private FacingDirection currentFacing;
+    // Selectable in the Unity Editor
+    [SerializeField]
+    public FacingDirection currentFacing;
 
     public enum FurnitureType
     {
@@ -50,6 +54,7 @@ public class FurnitureScript : MonoBehaviour
         anchorPoint = transform.Find("anchorPoint").gameObject;
         myCharacterMovement = Player.GetComponent<CharacterMovement>();
         characterAnimation = Player.GetComponent<CharacterAnimation>();
+        bedCoverTransformAdjustmentScript = Player.GetComponent<BedCoverTransformAdjustmentScript>();
         myCharacterCustomization = Player.GetComponent<CharacterCustomization>();
         currentAnchorPoint = anchorPoint.transform.position;
 
@@ -177,7 +182,8 @@ public class FurnitureScript : MonoBehaviour
                 break;
 
             case FurnitureType.bed:
-                HandleBedEngagement(Player, 0);                
+                HandleBedEngagement(Player, true); // alphas of sprites!!!!!!! 
+                bedCoverTransformAdjustmentScript.SetBedCoverTransformPosition();              
                 break;
         }
     }
@@ -952,7 +958,7 @@ public class FurnitureScript : MonoBehaviour
             Player.GetComponent<IsoSpriteSorting>().SorterPositionOffset += new Vector3(0, -0.75f, 0);
         }
     }
-    public void HandleBedEngagement(GameObject treeNode, float alpha)
+    public void HandleBedEngagement(GameObject treeNode, bool enter) // handle alphas!!
         {
             if (treeNode == null)
             {
@@ -970,17 +976,21 @@ public class FurnitureScript : MonoBehaviour
             {
                 if(!treeNode.name.Contains("bedCoverSprite"))
                 {
-                    sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, alpha);
+                    sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, enter ? 0f : 1f);
+
                 }
                 else
-                {
+                {  
                     sr.color = furnitureColor;
+
+                    sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, enter ? 1f : 0f);
+
                 }
             }
 
             foreach (Transform child in treeNode.transform)
             {
-                HandleBedEngagement(child.gameObject, alpha);
+                HandleBedEngagement(child.gameObject, enter);
             }
 
 

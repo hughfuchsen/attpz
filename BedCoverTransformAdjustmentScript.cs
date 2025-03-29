@@ -7,10 +7,8 @@ public class BedCoverTransformAdjustmentScript : MonoBehaviour
 
     CharacterAnimation characterAnimation;
     [SerializeField] GameObject Player;
-    [SerializeField] GameObject bedCoverSprite;
 
-    public int rideBedInt = 15;
-
+    public Vector3 xOffset;
 
     public Vector3 initialBedCoverTransformPosition;
     public Vector3 newBedCoverTransformPosition;
@@ -20,8 +18,8 @@ public class BedCoverTransformAdjustmentScript : MonoBehaviour
         Player = GameObject.FindGameObjectWithTag("Player");
         characterAnimation = Player.GetComponent<CharacterAnimation>();  
 
-        bedCoverSprite = transform.Find("bedCoverSprite").gameObject;
-        initialBedCoverTransformPosition = bedCoverSprite.transform.localPosition;   
+
+        initialBedCoverTransformPosition = Player.transform.localPosition;   
     }
 
 
@@ -31,38 +29,61 @@ public class BedCoverTransformAdjustmentScript : MonoBehaviour
 //   public int leftAnim;
 //   public int upRightAnim;
 //   public int upLeftAnim;
-    public void SetBedTransformPosition()
+    public void SetBedCoverTransformPosition()
     {
+        if(characterAnimation.currentFurnitureScript != null)
+        {
+            switch (characterAnimation.currentFurnitureScript.currentFacing)
+                    {
+                        case FurnitureScript.FacingDirection.UpLeft:
+                            xOffset = new Vector3(0,0,0);
+                            break;
+
+                        case FurnitureScript.FacingDirection.UpRight:
+                            xOffset = new Vector3(0,0,0);
+                            break;
+
+                        case FurnitureScript.FacingDirection.DownLeft:
+                            xOffset = new Vector3(0,0,0);
+                            break;
+
+                        case FurnitureScript.FacingDirection.DownRight:
+                            xOffset = new Vector3(0,0,0);
+                            break;
+                    }
+
+        }
+
         if(characterAnimation.bodyTypeNumber == 1 || characterAnimation.bodyTypeNumber == 2)
         {
             if(characterAnimation.currentAnimationDirection == characterAnimation.rightDownAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, 0, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, 0, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.leftDownAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, 0, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, 0, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.rightAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, 0, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, 0, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.leftAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, 0, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, 0, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.upRightAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(2f, 0, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(2f, 0, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.upLeftAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(-2f, 0, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(-2f, 0, 0);
             }
         }
 
@@ -72,32 +93,32 @@ public class BedCoverTransformAdjustmentScript : MonoBehaviour
         {
             if(characterAnimation.currentAnimationDirection == characterAnimation.rightDownAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(1f, 0, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(1f, 0, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.leftDownAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(-1f, 0, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(-1f, 0, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.rightAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(1f, 0, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(1f, 0, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.leftAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(-1f, 0, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(-1f, 0, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.upRightAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(2f, 0, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(2f, 0, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.upLeftAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(-2f, 0, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(-2f, 0, 0);
             }
         }
         
@@ -106,32 +127,32 @@ public class BedCoverTransformAdjustmentScript : MonoBehaviour
         {
             if(characterAnimation.currentAnimationDirection == characterAnimation.rightDownAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0, -1f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0, -1f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.leftDownAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -1f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -1f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.rightAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0, -1f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0, -1f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.leftAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -1f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -1f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.upRightAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(2f, -1, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(2f, -1, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.upLeftAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(-2f, -1f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(-2f, -1f, 0);
             }
         }
 
@@ -139,32 +160,32 @@ public class BedCoverTransformAdjustmentScript : MonoBehaviour
         {
             if(characterAnimation.currentAnimationDirection == characterAnimation.rightDownAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0, -1f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0, -1f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.leftDownAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -1f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -1f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.rightAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0, -1f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0, -1f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.leftAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -1f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -1f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.upRightAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(1f, -1, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(1f, -1, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.upLeftAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(-1f, -1f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(-1f, -1f, 0);
             }
         }
         
@@ -172,32 +193,32 @@ public class BedCoverTransformAdjustmentScript : MonoBehaviour
         {
             if(characterAnimation.currentAnimationDirection == characterAnimation.rightDownAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(1, -1f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(1, -1f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.leftDownAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(-1f, -1f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(-1f, -1f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.rightAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(1f, -1f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(1f, -1f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.leftAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(-1f, -1f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(-1f, -1f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.upRightAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(1f, -1f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(1f, -1f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.upLeftAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(-1f, -1f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(-1f, -1f, 0);
             }
         }
        
@@ -205,32 +226,32 @@ public class BedCoverTransformAdjustmentScript : MonoBehaviour
         {
             if(characterAnimation.currentAnimationDirection == characterAnimation.rightDownAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(1f, 0f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(1f, 0f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.leftDownAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(-1f, 0f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(-1f, 0f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.rightAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(1f, 0f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(1f, 0f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.leftAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(-1f, 0f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(-1f, 0f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.upRightAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(2f, 1f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(2f, 1f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.upLeftAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(-2f, 1f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(-2f, 1f, 0);
             }
         }
   
@@ -238,32 +259,32 @@ public class BedCoverTransformAdjustmentScript : MonoBehaviour
         {
             if(characterAnimation.currentAnimationDirection == characterAnimation.rightDownAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(1f, 0f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(1f, 0f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.leftDownAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(-1f, 0f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(-1f, 0f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.rightAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(1f, 0f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(1f, 0f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.leftAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(-1f, 0f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(-1f, 0f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.upRightAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(1f, 1f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(1f, 1f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.upLeftAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(-1f, 1f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(-1f, 1f, 0);
             }
         }
         
@@ -271,32 +292,32 @@ public class BedCoverTransformAdjustmentScript : MonoBehaviour
         {
             if(characterAnimation.currentAnimationDirection == characterAnimation.rightDownAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, 0f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, 0f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.leftDownAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, 0f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, 0f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.rightAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, 0f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, 0f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.leftAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, 0f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, 0f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.upRightAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(2f, 0f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(2f, 0f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.upLeftAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(-2f, 0f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(-2f, 0f, 0);
             }
         }
         
@@ -304,32 +325,32 @@ public class BedCoverTransformAdjustmentScript : MonoBehaviour
         {
             if(characterAnimation.currentAnimationDirection == characterAnimation.rightDownAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, 0f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, 0f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.leftDownAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, 0f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, 0f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.rightAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, 0f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, 0f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.leftAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, 0f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, 0f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.upRightAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(1f, 0f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(1f, 0f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.upLeftAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(-1f, 0f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(-1f, 0f, 0);
             }
         }
         
@@ -337,32 +358,32 @@ public class BedCoverTransformAdjustmentScript : MonoBehaviour
         {
             if(characterAnimation.currentAnimationDirection == characterAnimation.rightDownAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -2f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -2f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.leftDownAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -2f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -2f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.rightAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -2f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -2f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.leftAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -2f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -2f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.upRightAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(2f, -2f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(2f, -2f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.upLeftAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(-2f, -2f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(-2f, -2f, 0);
             }
         }
         
@@ -370,32 +391,32 @@ public class BedCoverTransformAdjustmentScript : MonoBehaviour
         {
             if(characterAnimation.currentAnimationDirection == characterAnimation.rightDownAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -2f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -2f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.leftDownAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -2f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -2f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.rightAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -2f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -2f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.leftAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -2f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -2f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.upRightAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(1f, -2f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(1f, -2f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.upLeftAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(-1f, -2f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(-1f, -2f, 0);
             }
         }
         
@@ -403,32 +424,32 @@ public class BedCoverTransformAdjustmentScript : MonoBehaviour
         {
             if(characterAnimation.currentAnimationDirection == characterAnimation.rightDownAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(1f, 1f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(1f, 1f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.leftDownAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(-1f, 1f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(-1f, 1f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.rightAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(1f, 1f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(1f, 1f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.leftAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(-1f, 1f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(-1f, 1f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.upRightAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(2f, 1f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(2f, 1f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.upLeftAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(-2f, 1f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(-2f, 1f, 0);
             }
         }
         
@@ -436,32 +457,32 @@ public class BedCoverTransformAdjustmentScript : MonoBehaviour
         {
             if(characterAnimation.currentAnimationDirection == characterAnimation.rightDownAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, 1f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, 1f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.leftDownAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, 1f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, 1f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.rightAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, 1f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, 1f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.leftAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, 1f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, 1f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.upRightAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(1f, 1f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(1f, 1f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.upLeftAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(-1f, 1f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(-1f, 1f, 0);
             }
         }
         
@@ -469,32 +490,32 @@ public class BedCoverTransformAdjustmentScript : MonoBehaviour
         {
             if(characterAnimation.currentAnimationDirection == characterAnimation.rightDownAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -1f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -1f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.leftDownAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -1f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -1f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.rightAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -1f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -1f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.leftAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -1f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -1f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.upRightAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(2f, -1f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(2f, -1f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.upLeftAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(-2f, -1f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(-2f, -1f, 0);
             }
         }
         
@@ -502,32 +523,32 @@ public class BedCoverTransformAdjustmentScript : MonoBehaviour
         {
             if(characterAnimation.currentAnimationDirection == characterAnimation.rightDownAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -1f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -1f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.leftDownAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -1f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -1f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.rightAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -1f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -1f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.leftAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -1f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -1f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.upRightAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(1f, -1f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(1f, -1f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.upLeftAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(-1f, -1f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(-1f, -1f, 0);
             }
         }
         
@@ -535,32 +556,32 @@ public class BedCoverTransformAdjustmentScript : MonoBehaviour
         {
             if(characterAnimation.currentAnimationDirection == characterAnimation.rightDownAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -2f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -2f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.leftDownAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -2f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -2f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.rightAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -2f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -2f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.leftAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -2f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -2f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.upRightAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(2f, -1f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(2f, -1f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.upLeftAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(-2f, -1f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(-2f, -1f, 0);
             }
         }
         
@@ -568,32 +589,32 @@ public class BedCoverTransformAdjustmentScript : MonoBehaviour
         {
             if(characterAnimation.currentAnimationDirection == characterAnimation.rightDownAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -2f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -2f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.leftDownAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -2f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -2f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.rightAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -2f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -2f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.leftAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -2f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -2f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.upRightAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(1f, -1f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(1f, -1f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.upLeftAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(-1f, -1f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(-1f, -1f, 0);
             }
         }
         
@@ -601,32 +622,32 @@ public class BedCoverTransformAdjustmentScript : MonoBehaviour
         {
             if(characterAnimation.currentAnimationDirection == characterAnimation.rightDownAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -1f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -1f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.leftDownAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -1f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -1f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.rightAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -1f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -1f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.leftAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -1f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -1f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.upRightAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(2f, 0f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(2f, 0f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.upLeftAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(-2f, 0f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(-2f, 0f, 0);
             }
         }
         
@@ -634,32 +655,32 @@ public class BedCoverTransformAdjustmentScript : MonoBehaviour
         {
             if(characterAnimation.currentAnimationDirection == characterAnimation.rightDownAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -1f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -1f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.leftDownAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -1f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -1f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.rightAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -1f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -1f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.leftAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -1f, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(0f, -1f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.upRightAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(1f, 0, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(-1, 7f, 0);
             }
 
             else if(characterAnimation.currentAnimationDirection == characterAnimation.upLeftAnim)
             {
-                bedCoverSprite.transform.localPosition = initialBedCoverTransformPosition + new Vector3(-1f, 0, 0);
+                Player.transform.localPosition = initialBedCoverTransformPosition + new Vector3(-1f, 0, 0);
             }
         }
         

@@ -594,7 +594,7 @@ public class CharacterAnimation : MonoBehaviour
                 break;
 
             case FurnitureScript.FurnitureType.bed:
-                 currentFurnitureScript.HandleBedEngagement(currentFurnitureScript.Player, 1f);
+                 currentFurnitureScript.HandleBedEngagement(currentFurnitureScript.Player, false);
                 // Add your bed-specific logic here
                 break;
 

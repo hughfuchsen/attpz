@@ -97,6 +97,7 @@ public class FurnitureScript : MonoBehaviour
         Player.GetComponent<IsoSpriteSorting>().SorterPositionOffset = new Vector3(8, -28, 0);
     }
 
+
     private void OnTriggerStay2D(Collider2D collision)
     {
         if (collision.gameObject.CompareTag("PlayerCollider"))

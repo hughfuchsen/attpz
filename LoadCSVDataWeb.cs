@@ -40,6 +40,8 @@ public class LoadCSVDataWeb : MonoBehaviour
 
     public List<GameObject> npcList = new List<GameObject>();
 
+    public string currentCharacterName;
+
 
     // Add a public reference to the warning text UI element
 
@@ -652,6 +654,7 @@ public class LoadCSVDataWeb : MonoBehaviour
         // uiText.text = "";
         int randomIndex = UnityEngine.Random.Range(0, dataRows.Count);
         string randomName = dataRows[randomIndex][0];
+        currentCharacterName = randomName;
         DisplayDetailsForName(randomName);
         searchInputField.text = "";
         inputPlaceholder.text = "Search for name here...";

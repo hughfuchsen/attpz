@@ -17,9 +17,6 @@ public class BedCoverTransformAdjustmentScript : MonoBehaviour
     {
         Player = GameObject.FindGameObjectWithTag("Player");
         characterAnimation = Player.GetComponent<CharacterAnimation>();  
-
-
-        initialBedCoverTransformPosition = Player.transform.localPosition;   
     }
 
 
@@ -29,30 +26,17 @@ public class BedCoverTransformAdjustmentScript : MonoBehaviour
 //   public int leftAnim;
 //   public int upRightAnim;
 //   public int upLeftAnim;
+
+    public void HandlePlayerBedTransform()
+    {
+        
+    }
+
     public void SetBedCoverTransformPosition()
     {
-        if(characterAnimation.currentFurnitureScript != null)
-        {
-            switch (characterAnimation.currentFurnitureScript.currentFacing)
-                    {
-                        case FurnitureScript.FacingDirection.UpLeft:
-                            xOffset = new Vector3(0,0,0);
-                            break;
+        initialBedCoverTransformPosition = Player.transform.localPosition;   
 
-                        case FurnitureScript.FacingDirection.UpRight:
-                            xOffset = new Vector3(0,0,0);
-                            break;
 
-                        case FurnitureScript.FacingDirection.DownLeft:
-                            xOffset = new Vector3(0,0,0);
-                            break;
-
-                        case FurnitureScript.FacingDirection.DownRight:
-                            xOffset = new Vector3(0,0,0);
-                            break;
-                    }
-
-        }
 
         if(characterAnimation.bodyTypeNumber == 1 || characterAnimation.bodyTypeNumber == 2)
         {

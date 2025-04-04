@@ -111,7 +111,6 @@ public class CharacterMovement : MonoBehaviour
   // Update is called once per frame
   public void Update()
   {
-    Debug.Log(movementAutopilot);
     if(this.gameObject.tag == "Player")
     {
       HandleSpaceBarReactivation();
@@ -485,8 +484,6 @@ public class CharacterMovement : MonoBehaviour
           controlDirection = Direction.UpFacingRight;
         } // Up
 
-        Debug.Log(activeCollisions.Count);
-        Debug.Log(currentContactQuadrant);
 
         if (activeCollisions.Count > 0 && !playerOnThresh) {
           controlDirection = HandleQuadrantContact(controlDirection, currentContactQuadrant);

@@ -10,7 +10,8 @@ public class CharacterAnimation : MonoBehaviour
   [HideInInspector] public float initialAnimationSpeed;
   [HideInInspector] public float animationSpeed = 0.09f; // Time between frames
 
-  [HideInInspector] public List<GameObject> characterSpriteList = new List<GameObject>();
+   public List<GameObject> characterSpriteList = new List<GameObject>();
+  [HideInInspector] public List<GameObject> zeroInitialAlphaSpriteList = new List<GameObject>();
   [HideInInspector] public List<Color> initialChrctrColorList = new List<Color>();
 
 
@@ -52,7 +53,9 @@ public class CharacterAnimation : MonoBehaviour
   [HideInInspector] public Color currentBikeColor, bikeInitialColor;
 
 
-  [HideInInspector] public Coroutine allowTimeForSpaceBarCoro;
+  [HideInInspector] public Coroutine allowTimeForSpaceBarCoro;  
+  [HideInInspector] public Coroutine lateStartUpdateCharacterDataCoro;  
+
 
 
   [HideInInspector] public bool playerOnFurniture = false;
@@ -97,10 +100,7 @@ public class CharacterAnimation : MonoBehaviour
     bikeTransformAdjustment = GetComponent<BikeTransformAdjustment>();
 
 
-    if(this.gameObject.CompareTag("Player"))
-    {
-      GetSpritesAndAddToLists(this.gameObject, characterSpriteList, new List<GameObject>(), initialChrctrColorList);
-    }
+
 
     // Find all input fields in the scene
     inputFields = FindObjectsOfType<TMP_InputField>();
@@ -248,7 +248,22 @@ public class CharacterAnimation : MonoBehaviour
 
   }
 
+  void Start()
+  {
+    lateStartUpdateCharacterDataCoro = StartCoroutine(LateStartUpdateCharacterData());
+  }
 
+    IEnumerator LateStartUpdateCharacterData()
+    {
+        // Wait until the end of the current frame
+        yield return new WaitForEndOfFrame();
+
+        if(this.gameObject.CompareTag("Player"))
+        {
+          Debug.Log("its");
+          GetSpritesAndAddToLists(this.gameObject, characterSpriteList, new List<GameObject>(), initialChrctrColorList);
+        }
+    }
 
 
   public void Animate(int movementStartIndex, int movementFrameCount, int animationDirection, int bodyTypeNumber)
@@ -540,6 +555,14 @@ public class CharacterAnimation : MonoBehaviour
       }
   }
 
+  public void initializeCharacterSprites()
+  {
+    for(int i = 0; i < characterSpriteList.Count; i++)
+    {
+      characterSpriteList[i].GetComponent<SpriteRenderer>().color = initialChrctrColorList[i];
+    }
+  }
+
 
   public void SetAlpha(GameObject treeNode, float alpha) // opening cupboards
   {
@@ -594,7 +617,8 @@ public class CharacterAnimation : MonoBehaviour
                 break;
 
             case FurnitureScript.FurnitureType.bed:
-                 currentFurnitureScript.HandleBedEngagement(currentFurnitureScript.Player, false);
+                 currentFurnitureScript.HandlePlayerAlphaEngagement(false);
+                 currentFurnitureScript.SetBedCoverAlpha(false);
                 // Add your bed-specific logic here
                 break;
 

@@ -21,9 +21,8 @@ public class FurnitureScript : MonoBehaviour
 
 
     public Vector3 currentAnchorPoint;
-    public bool itsAtoilet = false;
-    public bool itsAbed = false;
 
+    public float issOffsetY = 0f;
     public Color furnitureColor = Color.white;
     private Vector3 initialPlayerPosBeforeEngaging;
 
@@ -141,7 +140,8 @@ public class FurnitureScript : MonoBehaviour
                         Input.GetKey(KeyCode.JoystickButton1) ||  // B button
                         Input.GetKey(KeyCode.JoystickButton2)  // X button
                                                                // Input.GetKey(KeyCode.JoystickButton3)
-                        ) && !myCharacterMovement.playerOnBike && !myCharacterMovement.playerOnFurniture)
+                        ) && !myCharacterMovement.playerOnBike && !myCharacterMovement.playerOnFurniture 
+                          && myCharacterMovement.change == Vector3.zero)
                 {
                     gameObject.layer = LayerMask.NameToLayer("Player");
                     IgnoreCollisionLayer();
@@ -457,6 +457,10 @@ public class FurnitureScript : MonoBehaviour
                 Player.GetComponent<IsoSpriteSorting>().SorterPositionOffset += new Vector3(0, -4f, 0);
             }
         }
+        else if(this.name.Contains("Stool") && (currentFacing != FacingDirection.UpLeft && currentFacing != FacingDirection.UpRight))
+        {
+            Player.GetComponent<IsoSpriteSorting>().SorterPositionOffset += new Vector3(0, issOffsetY, 0);
+        }
         else
         {
             if (characterAnimation.bodyTypeNumber == 1
@@ -513,7 +517,7 @@ public class FurnitureScript : MonoBehaviour
 
         for (int i = 0; i < bedCoverSpriteList.Count; i++)
         {
-            SpriteRenderer sr = bedCoverSpriteList[i].GetComponent<SpriteRenderer>();
+            SpriteRenderer bedSr = bedCoverSpriteList[i].GetComponent<SpriteRenderer>();
 
             if (bedCoverSpriteList[i].name.Contains("headInBedSprite"))
             {
@@ -525,7 +529,7 @@ public class FurnitureScript : MonoBehaviour
                         SpriteRenderer playerSr = playerSpriteList[j].GetComponent<SpriteRenderer>();
                         Color col = playerSr.color;
                         col.a = enter ? initialAlphaFloatList[j] : 0;
-                        sr.color = col;
+                        bedSr.color = col;
                         // sr.sprite = playerSr.sprite;
                         break;
                     }
@@ -539,14 +543,19 @@ public class FurnitureScript : MonoBehaviour
                 {
                     SpriteRenderer playerSr = playerSpriteList[j].GetComponent<SpriteRenderer>();
                     Color col = playerSr.color;
-
-                    if (playerSpriteList[j].name.Contains("Top") &&  initialAlphaFloatList[j] != 0)
+                    
+                    if( initialAlphaFloatList[j] == 0 )
+                    {
+                        bedSr.color = playerSr.color;
+                    }
+                    else if (playerSpriteList[j].name.Contains("Top") &&  initialAlphaFloatList[j] != 0)
                     {
                         col.a = enter ? initialAlphaFloatList[j] : 0;
-                        sr.color = col;
+                        bedSr.color = col;
                         // sr.sprite = playerSr.sprite;
                         break;
                     }
+
                 }
             }
 

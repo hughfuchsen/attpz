@@ -42,7 +42,7 @@ public class BikeScript : MonoBehaviour
     {
         if(other.CompareTag("PlayerCollider"))
         {    
-            if (characterMovement.spaceBarDeactivated == false)
+            if (characterMovement.spaceBarDeactivated == false && characterMovement.change == Vector3.zero)
             {
                   if ((Input.GetKey(KeyCode.Space) || 
                       Input.GetKey(KeyCode.JoystickButton0) ||  // A button

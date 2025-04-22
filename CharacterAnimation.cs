@@ -260,7 +260,6 @@ public class CharacterAnimation : MonoBehaviour
 
         if(this.gameObject.CompareTag("Player"))
         {
-          Debug.Log("its");
           GetSpritesAndAddToLists(this.gameObject, characterSpriteList, new List<GameObject>(), initialChrctrColorList);
         }
     }

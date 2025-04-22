@@ -56,16 +56,11 @@ public class TriggerButtonPress : MonoBehaviour
     {
         time = 1f;  // Reset time when entering the trigger
 
-        // if(!isOutside)
+        // if(Input.GetKey(KeyCode.Space))
         // {
-        //     if (other.CompareTag("PlayerCollider") && !myCharacterMovement.playerIsOutside)
-        //     {
-        //         for (int i = 0; i < vSprites.Count; i++)
-        //         {
-        //             SetVValue(vSprites[i], 0.01f);
-        //         }
-        //     }
+        //     spacebarReleased = false; // Spacebar is being held down
         // }
+        
     }
 
     private void OnTriggerStay2D(Collider2D other)
@@ -77,8 +72,8 @@ public class TriggerButtonPress : MonoBehaviour
                 if(!myCharacterMovement.playerOnThresh)
                 {
                     OscillateVValue();
-
-                    if (Input.GetKey(KeyCode.Space))
+                
+                    if (Input.GetKey(KeyCode.Space) && myCharacterMovement.change == Vector3.zero)
                     {
                         for (int i = 0; i < sprites.Count; i++)
                         {

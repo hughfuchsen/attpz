@@ -476,7 +476,7 @@ public class FurnitureScript : MonoBehaviour
             || characterAnimation.bodyTypeNumber == 27
             || characterAnimation.bodyTypeNumber == 28)
             {
-                Player.GetComponent<IsoSpriteSorting>().SorterPositionOffset += new Vector3(0, -0.75f, 0);
+                Player.GetComponent<IsoSpriteSorting>().SorterPositionOffset += new Vector3(0, 1f, 0);
             }
         }
     }

@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class ActivateCharacterUITrigger : MonoBehaviour
 {
+    CharacterAnimation myCharacterAnimation;
     public GameObject browseChrctrObj;
     public GameObject createChrctrObj;
 
@@ -33,6 +34,8 @@ public class ActivateCharacterUITrigger : MonoBehaviour
         StartCoroutine (LateStart());
 
         Player = GameObject.FindGameObjectWithTag("Player");
+
+        myCharacterAnimation = Player.GetComponent<CharacterAnimation>();
 
         backdrop = GameObject.FindGameObjectWithTag("InnerBuildingBackdrop");
 
@@ -69,10 +72,13 @@ public class ActivateCharacterUITrigger : MonoBehaviour
                     if (GameObject.Find("creationUIWeb")?.activeSelf == true)
                     {
                         Player.GetComponent<CharacterCustomization>().UpdateRandom();
+                        // Player.GetComponent<CharacterAnimation>().characterSpriteList.Clear;
+                        // Player.GetComponent<CharacterAnimation>().initialChrctrColorList.Clear;
                     }
                     else
                     {
                         loadCSVData.DisplayRandomRow();
+                        myCharacterAnimation.GetSpritesAndAddToLists(Player, myCharacterAnimation.characterSpriteList, new List<GameObject>(), myCharacterAnimation.initialChrctrColorList);
                     }
             
                 }

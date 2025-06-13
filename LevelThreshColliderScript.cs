@@ -19,6 +19,11 @@ public class LevelThreshColliderScript : MonoBehaviour
 
     public bool plyrCrsngLeft = false;
 
+    public Coroutine thresholdSortingSequenceCoro;
+
+    private string initialSortingLayer;
+
+
     
     // Start is called before the first frame update
     void Start()
@@ -200,8 +205,46 @@ public class LevelThreshColliderScript : MonoBehaviour
 
                 aboveCollider = false;
             }
+            if(this.transform.parent.GetComponentInChildren<BuildingThreshColliderScript>() == null)
+            {
+                thresholdSortingSequenceCoro = StartCoroutine(ThresholdLayerSortingSequence(0.3f, Player, "ThresholdSequence"));
+            }
+
         }
     }
+
+    IEnumerator ThresholdLayerSortingSequence(
+    float waitTime,
+    GameObject gameObject,
+    string newSortingLayer) 
+    {  
+        initialSortingLayer = Player.transform.Find("head").GetComponent<SpriteRenderer>().sortingLayerName; 
+        // initialSortingLayer = LayerMask.LayerToName(this.gameObject.layer);
+
+        SetTreeSortingLayer(gameObject, newSortingLayer);
+
+        yield return new WaitForSeconds(waitTime);
+
+        if (Player.transform.Find("head").GetComponent<SpriteRenderer>().sortingLayerName == newSortingLayer)
+        {
+            SetTreeSortingLayer(gameObject, initialSortingLayer);
+        }
+
+        yield return null;
+    }
+
+
+    static void SetTreeSortingLayer(GameObject gameObject, string sortingLayerName)
+    {
+        if(gameObject.GetComponent<SpriteRenderer>() != null) 
+        {
+            gameObject.GetComponent<SpriteRenderer>().sortingLayerName = sortingLayerName;
+        }
+        foreach (Transform child in gameObject.transform)
+        {
+            LevelThreshColliderScript.SetTreeSortingLayer(child.gameObject, sortingLayerName);
+        }
+    }  
 
     private bool isPlayerCrossingUp()
     {

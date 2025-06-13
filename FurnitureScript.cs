@@ -457,7 +457,7 @@ public class FurnitureScript : MonoBehaviour
                 Player.GetComponent<IsoSpriteSorting>().SorterPositionOffset += new Vector3(0, -4f, 0);
             }
         }
-        else if(this.name.Contains("Stool") && (currentFacing != FacingDirection.UpLeft && currentFacing != FacingDirection.UpRight))
+        else if(this.name.Contains("Stool"))
         {
             Player.GetComponent<IsoSpriteSorting>().SorterPositionOffset += new Vector3(0, issOffsetY, 0);
         }
@@ -476,7 +476,7 @@ public class FurnitureScript : MonoBehaviour
             || characterAnimation.bodyTypeNumber == 27
             || characterAnimation.bodyTypeNumber == 28)
             {
-                Player.GetComponent<IsoSpriteSorting>().SorterPositionOffset += new Vector3(0, 1f, 0);
+                Player.GetComponent<IsoSpriteSorting>().SorterPositionOffset += new Vector3(0, -1f, 0);
             }
         }
     }

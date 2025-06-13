@@ -29,7 +29,7 @@ public class CharacterAnimation : MonoBehaviour
   [HideInInspector] public Sprite[] allHeadSprites, allEyeSprites, allThroatSprites, allCollarSprites, allTorsoSprites, 
                       allWaistSprites, allWaistShortsSprites, allKneesShinsSprites, allAnklesSprites, allFeetSprites, 
                       allDressSprites, allJakettoSprites, allLongSleeveSprites, allHandSprites, allShortSleeveSprites, 
-                      allMohawk5TopSprites, allMohawk5BottomSprites, allHair0TopSprites, allHair0BottomSprites, 
+                      allWaterOnHeadSprites, allMohawk5TopSprites, allMohawk5BottomSprites, allHair0TopSprites, allHair0BottomSprites, 
                       allHair1TopSprites, allHair7TopSprites, allHair8TopSprites, allHair1BottomSprites, 
                       allHair2BottomSprites, allHair3BottomSprites, allHair4BottomSprites, allHair6BottomSprites, 
                       allHair7BottomSprites, allHair8BottomSprites, allHairFringe1Sprites, allHairFringe2Sprites, 
@@ -38,7 +38,7 @@ public class CharacterAnimation : MonoBehaviour
 
   [HideInInspector] public SpriteRenderer headSprite, eyeSprite, throatSprite, collarSprite, torsoSprite, waistSprite, 
                          waistShortsSprite, kneesShinsSprite, anklesSprite, feetSprite, jakettoSprite, dressSprite, 
-                         longSleeveSprite, handSprite, shortSleeveSprite, mohawk5TopSprite, mohawk5BottomSprite, 
+                         longSleeveSprite, handSprite, shortSleeveSprite, waterOnHeadSprite, mohawk5TopSprite, mohawk5BottomSprite, 
                          hair0TopSprite, hair0BottomSprite, hair1TopSprite, hair7TopSprite, hair8TopSprite, 
                          hair1BottomSprite, hair2BottomSprite, hair3BottomSprite, hair4BottomSprite, hair6BottomSprite, 
                          hair7BottomSprite, hair8BottomSprite, hairFringe1Sprite, hairFringe2Sprite;
@@ -138,6 +138,7 @@ public class CharacterAnimation : MonoBehaviour
     allLongSleeveSprites = Resources.LoadAll<Sprite>("longSleeve");
     allHandSprites = Resources.LoadAll<Sprite>("hands");
     allShortSleeveSprites = Resources.LoadAll<Sprite>("shortSleeve");
+    allWaterOnHeadSprites = Resources.LoadAll<Sprite>("waterOnHead");
     allMohawk5TopSprites = Resources.LoadAll<Sprite>("mohawk5Top");
     allMohawk5BottomSprites = Resources.LoadAll<Sprite>("mohawk5Bottom");
     allHair0TopSprites = Resources.LoadAll<Sprite>("hair0Top");
@@ -172,6 +173,7 @@ public class CharacterAnimation : MonoBehaviour
     longSleeveSprite = transform.Find("longSleeve").GetComponent<SpriteRenderer>();
     handSprite = transform.Find("hands").GetComponent<SpriteRenderer>();
     shortSleeveSprite = transform.Find("shortSleeve").GetComponent<SpriteRenderer>();
+    waterOnHeadSprite = transform.Find("waterOnHead").GetComponent<SpriteRenderer>();
     mohawk5TopSprite = transform.Find("hair").transform.Find("mohawk5Top").GetComponent<SpriteRenderer>();
     mohawk5BottomSprite = transform.Find("hair").transform.Find("mohawk5Bottom").GetComponent<SpriteRenderer>();
     hair0TopSprite = transform.Find("hair").transform.Find("hair0Top").GetComponent<SpriteRenderer>();
@@ -214,6 +216,7 @@ public class CharacterAnimation : MonoBehaviour
     longSleeveSprite.sprite = allLongSleeveSprites[bodyTypeNumber * bodyTypeIndexMultiplier];
     handSprite.sprite = allHandSprites[bodyTypeNumber * bodyTypeIndexMultiplier];
     shortSleeveSprite.sprite = allShortSleeveSprites[bodyTypeNumber * bodyTypeIndexMultiplier];      
+    waterOnHeadSprite.sprite = allWaterOnHeadSprites[bodyTypeNumber * bodyTypeIndexMultiplier];      
     mohawk5TopSprite.sprite = allMohawk5TopSprites[bodyTypeNumber * bodyTypeIndexMultiplier];      
     mohawk5BottomSprite.sprite = allMohawk5BottomSprites[bodyTypeNumber * bodyTypeIndexMultiplier];      
     hair0TopSprite.sprite = allHair0TopSprites[bodyTypeNumber * bodyTypeIndexMultiplier];      
@@ -256,6 +259,7 @@ public class CharacterAnimation : MonoBehaviour
     IEnumerator LateStartUpdateCharacterData()
     {
         // Wait until the end of the current frame
+        yield return new WaitForEndOfFrame();
         yield return new WaitForEndOfFrame();
 
         if(this.gameObject.CompareTag("Player"))
@@ -344,6 +348,7 @@ public class CharacterAnimation : MonoBehaviour
       longSleeveSprite.sprite = allLongSleeveSprites[movementIndices[currentFrame]];
       handSprite.sprite = allHandSprites[movementIndices[currentFrame]];
       shortSleeveSprite.sprite = allShortSleeveSprites[movementIndices[currentFrame]];
+      waterOnHeadSprite.sprite = allWaterOnHeadSprites[movementIndices[currentFrame]];
       mohawk5TopSprite.sprite = allMohawk5TopSprites[movementIndices[currentFrame]];
       mohawk5BottomSprite.sprite = allMohawk5BottomSprites[movementIndices[currentFrame]];
       hair0TopSprite.sprite = allHair0TopSprites[movementIndices[currentFrame]];
@@ -528,30 +533,34 @@ public class CharacterAnimation : MonoBehaviour
       }
   } 
 
-  private void GetSpritesAndAddToLists(GameObject obj, List<GameObject> spriteList, List<GameObject> excludeList, List<Color> colorList)
+  public void GetSpritesAndAddToLists(GameObject obj, List<GameObject> spriteList, List<GameObject> excludeList, List<Color> colorList)
   {
-      Stack<GameObject> stack = new Stack<GameObject>();
-      stack.Push(obj);
+    // Clear the lists before repopulating
+    spriteList.Clear();
+    colorList.Clear();
 
-      while (stack.Count > 0)
-      {
-          GameObject currentNode = stack.Pop();
-          SpriteRenderer sr = currentNode.GetComponent<SpriteRenderer>();
+    Stack<GameObject> stack = new Stack<GameObject>();
+    stack.Push(obj);
 
-          if (sr != null)
-          {
-              Color col = sr.color;
-              spriteList.Add(currentNode);
-              colorList.Add(col);
-          }
+    while (stack.Count > 0)
+    {
+        GameObject currentNode = stack.Pop();
+        SpriteRenderer sr = currentNode.GetComponent<SpriteRenderer>();
 
-          foreach (Transform child in currentNode.transform)
-          {
-              if (!excludeList.Contains(child.gameObject)){
-                  stack.Push(child.gameObject);
-              }
-          }
-      }
+        if (sr != null)
+        {
+            Color col = sr.color;
+            spriteList.Add(currentNode);
+            colorList.Add(col);
+        }
+
+        foreach (Transform child in currentNode.transform)
+        {
+            if (!excludeList.Contains(child.gameObject)){
+                stack.Push(child.gameObject);
+            }
+        }
+    }
   }
 
   public void initializeCharacterSprites()

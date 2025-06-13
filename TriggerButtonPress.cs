@@ -28,7 +28,7 @@ public class TriggerButtonPress : MonoBehaviour
     {
         Player = GameObject.FindGameObjectWithTag("Player");
         myCharacterMovement = Player.GetComponent<CharacterMovement>(); 
-        myCharacterAnimation = Player.GetComponent<CharacterAnimation>(); 
+        myCharacterAnimation = Player.GetComponent<CharacterAnimation>();   
 
         for (int i = 0; i < treeObjects.Count; i++)
         {

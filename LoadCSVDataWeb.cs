@@ -49,6 +49,7 @@ public class LoadCSVDataWeb : MonoBehaviour
     private string csvFilePath;
     private TextAsset csvFile;
     private CharacterCustomization myCharacterCustomization;
+    CharacterAnimation myCharacterAnimation;
     
     private CharacterMovement characterMovement;
     private TMP_InputField[] inputFields;
@@ -96,6 +97,7 @@ public class LoadCSVDataWeb : MonoBehaviour
         csvFile = Resources.Load<TextAsset>("gradshowentries");
         GameObject customizationMenu = GameObject.FindGameObjectWithTag("CharacterCustomizationMenu");
         myCharacterCustomization = GameObject.FindGameObjectWithTag("Player").GetComponent<CharacterCustomization>();
+        myCharacterAnimation = GameObject.FindGameObjectWithTag("Player").GetComponent<CharacterAnimation>();
         characterMovement = GameObject.FindGameObjectWithTag("Player").GetComponent<CharacterMovement>();
 
 
@@ -429,6 +431,7 @@ public class LoadCSVDataWeb : MonoBehaviour
                 {
                     searchInputField.text = name;
                     DisplayDetailsForName(name);
+                    myCharacterAnimation.GetSpritesAndAddToLists(GameObject.FindGameObjectWithTag("Player"), myCharacterAnimation.characterSpriteList, new List<GameObject>(), myCharacterAnimation.initialChrctrColorList);
                     ClearSuggestions();
                 });
                 suggestionItems.Add(suggestionItem);

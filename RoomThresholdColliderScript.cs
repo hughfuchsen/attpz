@@ -613,7 +613,7 @@ public class RoomThresholdColliderScript : MonoBehaviour
                 {
                     for (int j = 0; j < roomAbove.doorsBelow[i].closedDoorSpriteList.Count; j++)
                     {
-                        this.closedDoorFadeCoroutine = StartCoroutine(treeFade(roomAbove.doorsBelow[i].closedDoorSpriteList[j], 0.3f, 0.3f));
+                        this.closedDoorFadeCoroutine = StartCoroutine(treeFade(roomAbove.doorsBelow[i].closedDoorSpriteList[j], 0.4f, 0.3f));
                     }  
                     for (int k = 0; k < roomAbove.doorsBelow[i].closedDoorSpriteList.Count; k++)
                     {
@@ -641,7 +641,7 @@ public class RoomThresholdColliderScript : MonoBehaviour
                         if(roomAbove.doorsBelow[i].ThisThresholdIsAnEntranceToTheBuildingOrIsStairs())
                         {
                             this.closedDoorFadeCoroutine = StartCoroutine(treeFade(roomAbove.doorsBelow[i].closedDoorSpriteList[j], 
-                                                                            roomAbove.doorsBelow[i].initialClosedDoorAlpha[j], 0.3f, 0.3f)); 
+                                                                            roomAbove.doorsBelow[i].initialClosedDoorAlpha[j], 0.4f, 0.3f)); 
                             // SetTreeAlpha(roomAbove.doorsBelow[i].closedDoorSpriteList[j], roomAbove.doorsBelow[i].initialClosedDoorAlpha[j]);
                         }
                     } 

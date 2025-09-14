@@ -14,6 +14,8 @@ public class TriggerButtonPress : MonoBehaviour
     private float time = 0f; // The current time for the sine wave animation
     private bool spacebarReleased = true; // Flag to track if spacebar was released
 
+    private Coroutine spriteReset;
+
     public bool isOutside = false;
 
     [SerializeField] GameObject Player;
@@ -25,7 +27,7 @@ public class TriggerButtonPress : MonoBehaviour
 
 
     void Awake()
-    {
+    { 
         Player = GameObject.FindGameObjectWithTag("Player");
         myCharacterMovement = Player.GetComponent<CharacterMovement>(); 
         myCharacterAnimation = Player.GetComponent<CharacterAnimation>();   
@@ -80,23 +82,28 @@ public class TriggerButtonPress : MonoBehaviour
                             SetAlpha(sprites[i], 1);
                         }
 
-                        for (int i = 0; i < myCharacterAnimation.characterSpriteList.Count; i++)
-                        {            
-                            myCharacterAnimation.SetAlpha(myCharacterAnimation.characterSpriteList[i], 0.15f);
+                        if (spriteReset != null)
+                        {
+                            StopCoroutine(spriteReset);
+                            spriteReset = null;
                         }
+                        // for (int i = 0; i < myCharacterAnimation.characterSpriteList.Count; i++)
+                        // {            
+                        //     myCharacterAnimation.SetAlpha(myCharacterAnimation.characterSpriteList[i], 0.15f);
+                        // }
 
                         spacebarReleased = false; // Spacebar is being held down
                     }
                     else if (!Input.GetKey(KeyCode.Space) && !spacebarReleased) // Check if spacebar was released
                     {
-                        for (int i = 0; i < sprites.Count; i++)
-                        {
-                            SetAlpha(sprites[i], 0); // Reset alpha value to 0
-                        }
-                        for (int i = 0; i < myCharacterAnimation.characterSpriteList.Count; i++)
-                        {            
-                            myCharacterAnimation.SetAlpha(myCharacterAnimation.characterSpriteList[i], myCharacterAnimation.initialChrctrColorList[i].a);
-                        }
+                        // for (int i = 0; i < sprites.Count; i++)
+                        // {
+                        //     SetAlpha(sprites[i], 0); // Reset alpha value to 0
+                        // }
+                        // for (int i = 0; i < myCharacterAnimation.characterSpriteList.Count; i++)
+                        // {            
+                        //     myCharacterAnimation.SetAlpha(myCharacterAnimation.characterSpriteList[i], myCharacterAnimation.initialChrctrColorList[i].a);
+                        // }
 
                         spacebarReleased = true; // Spacebar is released
                     }
@@ -120,20 +127,22 @@ public class TriggerButtonPress : MonoBehaviour
         {
             if (other.CompareTag("PlayerCollider") && !myCharacterMovement.playerIsOutside)
             {
-                for (int i = 0; i < sprites.Count; i++)
-                {
-                    SetAlpha(sprites[i], 0);
-                }
+                // for (int i = 0; i < sprites.Count; i++)
+                // {
+                //     SetAlpha(sprites[i], 0);
+                // }
                 
                 for (int i = 0; i < vSprites.Count; i++)
                 {
                     SetColor(vSprites[i], initialVValue[i]);
                 }  
 
-                for (int i = 0; i < myCharacterAnimation.characterSpriteList.Count; i++)
-                {            
-                    myCharacterAnimation.SetAlpha(myCharacterAnimation.characterSpriteList[i], myCharacterAnimation.initialChrctrColorList[i].a);
-                }
+                // for (int i = 0; i < myCharacterAnimation.characterSpriteList.Count; i++)
+                // {            
+                //     myCharacterAnimation.SetAlpha(myCharacterAnimation.characterSpriteList[i], myCharacterAnimation.initialChrctrColorList[i].a);
+                // }
+
+                spriteReset = StartCoroutine(ResetSpritesAfterTime());
             }
         }
     }
@@ -203,6 +212,18 @@ public class TriggerButtonPress : MonoBehaviour
         SpriteRenderer sr = treeNode.GetComponent<SpriteRenderer>();
 
         sr.color = color;
-    }    
+    }  
+
+    private IEnumerator ResetSpritesAfterTime()
+    {
+        yield return new WaitForSeconds(Random.Range(1.5f, 2.5f));
+
+        // Loop through sprites and reset alpha
+        for (int i = 0; i < sprites.Count; i++)
+        {
+            SetAlpha(sprites[i], 0f); // Reset alpha value to 0
+        }
+    }
+ 
 }
 

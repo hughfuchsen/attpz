@@ -7,6 +7,8 @@ public class BuildingScript : MonoBehaviour
 {
     public List<BuildingScript> allOtherBuildings = new List<BuildingScript>();
 
+    [HideInInspector] public CameraMovement cameraMovement;
+
     public GameObject innerBuilding;
     public GameObject outerBuilding;
     [SerializeField] public List<GameObject> gameObjectsToShowWhileOutside = new List<GameObject>();
@@ -93,6 +95,8 @@ public class BuildingScript : MonoBehaviour
         // GetSpritesAndAddToLists(GameObject obj, List<GameObject> spriteList, List<GameObject> excludeList, List<Color> colorList)
 
         this.ExitBuilding(0f, 0f, false);
+
+        cameraMovement = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraMovement>();
 
     }
 
@@ -210,6 +214,11 @@ public class BuildingScript : MonoBehaviour
         outerBuildingFadeCoroutine = StartCoroutine(FadeThenSetDontSort(true, false, false, outerSpriteSortingScriptObj, false, true, waitTimeOutside, false, outerBuildingSpriteList, outerBuildingInitialColorList, null, tagsToExludeEntExt));
         setDontSortForAllOuterBuildingsCoro = StartCoroutine(SetDontSortForAllOtherOuterBuildings(false, false));
 
+        // cameraMovement.currentRoom = null;
+        // cameraMovement.currentLevel = null;
+        // cameraMovement.currentBuilding = null;
+        
+
     }
     public void GoBehindBuilding()
     {
@@ -251,6 +260,10 @@ public class BuildingScript : MonoBehaviour
         setDontSortForAllOuterBuildingsCoro = StartCoroutine(SetDontSortForAllOtherOuterBuildings(false, false));
         // innerBuildingFadeCoroutine = StartCoroutine(BuildingSequence(true, 0.3f, true, innerBuildingSpriteList, null, 0f));
         // outerBuildingFadeCoroutine = StartCoroutine(BuildingSequence(true, 0.3f, true, outerBuildingSpriteList, null, 0.35f, tagsToExludeEntExt));
+        
+        // cameraMovement.currentRoom = null;
+        // cameraMovement.currentLevel = null;
+        // cameraMovement.currentBuilding = null;
     }
 
 
@@ -316,6 +329,9 @@ public class BuildingScript : MonoBehaviour
                 // }
             }
 
+            // cameraMovement.currentRoom = null;
+            // cameraMovement.currentLevel = null;
+            // cameraMovement.currentBuilding = null;
 
             // Your code after the wait time elapses
         }
@@ -368,12 +384,13 @@ public class BuildingScript : MonoBehaviour
                 {
                     SetTreeAlpha(gameObjectsToShowWhileOutsideSpriteList[i], 0f);
                 }
-            }        
+            }    
+
+            // cameraMovement.currentRoom = null;
+            // cameraMovement.currentLevel = null;
+            // cameraMovement.currentBuilding = null;    
             // Your code after the wait time elapses
         }
-
-
-
 
 
 
@@ -384,6 +401,7 @@ public class BuildingScript : MonoBehaviour
             //     // allOtherBuildings[i].SetDontSort(allOtherBuildings[i].innerSpriteSortingScriptObj, true);
             //     allOtherBuildings[i].SetDontSort(allOtherBuildings[i].outerSpriteSortingScriptObj, true);            
             // }
+            // cameraMovement.currentBuilding = this;    
 
 
             for (int i = 0; i < npcSpriteList.Count; i++)
@@ -402,8 +420,6 @@ public class BuildingScript : MonoBehaviour
                 //     npcList[i].GetComponent<CharacterMovement>().npcRandomMovementCoro = StartCoroutine(npcList[i].GetComponent<CharacterMovement>().MoveCharacterRandomly());
                 // }
             }
-
-
 
 
             for (int i = 0; i < innerBuildingSpriteList.Count; i++)
@@ -439,7 +455,9 @@ public class BuildingScript : MonoBehaviour
                 {
                     SetTreeAlpha(gameObjectsToShowWhileOutsideSpriteList[i], gameObjectsToShowWhileOutsideColorList[i].a);
                 }
-            }  
+            } 
+
+ 
         }
 
         //instant alpha

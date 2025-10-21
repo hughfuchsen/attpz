@@ -5,7 +5,7 @@ using UnityEngine;
 public class CombinationGenerator : MonoBehaviour
 {
     static System.Random random = new System.Random();
-    private const string filePath = "Assets/AATPZAssets/Resources/combinations.14.11.24.csv"; // File path for the CSV
+    private const string filePath = "Assets/AATPZAssets/Resources/combinations.17.09.25.csv"; // File path for the CSV
 
     // Start is called before the first frame update
     void Start()
@@ -43,6 +43,7 @@ public class CombinationGenerator : MonoBehaviour
             random.Next(0, 4),   // width (0-3)
             random.Next(0, 10),  // pantsCol (0-10)
             random.Next(0, 11),  // shirtCol (0-10)
+            random.Next(0, 1),  // hat (0-1)
             random.Next(0, 13),  // hairStyle (1-13)
             random.Next(0, 9),   // jaketto (0-8)
             random.Next(0, 10),  // jakettoCol (0-10)

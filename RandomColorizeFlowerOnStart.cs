@@ -1,16 +1,24 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RandomColorizeFlowerOnStart : MonoBehaviour
+public class FlowerScript : MonoBehaviour
 {
+    private List<Transform> initialPositionsList; 
     private List<SpriteRenderer> childSpriteRenderers = new List<SpriteRenderer>();
     private IsoSpriteSorting isoSpriteSorting;
+
+    [SerializeField] GameObject petal;
+    [SerializeField] GameObject bud;
+    [SerializeField] GameObject trig;
+    [SerializeField] GameObject stem;
+
+    public int trigPosX;
+    public int trigPosY;
 
     public int stemRangeMin = 1;
     public int stemRangeMax = 6;
     public int minOffsetX = 0;
     public int maxOffsetX = 3;
-
 
 
     private void Start()
@@ -23,6 +31,7 @@ public class RandomColorizeFlowerOnStart : MonoBehaviour
             if (spriteRenderer != null)
             {
                 childSpriteRenderers.Add(spriteRenderer);
+                initialPositionsList.Add(child);
             }
         }
 
@@ -33,18 +42,25 @@ public class RandomColorizeFlowerOnStart : MonoBehaviour
             {
                 SetRandomColor(spriteRenderer);
             }
+            else if(spriteRenderer.name.Equals("FlowerStem"))
+            {
+                SetRandomGreenColor(spriteRenderer);
+            }
         }
 
         // Find and move the FlowerStem object (child)
         Transform flowerStem = transform.Find("FlowerStem");
         if (flowerStem != null)
         {
-            // Randomly move the flowerStem 
-            float randomXOffset = Random.Range(minOffsetX, maxOffsetX+1);
+            // Randomly move the flowerStem  
+            int randomXOffset = Random.Range(minOffsetX, maxOffsetX+1);
             flowerStem.position += new Vector3(randomXOffset, 0, 0);
+            
+        
 
             int randomYScale = Random.Range(stemRangeMin, stemRangeMax+1);  // This will give values between 3 and 6 (inclusive)
             flowerStem.localScale = new Vector3(flowerStem.localScale.x, randomYScale, flowerStem.localScale.z);
+
 
 
             for (int i = 1; i <= stemRangeMax; i++)
@@ -54,6 +70,9 @@ public class RandomColorizeFlowerOnStart : MonoBehaviour
                     isoSpriteSorting.SorterPositionOffset.y -= i;
                 }
             }
+
+            trig.transform.position = new Vector3((trig.transform.position.x + randomXOffset), (trig.transform.position.y - randomYScale + 1), 0);
+
 
             // if(randomYScale == stemRangeMin + 1)
             // {
@@ -96,6 +115,56 @@ public class RandomColorizeFlowerOnStart : MonoBehaviour
 
         Color randomColor = Color.HSVToRGB(hue, saturation, value);
         spriteRenderer.color = randomColor;
+    }
+
+    private void SetRandomGreenColor(SpriteRenderer spriteRenderer)
+    {
+        float hue = Random.Range(0.22f, 0.42f);
+
+        // Generate hue while avoiding the green range (0.25 to 0.45)
+
+        float saturation = 0.68f;
+        float value = 1f;
+
+        Color randomColor = Color.HSVToRGB(hue, saturation, value);
+        spriteRenderer.color = randomColor;
+    }
+    void OnTriggerEnter2D(Collider2D collision)
+    {
+        Bounds playerBounds = collision.bounds;
+
+        // Find the point of contact
+        Vector2 contactPoint = collision.ClosestPoint(transform.position);
+
+        // Define regions within the player's collider
+        Vector2 center = playerBounds.center;
+        Vector2 max = playerBounds.max;
+        Vector2 min = playerBounds.min;
+
+        // Check if the contact point is within the top-right quarter
+        if (contactPoint.x >= center.x && contactPoint.y >= center.y)
+        {
+            // Execute your desired code here for top-right 
+
+        }
+        // Check if the contact point is within the top-left quarter
+        else if (contactPoint.x <= center.x && contactPoint.y >= center.y)
+        {
+            // Execute your desired code here for top-left
+
+        }
+        // Check if the contact point is within the bottom-left quarter
+        else if (contactPoint.x <= center.x && contactPoint.y <= center.y)
+        {
+            // Execute your desired code here for bottom-left
+
+        }
+        // Check if the contact point is within the bottom-right quarter
+        else if (contactPoint.x >= center.x && contactPoint.y <= center.y)
+        {
+            // Execute your desired code here for bottom-right
+
+        }
     }
 }
 

@@ -5,23 +5,43 @@ using UnityEngine;
 public class RoomScript : MonoBehaviour
 {
     public BuildingScript building;
+    [HideInInspector] public CameraMovement cameraMovement;
     public LevelScript level = null;
     public List<RoomScript> roomsSameOrAbove = new List<RoomScript>();
     public List<RoomScript> roomsBelow = new List<RoomScript>();
+    private List<GameObject> roomSpriteList = new List<GameObject>();
+    private List<Color> initialColorList = new List<Color>();
+    private List<Color> desaturatedColorList = new List<Color>();
+    // private List<Color> initialColorListToBeChangedWithLevelMovements = new List<Color>();
     private List<Transform> childColliders = new List<Transform>(); // Separate list for child colliders
     public List<RoomThresholdColliderScript> doorsBelow = new List<RoomThresholdColliderScript>();
     private List<Coroutine> doorsBelowCoros = new List<Coroutine>();
-    public int wallHeight = 30;
+    public int wallHeight = 31;
     private Vector3 initialPosition;
     private List<Vector3> childColliderInitialPositions = new List<Vector3>();
     private Coroutine currentMotionCoroutine;
+    private Coroutine currentColorCoroutine;
     private Coroutine currentColliderMotionCoroutine;
 
     public List<GameObject> npcList = new List<GameObject>();
     [HideInInspector] public List<GameObject> npcSpriteList = new List<GameObject>();
     [HideInInspector] public List<Color> npcColorList = new List<Color>();
 
+    void Awake()
+    {
+        GetSpritesAndAddToLists(this.gameObject, roomSpriteList);
+        for (int i = 0; i < roomSpriteList.Count; i++)
+        {
+            // if(!roomSpriteList[i].CompareTag("ClosedDoor"))
+            // {
+                SpriteRenderer sr = roomSpriteList[i].GetComponent<SpriteRenderer>();
 
+                Color initialColor = sr.color;
+                initialColorList.Add(initialColor);
+                // initialColorListToBeChangedWithLevelMovements.Add(initialColor);
+            // }
+        }
+    }
 
     void Start()
     {
@@ -35,6 +55,12 @@ public class RoomScript : MonoBehaviour
 
         StartCoroutine(LateStartCoroForNonPlayerCharacters());
 
+        cameraMovement = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraMovement>();
+
+
+        AddInitialColorsToDesaturatedColorList();
+
+        wallHeight = wallHeight + 9;
     }
 
     private void FindColliderObjects(Transform transform)
@@ -49,7 +75,9 @@ public class RoomScript : MonoBehaviour
             foreach (Transform child in current)
             {
                 // if (child.CompareTag("Collider") || child.CompareTag("Trigger"))
-                if (child.GetComponent<BoxCollider2D>() != null || child.GetComponent<PolygonCollider2D>() != null)
+                if ((child.GetComponent<BoxCollider2D>() != null || child.GetComponent<PolygonCollider2D>() != null)
+                    && !child.CompareTag("MovableCollider")
+                    )
                 {
                     childColliders.Add(child);
                     childColliderInitialPositions.Add(child.position); // Store the initial local position
@@ -83,6 +111,9 @@ public class RoomScript : MonoBehaviour
             doorsBelow[i].SetPlayerIsInRoomAbove(true);
             doorsBelow[i].SetPlayerIsInDoorway(false);
         }
+
+        cameraMovement.currentRoom = this;
+
     }
     
     public void ExitRoomAndSetDoorwayInstances() 
@@ -92,6 +123,7 @@ public class RoomScript : MonoBehaviour
             doorsBelow[i].SetPlayerIsInRoomAbove(false);
             doorsBelow[i].SetPlayerIsInDoorway(false);
         }
+        cameraMovement.currentRoom = null;
     }
     
     public void ResetRoomPositions() //move rooms to initial positions
@@ -113,8 +145,13 @@ public class RoomScript : MonoBehaviour
         {
             StopCoroutine(currentMotionCoroutine);
         }
+        // if (currentColorCoroutine != null)
+        // {
+        //     StopCoroutine(currentColorCoroutine);
+        // }
 
         currentMotionCoroutine = StartCoroutine(Displace(false, null, this.gameObject, initialPosition, movingUp));
+        // currentColorCoroutine = StartCoroutine(ApplyColorToRoom(false));
     }
     
     public void MoveDown(bool shouldWait, float? waitTime, bool movingUp = false)
@@ -123,11 +160,17 @@ public class RoomScript : MonoBehaviour
         {
             StopCoroutine(currentMotionCoroutine);
         }
+        // if (currentColorCoroutine != null)
+        // {
+        //     StopCoroutine(currentColorCoroutine);
+        // }
 
         if (waitTime.HasValue)
         {
             // Move the parent object down
             currentMotionCoroutine = StartCoroutine(Displace(shouldWait, waitTime.Value, this.gameObject, initialPosition + new Vector3(0, -wallHeight, 0), movingUp));
+            // currentColorCoroutine = StartCoroutine(ApplyColorToRoom(true));
+
         }
         else
         {
@@ -137,213 +180,10 @@ public class RoomScript : MonoBehaviour
     }
 
 
-    // IEnumerator Displace(bool shouldWait, float? waitTime, GameObject obj, Vector3 targetPosition)
-    // {
-    //     Vector3 currentPosition = obj.transform.localPosition;
-
-    //     float distance = (currentPosition - targetPosition).magnitude;
-
-    //     float timeToReachTarget = 0.3f;
-
-    //     float elapsedTime = 0f;
-
-    //     List<Vector2> npcInitialColliderPos = new List<Vector2>();
-
-    //     for (int i = 0; i < building.npcList.Count; i++)
-    //     {
-
-    //         npcInitialColliderPos.Add(building.npcList[i].GetComponent<BoxCollider2D>().offset);
-    //         // npcInitialColliderPos[i] = building.npcList[i].GetComponent<BoxCollider2D>().offset;
-    //     }
-
-
-    //     if(shouldWait)
-    //     {
-    //         yield return new WaitForSeconds(waitTime.Value);
-    //     }
-        
-    //     while (elapsedTime < timeToReachTarget)
-    //     {
-    //         elapsedTime += Time.deltaTime;
-
-    //         float t = Mathf.Clamp01(elapsedTime / timeToReachTarget);
-
-    //         // Rearranged LERP:
-    //         // displacements = target - initial
-    //         // initial + displacements * t
-    //         // initial + (target - initial) * t
-    //         // initial + target * t - initial * t
-    //         // initial * (1 - t) + target * t
-    //         obj.transform.localPosition = currentPosition * (1 - t) + targetPosition * t;
-
-    //         for (int i = 0; i < childColliders.Count; i++)
-    //         {
-    //             childColliders[i].position = childColliderInitialPositions[i];
-    //         }
-
-    //         for (int i = 0; i < building.npcList.Count; i++)
-    //         {
-    //             // building.npcList[i].GetComponent<CharacterMovement>().change = Vector3.zero;
-    //             building.npcList[i].GetComponent<BoxCollider2D>().offset = npcInitialColliderPos[i];
-    //         }
-
-
-    //         yield return null;
-    //     }
-
-    //     obj.transform.localPosition = targetPosition; // Ensure the object reaches the exact target position
-
-    //     for (int i = 0; i < childColliders.Count; i++)
-    //     {
-    //         childColliders[i].position = childColliderInitialPositions[i]; // Ensure the object reaches the exact target position
-    //     }
-    // }
-
-    // IEnumerator Displace(bool shouldWait, float? waitTime, GameObject obj, Vector3 targetPosition, bool movingUp)
-    // {
-
-    //     Vector3 currentPosition = obj.transform.localPosition;
-    //     float timeToReachTarget = 0.3f;
-    //     float elapsedTime = 0f;
-
-    //     // Populate npcInitialColliderPos list and save initial and target positions for each NPC
-    //     List<Vector2> npcInitialColliderPos = new List<Vector2>();
-    //     List<Vector3> npcInitialPositions = new List<Vector3>();
-    //     List<Vector3> npcTargetPositions = new List<Vector3>();
-
-    //     Vector3 npcTargetPosition;
-
-    //     for (int i = 0; i < npcList.Count; i++)
-    //     {            
-    //         npcInitialColliderPos.Add(npcList[i].GetComponent<BoxCollider2D>().offset);
-    //         npcList[i].transform.parent = this.transform;
-    //     }
-
-    //     for (int i = 0; i < npcSpriteList.Count; i++)
-    //     {      
-    //         Vector3 npcInitialPosition = npcSpriteList[i].transform.position;
-    //         npcInitialPositions.Add(npcInitialPosition);
-
-    //     }
-
-    //     if (shouldWait)
-    //     {
-    //         yield return new WaitForSeconds(waitTime.Value);
-    //     }
-
-    //     while (elapsedTime < timeToReachTarget)
-    //     {
-    //         elapsedTime += Time.deltaTime;
-    //         float t = Mathf.Clamp01(elapsedTime / timeToReachTarget);
-
-    //         // Move main object toward target
-    //         obj.transform.localPosition = currentPosition * (1 - t) + targetPosition * t;
-
-    //         // Move each NPC from its initial position to its target position
-
-
-            
-
-    //         for (int i = 0; i < childColliders.Count; i++)
-    //         {
-    //             childColliders[i].position = childColliderInitialPositions[i];
-    //         }
-
- 
-
-    //         yield return null;
-    //     }
-
-    //     for (int i = 0; i < npcList.Count; i++)
-    //     {
-    //         npcList[i].transform.parent = null;
-    //     }
-
-    //     obj.transform.localPosition = targetPosition;
-
-    //     for (int i = 0; i < npcList.Count; i++)
-    //     {
-    //         npcList[i].GetComponent<BoxCollider2D>().offset = npcInitialColliderPos[i];
-    //     }
-
-    //     for (int i = 0; i < childColliders.Count; i++)
-    //     {
-    //         childColliders[i].position = childColliderInitialPositions[i];
-    //     }
-    // }
-
-
-   
-
-    // IEnumerator Displace(bool shouldWait, float? waitTime, GameObject obj, Vector3 targetPosition, bool movingUp)
-    // {
-    //     Vector3 currentPosition = obj.transform.localPosition;
-    //     float timeToReachTarget = 0.3f;
-    //     float elapsedTime = 0f;
-
-    //     // Save initial collider offsets and positions for each NPC
-    //     List<Vector3> npcInitialCollider = new List<Vector2>();
-    //     List<Vector3> npcInitialPositions = new List<Vector3>();
-
-    //     for (int i = 0; i < npcList.Count; i++)
-    //     {            
-    //         npcInitialColliderPos.Add(npcList[i].GetComponentInChildren<BoxCollider2D>().transform.position);
-    //         npcInitialPositions.Add(npcList[i].transform.position);  // Store initial world position
-    //         npcList[i].transform.parent = this.transform;
-    //     }
-
-    //     if (shouldWait)
-    //     {
-    //         yield return new WaitForSeconds(waitTime.Value);
-    //     }
-
-    //     while (elapsedTime < timeToReachTarget)
-    //     {
-    //         elapsedTime += Time.deltaTime;
-    //         float t = Mathf.Clamp01(elapsedTime / timeToReachTarget);
-
-    //         // Move main object toward target
-    //         obj.transform.localPosition = Vector3.Lerp(currentPosition, targetPosition, t);
-
-    //         for (int i = 0; i < childColliders.Count; i++)
-    //         {
-    //             childColliders[i].position = childColliderInitialPositions[i];
-    //         }
-
-    //         // Adjust each NPC's collider offset to simulate a fixed collider position
-    //         for (int i = 0; i < npcList.Count; i++)
-    //         {
-    //             Vector3 npcColliderObj = npcList[i].GetComponentInChildren<BoxCollider2D>();
-
-    //             npcColliderObj.offset = npcInitialColliderPos[i] + (Vector2)displacement;
-
-    //             npcList[i].GetComponent<CharacterMovement>().change = Vector3.zero;
-    //         }
-
-    //         yield return null;
-    //     }
-
-    //     // Detach NPCs from parent and reset their positions if needed
-    //     for (int i = 0; i < npcList.Count; i++)
-    //     {
-    //         npcList[i].transform.parent = null;
-    //         npcInitialPositions[i] = npcList[i].transform.position;
-    //         // npcList[i].GetComponent<BoxCollider2D>().offset = npcInitialColliderPos[i]; // Reset offset
-    //     }
-
-    //     obj.transform.localPosition = targetPosition;
-
-    //     for (int i = 0; i < childColliders.Count; i++)
-    //     {
-    //         childColliders[i].position = childColliderInitialPositions[i];
-    //     }
-    // }
-
-
 
     IEnumerator Displace(bool shouldWait, float? waitTime, GameObject obj, Vector3 targetPosition, bool movingUp)
     {
-        Vector3 currentPosition = obj.transform.localPosition;
+        Vector3 currentPosition = obj.transform.localPosition; 
         float timeToReachTarget = 0.3f;
         float elapsedTime = 0f;
 
@@ -430,7 +270,64 @@ public class RoomScript : MonoBehaviour
     }
 
 
+    IEnumerator ApplyColorToRoom(bool applyColor)
+    {
+        if (applyColor == true)
+        {
+            Desaturate();
+        }
+        else
+        {
+            Resaturate();
+        }
 
+        yield return null;
+    }
+
+    public void Desaturate()
+    {
+        for (int i = 0; i < roomSpriteList.Count; i++)
+        {
+            SpriteRenderer sr = roomSpriteList[i].GetComponent<SpriteRenderer>();
+
+            if (roomSpriteList[i].CompareTag("OpenDoor") || roomSpriteList[i].CompareTag("AlphaZeroEntExt"))
+            {
+                Color newColor = sr.color; // Get the current color
+                newColor.a = 0; // Set the alpha component
+                sr.color = newColor; // Assign the modified color
+            }
+            else
+            {
+                sr.color = desaturatedColorList[i]; // Assign the previously calculated desaturated color
+            }
+        }
+    }
+
+    public void Resaturate()
+    {
+        for (int i = 0; i < roomSpriteList.Count; i++)
+        {
+            SpriteRenderer sr = roomSpriteList[i].GetComponent<SpriteRenderer>();
+
+            if (roomSpriteList[i].CompareTag("OpenDoor") || roomSpriteList[i].CompareTag("AlphaZeroEntExt"))
+            {
+                if (sr != null)
+                {
+                    Color newColor = sr.color; // Get the current color
+                    newColor.a = 0; // Set the alpha component
+                    sr.color = newColor; // Assign the modified color
+                }
+            }
+            else if (sr.color.a == 0f)
+            {
+                sr.color = new Color(initialColorList[i].r, initialColorList[i].g, initialColorList[i].b, 0f);
+            }
+            else
+            {
+                sr.color = initialColorList[i];
+            }
+        }
+    }
 
         // Finds the parent GameObject by tag
     public BuildingScript FindParentByBuildingScriptComponent()
@@ -492,7 +389,7 @@ public class RoomScript : MonoBehaviour
             GameObject currentNode = stack.Pop();
             SpriteRenderer sr = currentNode.GetComponent<SpriteRenderer>();
 
-            if (sr != null)
+            if (sr != null && !currentNode.CompareTag("ClosedDoor"))
             {
                 spriteList.Add(currentNode);
             }
@@ -515,6 +412,23 @@ public class RoomScript : MonoBehaviour
             foreach (Transform child in obj.transform)
             {
                 SetZToZero(child.gameObject);
+            }
+        }
+
+    void AddInitialColorsToDesaturatedColorList()
+        {
+            for (int i = 0; i < initialColorList.Count; i++)
+            {
+                Color desaturatedColor = initialColorList[i];
+                Color.RGBToHSV(initialColorList[i], out float h, out float s, out float v);
+
+                
+                s -= s / 2f;
+                // v -= v / 5f;
+
+                desaturatedColor = Color.HSVToRGB(h, s, v); // Update desaturatedColor with modified HSV values
+
+                desaturatedColorList.Add(desaturatedColor); // Add the modified color to the new list
             }
         }
 

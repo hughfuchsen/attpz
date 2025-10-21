@@ -1201,7 +1201,7 @@ public class LoadCSVData : MonoBehaviour
                     chosenDataRow = parameters;
                     myCharacterCustomization.UpdateSpecific(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4],
                                                 parameters[5], parameters[6], parameters[7], parameters[8], parameters[9],
-                                                parameters[10], parameters[11], parameters[12], parameters[13]);
+                                                parameters[10], parameters[11], parameters[12], parameters[13], parameters[14]);
                 }
             }
         }
@@ -1223,7 +1223,7 @@ public class LoadCSVData : MonoBehaviour
             List<int> parameters = intParams.Select(param => int.Parse(param.Trim())).ToList();
             obj.GetComponent<CharacterCustomization>().UpdateSpecific(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4],
                     parameters[5], parameters[6], parameters[7], parameters[8], parameters[9],
-                    parameters[10], parameters[11], parameters[12], parameters[13]);
+                    parameters[10], parameters[11], parameters[12], parameters[13], parameters[14]);
         }
     
         string dialogueText1 = row[7];

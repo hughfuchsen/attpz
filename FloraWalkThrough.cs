@@ -34,7 +34,6 @@ public class FloraWalkThrough : MonoBehaviour
     {
         if (collision.gameObject.tag == "PlayerCollider" || collision.gameObject.tag == "NPCCollider" )
         {
-
             Bounds playerBounds = collision.bounds;
 
             // Find the point of contact
@@ -69,6 +68,7 @@ public class FloraWalkThrough : MonoBehaviour
                 // Execute your desired code here for bottom-right
                 Animate("BendRight");
             }
+            
         } 
     }
 

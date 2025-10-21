@@ -30,7 +30,7 @@ public enum ContactQuadrant
 }
  
 public class CharacterMovement : MonoBehaviour
-{
+{ 
   CharacterAnimation characterAnimation;
   CharacterMovement myCharacterMovement;
 
@@ -123,15 +123,17 @@ public class CharacterMovement : MonoBehaviour
   }
   void FixedUpdate()
     {
-      MoveCharacter(); 
+      if(this.gameObject.tag == "Player")
+      {
+        MoveCharacter(); 
+      }
     }
 
 
   public void MoveCharacter()
   {
       // get user inputs
-    if(this.gameObject.tag == "Player")
-    {
+
       change = Vector3.zero;
       if (IsInputFieldFocused() || playerOnFurniture)
       {
@@ -165,7 +167,7 @@ public class CharacterMovement : MonoBehaviour
       // Debug.Log("Velocity: " + velocity);
       // Debug.Log("Input: " + change);
       // CheckDirection(velocity);
-    }
+    
       
 
     if(change != Vector3.zero)
@@ -197,6 +199,10 @@ public class CharacterMovement : MonoBehaviour
     else if (motionDirection == "downLadder")
     {
       motionDirection = "upDownLadder";
+    }
+    else if(motionDirection == "none")
+    {
+      // do nutting
     }
     else // if change == 0 :^)
     {

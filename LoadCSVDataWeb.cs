@@ -94,7 +94,7 @@ public class LoadCSVDataWeb : MonoBehaviour
 
         // Initialize paths and references
         csvFilePath = Path.Combine(Application.persistentDataPath, "CharacterProfilesPrototype7.csv");
-        csvFile = Resources.Load<TextAsset>("gradshowentries");
+        csvFile = Resources.Load<TextAsset>("characterTable18.09.2025");
         GameObject customizationMenu = GameObject.FindGameObjectWithTag("CharacterCustomizationMenu");
         myCharacterCustomization = GameObject.FindGameObjectWithTag("Player").GetComponent<CharacterCustomization>();
         myCharacterAnimation = GameObject.FindGameObjectWithTag("Player").GetComponent<CharacterAnimation>();
@@ -357,8 +357,8 @@ public class LoadCSVDataWeb : MonoBehaviour
             myCharacterCustomization.currentFeetIndex, myCharacterCustomization.currentPantsIndex, myCharacterCustomization.currentWaistIndex,
             myCharacterCustomization.currentHairColorIndex, myCharacterCustomization.currentShirtIndex, myCharacterCustomization.currentHeightIndex,
             myCharacterCustomization.currentBodyTypeIndex, myCharacterCustomization.currentWidthIndex, myCharacterCustomization.currentPantsColorIndex,
-            myCharacterCustomization.currentShirtColorIndex, myCharacterCustomization.currentHairStyleIndex, myCharacterCustomization.currentJakettoIndex,
-            myCharacterCustomization.currentJakettoColorIndex, myCharacterCustomization.currentSkinColorIndex
+            myCharacterCustomization.currentShirtColorIndex, myCharacterCustomization.currentHairStyleIndex, myCharacterCustomization.currentHatIndex, 
+            myCharacterCustomization.currentJakettoIndex, myCharacterCustomization.currentJakettoColorIndex, myCharacterCustomization.currentSkinColorIndex
         };
 
         // Join parameters as a comma-separated string and wrap them in double quotes
@@ -565,13 +565,13 @@ public class LoadCSVDataWeb : MonoBehaviour
 
                 // Handle character myCharacterCustomization params
                 string[] intParams = column[6].Split(',').Where(param => !string.IsNullOrWhiteSpace(param)).ToArray();
-                if (intParams.Length == 14)
+                if (intParams.Length == 15)
                 {
                     List<int> parameters = intParams.Select(param => int.Parse(param.Trim())).ToList();
                     chosenDataRow = parameters;
                     myCharacterCustomization.UpdateSpecific(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4],
                                                 parameters[5], parameters[6], parameters[7], parameters[8], parameters[9],
-                                                parameters[10], parameters[11], parameters[12], parameters[13]);
+                                                parameters[10], parameters[11], parameters[12], parameters[13], parameters[14]);
                 }
             }
         }
@@ -593,7 +593,7 @@ public class LoadCSVDataWeb : MonoBehaviour
             List<int> parameters = intParams.Select(param => int.Parse(param.Trim())).ToList();
             obj.GetComponent<CharacterCustomization>().UpdateSpecific(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4],
                     parameters[5], parameters[6], parameters[7], parameters[8], parameters[9],
-                    parameters[10], parameters[11], parameters[12], parameters[13]);
+                    parameters[10], parameters[11], parameters[12], parameters[13], parameters[14]);
         }
     
         string dialogueText1 = row[7];

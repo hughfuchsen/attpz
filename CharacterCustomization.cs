@@ -20,6 +20,7 @@ public class CharacterCustomization : MonoBehaviour
     [HideInInspector] public bool lockedBodyType = false;
     [HideInInspector] public bool lockedHeight = false;
     [HideInInspector] public bool lockedWidth = false;
+    [HideInInspector] public bool lockedHat = false;
     [HideInInspector] public bool lockedHair = false;
     [HideInInspector] public bool lockedShirt = false;
     [HideInInspector] public bool lockedWaist = false;
@@ -33,6 +34,7 @@ public class CharacterCustomization : MonoBehaviour
     private Image lockHeightImgComponent;
     private Image lockWidthImgComponent;
     private Image lockHairImgComponent;
+    private Image lockHatImgComponent;
     private Image lockShirtImgComponent;
     private Image lockWaistImgComponent;
     private Image lockPantsImgComponent;
@@ -55,6 +57,7 @@ public class CharacterCustomization : MonoBehaviour
     [HideInInspector] public int currentHeightIndex = 0;   // Index to track current height
     [HideInInspector] public int currentWidthIndex = 0;    // Index to track current currentWidthIndex
     [HideInInspector] public int currentHairStyleIndex = 0;    //"" "" "" 
+    [HideInInspector] public int currentHatIndex = 0;    //"" "" "" 
     [HideInInspector] public int currentHairColorIndex = 0;    //"" "" "" 
     [HideInInspector] public int currentShirtIndex = 0;    //"" "" "" 
     [HideInInspector] public int currentWaistIndex = 0;   
@@ -95,6 +98,7 @@ public class CharacterCustomization : MonoBehaviour
         lockHeightImgComponent = GameObject.FindGameObjectWithTag("LockHeightUI").GetComponent<Image>();
         lockWidthImgComponent = GameObject.FindGameObjectWithTag("LockWidthUI").GetComponent<Image>();
         lockHairImgComponent = GameObject.FindGameObjectWithTag("LockHairUI").GetComponent<Image>();
+        lockHatImgComponent = GameObject.FindGameObjectWithTag("LockHatUI").GetComponent<Image>();
         lockShirtImgComponent = GameObject.FindGameObjectWithTag("LockShirtUI").GetComponent<Image>();
         lockWaistImgComponent = GameObject.FindGameObjectWithTag("LockWaistUI").GetComponent<Image>();
         lockPantsImgComponent = GameObject.FindGameObjectWithTag("LockPantsUI").GetComponent<Image>();
@@ -107,6 +111,7 @@ public class CharacterCustomization : MonoBehaviour
         lockHeightImgComponent.sprite = unlockedImage;
         lockWidthImgComponent.sprite = unlockedImage;
         lockHairImgComponent.sprite = unlockedImage;
+        lockHatImgComponent.sprite = unlockedImage;
         lockShirtImgComponent.sprite = unlockedImage;
         lockWaistImgComponent.sprite = unlockedImage;
         lockPantsImgComponent.sprite = unlockedImage;
@@ -345,8 +350,32 @@ public class CharacterCustomization : MonoBehaviour
             SetHairStyle13();
         }
 
+    }
+    public void NextHat()
+    {
+        currentHatIndex++;
+        // if (currentHairStyleIndex >= 10)
+        // {
+        //     currentHairStyleIndex = 0; // Wrap around to the first currentWidthIndex option
+        // }
+        if (currentHatIndex >= 2)
+        {
+            currentHatIndex = 0; // Wrap around to the first currentWidthIndex option
+        }
+        UpdateHat();
+    }
 
+    public void UpdateHat()
+    {
 
+        if(currentHatIndex == 0)
+        {
+            SetNoHat();
+        }
+        else if(currentHatIndex == 1)
+        {
+            SetHat1();
+        }
 
     }
 
@@ -825,6 +854,15 @@ private void UpdateLockImage()
         lockWidthImgComponent.sprite = unlockedImage;
     }
 
+    if (lockedHat)
+    {
+        lockHatImgComponent.sprite = lockedImage;
+    }
+    else
+    {
+        lockHatImgComponent.sprite = unlockedImage;
+    }
+
     if (lockedHair)
     {
         lockHairImgComponent.sprite = lockedImage;
@@ -904,6 +942,11 @@ private void UpdateLockImage()
     public void HairLock()
     {
         lockedHair = !lockedHair;
+        UpdateLockImage();
+    }
+    public void HatLock()
+    {
+        lockedHat = !lockedHat;
         UpdateLockImage();
     }
     public void ShirtLock()
@@ -991,6 +1034,11 @@ private void UpdateLockImage()
             currentShirtColorIndex = Random.Range(0, 11);
             UpdateShirtColor();
         }
+        if(!lockedHat)
+        {
+            currentHatIndex = Random.Range(0, 1);
+            UpdateHat(); 
+        }
         if(!lockedHair)
         {
             currentHairStyleIndex = Random.Range(0, 13);
@@ -1023,6 +1071,7 @@ private void UpdateLockImage()
                                 int width, 
                                 int pantsCol, 
                                 int shirtCol, 
+                                int hat, 
                                 int hairStyle, 
                                 int jaketto, 
                                 int jakettoCol, 
@@ -1082,6 +1131,9 @@ private void UpdateLockImage()
             currentShirtColorIndex = shirtCol;
             UpdateShirtColor();
        
+            currentHatIndex = hat;
+            UpdateHat();
+
             currentHairStyleIndex = hairStyle;
             UpdateHairStyle();
 
@@ -1103,7 +1155,7 @@ private void UpdateLockImage()
                 List<int> parameters = intParams.Select(param => int.Parse(param.Trim())).ToList();
                 UpdateSpecific(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4],
                         parameters[5], parameters[6], parameters[7], parameters[8], parameters[9],
-                        parameters[10], parameters[11], parameters[12], parameters[13]);
+                        parameters[10], parameters[11], parameters[12], parameters[13], parameters[14]);
             }
         }
     }
@@ -2585,6 +2637,61 @@ private void UpdateLockImage()
         }
     }
 
+
+    public void SetNoHat()
+    {
+        Transform hair = characterAnimation.transform.Find("hair");
+        if (hair != null)
+        {
+            foreach (Transform child in hair)
+            {
+                SpriteRenderer spriteRenderer = child.GetComponent<SpriteRenderer>();
+                if(spriteRenderer != null)
+                {
+                  if (child.gameObject.name.Contains("hat"))
+                  {
+                      spriteRenderer.color = characterAnimation.currentHairColor;  
+                      Color color = spriteRenderer.color;
+                      color.a = 0f;  
+                      spriteRenderer.color = color;
+                  }
+                  UpdateHairStyle();
+                }
+            }
+        }
+    }
+
+    public void SetHat1()
+    {
+        Transform hair = characterAnimation.transform.Find("hair");
+        if (hair != null)
+        {
+            foreach (Transform child in hair)
+            {
+                SpriteRenderer spriteRenderer = child.GetComponent<SpriteRenderer>();
+                if(spriteRenderer != null)
+                {
+                  if ((child.gameObject.name.Contains("hair") || child.gameObject.name.Contains("mohawk")) && child.gameObject.name.Contains("Top"))
+                  {
+                      spriteRenderer.color = characterAnimation.currentHairColor;  
+                      Color color = spriteRenderer.color;
+                      color.a = 0f;  
+                      spriteRenderer.color = color;
+                  }
+
+                  if (child.gameObject.name.Contains("hat1Top"))
+                  {
+                      spriteRenderer.color = characterAnimation.currentHatColor;  
+                      Color color = spriteRenderer.color;
+                      color.a = 1f;  
+                      spriteRenderer.color = color;
+                  }
+
+
+                }
+            }
+        }
+    }
 
 
 

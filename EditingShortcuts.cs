@@ -101,7 +101,9 @@
                 transform.localPosition = RoundVector3(transform.localPosition);
                 transform.localEulerAngles = RoundVector3(transform.localEulerAngles);
                 transform.localScale = RoundVector3(transform.localScale);
+                transform.position = new Vector3(transform.position.x, transform.position.y, 0);
             }
+            // }
         }
     }
 

@@ -13,7 +13,7 @@ public class CharacterAnimation : MonoBehaviour
    public List<GameObject> characterSpriteList = new List<GameObject>();
   [HideInInspector] public List<GameObject> zeroInitialAlphaSpriteList = new List<GameObject>();
   [HideInInspector] public List<Color> initialChrctrColorList = new List<Color>();
-
+ 
 
   IsoSpriteSorting IsoSpriteSorting; 
 
@@ -29,7 +29,7 @@ public class CharacterAnimation : MonoBehaviour
   [HideInInspector] public Sprite[] allHeadSprites, allEyeSprites, allThroatSprites, allCollarSprites, allTorsoSprites, 
                       allWaistSprites, allWaistShortsSprites, allKneesShinsSprites, allAnklesSprites, allFeetSprites, 
                       allDressSprites, allJakettoSprites, allLongSleeveSprites, allHandSprites, allShortSleeveSprites, 
-                      allWaterOnHeadSprites, allMohawk5TopSprites, allMohawk5BottomSprites, allHair0TopSprites, allHair0BottomSprites, 
+                      allHat1TopSprites, allMohawk5TopSprites, allMohawk5BottomSprites, allHair0TopSprites, allHair0BottomSprites, 
                       allHair1TopSprites, allHair7TopSprites, allHair8TopSprites, allHair1BottomSprites, 
                       allHair2BottomSprites, allHair3BottomSprites, allHair4BottomSprites, allHair6BottomSprites, 
                       allHair7BottomSprites, allHair8BottomSprites, allHairFringe1Sprites, allHairFringe2Sprites, 
@@ -38,7 +38,7 @@ public class CharacterAnimation : MonoBehaviour
 
   [HideInInspector] public SpriteRenderer headSprite, eyeSprite, throatSprite, collarSprite, torsoSprite, waistSprite, 
                          waistShortsSprite, kneesShinsSprite, anklesSprite, feetSprite, jakettoSprite, dressSprite, 
-                         longSleeveSprite, handSprite, shortSleeveSprite, waterOnHeadSprite, mohawk5TopSprite, mohawk5BottomSprite, 
+                         longSleeveSprite, handSprite, shortSleeveSprite, hat1TopSprite, mohawk5TopSprite, mohawk5BottomSprite, 
                          hair0TopSprite, hair0BottomSprite, hair1TopSprite, hair7TopSprite, hair8TopSprite, 
                          hair1BottomSprite, hair2BottomSprite, hair3BottomSprite, hair4BottomSprite, hair6BottomSprite, 
                          hair7BottomSprite, hair8BottomSprite, hairFringe1Sprite, hairFringe2Sprite;
@@ -75,7 +75,7 @@ public class CharacterAnimation : MonoBehaviour
 
   CharacterMovement characterMovement;
 
-  [HideInInspector] public Color currentSkinColor, currentHairColor, currentShirtColor, currentPantsColor, 
+  [HideInInspector] public Color currentSkinColor, currentHairColor, currentHatColor, currentShirtColor, currentPantsColor, 
                           currentShoeColor, currentJakettoColor;
 
 
@@ -138,7 +138,7 @@ public class CharacterAnimation : MonoBehaviour
     allLongSleeveSprites = Resources.LoadAll<Sprite>("longSleeve");
     allHandSprites = Resources.LoadAll<Sprite>("hands");
     allShortSleeveSprites = Resources.LoadAll<Sprite>("shortSleeve");
-    allWaterOnHeadSprites = Resources.LoadAll<Sprite>("waterOnHead");
+    allHat1TopSprites = Resources.LoadAll<Sprite>("waterOnHead");
     allMohawk5TopSprites = Resources.LoadAll<Sprite>("mohawk5Top");
     allMohawk5BottomSprites = Resources.LoadAll<Sprite>("mohawk5Bottom");
     allHair0TopSprites = Resources.LoadAll<Sprite>("hair0Top");
@@ -173,7 +173,7 @@ public class CharacterAnimation : MonoBehaviour
     longSleeveSprite = transform.Find("longSleeve").GetComponent<SpriteRenderer>();
     handSprite = transform.Find("hands").GetComponent<SpriteRenderer>();
     shortSleeveSprite = transform.Find("shortSleeve").GetComponent<SpriteRenderer>();
-    waterOnHeadSprite = transform.Find("waterOnHead").GetComponent<SpriteRenderer>();
+    hat1TopSprite = transform.Find("hair").transform.Find("hat1Top").GetComponent<SpriteRenderer>();
     mohawk5TopSprite = transform.Find("hair").transform.Find("mohawk5Top").GetComponent<SpriteRenderer>();
     mohawk5BottomSprite = transform.Find("hair").transform.Find("mohawk5Bottom").GetComponent<SpriteRenderer>();
     hair0TopSprite = transform.Find("hair").transform.Find("hair0Top").GetComponent<SpriteRenderer>();
@@ -191,7 +191,7 @@ public class CharacterAnimation : MonoBehaviour
     hairFringe1Sprite = transform.Find("hair").transform.Find("hairFringe1").GetComponent<SpriteRenderer>();
     hairFringe2Sprite = transform.Find("hair").transform.Find("hairFringe2").GetComponent<SpriteRenderer>();
     bikeSprite = transform.Find("bike").GetComponent<SpriteRenderer>();
-
+ 
     bikeStatic = GameObject.FindGameObjectWithTag("Bike");
     bikeScript = bikeStatic.transform.Find("bikeTrig").GetComponent<BikeScript>();
     bikeInitialColor = bikeSprite.color;
@@ -216,7 +216,7 @@ public class CharacterAnimation : MonoBehaviour
     longSleeveSprite.sprite = allLongSleeveSprites[bodyTypeNumber * bodyTypeIndexMultiplier];
     handSprite.sprite = allHandSprites[bodyTypeNumber * bodyTypeIndexMultiplier];
     shortSleeveSprite.sprite = allShortSleeveSprites[bodyTypeNumber * bodyTypeIndexMultiplier];      
-    waterOnHeadSprite.sprite = allWaterOnHeadSprites[bodyTypeNumber * bodyTypeIndexMultiplier];      
+    hat1TopSprite.sprite = allHat1TopSprites[bodyTypeNumber * bodyTypeIndexMultiplier];      
     mohawk5TopSprite.sprite = allMohawk5TopSprites[bodyTypeNumber * bodyTypeIndexMultiplier];      
     mohawk5BottomSprite.sprite = allMohawk5BottomSprites[bodyTypeNumber * bodyTypeIndexMultiplier];      
     hair0TopSprite.sprite = allHair0TopSprites[bodyTypeNumber * bodyTypeIndexMultiplier];      
@@ -239,6 +239,7 @@ public class CharacterAnimation : MonoBehaviour
 
     currentSkinColor = (HexToColor("#F5CBA7"));
     currentHairColor = (HexToColor("#F5CBA7"));
+    currentHatColor = (HexToColor("#ffffff"));
     currentShirtColor = (HexToColor("#aaaaaa"));
     currentPantsColor = (HexToColor("#00B6FF"));
     currentShoeColor = (HexToColor("#AB4918"));
@@ -348,7 +349,7 @@ public class CharacterAnimation : MonoBehaviour
       longSleeveSprite.sprite = allLongSleeveSprites[movementIndices[currentFrame]];
       handSprite.sprite = allHandSprites[movementIndices[currentFrame]];
       shortSleeveSprite.sprite = allShortSleeveSprites[movementIndices[currentFrame]];
-      waterOnHeadSprite.sprite = allWaterOnHeadSprites[movementIndices[currentFrame]];
+      hat1TopSprite.sprite = allHat1TopSprites[movementIndices[currentFrame]];
       mohawk5TopSprite.sprite = allMohawk5TopSprites[movementIndices[currentFrame]];
       mohawk5BottomSprite.sprite = allMohawk5BottomSprites[movementIndices[currentFrame]];
       hair0TopSprite.sprite = allHair0TopSprites[movementIndices[currentFrame]];

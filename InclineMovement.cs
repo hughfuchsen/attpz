@@ -232,6 +232,118 @@ public class InclineMovement : MonoBehaviour
     }
 
 
+    // void OnTriggerStay2D(Collider2D collision)
+    // {
+    //     if(itsALadder) // if it is a ladder baby
+    //     {
+    //         if (Input.GetKeyDown(KeyCode.Space)) // Y button on Xbox controller
+    //         {
+    //             //alter the motion direction
+    //             if(myCharacterMovement.motionDirection == "normal")
+    //             {
+    //                 // anchor player to ladder
+    //                 if(!topOfStairCase)
+    //                 {
+    //                     Player.transform.position = FindSiblingWithTag("Ladder").transform.position - isoSpriteSortingScript.SorterPositionOffset;
+    //                 }
+    //                 else
+    //                 {
+    //                     Player.transform.position = FindSiblingWithTag("Ladder").transform.position - isoSpriteSortingScript.SorterPositionOffset + new Vector3(0, ladderHeight, 0);
+    //                 }
+
+    //                 if((isPlayerCrossingUp() && (isPlayerCrossingLeft()||!isPlayerCrossingLeft())))
+    //                 {
+    //                     //manage animation
+    //                     if(isPlayerCrossingLeft())
+    //                     {
+    //                         myCharacterAnimation.ladderAnimDirectionIndex = myCharacterAnimation.upLeftAnim;
+    //                     }
+    //                     else
+    //                     {
+    //                         myCharacterAnimation.ladderAnimDirectionIndex = myCharacterAnimation.upRightAnim;
+    //                     }
+
+                        
+    //                     if(!topOfStairCase)
+    //                     {
+    //                         myCharacterMovement.motionDirection = "upLadder";
+    //                     }
+    //                     else
+    //                     {
+    //                         myCharacterMovement.motionDirection = "downLadder";
+    //                     }
+    //                     //add certain animation and anchoring here
+    //                     gameObject.layer = LayerMask.NameToLayer(higherColliderLayerName);
+    //                     SetCollisionLayer(higherColliderLayerName);
+    //                 }
+    //                 else if((!isPlayerCrossingUp() && (isPlayerCrossingLeft()||!isPlayerCrossingLeft())))
+    //                 {
+    //                     //add certain animation 
+    //                     if(!topOfStairCase)
+    //                     {
+    //                         myCharacterMovement.motionDirection = "upLadder";
+                            
+    //                         //manage animation
+    //                         if(isPlayerCrossingLeft())
+    //                         {
+    //                             myCharacterAnimation.ladderAnimDirectionIndex = myCharacterAnimation.leftAnim;
+    //                         }
+    //                         else
+    //                         {
+    //                             myCharacterAnimation.ladderAnimDirectionIndex = myCharacterAnimation.rightAnim;
+    //                         }
+    //                     }
+    //                     else
+    //                     {
+    //                         myCharacterMovement.motionDirection = "downLadder";
+                            
+    //                         //manage animation
+    //                         if(isPlayerCrossingLeft())
+    //                         {
+    //                             myCharacterAnimation.ladderAnimDirectionIndex = myCharacterAnimation.upRightAnim;
+    //                         }
+    //                         else
+    //                         {
+    //                             myCharacterAnimation.ladderAnimDirectionIndex = myCharacterAnimation.upLeftAnim;
+    //                         }
+    //                     }
+    //                     gameObject.layer = LayerMask.NameToLayer(higherColliderLayerName);
+    //                     SetCollisionLayer(higherColliderLayerName);
+    //                 }
+    //                 isoSpriteSortingScript.isMovable = false;
+    //             }
+    //             else if((isPlayerCrossingUp() && myCharacterMovement.motionDirection != "normal"))
+    //             {
+    //                 myCharacterMovement.motionDirection = "normal";  
+    //                 SetTreeSortingLayer(collision.transform.parent.gameObject, higherSortingLayerToAssign);
+    //                 isoSpriteSortingScript.isMovable = true;
+    //             }
+    //             else if((!isPlayerCrossingUp() && myCharacterMovement.motionDirection != "normal"))
+    //             {
+    //                 myCharacterMovement.motionDirection = "normal"; 
+    //                 gameObject.layer = LayerMask.NameToLayer(lowerColliderLayerName);
+    //                 SetCollisionLayer(lowerColliderLayerName);
+    //                 SetTreeSortingLayer(collision.transform.parent.gameObject, lowerSortingLayerToAssign);
+    //                 isoSpriteSortingScript.isMovable = true;
+    //             }
+
+    //             // alter the collider layer and sprite sorting layer that is active with the player
+    //             // if(!topOfStairCase)
+    //             // {
+    //             //     gameObject.layer = LayerMask.NameToLayer(higherColliderLayerName);
+    //             //     SetCollisionLayer(higherColliderLayerName);
+    //             //     SetTreeSortingLayer(collision.transform.parent.gameObject, higherSortingLayerToAssign);
+    //             // }                   
+    //             // else
+    //             // {
+    //             //     gameObject.layer = LayerMask.NameToLayer(lowerColliderLayerName);
+    //             //     SetCollisionLayer(lowerColliderLayerName);
+    //             //     SetTreeSortingLayer(collision.transform.parent.gameObject, lowerSortingLayerToAssign);
+    //             // } 
+    //             }
+    //         }
+    //     }
+
 
     void OnTriggerExit2D(Collider2D collision)
     {

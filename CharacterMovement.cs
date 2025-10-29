@@ -78,7 +78,7 @@ public class CharacterMovement : MonoBehaviour
   [HideInInspector] public ContactQuadrant currentContactQuadrant;
 
   // Map the angle to control directions
-  Direction controlDirection = Direction.Nothing; // Default value should never be used
+  public Direction controlDirection = Direction.Nothing; // Default value should never be used
 
 
   // Start is called before the first frame update
@@ -185,7 +185,7 @@ public class CharacterMovement : MonoBehaviour
       //   {MoveCharacterVerticalInclineLeftToward();}
       // else if (motionDirection == "inclineRightToward") 
       //   {MoveCharacterVerticalInclineRightToward();}
-      else if (motionDirection == "upDownLadder") 
+      else if (motionDirection == "upDownLadder") // why is there updown up and down??? because it is optimising player experience with movement continuity
         {MoveCharacterUpDownLadder();}
       else if (motionDirection == "upLadder") 
         {MoveCharacterUpLadder();}
@@ -209,6 +209,11 @@ public class CharacterMovement : MonoBehaviour
       if(playerOnFurniture == true)
       {
         characterAnimation.Animate(characterAnimation.sit, 1, characterAnimation.currentAnimationDirection, characterAnimation.bodyTypeNumber);
+      }
+      else if (motionDirection == "upLadder" || motionDirection == "downLadder" || motionDirection == "upDownLadder")
+      {
+        //maybe do nuttin again my guy?
+        // characterAnimation.Animate(characterAnimation.idle, 1, characterAnimation.currentAnimationDirection, characterAnimation.bodyTypeNumber);
       }
       else if(!playerOnBike ) // not optimal
       {
@@ -273,46 +278,46 @@ public class CharacterMovement : MonoBehaviour
     myRigidbody.MovePosition(transform.position + change * movementSpeed * Time.deltaTime);    
 
   }
-  void MoveCharacterVerticalInclineLeftToward()
-  {
-    if (change == Vector3.right+Vector3.up)   { change = new Vector3(1f,-0.2f,0f); }
-    if (change == Vector3.left+Vector3.up)    { change = new Vector3(-1f,0.2f,0f); }
-    if (change == Vector3.up)                 { change = new Vector3(-1f,0.2f,0f); }
-    if (change == Vector3.right)              { change = new Vector3(1f,-0.2f,0f); }
-    if (change == Vector3.right+Vector3.down) { change = new Vector3(1f,-0.2f,0f); }
-    if (change == Vector3.left+Vector3.down)  { change = new Vector3(-1f,0.2f,0f); }
-    if (change == Vector3.down)               { change = new Vector3(1f,-0.2f,0f); }
-    if (change == Vector3.left)               { change = new Vector3(-1f,0.2f,0f); }
-    // AnimateMovement(movementStartIndex, movementFrameCount, ladderAnimDirectionIndex, bodyTypeNumber);
-    myRigidbody.MovePosition(transform.position + change * movementSpeed * Time.deltaTime);
+  // void MoveCharacterVerticalInclineLeftToward()
+  // {
+  //   if (change == Vector3.right+Vector3.up)   { change = new Vector3(1f,-0.2f,0f); }
+  //   if (change == Vector3.left+Vector3.up)    { change = new Vector3(-1f,0.2f,0f); }
+  //   if (change == Vector3.up)                 { change = new Vector3(-1f,0.2f,0f); }
+  //   if (change == Vector3.right)              { change = new Vector3(1f,-0.2f,0f); }
+  //   if (change == Vector3.right+Vector3.down) { change = new Vector3(1f,-0.2f,0f); }
+  //   if (change == Vector3.left+Vector3.down)  { change = new Vector3(-1f,0.2f,0f); }
+  //   if (change == Vector3.down)               { change = new Vector3(1f,-0.2f,0f); }
+  //   if (change == Vector3.left)               { change = new Vector3(-1f,0.2f,0f); }
+  //   // AnimateMovement(movementStartIndex, movementFrameCount, currentAnimationDirection, bodyTypeNumber);
+  //   myRigidbody.MovePosition(transform.position + change * movementSpeed * Time.deltaTime);
       
-  }
+  // }
 
-  void MoveCharacterVerticalInclineRightToward()
-  {
-    if (change == Vector3.right+Vector3.up)   { change = new Vector3(1f,0.2f,0f); }
-    if (change == Vector3.left+Vector3.up)    { change = new Vector3(-1f,-0.2f,0f); }
-    if (change == Vector3.up)                 { change = new Vector3(-1f,-0.2f,0f); }
-    if (change == Vector3.right)              { change = new Vector3(1f,0.2f,0f); }
-    if (change == Vector3.right+Vector3.down) { change = new Vector3(1f,0.2f,0f); }
-    if (change == Vector3.left+Vector3.down)  { change = new Vector3(-1f,-0.2f,0f); }
-    if (change == Vector3.down)               { change = new Vector3(1f,0.2f,0f); }
-    if (change == Vector3.left)               { change = new Vector3(-1f,-0.2f,0f); }
-    // AnimateMovement(movementStartIndex, movementFrameCount, ladderAnimDirectionIndex, bodyTypeNumber);
-    myRigidbody.MovePosition(transform.position + change * movementSpeed * Time.deltaTime);
+  // void MoveCharacterVerticalInclineRightToward()
+  // {
+  //   if (change == Vector3.right+Vector3.up)   { change = new Vector3(1f,0.2f,0f); }
+  //   if (change == Vector3.left+Vector3.up)    { change = new Vector3(-1f,-0.2f,0f); }
+  //   if (change == Vector3.up)                 { change = new Vector3(-1f,-0.2f,0f); }
+  //   if (change == Vector3.right)              { change = new Vector3(1f,0.2f,0f); }
+  //   if (change == Vector3.right+Vector3.down) { change = new Vector3(1f,0.2f,0f); }
+  //   if (change == Vector3.left+Vector3.down)  { change = new Vector3(-1f,-0.2f,0f); }
+  //   if (change == Vector3.down)               { change = new Vector3(1f,0.2f,0f); }
+  //   if (change == Vector3.left)               { change = new Vector3(-1f,-0.2f,0f); }
+  //   // AnimateMovement(movementStartIndex, movementFrameCount, currentAnimationDirection, bodyTypeNumber);
+  //   myRigidbody.MovePosition(transform.position + change * movementSpeed * Time.deltaTime);
       
-  } 
+  // } 
   void MoveCharacterUpDownLadder()
   { 
-      if (change == Vector3.right+Vector3.up)   { change = new Vector3(0f,1f,0f);}
-      if (change == Vector3.left+Vector3.up)    { change = new Vector3(0f,1f,0f);}
+      if (change == Vector3.right+Vector3.up)   { change = new Vector3(0f,0f,0f);}
+      if (change == Vector3.left+Vector3.up)    { change = new Vector3(0f,0f,0f);}
       if (change == Vector3.up)                 { change = new Vector3(0f,1f,0f);}
-      if (change == Vector3.right)              { change = new Vector3(0f,1f,0f);}
-      if (change == Vector3.right+Vector3.down) { change = new Vector3(0f,-1f,0f);}
-      if (change == Vector3.left+Vector3.down)  { change = new Vector3(0f,-1f,0f);}
+      if (change == Vector3.right)              { change = new Vector3(0f,0f,0f);}
+      if (change == Vector3.right+Vector3.down) { change = new Vector3(0f,-0f,0f);}
+      if (change == Vector3.left+Vector3.down)  { change = new Vector3(0f,-0f,0f);}
       if (change == Vector3.down)               { change = new Vector3(0f,-1f,0f);}
-      if (change == Vector3.left)               { change = new Vector3(0f,-1f,0f);}
-      characterAnimation.Animate(characterAnimation.movementStartIndex, characterAnimation.movementFrameCount, characterAnimation.ladderAnimDirectionIndex, characterAnimation.bodyTypeNumber);
+      if (change == Vector3.left)               { change = new Vector3(0f,-0f,0f);}
+      characterAnimation.Animate(characterAnimation.movementStartIndex, characterAnimation.movementFrameCount, characterAnimation.currentAnimationDirection, characterAnimation.bodyTypeNumber);
       myRigidbody.MovePosition(transform.position + change * movementSpeed * Time.deltaTime);
   }
   void MoveCharacterUpLadder()
@@ -325,7 +330,7 @@ public class CharacterMovement : MonoBehaviour
       else if (change == Vector3.left+Vector3.down)  { change = new Vector3(0f,1f,0f);}
       else if (change == Vector3.down)               { change = new Vector3(0f,1f,0f);}
       else if (change == Vector3.left)               { change = new Vector3(0f,1f,0f);}
-      characterAnimation.Animate(characterAnimation.movementStartIndex, characterAnimation.movementFrameCount, characterAnimation.ladderAnimDirectionIndex, characterAnimation.bodyTypeNumber);
+      characterAnimation.Animate(characterAnimation.movementStartIndex, characterAnimation.movementFrameCount, characterAnimation.currentAnimationDirection, characterAnimation.bodyTypeNumber);
       myRigidbody.MovePosition(transform.position + change * movementSpeed * Time.deltaTime);
   }
   void MoveCharacterDownLadder()
@@ -338,7 +343,7 @@ public class CharacterMovement : MonoBehaviour
       else if (change == Vector3.left+Vector3.down)  { change = new Vector3(0f,-1f,0f);}
       else if (change == Vector3.down)               { change = new Vector3(0f,-1f,0f);}
       else if (change == Vector3.left)               { change = new Vector3(0f,-1f,0f);}
-      characterAnimation.Animate(characterAnimation.movementStartIndex, characterAnimation.movementFrameCount, characterAnimation.ladderAnimDirectionIndex, characterAnimation.bodyTypeNumber);
+      characterAnimation.Animate(characterAnimation.movementStartIndex, characterAnimation.movementFrameCount, characterAnimation.currentAnimationDirection, characterAnimation.bodyTypeNumber);
       myRigidbody.MovePosition(transform.position + change * movementSpeed * Time.deltaTime);
   }
 

@@ -18,7 +18,8 @@ public class InclineMovement : MonoBehaviour
     public bool middleOfStairCase;
     public bool itsALadder;
     public int ladderHeight = 0;
-    public bool plyrCrsngLeft = false;
+    public bool plyrCrsngLeft = false; 
+    public bool inFrontOfLadder;
 
 
     // Start is called before the first frame update
@@ -120,11 +121,22 @@ public class InclineMovement : MonoBehaviour
                     //     }
                     // }
             }
-            else // if it is a ladder baby
+            else // if it is a ladder, baby
             {
                 //alter the motion direction
                 if(myCharacterMovement.motionDirection == "normal")
                 {
+                    if(inFrontOfLadder == true)
+                    {
+                        if(myCharacterMovement.facingLeft == true)
+                        {
+                            myCharacterAnimation.currentAnimationDirection = myCharacterAnimation.upLeftAnim;
+                        }
+                        else
+                        {                           
+                            myCharacterAnimation.currentAnimationDirection = myCharacterAnimation.upRightAnim;
+                        }
+                    }
                     // anchor player to ladder
                     if(!topOfStairCase)
                     {
@@ -135,19 +147,8 @@ public class InclineMovement : MonoBehaviour
                         Player.transform.position = FindSiblingWithTag("Ladder").transform.position - isoSpriteSortingScript.SorterPositionOffset + new Vector3(0, ladderHeight, 0);
                     }
 
-                    if((isPlayerCrossingUp() && (isPlayerCrossingLeft()||!isPlayerCrossingLeft())))
+                    if(isPlayerCrossingUp())
                     {
-                        //manage animation
-                        if(isPlayerCrossingLeft())
-                        {
-                            myCharacterAnimation.ladderAnimDirectionIndex = myCharacterAnimation.upLeftAnim;
-                        }
-                        else
-                        {
-                            myCharacterAnimation.ladderAnimDirectionIndex = myCharacterAnimation.upRightAnim;
-                        }
-
-                        
                         if(!topOfStairCase)
                         {
                             myCharacterMovement.motionDirection = "upLadder";
@@ -160,56 +161,37 @@ public class InclineMovement : MonoBehaviour
                         gameObject.layer = LayerMask.NameToLayer(higherColliderLayerName);
                         SetCollisionLayer(higherColliderLayerName);
                     }
-                    else if((!isPlayerCrossingUp() && (isPlayerCrossingLeft()||!isPlayerCrossingLeft())))
+                    else if(!isPlayerCrossingUp())
                     {
                         //add certain animation 
                         if(!topOfStairCase)
                         {
                             myCharacterMovement.motionDirection = "upLadder";
-                            
-                            //manage animation
-                            if(isPlayerCrossingLeft())
-                            {
-                                myCharacterAnimation.ladderAnimDirectionIndex = myCharacterAnimation.leftAnim;
-                            }
-                            else
-                            {
-                                myCharacterAnimation.ladderAnimDirectionIndex = myCharacterAnimation.rightAnim;
-                            }
                         }
                         else
                         {
                             myCharacterMovement.motionDirection = "downLadder";
                             
-                            //manage animation
-                            if(isPlayerCrossingLeft())
-                            {
-                                myCharacterAnimation.ladderAnimDirectionIndex = myCharacterAnimation.upRightAnim;
-                            }
-                            else
-                            {
-                                myCharacterAnimation.ladderAnimDirectionIndex = myCharacterAnimation.upLeftAnim;
-                            }
                         }
                         gameObject.layer = LayerMask.NameToLayer(higherColliderLayerName);
                         SetCollisionLayer(higherColliderLayerName);
                     }
                     isoSpriteSortingScript.isMovable = false;
                 }
-                else if((isPlayerCrossingUp() && myCharacterMovement.motionDirection != "normal"))
+                else if((isPlayerCrossingUp() && myCharacterMovement.motionDirection != "normal")) // on ladder and exiting at top of ladder
                 {
                     myCharacterMovement.motionDirection = "normal";  
                     SetTreeSortingLayer(collision.transform.parent.gameObject, higherSortingLayerToAssign);
                     isoSpriteSortingScript.isMovable = true;
                 }
-                else if((!isPlayerCrossingUp() && myCharacterMovement.motionDirection != "normal"))
-                {
-                    myCharacterMovement.motionDirection = "normal"; 
-                    gameObject.layer = LayerMask.NameToLayer(lowerColliderLayerName);
-                    SetCollisionLayer(lowerColliderLayerName);
-                    SetTreeSortingLayer(collision.transform.parent.gameObject, lowerSortingLayerToAssign);
-                    isoSpriteSortingScript.isMovable = true;
-                }
+                // else if((!isPlayerCrossingUp() && myCharacterMovement.motionDirection != "normal")) // on ladder and exiting at bottom of ladder
+                // {
+                //     myCharacterMovement.motionDirection = "normal"; 
+                //     gameObject.layer = LayerMask.NameToLayer(lowerColliderLayerName);
+                //     SetCollisionLayer(lowerColliderLayerName);
+                //     SetTreeSortingLayer(collision.transform.parent.gameObject, lowerSortingLayerToAssign);
+                //     isoSpriteSortingScript.isMovable = true;
+                // }
 
                 // alter the collider layer and sprite sorting layer that is active with the player
                 // if(!topOfStairCase)
@@ -402,7 +384,7 @@ public class InclineMovement : MonoBehaviour
                             SetCollisionLayer(lowerColliderLayerName);
                         }
                     }
-                    else if (myCharacterMovement.motionDirection != "normal")
+                    else if (myCharacterMovement.motionDirection != "normal") // if it's going ladder movemento 
                     {
                         if(!topOfStairCase)
                         {
@@ -411,6 +393,7 @@ public class InclineMovement : MonoBehaviour
                                 myCharacterMovement.motionDirection = "normal";  
                                 gameObject.layer = LayerMask.NameToLayer(lowerColliderLayerName);
                                 SetCollisionLayer(lowerColliderLayerName);
+                                isoSpriteSortingScript.isMovable = true;
                             }
                         }
                         else if(topOfStairCase)
@@ -420,6 +403,7 @@ public class InclineMovement : MonoBehaviour
                                 myCharacterMovement.motionDirection = "normal";  
                                 gameObject.layer = LayerMask.NameToLayer(higherColliderLayerName);
                                 SetCollisionLayer(higherColliderLayerName);
+                                isoSpriteSortingScript.isMovable = true;
                             }
                             else
                             {

@@ -70,6 +70,9 @@ public class CharacterAnimation : MonoBehaviour
 
   [HideInInspector] public int[] movementIndices;
 
+  private float idleHopTimer = 0f;
+
+
 
   CharacterCustomization characterCustomization;
 
@@ -299,11 +302,9 @@ public class CharacterAnimation : MonoBehaviour
       Walk();
       }
 
-      currentAnimationDirection = animationDirection;
+      currentAnimationDirection = animationDirection; 
 
       HandleGettingOffBikeOrSeat();
-      
-
 
     }
     else if (this.gameObject.tag == "NPC")
@@ -314,6 +315,33 @@ public class CharacterAnimation : MonoBehaviour
       }
     }
   
+   // Only idle-hop when not moving, or climbing
+    if (characterMovement.change == Vector3.zero)
+    {
+        bool isIdleLeft = animationDirection == leftAnim || animationDirection == leftDownAnim;
+        bool isIdleRight = animationDirection == rightAnim || animationDirection == rightDownAnim;
+
+        if (isIdleLeft || isIdleRight)
+        {
+            idleHopTimer -= Time.deltaTime;
+
+            if (idleHopTimer <= 0f)
+            {
+                if (isIdleLeft)
+                    animationDirection = (animationDirection == leftAnim) ? leftDownAnim : leftAnim;
+                else if (isIdleRight)
+                    animationDirection = (animationDirection == rightAnim) ? rightDownAnim : rightAnim;
+
+                currentAnimationDirection = animationDirection;
+                idleHopTimer = Random.Range(0.5f, 1f);
+            }
+        }
+        else
+        {
+            idleHopTimer = 0f;
+        }
+    }
+
 
     movementIndices = Enumerable.Range(movementStartIndex + animationDirection + ((bodyTypeNumber - 1) * bodyTypeIndexMultiplier), movementFrameCount).ToArray();
     // Timer to control the animation frame rate
@@ -325,7 +353,10 @@ public class CharacterAnimation : MonoBehaviour
       timer = 0f; // Reset timer
 
       // Update the current frame
-      currentFrame++;
+      if (characterMovement.change != Vector3.zero)
+      {
+        currentFrame++;
+      }
 
       // If we've reached the end of the movementIndices array, loop back to the first sprite
       if (currentFrame >= movementIndices.Length)

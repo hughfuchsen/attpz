@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class RoomScript : MonoBehaviour
 {
+    public SurfaceType roomSurface = SurfaceType.Carpet; // Default value 
+
     public BuildingScript building;
     [HideInInspector] public CameraMovement cameraMovement;
     public LevelScript level = null;
@@ -26,6 +28,8 @@ public class RoomScript : MonoBehaviour
     public List<GameObject> npcList = new List<GameObject>();
     [HideInInspector] public List<GameObject> npcSpriteList = new List<GameObject>();
     [HideInInspector] public List<Color> npcColorList = new List<Color>();
+
+
 
     void Awake()
     {

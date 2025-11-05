@@ -260,17 +260,12 @@ public class CharacterAnimation : MonoBehaviour
     lateStartUpdateCharacterDataCoro = StartCoroutine(LateStartUpdateCharacterData());
   }
 
-    IEnumerator LateStartUpdateCharacterData()
-    {
-        // Wait until the end of the current frame
-        yield return new WaitForEndOfFrame();
-        yield return new WaitForEndOfFrame();
-
-        if(this.gameObject.CompareTag("Player"))
-        {
-          GetSpritesAndAddToLists(this.gameObject, characterSpriteList, new List<GameObject>(), initialChrctrColorList);
-        }
-    }
+  IEnumerator LateStartUpdateCharacterData()
+  {
+    yield return new WaitForEndOfFrame();
+    yield return new WaitForEndOfFrame();
+    GetSpritesAndAddToLists(this.gameObject, characterSpriteList, new List<GameObject>(), initialChrctrColorList);
+  }
 
 
   public void Animate(int movementStartIndex, int movementFrameCount, int animationDirection, int bodyTypeNumber)
@@ -333,7 +328,7 @@ public class CharacterAnimation : MonoBehaviour
                     animationDirection = (animationDirection == rightAnim) ? rightDownAnim : rightAnim;
 
                 currentAnimationDirection = animationDirection;
-                idleHopTimer = Random.Range(0.5f, 1f);
+                idleHopTimer = Random.Range(Random.Range(0.5f, 6f), 15f);
             }
         }
         else

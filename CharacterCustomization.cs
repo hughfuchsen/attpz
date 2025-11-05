@@ -1150,7 +1150,7 @@ private void UpdateLockImage()
         {
             Debug.Log("it exists");
             string[] intParams = chrctrAppearance.Split(',').Where(param => !string.IsNullOrWhiteSpace(param)).ToArray();
-            if (intParams.Length == 14)
+            if (intParams.Length == 15)
             {
                 List<int> parameters = intParams.Select(param => int.Parse(param.Trim())).ToList();
                 UpdateSpecific(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4],

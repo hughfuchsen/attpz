@@ -35,6 +35,9 @@ public class CameraMovement : MonoBehaviour
     void Awake()
     {
         innerBuildingBackdrop.SetActive(true);
+        currentRoom = null;
+        currentLevel = null;
+        currentBuilding = null;
     }
 
     void Start()
@@ -49,9 +52,7 @@ public class CameraMovement : MonoBehaviour
 
         Cursor.SetCursor(cursorTexture, hotSpot, CursorMode.Auto);
 
-        currentRoom = null;
-        currentLevel = null;
-        currentBuilding = null;
+
     }
 
     void Update()

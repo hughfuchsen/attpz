@@ -708,7 +708,6 @@ public class LoadCSVData : MonoBehaviour
     private List<GameObject> suggestionItems = new List<GameObject>();
 
     private TextMeshProUGUI inputPlaceholder;
-    private bool isInitialPlaceholderActive = true;
 // Store the original placeholder text and color
     private string originalPlaceholderText;
     private Color originalPlaceholderColor;

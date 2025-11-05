@@ -85,7 +85,10 @@ public class CharacterAudioController : MonoBehaviour
         cameraMovement = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraMovement>();
 
         // Optional: continuously sample the surface once per frame (after rendering)
-        StartCoroutine(SampleSurfaceCoroutine());
+        if(this.gameObject.tag == "Player")
+        {
+            StartCoroutine(SampleSurfaceCoroutine());
+        }
     }
 
     private IEnumerator SampleSurfaceCoroutine()
@@ -105,8 +108,11 @@ public class CharacterAudioController : MonoBehaviour
 
     void Update()
     {
-        SyncSurfaceCamera();
-        HandleFootsteps();
+        if(this.gameObject.tag == "Player")
+        {
+            SyncSurfaceCamera();
+            HandleFootsteps();
+        }
     }
 
     private void SyncSurfaceCamera()

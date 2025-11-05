@@ -59,7 +59,6 @@ public class LoadCSVDataWeb : MonoBehaviour
     private List<GameObject> suggestionItems = new List<GameObject>();
 
     private TextMeshProUGUI inputPlaceholder;
-    private bool isInitialPlaceholderActive = true;
 // Store the original placeholder text and color
     private string originalPlaceholderText;
     private Color originalPlaceholderColor;
@@ -588,7 +587,7 @@ public class LoadCSVDataWeb : MonoBehaviour
 
         // Handle character myCharacterCustomization params
         string[] intParams = row[6].Split(',').Where(param => !string.IsNullOrWhiteSpace(param)).ToArray();
-        if (intParams.Length == 14)
+        if (intParams.Length == 15)
         {
             List<int> parameters = intParams.Select(param => int.Parse(param.Trim())).ToList();
             obj.GetComponent<CharacterCustomization>().UpdateSpecific(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4],

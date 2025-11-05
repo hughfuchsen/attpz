@@ -30,6 +30,11 @@ public class CharacterDialogueScript : MonoBehaviour
     private CharacterMovement myCharacterMovement;
     private Transform myCharacterTransform;
 
+    public float typingSpeed = 0.03f; // normal typing speed
+    private Coroutine typingCoroutine;
+    private bool isTyping = false;
+    private bool fastForward = false;
+
 
    
     void Start()
@@ -102,38 +107,72 @@ public class CharacterDialogueScript : MonoBehaviour
 
     }
 
-    void Update()
+   void Update()
     {
-        // Check if the player is in range and the space key is pressed
         if (isPlayerInRange)
         {
-            if((characterMovement.playerIsOutside && myCharacterMovement.playerIsOutside)
-                || !characterMovement.playerIsOutside && !myCharacterMovement.playerIsOutside)
+            bool bothOutside = characterMovement.playerIsOutside && myCharacterMovement.playerIsOutside;
+            bool bothInside = !characterMovement.playerIsOutside && !myCharacterMovement.playerIsOutside;
+
+            if (bothOutside || bothInside)
             {
-                if (Input.GetKeyDown(KeyCode.Space) || 
-                        Input.GetKeyDown(KeyCode.JoystickButton0) ||  // A button
-                        Input.GetKeyDown(KeyCode.JoystickButton1) ||  // B button
-                        Input.GetKeyDown(KeyCode.JoystickButton2)   // X button
-                        // Input.GetKeyDown(KeyCode.JoystickButton3)
-                        )            
-                {  
-                    ShowNextDialogue();
-                    dialogueBGrndImage.color = Color.white;
-                    // dialogueBGrndImage.SetActive(true);
+                // Press Space or controller button
+                if (Input.GetKeyDown(KeyCode.Space) ||
+                    Input.GetKeyDown(KeyCode.JoystickButton0) ||
+                    Input.GetKeyDown(KeyCode.JoystickButton1) ||
+                    Input.GetKeyDown(KeyCode.JoystickButton2))
+                {
+                    if (isTyping)
+                    {
+                        // If text is typing, finish it instantly
+                        fastForward = true;
+                    }
+                    else
+                    {
+                        // Show next line
+                        ShowNextDialogue();
+                        dialogueBGrndImage.color = Color.white;
+                    }
                 }
+
+                // If player is holding space, speed up text
+                fastForward = Input.GetKey(KeyCode.Space);
             }
         }
     }
 
     void ShowNextDialogue()
     {
-        // Display the current dialogue in the TextMeshPro component
-        dialogueDisplay.text = dialogues[currentDialogueIndex];
+        if (typingCoroutine != null)
+            StopCoroutine(typingCoroutine);
+
+        dialogueDisplay.text = "";
         dialogueNameDisplay.text = nameText + ":";
 
-        // Move to the next dialogue, reset if at the end
+        typingCoroutine = StartCoroutine(TypeDialogue(dialogues[currentDialogueIndex]));
+
         currentDialogueIndex = (currentDialogueIndex + 1) % dialogues.Count;
     }
+
+    IEnumerator TypeDialogue(string sentence)
+    {
+        isTyping = true;
+        fastForward = false;
+        dialogueDisplay.text = "";
+
+        foreach (char letter in sentence)
+        {
+            dialogueDisplay.text += letter;
+
+            if (fastForward)
+                yield return new WaitForSeconds(typingSpeed / 20f); // faster while holding
+            else
+                yield return new WaitForSeconds(typingSpeed);
+        }
+
+        isTyping = false;
+    }
+
 
     private void OnTriggerEnter2D(Collider2D other)
     {

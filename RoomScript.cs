@@ -5,7 +5,6 @@ using UnityEngine;
 public class RoomScript : MonoBehaviour
 {
     public SurfaceType roomSurface = SurfaceType.Carpet; // Default value 
-
     public BuildingScript building;
     [HideInInspector] public CameraMovement cameraMovement;
     public LevelScript level = null;
@@ -24,12 +23,9 @@ public class RoomScript : MonoBehaviour
     private Coroutine currentMotionCoroutine;
     private Coroutine currentColorCoroutine;
     private Coroutine currentColliderMotionCoroutine;
-
-    public List<GameObject> npcList = new List<GameObject>();
-    [HideInInspector] public List<GameObject> npcSpriteList = new List<GameObject>();
-    [HideInInspector] public List<Color> npcColorList = new List<Color>();
-
-
+    public List<GameObject> npcListForRoom = new List<GameObject>();
+    [HideInInspector] public List<GameObject> npcSpriteListForRoom = new List<GameObject>();
+    [HideInInspector] public List<Color> npcColorListForRoom = new List<Color>();
 
     void Awake()
     {
@@ -117,7 +113,6 @@ public class RoomScript : MonoBehaviour
         }
 
         cameraMovement.currentRoom = this;
-
     }
     
     public void ExitRoomAndSetDoorwayInstances() 
@@ -195,15 +190,15 @@ public class RoomScript : MonoBehaviour
         List<Vector3> npcInitialPositions = new List<Vector3>();
         List<Vector3> colliderInitialPositions = new List<Vector3>();
 
-        for (int i = 0; i < npcList.Count; i++)
+        for (int i = 0; i < npcListForRoom.Count; i++)
         {
-            npcInitialPositions.Add(npcList[i].transform.position);
-            npcList[i].transform.parent = this.transform;
-            SetZToZero(npcList[i]);
+            npcInitialPositions.Add(npcListForRoom[i].transform.position);
+            npcListForRoom[i].transform.parent = this.transform;
+            SetZToZero(npcListForRoom[i]);
 
 
             // Get the child collider's position and save it
-            var collider = npcList[i].GetComponentInChildren<BoxCollider2D>();
+            var collider = npcListForRoom[i].GetComponentInChildren<BoxCollider2D>();
             if (collider != null)
             {
                 colliderInitialPositions.Add(collider.transform.position);
@@ -229,11 +224,11 @@ public class RoomScript : MonoBehaviour
             }
 
             // Move each NPC toward its target position
-            for (int i = 0; i < npcList.Count; i++)
+            for (int i = 0; i < npcListForRoom.Count; i++)
             {
-                npcList[i].GetComponent<CharacterMovement>().change = Vector3.zero;
+                npcListForRoom[i].GetComponent<CharacterMovement>().change = Vector3.zero;
 
-                var collider = npcList[i].GetComponentInChildren<BoxCollider2D>();
+                var collider = npcListForRoom[i].GetComponentInChildren<BoxCollider2D>();
                 if (collider != null)
                 {
                     collider.transform.position = colliderInitialPositions[i];
@@ -252,16 +247,16 @@ public class RoomScript : MonoBehaviour
         }
 
         // Detach NPCs from parent and reset their positions if needed
-        for (int i = 0; i < npcList.Count; i++)
+        for (int i = 0; i < npcListForRoom.Count; i++)
         {
-            npcList[i].transform.parent = null;
-            npcInitialPositions[i] = npcList[i].transform.position;
-            SetZToZero(npcList[i]);
+            npcListForRoom[i].transform.parent = null;
+            npcInitialPositions[i] = npcListForRoom[i].transform.position;
+            SetZToZero(npcListForRoom[i]);
 
-            var collider = npcList[i].GetComponentInChildren<BoxCollider2D>();
+            var collider = npcListForRoom[i].GetComponentInChildren<BoxCollider2D>();
             if (collider != null)
             {
-                Vector3 colliderTransform = npcList[i].GetComponentInChildren<BoxCollider2D>().transform.position;
+                Vector3 colliderTransform = npcListForRoom[i].GetComponentInChildren<BoxCollider2D>().transform.position;
                 if(colliderTransform.y < 5)
                 {
                     colliderTransform.y = 0;
@@ -269,7 +264,7 @@ public class RoomScript : MonoBehaviour
                 }
                 colliderInitialPositions[i] = collider.transform.position;
             }
-            // npcList[i].GetComponent<BoxCollider2D>().offset = npcInitialColliderPos[i]; // Reset offset
+            // npcListForRoom[i].GetComponent<BoxCollider2D>().offset = npcInitialColliderPos[i]; // Reset offset
         }
     }
 
@@ -370,14 +365,14 @@ public class RoomScript : MonoBehaviour
         yield return new WaitForEndOfFrame();
 
         
-        foreach(GameObject obj in npcList) {
-            GetSpritesAndAddToLists(obj, npcSpriteList);
+        foreach(GameObject obj in npcListForRoom) {
+            GetSpritesAndAddToLists(obj, npcSpriteListForRoom);
         }
 
 
-        // for (int i = 0; i < npcSpriteList.Count; i++)
+        // for (int i = 0; i < npcSpriteListForRoom.Count; i++)
         // {  
-        //     SetTreeAlpha(npcSpriteList[i], 0f);
+        //     SetTreeAlpha(npcSpriteListForRoom[i], 0f);
         // } 
 
     }
@@ -440,13 +435,13 @@ public class RoomScript : MonoBehaviour
     // {
     //     yield return new WaitForEndOfFrame();
         
-    //     foreach(GameObject obj in npcList) {
-    //         GetSpritesAndAddToLists(obj, npcSpriteList, new List<GameObject>(), npcColorList);
+    //     foreach(GameObject obj in npcListForRoom) {
+    //         GetSpritesAndAddToLists(obj, npcSpriteListForRoom, new List<GameObject>(), npcColorListForRoom);
     //     }
 
-    //     for (int i = 0; i < npcSpriteList.Count; i++)
+    //     for (int i = 0; i < npcSpriteListForRoom.Count; i++)
     //     {  
-    //         SetTreeAlpha(npcSpriteList[i], 0f);
+    //         SetTreeAlpha(npcSpriteListForRoom[i], 0f);
     //     } 
 
     // }

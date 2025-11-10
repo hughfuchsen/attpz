@@ -272,7 +272,7 @@ public class CharacterDialogueScript : MonoBehaviour
         // Restart the NPC movement coroutine when the player leaves
         if (characterMovement.npcRandomMovementCoro == null && isPlayerInRange == false)
         {
-            characterMovement.npcRandomMovementCoro = characterMovement.StartCoroutine(characterMovement.MoveCharacterRandomly());
+            // characterMovement.npcRandomMovementCoro = characterMovement.StartCoroutine(characterMovement.MoveCharacterRandomly());
             staring = false;
         }
         // if(isPlayerInRange == false)

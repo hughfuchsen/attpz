@@ -189,9 +189,20 @@ public class RoomThresholdColliderScript : MonoBehaviour
                     cm.controlDirectionToPlayerDirection[Direction.DownFacingLeft] = Direction.DownLeft;
                     cm.controlDirectionToPlayerDirection[Direction.DownLeft] = Direction.DownLeft;
                 }
+                // if(IsCrossingUp(cm))
+                // {
+                    if(ThisThresholdIsAnEntranceToTheBuildingOrIsStairs() || (cm.currentBuilding == myCM.currentBuilding))
+                    {
+                        SetClosedDoorToZeroAlpha();
+                        SetOpenDoorToInitialAlpha();
+                    }
 
-                SetClosedDoorToZeroAlpha();
-                SetOpenDoorToInitialAlpha();
+                // }
+                // else
+                // {
+                //     SetClosedDoorToZeroAlpha();
+                //     SetOpenDoorToInitialAlpha();
+                // }
                 // SetPlayerIsInDoorway(true);
             }
             else // if it is a ladder
@@ -200,7 +211,7 @@ public class RoomThresholdColliderScript : MonoBehaviour
                 {
                     if (roomBelow != null || roomAbove != null)
                     {
-                        roomBelow.ResetRoomPositions(); 
+                        // roomBelow.ResetRoomPositions(); 
                     }
                 }  
                 else
@@ -208,28 +219,21 @@ public class RoomThresholdColliderScript : MonoBehaviour
                     if (roomBelow != null || roomAbove != null)
                     {
                         // roomAbove.EnterRoom(true, 0.3f); 
-                        roomBelow.EnterRoom(true, 0.3f); 
+                        // roomBelow.EnterRoom(true, 0.3f); 
                     }
                 }
             }
-        }
-        else if(other.gameObject.tag == "NPCCollider")
-        { // for npc random movement
-            // if(other.GetComponent<CharacterMovement>() != null && other == other.GetComponent<CharacterMovement>().boxCollider)
-            // {
-                // other.transform.parent.GetComponent<CharacterMovement>().ReverseDirection(true);
-            // }
         }
     }
 
     void OnTriggerExit2D(Collider2D other)
     {
-        CharacterMovement cm = other.transform.parent.GetComponent<CharacterMovement>();
-
-        bool aboveCollider = aboveColliderByCharacter.ContainsKey(other.gameObject) && aboveColliderByCharacter[other.gameObject];
-
         if (other.gameObject.tag == "PlayerCollider")
         {    
+            CharacterMovement cm = other.transform.parent.GetComponent<CharacterMovement>();
+
+            bool aboveCollider = aboveColliderByCharacter.ContainsKey(other.gameObject) && aboveColliderByCharacter[other.gameObject];
+            
             cm.playerOnThresh = false;
 
             StopAllCoros();
@@ -274,8 +278,6 @@ public class RoomThresholdColliderScript : MonoBehaviour
                         {
                             roomAbove.EnterRoom(false, 0f);
                         }
-
-
                     }
                 }  
                 else //ON EXIT CROSSING DOWN
@@ -355,6 +357,12 @@ public class RoomThresholdColliderScript : MonoBehaviour
         }
         else if (other.gameObject.tag == "NPCCollider")
         {    
+            GameObject character = other.transform.parent.gameObject;
+
+            CharacterMovement cm = other.transform.parent.GetComponent<CharacterMovement>();
+
+            bool aboveCollider = aboveColliderByCharacter.ContainsKey(other.gameObject) && aboveColliderByCharacter[other.gameObject];
+            
             cm.playerOnThresh = false;
 
             // StopAllCoros();
@@ -373,25 +381,37 @@ public class RoomThresholdColliderScript : MonoBehaviour
                         { 
                             // roomBelow.ResetRoomPositions(); 
                             // roomBelow.ExitRoomAndSetDoorwayInstances(); 
-                            roomBelow.npcListForRoom.Remove(other.transform.parent.gameObject);
-                            SetOpenDoorToZeroAlpha();
-                            SetClosedDoorToInitialAlpha();
+                            // roomBelow.npcListForRoom.Remove(other.transform.parent.gameObject);
+                            if(cm.currentBuilding == myCM.currentBuilding)
+                            {    
+                                SetOpenDoorToZeroAlpha();
+                                SetClosedDoorToInitialAlpha();
+                            }
                         }  
                         else if (roomAbove != null) // if player is entering the building from the fro
                         {
-                            SetClosedDoorToInitialAlpha();
+                            // if(cm.currentBuilding != myCM.currentBuilding)
+                            // {
+                                SetClosedDoorToInitialAlpha();
+                                SetOpenDoorToZeroAlpha();
+                            // }
                             // roomAbove.EnterRoom(true, 0.3f); 
-                            roomAbove.npcListForRoom.Add(other.transform.parent.gameObject);
+                            // roomAbove.npcListForRoom.Add(other.transform.parent.gameObject);
+                            roomAbove.NpcEnterRoom(character);
                         }
                     }
                     else // if this threshold is just the entrance to a room and not a building entrance
-                    {               
-                        SetClosedDoorToInitialAlpha(); 
+                    {    
+                        if(cm.currentBuilding == myCM.currentBuilding)
+                        {           
+                            SetClosedDoorToInitialAlpha();
+                            SetOpenDoorToZeroAlpha();
+                        } 
 
                         if (roomBelow != null) // this first in order to correctly assign the current room
                         {
                             // roomBelow.ExitRoomAndSetDoorwayInstances();
-                            roomBelow.npcListForRoom.Remove(other.transform.parent.gameObject);
+                            // roomBelow.npcListForRoom.Remove(other.transform.parent.gameObject);
                         }
                         if (roomBelow != null && roomAbove == null) // if there is no room above the thresh i.e. if 
                                                                     // the player is leaving the level and the rooms need to go in their original pos.
@@ -401,7 +421,8 @@ public class RoomThresholdColliderScript : MonoBehaviour
                         else if (roomAbove != null) 
                         {
                             // roomAbove.EnterRoom(false, 0f);
-                            roomAbove.npcListForRoom.Add(other.transform.parent.gameObject);
+                            // roomAbove.npcListForRoom.Add(other.transform.parent.gameObject);
+                            roomAbove.NpcEnterRoom(character);
                         }
 
 
@@ -412,9 +433,14 @@ public class RoomThresholdColliderScript : MonoBehaviour
                     if (roomAbove != null)
                     {
                         // roomAbove.ExitRoomAndSetDoorwayInstances();
-                        roomAbove.npcListForRoom.Remove(other.transform.parent.gameObject);
-                        SetOpenDoorToZeroAlpha();
-                        SetClosedDoorToInitialAlpha();
+                        // roomAbove.npcListForRoom.Remove(other.transform.parent.gameObject);
+                        // if(cm.currentBuilding == myCM.currentBuilding)
+                        // {
+                            // Debug.Log("zong");
+
+                            SetOpenDoorToZeroAlpha();
+                            SetClosedDoorToInitialAlpha();
+                        // }
                     }
 
                     if (ThisThresholdIsAnEntranceToTheBuildingOrIsStairs())
@@ -423,25 +449,29 @@ public class RoomThresholdColliderScript : MonoBehaviour
                         {
                             // roomAbove.ResetRoomPositions();
                             // roomAbove.ExitRoomAndSetDoorwayInstances();
-                            roomAbove.npcListForRoom.Remove(other.transform.parent.gameObject);
+                            // roomAbove.npcListForRoom.Remove(other.transform.parent.gameObject);
                         }   
                         else
                         if (!cm.playerIsOutside && roomBelow != null) // if the player IS inside bulding and ABOVE collider, going down stairs and entering room downstairs
                         {
                             // roomBelow.EnterRoom(false, 0f);
-                            roomBelow.npcListForRoom.Add(other.transform.parent.gameObject);
-
-                            SetClosedDoorToInitialAlpha();
-                            for (int i = 0; i < openDoorSpriteList.Count; i++)
-                            { 
-                                SetTreeAlpha(this.FindSiblingWithTag("OpenDoor"), 0);
-                            }  
+                            // roomBelow.npcListForRoom.Add(other.transform.parent.gameObject);
+                            roomBelow.NpcEnterRoom(character);
+                            if(cm.currentBuilding == myCM.currentBuilding)
+                            {
+                                SetClosedDoorToInitialAlpha();
+                                for (int i = 0; i < openDoorSpriteList.Count; i++)
+                                { 
+                                    SetTreeAlpha(this.FindSiblingWithTag("OpenDoor"), 0);
+                                }  
+                            }
                         }    
                     }
                     else if (roomBelow != null) // entering a room going down while inside building
                     {
                         // roomBelow.EnterRoom(false, 0f);
-                        roomBelow.npcListForRoom.Add(other.transform.parent.gameObject);
+                        // roomBelow.npcListForRoom.Add(other.transform.parent.gameObject);
+                        roomBelow.NpcEnterRoom(character);
 
                         if (!cm.playerIsOutside && aboveCollider) // if player is inside 
                         {
@@ -474,7 +504,8 @@ public class RoomThresholdColliderScript : MonoBehaviour
                         {
                             // roomAbove.EnterRoom(true, 0.3f); 
                             // roomBelow.EnterRoom(true, 0.3f); 
-                            roomBelow.npcListForRoom.Add(other.transform.parent.gameObject);
+                            // roomBelow.npcListForRoom.Add(other.transform.parent.gameObject);
+                            roomBelow.NpcEnterRoom(character);
                         }
                     }
                     else

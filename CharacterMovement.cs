@@ -76,6 +76,10 @@ public class CharacterMovement : MonoBehaviour
   // Map the angle to control directions
   public Direction controlDirection = Direction.Nothing; // Default value should never be used
 
+  public BuildingScript currentBuilding = null;
+  public LevelScript currentLevel = null;
+  public RoomScript currentRoom = null;
+
 
   // Start is called before the first frame update
   void Start()    

@@ -6,8 +6,11 @@ public class RoomScript : MonoBehaviour
 {
     public SurfaceType roomSurface = SurfaceType.Carpet; // Default value 
     public BuildingScript building;
-    [HideInInspector] public CameraMovement cameraMovement;
     public LevelScript level = null;
+    [HideInInspector] public CameraMovement cameraMovement;
+    [HideInInspector] public CharacterMovement myCM;
+    [HideInInspector] public bool isMovingg = false;
+    [HideInInspector] public bool isDown = false;
     public List<RoomScript> roomsSameOrAbove = new List<RoomScript>();
     public List<RoomScript> roomsBelow = new List<RoomScript>();
     private List<GameObject> roomSpriteList = new List<GameObject>();
@@ -15,17 +18,20 @@ public class RoomScript : MonoBehaviour
     private List<Color> desaturatedColorList = new List<Color>();
     // private List<Color> initialColorListToBeChangedWithLevelMovements = new List<Color>();
     private List<Transform> childColliders = new List<Transform>(); // Separate list for child colliders
+    private List<Vector3> childColliderInitialPositions = new List<Vector3>();
+
     public List<RoomThresholdColliderScript> doorsBelow = new List<RoomThresholdColliderScript>();
     private List<Coroutine> doorsBelowCoros = new List<Coroutine>();
     public int wallHeight = 31;
     private Vector3 initialPosition;
-    private List<Vector3> childColliderInitialPositions = new List<Vector3>();
     private Coroutine currentMotionCoroutine;
     private Coroutine currentColorCoroutine;
     private Coroutine currentColliderMotionCoroutine;
     public List<GameObject> npcListForRoom = new List<GameObject>();
     [HideInInspector] public List<GameObject> npcSpriteListForRoom = new List<GameObject>();
     [HideInInspector] public List<Color> npcColorListForRoom = new List<Color>();
+
+    [HideInInspector] public Coroutine npcRoomMoveCoro;
 
     void Awake()
     {
@@ -56,6 +62,7 @@ public class RoomScript : MonoBehaviour
         StartCoroutine(LateStartCoroForNonPlayerCharacters());
 
         cameraMovement = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraMovement>();
+        myCM = GameObject.FindGameObjectWithTag("Player").GetComponent<CharacterMovement>();
 
 
         AddInitialColorsToDesaturatedColorList();
@@ -111,8 +118,155 @@ public class RoomScript : MonoBehaviour
             doorsBelow[i].SetPlayerIsInRoomAbove(true);
             doorsBelow[i].SetPlayerIsInDoorway(false);
         }
+        for (int i = 0; i < npcListForRoom.Count; i++)
+        {
+            // StartCoroutine(HandleNPCsInRooms(npcListForRoom[i]));
+        }
 
         cameraMovement.currentRoom = this;
+    }
+    public void NpcEnterRoom(GameObject character)
+    {
+        var NPCca = character.GetComponent<CharacterAnimation>();
+        var NPCcm = character.GetComponent<CharacterMovement>();
+        var npcIsoSS = character.GetComponent<IsoSpriteSorting>();
+
+        // if NPC was already in another room
+        if (NPCcm.currentRoom != null)
+        {
+            RoomScript previousRoom = NPCcm.currentRoom;
+            bool previousRoomWasDown = previousRoom.isDown;
+
+            // Remove from old room
+            previousRoom.npcListForRoom.Remove(character);
+
+            // Assign to this room
+            NPCcm.currentRoom = this;
+            npcListForRoom.Add(character);
+
+            // Adjust sprite & sorting offsets if room vertical state changed
+            for (int i = 0; i < NPCca.characterSpriteList.Count; i++)
+            {
+                Vector3 basePos = NPCca.initialChrctrSpriteTransformList[i].localPosition;
+
+                if (!isDown && previousRoomWasDown)
+                {
+                    // Moved up
+                    NPCca.characterSpriteList[i].transform.localPosition = basePos + new Vector3(0, wallHeight, 0);
+                }
+                else if (isDown && !previousRoomWasDown)
+                {
+                    // Moved down
+                    NPCca.characterSpriteList[i].transform.localPosition = basePos + new Vector3(0, -wallHeight, 0);
+                }
+                else
+                {
+                    // Same vertical level — keep original
+                    NPCca.characterSpriteList[i].transform.localPosition = basePos;
+                }
+            }
+            if (!isDown && previousRoomWasDown)
+            {
+                // Moved up
+                npcIsoSS.SorterPositionOffset.y += wallHeight;
+            }
+            else if (isDown && !previousRoomWasDown)
+            {
+                // Moved down
+                npcIsoSS.SorterPositionOffset.y -= wallHeight;
+            }
+        }
+        else
+        {
+            // First room entry (no previous room)
+            NPCcm.currentRoom = this;
+            npcListForRoom.Add(character);
+
+            // Adjust sprite & sorting offsets if room vertical state changed
+            for (int i = 0; i < NPCca.characterSpriteList.Count; i++)
+            {
+                Vector3 basePos = NPCca.initialChrctrSpriteTransformList[i].localPosition;
+
+                if (isDown)
+                {
+                    // Moved down
+                    NPCca.characterSpriteList[i].transform.localPosition = basePos + new Vector3(0, -wallHeight, 0);
+                }
+                else
+                {
+                    // Same vertical level — keep original
+                    NPCca.characterSpriteList[i].transform.localPosition = basePos;
+                }
+            }
+            if (isDown)
+            {
+                // Moved down
+                npcIsoSS.SorterPositionOffset.y -= wallHeight;
+            }
+        }
+    }
+    public void NpcExitRoom(GameObject character)
+    {
+        var NPCca = character.GetComponent<CharacterAnimation>();
+        var NPCcm = character.GetComponent<CharacterMovement>();
+        var npcIsoSS = character.GetComponent<IsoSpriteSorting>();
+
+        // if NPC was already in another room
+        if (NPCcm.currentRoom != null)
+        {
+            RoomScript previousRoom = NPCcm.currentRoom;
+            // bool previousRoomWasDown = previousRoom.isDown;
+
+            // Remove from old room
+            previousRoom.npcListForRoom.Remove(character);
+
+            NPCcm.currentRoom = null;
+
+            // Adjust sprite & sorting offsets if room vertical state changed
+            for (int i = 0; i < NPCca.characterSpriteList.Count; i++)
+            {
+                Vector3 basePos = NPCca.initialChrctrSpriteTransformList[i].localPosition;
+                // Moved up
+                if (previousRoom.isDown)
+                {
+                    // previous room is down down!!! down
+                    NPCca.characterSpriteList[i].transform.localPosition = basePos + new Vector3(0, wallHeight, 0);
+                }
+                else
+                {
+                    // Same vertical level — keep original
+                    NPCca.characterSpriteList[i].transform.localPosition = basePos;
+                }
+            }
+            npcIsoSS.SorterPositionOffset.y = -28f;
+
+        }
+    }
+
+
+    public IEnumerator HandleNPCsInRooms(GameObject character)
+    {
+        IsoSpriteSorting npcIsoSS = character.GetComponent<IsoSpriteSorting>();
+        CharacterAnimation NPCca = character.GetComponent<CharacterAnimation>();
+        CharacterMovement NPCcm = character.GetComponent<CharacterMovement>();
+      if(NPCcm.currentRoom != null)
+      {  
+        if(myCM.currentRoom != NPCcm.currentRoom)
+        {   
+            for (int i = 0; i < NPCca.characterSpriteList.Count; i++)
+            {
+                NPCca.characterSpriteList[i].transform.localPosition = 
+                isDown ? 
+                (NPCca.initialChrctrSpriteTransformList[i].localPosition + new Vector3(0, -wallHeight, 0)) 
+                : NPCca.initialChrctrSpriteTransformList[i].localPosition;
+            }
+            npcIsoSS.SorterPositionOffset.y = 
+                isDown ? 
+                (npcIsoSS.initialSorterPositionOffset1.y - wallHeight) 
+                : npcIsoSS.initialSorterPositionOffset1.y;
+        }
+      }
+        yield return null;
     }
     
     public void ExitRoomAndSetDoorwayInstances() 
@@ -138,19 +292,17 @@ public class RoomScript : MonoBehaviour
         }
     }
 
+
+
     private void MoveUp(bool movingUp = true)
     {
         if (currentMotionCoroutine != null)
         {
             StopCoroutine(currentMotionCoroutine);
         }
-        // if (currentColorCoroutine != null)
-        // {
-        //     StopCoroutine(currentColorCoroutine);
-        // }
 
         currentMotionCoroutine = StartCoroutine(Displace(false, null, this.gameObject, initialPosition, movingUp));
-        // currentColorCoroutine = StartCoroutine(ApplyColorToRoom(false));
+        // isDown = false;
     }
     
     public void MoveDown(bool shouldWait, float? waitTime, bool movingUp = false)
@@ -168,7 +320,6 @@ public class RoomScript : MonoBehaviour
         {
             // Move the parent object down
             currentMotionCoroutine = StartCoroutine(Displace(shouldWait, waitTime.Value, this.gameObject, initialPosition + new Vector3(0, -wallHeight, 0), movingUp));
-            // currentColorCoroutine = StartCoroutine(ApplyColorToRoom(true));
 
         }
         else
@@ -176,97 +327,217 @@ public class RoomScript : MonoBehaviour
             // Handle the case where waitTime is null (optional)
             // Debug.LogError("waitTime is null. You should handle this case appropriately.");
         }
+        // isDown = true;
     }
-
-
-
-    IEnumerator Displace(bool shouldWait, float? waitTime, GameObject obj, Vector3 targetPosition, bool movingUp)
+    public IEnumerator Displace(bool shouldWait, float? waitTime, GameObject obj, Vector3 targetRoomPosition, bool movingUp)
     {
-        Vector3 currentPosition = obj.transform.localPosition; 
+        isMovingg = true;
+
+        // Wait if requested
+        if (shouldWait && waitTime.HasValue)
+            yield return new WaitForSeconds(waitTime.Value);
+
+        // Capture the starting position of the room
+        Vector3 startRoomPos = obj.transform.localPosition;
+
         float timeToReachTarget = 0.3f;
         float elapsedTime = 0f;
 
-        // Store initial NPC positions and initial collider positions
-        List<Vector3> npcInitialPositions = new List<Vector3>();
-        List<Vector3> colliderInitialPositions = new List<Vector3>();
+        bool isMoving = Mathf.Abs(startRoomPos.y - targetRoomPosition.y) > 0.001f;
 
-        for (int i = 0; i < npcListForRoom.Count; i++)
+        // Take a snapshot of NPCs to avoid issues if npcListForRoom changes mid-coroutine
+        var movingNPCs = new List<GameObject>(npcListForRoom);
+
+        // Capture current sprite positions and SorterPositionOffsets at start
+        List<List<Vector3>> npcSpriteStartPositions = new List<List<Vector3>>();
+        List<float> npcStartOffsets = new List<float>();
+
+        foreach (var npc in movingNPCs)
         {
-            npcInitialPositions.Add(npcListForRoom[i].transform.position);
-            npcListForRoom[i].transform.parent = this.transform;
-            SetZToZero(npcListForRoom[i]);
+            var ca = npc.GetComponent<CharacterAnimation>();
+            var iso = npc.GetComponent<IsoSpriteSorting>();
 
+            List<Vector3> spritePositions = new List<Vector3>();
+            foreach (var sprite in ca.characterSpriteList)
+                spritePositions.Add(sprite.transform.localPosition);
+            npcSpriteStartPositions.Add(spritePositions);
 
-            // Get the child collider's position and save it
-            var collider = npcListForRoom[i].GetComponentInChildren<BoxCollider2D>();
-            if (collider != null)
-            {
-                colliderInitialPositions.Add(collider.transform.position);
-            }
+            npcStartOffsets.Add(iso.SorterPositionOffset.y);
         }
 
-        if (shouldWait)
-        {
-            yield return new WaitForSeconds(waitTime.Value);
-        }
-
+        // --- Main motion loop ---
         while (elapsedTime < timeToReachTarget)
         {
             elapsedTime += Time.deltaTime;
             float t = Mathf.Clamp01(elapsedTime / timeToReachTarget);
 
-            // Move main object toward target
-            obj.transform.localPosition = Vector3.Lerp(currentPosition, targetPosition, t);
+            // Move the room
+            obj.transform.localPosition = Vector3.Lerp(startRoomPos, targetRoomPosition, t);
 
-            for (int i = 0; i < childColliders.Count; i++)
+            // Keep non-NPC colliders fixed
+            for (int j = 0; j < childColliders.Count; j++)
+                childColliders[j].position = childColliderInitialPositions[j];
+
+            // Move NPCs
+            for (int i = 0; i < movingNPCs.Count; i++)
             {
-                childColliders[i].position = childColliderInitialPositions[i];
-            }
+                var npc = movingNPCs[i];
+                var ca = npc.GetComponent<CharacterAnimation>();
+                var cm = npc.GetComponent<CharacterMovement>();
+                var iso = npc.GetComponent<IsoSpriteSorting>();
 
-            // Move each NPC toward its target position
-            for (int i = 0; i < npcListForRoom.Count; i++)
-            {
-                npcListForRoom[i].GetComponent<CharacterMovement>().change = Vector3.zero;
-
-                var collider = npcListForRoom[i].GetComponentInChildren<BoxCollider2D>();
-                if (collider != null)
+                for (int k = 0; k < ca.characterSpriteList.Count; k++)
                 {
-                    collider.transform.position = colliderInitialPositions[i];
+                    var spriteChild = ca.characterSpriteList[k];
+                    Vector3 startPos = npcSpriteStartPositions[i][k];
+                    Vector3 targetPos = startPos;
+
+                    if (isMoving)
+                    {
+                        if (!isDown && !movingUp)
+                            targetPos += new Vector3(0, -wallHeight, 0); // move down
+                        else if (isDown && movingUp)
+                            targetPos += new Vector3(0, wallHeight, 0);  // move up
+                    }
+
+                    spriteChild.transform.localPosition = Vector3.Lerp(startPos, targetPos, t);
                 }
+
+                // Move the sorter offset relative to current value
+                float startOffset = npcStartOffsets[i];
+                float targetOffset = startOffset;
+
+                if (isMoving)
+                {
+                    if (!isDown && !movingUp)
+                        targetOffset -= wallHeight;
+                    else if (isDown && movingUp)
+                        targetOffset += wallHeight;
+                }
+
+                iso.SorterPositionOffset.y = Mathf.Lerp(startOffset, targetOffset, t);
+
+                cm.change = Vector3.zero;
             }
 
             yield return null;
         }
 
-        // Finalize the position of the main object
-        obj.transform.localPosition = targetPosition;
-    
-        for (int i = 0; i < childColliders.Count; i++)
-        {
-            childColliders[i].position = childColliderInitialPositions[i];
-        }
+        // --- Finalize positions ---
+        obj.transform.localPosition = targetRoomPosition;
 
-        // Detach NPCs from parent and reset their positions if needed
-        for (int i = 0; i < npcListForRoom.Count; i++)
-        {
-            npcListForRoom[i].transform.parent = null;
-            npcInitialPositions[i] = npcListForRoom[i].transform.position;
-            SetZToZero(npcListForRoom[i]);
+        for (int j = 0; j < childColliders.Count; j++)
+            childColliders[j].position = childColliderInitialPositions[j];
 
-            var collider = npcListForRoom[i].GetComponentInChildren<BoxCollider2D>();
-            if (collider != null)
-            {
-                Vector3 colliderTransform = npcListForRoom[i].GetComponentInChildren<BoxCollider2D>().transform.position;
-                if(colliderTransform.y < 5)
-                {
-                    colliderTransform.y = 0;
-                    colliderTransform.x = 0;
-                }
-                colliderInitialPositions[i] = collider.transform.position;
-            }
-            // npcListForRoom[i].GetComponent<BoxCollider2D>().offset = npcInitialColliderPos[i]; // Reset offset
-        }
+        // Update flags
+        isMovingg = false;
+        isDown = !movingUp;
     }
+
+    // public IEnumerator Displace(bool shouldWait, float? waitTime, GameObject obj, Vector3 targetRoomPosition, bool movingUp)
+    // {
+    //     isMovingg = true;
+
+    //     if (shouldWait)
+    //         yield return new WaitForSeconds(waitTime.Value);
+
+    //     Vector3 currentRoomPosition = obj.transform.localPosition;
+    //     float timeToReachTarget = 0.3f;
+    //     float elapsedTime = 0f;
+
+    //     bool isMoving = Mathf.Abs(currentRoomPosition.y - targetRoomPosition.y) > 0.001f;
+
+
+    //     // --- main motion loop ---
+    //     while (elapsedTime < timeToReachTarget)
+    //     {
+    //         elapsedTime += Time.deltaTime;
+    //         float t = Mathf.Clamp01(elapsedTime / timeToReachTarget);
+
+    //         // move room
+    //         obj.transform.localPosition = Vector3.Lerp(currentRoomPosition, targetRoomPosition, t);
+
+    //         // keep colliders fixed
+    //         for (int j = 0; j < childColliders.Count; j++)
+    //             childColliders[j].position = childColliderInitialPositions[j];
+
+    //         // move NPCs
+    //         for (int i = 0; i < npcListForRoom.Count; i++)
+    //         {
+    //             var NPCca = npcListForRoom[i].GetComponent<CharacterAnimation>();
+    //             var NPCcm = npcListForRoom[i].GetComponent<CharacterMovement>();
+    //             var NPCIso = npcListForRoom[i].GetComponent<IsoSpriteSorting>();
+
+    //             for (int k = 0; k < NPCca.characterSpriteList.Count; k++)
+    //             {
+    //                 var spriteChild = NPCca.characterSpriteList[k];
+    //                 Vector3 startPos = NPCca.initialChrctrSpriteTransformList[k].localPosition;
+    //                 Vector3 targetPos = startPos;
+
+    //                 if (isMoving && isDown && movingUp)
+    //                     startPos += new Vector3(0, -wallHeight, 0);
+    //                 else if (isMoving && !isDown && !movingUp)
+    //                     targetPos += new Vector3(0, -wallHeight, 0);
+
+    //                 spriteChild.transform.localPosition = Vector3.Lerp(startPos, targetPos, t);
+    //             }
+
+    //             float startISSOffset = -28f;
+    //             float targetOffset = startISSOffset;
+                
+    //             if(isMoving)
+    //             {
+    //                 if (!isDown && !movingUp)
+    //                 {
+    //                     targetOffset -= wallHeight;
+    //                     NPCIso.SorterPositionOffset.y = Mathf.Lerp(startISSOffset, targetOffset, t);
+    //                 }
+    //                 else if (isDown && movingUp)
+    //                 {
+    //                     startISSOffset -= wallHeight;
+    //                     NPCIso.SorterPositionOffset.y = Mathf.Lerp(startISSOffset, targetOffset, t);
+    //                 }
+    //             }
+                    
+
+    //             NPCcm.change = Vector3.zero;
+    //         }
+
+    //         yield return null;
+    //     }
+
+    //     // finalize
+    //     obj.transform.localPosition = targetRoomPosition;
+    //     for (int i = 0; i < childColliders.Count; i++)
+    //         childColliders[i].position = childColliderInitialPositions[i];
+
+    //     isMovingg = false;
+    //     isDown = !movingUp;
+    // }
+
+
+
+    List<Transform> GetAllSpriteChildren(Transform parent)
+    {
+        List<Transform> spriteChildren = new List<Transform>();
+
+        foreach (Transform child in parent)
+        {
+            // Skip collider children
+            if (child.GetComponent<Collider2D>() != null)
+                continue;
+
+            // If child has a SpriteRenderer, include it
+            if (child.GetComponent<SpriteRenderer>() != null)
+                spriteChildren.Add(child);
+
+            // Recurse into deeper children
+            spriteChildren.AddRange(GetAllSpriteChildren(child));
+        }
+
+        return spriteChildren;
+    }
+
 
 
     IEnumerator ApplyColorToRoom(bool applyColor)

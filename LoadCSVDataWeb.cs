@@ -430,7 +430,7 @@ public class LoadCSVDataWeb : MonoBehaviour
                 {
                     searchInputField.text = name;
                     DisplayDetailsForName(name);
-                    myCharacterAnimation.GetSpritesAndAddToLists(GameObject.FindGameObjectWithTag("Player"), myCharacterAnimation.characterSpriteList, new List<GameObject>(), myCharacterAnimation.initialChrctrColorList);
+                    myCharacterAnimation.GetSpritesAndAddToLists(GameObject.FindGameObjectWithTag("Player"), myCharacterAnimation.characterSpriteList, new List<GameObject>(), myCharacterAnimation.initialChrctrColorList, myCharacterAnimation.initialChrctrSpriteTransformList);
                     ClearSuggestions();
                 });
                 suggestionItems.Add(suggestionItem);

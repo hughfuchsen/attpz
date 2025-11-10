@@ -79,12 +79,12 @@ public class LevelThreshColliderScript : MonoBehaviour
     }
     void OnTriggerExit2D(Collider2D other)
     {
-        CharacterMovement cm = other.transform.parent.GetComponent<CharacterMovement>();
-
-        bool aboveCollider = aboveColliderByCharacter.ContainsKey(other.gameObject) && aboveColliderByCharacter[other.gameObject];
-
         if(other.CompareTag("PlayerCollider"))
         {
+            CharacterMovement cm = other.transform.parent.GetComponent<CharacterMovement>();
+
+            bool aboveCollider = aboveColliderByCharacter.ContainsKey(other.gameObject) && aboveColliderByCharacter[other.gameObject];
+
             // un-fix the player in \/ left/right diag way upon collider exit. 
             cm.ResetPlayerMovement();     
             
@@ -94,8 +94,7 @@ public class LevelThreshColliderScript : MonoBehaviour
                 {
                     if(levelAboveOrEntering != null)
                     {
-            
-                            levelAboveOrEntering.ResetLevels();
+                        levelAboveOrEntering.ResetLevels();
                     }
                     else if(levelBelowOrEntering != null)
                     {                            
@@ -128,17 +127,6 @@ public class LevelThreshColliderScript : MonoBehaviour
                     // }
                 }  
                 // }
-
-                // if(moveLevelsBelow)
-                // {
-                //     if(levelBelowOrEntering != null)
-                //     {
-                //         for (int i = 0; i < levelBelowOrEntering.Count; i++)
-                //         {                          
-                //             levelBelowOrEntering[i].MoveDown(false, null);
-                //         }
-                //     }  
-                // }  
 
             }
             else    // if player crossing down
@@ -189,16 +177,6 @@ public class LevelThreshColliderScript : MonoBehaviour
                 }       
                 // }
 
-                // if(moveLevelsBelow)
-                // {
-                //     if(levelBelowOrEntering != null)
-                //     {
-                //         for (int i = 0; i < levelBelowOrEntering.Count; i++)
-                //         {                          
-                //             levelBelowOrEntering[i].MoveUp();
-                //         }
-                //     } 
-                // }
 
             }
             if(this.transform.parent.GetComponentInChildren<BuildingThreshColliderScript>() == null)
@@ -209,6 +187,12 @@ public class LevelThreshColliderScript : MonoBehaviour
         }
         else if(other.CompareTag("NPCCollider"))
         {
+            GameObject character = other.transform.parent.gameObject;
+
+            CharacterMovement cm = other.transform.parent.GetComponent<CharacterMovement>();
+
+            bool aboveCollider = aboveColliderByCharacter.ContainsKey(other.gameObject) && aboveColliderByCharacter[other.gameObject];
+            
             // un-fix the player in \/ left/right diag way upon collider exit. 
             cm.ResetPlayerMovement(); 
             
@@ -235,40 +219,19 @@ public class LevelThreshColliderScript : MonoBehaviour
                 else if(this.transform.parent.GetComponentInChildren<BuildingThreshColliderScript>() != null && !cm.playerIsOutside)
                 {
                     if(levelAboveOrEntering != null)
-                    {
-                        levelAboveOrEntering.npcListForLevel.Add(other.transform.parent.gameObject);
-                        // for (int i = 0; i < levelAboveOrEntering.Count; i++)
-                        // {                      
-                        //     levelAboveOrEntering[i].EnterLevel(true, true);
-                        // }
+                    {                     
+                        cm.currentLevel = levelAboveOrEntering;
                     }
                     else if(levelBelowOrEntering != null)
                     {
-                        levelAboveOrEntering.npcListForLevel.Add(other.transform.parent.gameObject);
-                        // for (int i = 0; i < levelBelowOrEntering.Count; i++)
-                        // {                          
-                        //     levelBelowOrEntering[i].EnterLevel(true, true);
-                        // }
+                        cm.currentLevel = levelBelowOrEntering;
                     }
                 }
                 else if(levelAboveOrEntering != null)
                 {
-                    // for (int i = 0; i < levelAboveOrEntering.Count; i++)
-                    // {                      
-                    //     levelAboveOrEntering[i].EnterLevel(false, true);
-                    // }
+                    cm.currentLevel = levelAboveOrEntering;
                 }  
 
-                // if(moveLevelsBelow)
-                // {
-                //     if(levelBelowOrEntering != null)
-                //     {
-                //         for (int i = 0; i < levelBelowOrEntering.Count; i++)
-                //         {                          
-                //             levelBelowOrEntering[i].MoveDown(false, null);
-                //         }
-                //     }  
-                // }  
             }
             else    // if player crossing down
             {
@@ -294,46 +257,23 @@ public class LevelThreshColliderScript : MonoBehaviour
                 {
                     if(levelAboveOrEntering != null)
                     {
-                        // for (int i = 0; i < levelAboveOrEntering.Count; i++)
-                        // {                      
-                        //     levelAboveOrEntering[i].EnterLevel(true, false);
-                        // }
+                        cm.currentLevel = levelAboveOrEntering;
                     }   
                     else if(levelBelowOrEntering != null)
                     {
-                        // for (int i = 0; i < levelBelowOrEntering.Count; i++)
-                        // {                          
-                        //     levelBelowOrEntering[i].EnterLevel(true, false);
-                        // }
+                        cm.currentLevel = levelBelowOrEntering;
                     }        
                 }
-                // else if(moveLevelsAbove && aboveCollider)
-                // {
                 else if(levelBelowOrEntering != null)
                 {
-                    // for (int i = 0; i < levelBelowOrEntering.Count; i++)
-                    // {                          
-                    //     levelBelowOrEntering[i].EnterLevel(false, false);
-                    // }
+                    cm.currentLevel = levelBelowOrEntering;
                 }       
-                // }
-
-                // if(moveLevelsBelow)
-                // {
-                //     if(levelBelowOrEntering != null)
-                //     {
-                //         for (int i = 0; i < levelBelowOrEntering.Count; i++)
-                //         {                          
-                //             levelBelowOrEntering[i].MoveUp();
-                //         }
-                //     } 
-                // }
 
             }
-            if(this.transform.parent.GetComponentInChildren<BuildingThreshColliderScript>() == null)
-            {
-                thresholdSortingSequenceCoro = StartCoroutine(ThresholdLayerSortingSequence(0.3f, Player, "ThresholdSequence"));
-            }
+            // if(this.transform.parent.GetComponentInChildren<BuildingThreshColliderScript>() == null)
+            // {
+            //     thresholdSortingSequenceCoro = StartCoroutine(ThresholdLayerSortingSequence(0.3f, Player, "ThresholdSequence"));
+            // }
            
         }
         aboveColliderByCharacter.Remove(other.gameObject);

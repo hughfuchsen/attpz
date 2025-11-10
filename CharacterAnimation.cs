@@ -11,6 +11,7 @@ public class CharacterAnimation : MonoBehaviour
   [HideInInspector] public float animationSpeed = 0.09f; // Time between frames
 
    public List<GameObject> characterSpriteList = new List<GameObject>();
+   public List<Transform> initialChrctrSpriteTransformList = new List<Transform>();
   [HideInInspector] public List<GameObject> zeroInitialAlphaSpriteList = new List<GameObject>();
   [HideInInspector] public List<Color> initialChrctrColorList = new List<Color>();
  
@@ -264,7 +265,7 @@ public class CharacterAnimation : MonoBehaviour
   {
     yield return new WaitForEndOfFrame();
     yield return new WaitForEndOfFrame();
-    GetSpritesAndAddToLists(this.gameObject, characterSpriteList, new List<GameObject>(), initialChrctrColorList);
+    GetSpritesAndAddToLists(this.gameObject, characterSpriteList, new List<GameObject>(), initialChrctrColorList, initialChrctrSpriteTransformList);
   }
 
 
@@ -560,7 +561,7 @@ public class CharacterAnimation : MonoBehaviour
       }
   } 
 
-  public void GetSpritesAndAddToLists(GameObject obj, List<GameObject> spriteList, List<GameObject> excludeList, List<Color> colorList)
+  public void GetSpritesAndAddToLists(GameObject obj, List<GameObject> spriteList, List<GameObject> excludeList, List<Color> colorList, List<Transform> transformList)
   {
     // Clear the lists before repopulating
     spriteList.Clear();
@@ -573,12 +574,14 @@ public class CharacterAnimation : MonoBehaviour
     {
         GameObject currentNode = stack.Pop();
         SpriteRenderer sr = currentNode.GetComponent<SpriteRenderer>();
+        Transform tr = currentNode.GetComponent<Transform>();
 
         if (sr != null)
         {
             Color col = sr.color;
             spriteList.Add(currentNode);
             colorList.Add(col);
+            transformList.Add(tr);
         }
 
         foreach (Transform child in currentNode.transform)
@@ -611,6 +614,27 @@ public class CharacterAnimation : MonoBehaviour
       }
     }
   }  
+
+
+  public void SetTreeAlpha(GameObject treeNode, float alpha)
+  {
+      if (treeNode == null)
+      {
+          return; // TODO: remove this
+      }
+      else if(treeNode != transform.Find("bike"))
+      {
+        SpriteRenderer sr = treeNode.GetComponent<SpriteRenderer>();
+        if (sr != null)
+        {
+            sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, alpha);
+        }
+        foreach (Transform child in treeNode.transform)
+        {
+            SetTreeAlpha(child.gameObject, alpha);
+        }
+      }
+  }
   // public IEnumerator SetAlphaToZeroForAllSprites()
   // {
   //   yield return new WaitForEndOfFrame();

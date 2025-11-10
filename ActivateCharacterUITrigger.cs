@@ -78,7 +78,7 @@ public class ActivateCharacterUITrigger : MonoBehaviour
                     else
                     {
                         loadCSVData.DisplayRandomRow();
-                        myCharacterAnimation.GetSpritesAndAddToLists(Player, myCharacterAnimation.characterSpriteList, new List<GameObject>(), myCharacterAnimation.initialChrctrColorList);
+                        myCharacterAnimation.GetSpritesAndAddToLists(Player, myCharacterAnimation.characterSpriteList, new List<GameObject>(), myCharacterAnimation.initialChrctrColorList, myCharacterAnimation.initialChrctrSpriteTransformList);
                     }
             
                 }

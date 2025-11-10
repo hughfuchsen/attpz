@@ -55,7 +55,8 @@ public class IsoSpriteSorting : MonoBehaviour
     }
 
     public SortType sortType = SortType.Point;
-
+    
+    [HideInInspector] public Vector3 initialSorterPositionOffset1;
     public Vector3 SorterPositionOffset = new Vector3();
     public Vector3 SorterPositionOffset2 = new Vector3();
     public Renderer[] renderersToSort;
@@ -184,6 +185,7 @@ public class IsoSpriteSorting : MonoBehaviour
             IsoSpriteSortingManager temp = IsoSpriteSortingManager.Instance; //bring the instance into existence so the Update function will run;
             yield return null;
             Setup();
+            initialSorterPositionOffset1 = SorterPositionOffset;
         }
     }
 

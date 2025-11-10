@@ -13,7 +13,7 @@ public class BuildingScript : MonoBehaviour
     public GameObject outerBuilding;
     [SerializeField] public List<GameObject> gameObjectsToShowWhileOutside = new List<GameObject>();
     BalconyManager balconyManager;
-    CharacterMovement myCharacterMovement;
+    CharacterMovement MYcm;
     [SerializeField] GameObject Player;
     [HideInInspector] public List<GameObject> gameObjectsToShowWhileOutsideSpriteList = new List<GameObject>();
     // private List<GameObject> gameObjectsToHideWhileInsideSpriteList = new List<GameObject>();
@@ -46,17 +46,17 @@ public class BuildingScript : MonoBehaviour
     public void Awake()
     { 
         Player = GameObject.FindGameObjectWithTag("Player");
-        myCharacterMovement = Player.GetComponent<CharacterMovement>(); 
+        MYcm = Player.GetComponent<CharacterMovement>(); 
         balconyManager = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<BalconyManager>(); 
 
         soundtrackScript = GameObject.FindGameObjectWithTag("SoundtrackScript").GetComponent<SoundtrackScript>();
 
         foreach(GameObject obj in gameObjectsToShowWhileOutside) {
-            GetSpritesAndAddToLists(obj, gameObjectsToShowWhileOutsideSpriteList, new List<GameObject>(), gameObjectsToShowWhileOutsideColorList);
+            GetSpritesAndApplyToLists(obj, gameObjectsToShowWhileOutsideSpriteList, new List<GameObject>(), gameObjectsToShowWhileOutsideColorList, true);
         }
 
-        GetSpritesAndAddToLists(innerBuilding, innerBuildingSpriteList, gameObjectsToShowWhileOutside, innerBuildingInitialColorList);
-        GetSpritesAndAddToLists(outerBuilding, outerBuildingSpriteList, new List<GameObject>(), outerBuildingInitialColorList);
+        GetSpritesAndApplyToLists(innerBuilding, innerBuildingSpriteList, gameObjectsToShowWhileOutside, innerBuildingInitialColorList, true);
+        GetSpritesAndApplyToLists(outerBuilding, outerBuildingSpriteList, new List<GameObject>(), outerBuildingInitialColorList, true);
 
 
      
@@ -84,7 +84,7 @@ public class BuildingScript : MonoBehaviour
 
     }  
 
-    // Start is called before the first frame update
+    // Start is NPCcalled before the first frame update
     void Start() 
     {
         StartCoroutine(LateStartCoroForNonPlayerCharacters());
@@ -92,7 +92,7 @@ public class BuildingScript : MonoBehaviour
 
         innerBuilding.SetActive(true);
         outerBuilding.SetActive(true);
-        // GetSpritesAndAddToLists(GameObject obj, List<GameObject> spriteList, List<GameObject> excludeList, List<Color> colorList)
+        // GetSpritesAndApplyToLists(GameObject obj, List<GameObject> spriteList, List<GameObject> excludeList, List<Color> colorList)
        
         cameraMovement = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraMovement>();
 
@@ -102,16 +102,10 @@ public class BuildingScript : MonoBehaviour
 
     public void EnterBuilding()
     {
-        cameraMovement.currentBuilding = this;
+        MYcm.currentBuilding = this;
 
         soundtrackScript.FadeOutIn(soundtrackScript.track1, soundtrackScript.track2);
 
-        // foreach(GameObject npc in npcListForBuilding)
-        // {
-        //     npc.GetComponent<CharacterCustomization>().ResetAppearance();
-        //     // npc.GetComponent<CharacterAnimation>().SetAlphaToZeroForAllSprites();
-        //     // npc.GetComponent<CharacterAnimation>().SetTreeSortingLayer(npc.gameObject, "Level0");
-        // }
 
 
         if(this.innerBuildingFadeCoroutine != null)
@@ -160,6 +154,7 @@ public class BuildingScript : MonoBehaviour
     }
     public void ExitBuilding(float waitTimeInside, float waitTimeOutside, bool exitingFromBehindAlreadyOutside)
     {
+        MYcm.currentBuilding = null;
         if(cameraMovement.currentBuilding != null)
             cameraMovement.currentBuilding = null;
         if(cameraMovement.currentBuilding != null)
@@ -318,25 +313,23 @@ public class BuildingScript : MonoBehaviour
                     SetTreeAlpha(gameObjectsToShowWhileOutsideSpriteList[i], 0);
                 }
             }  
-
-            for (int i = 0; i < npcSpriteListForBuilding.Count; i++)
-            {  
-                SetTreeAlpha(npcSpriteListForBuilding[i], 0f);
-                if(npcSpriteListForBuilding[i].GetComponent<SpriteRenderer>().sortingLayerName == "Level0")
-                {
-                    SetTreeSortingLayer(npcSpriteListForBuilding[i], "Default");
-                } 
-            } 
             for (int i = 0; i < npcListForBuilding.Count; i++)
             {
-                npcListForBuilding[i].GetComponent<IsoSpriteSorting>().dontSort = true;
-                // if (npcListForBuilding[i].GetComponent<CharacterMovement>().npcRandomMovementCoro != null)
-                // {
-                //     npcListForBuilding[i].GetComponent<CharacterMovement>().StopCoroutine(npcListForBuilding[i].GetComponent<CharacterMovement>().npcRandomMovementCoro);
-                //     npcListForBuilding[i].GetComponent<CharacterMovement>().change = Vector3.zero;
-                //     npcListForBuilding[i].GetComponent<CharacterMovement>().npcRandomMovementCoro = null;
-                // }
+                SetTreeAlpha(npcListForBuilding[i], 0f);
             }
+
+            // for (int i = 0; i < npcSpriteListForBuilding.Count; i++)
+            // {  
+            //     SetTreeAlpha(npcSpriteListForBuilding[i], 0f);
+            //     if(npcSpriteListForBuilding[i].GetComponent<SpriteRenderer>().sortingLayerName == "Level0")
+            //     {
+            //         SetTreeSortingLayer(npcSpriteListForBuilding[i], "Default");
+            //     } 
+            // } 
+            // for (int i = 0; i < npcListForBuilding.Count; i++)
+            // {
+            //     npcListForBuilding[i].GetComponent<IsoSpriteSorting>().dontSort = true;
+            // }
 
             // cameraMovement.currentRoom = null;
             // cameraMovement.currentLevel = null;
@@ -352,25 +345,23 @@ public class BuildingScript : MonoBehaviour
             //     allOtherBuildings[i].SetDontSort(allOtherBuildings[i].outerSpriteSortingScriptObj, false);            
             // }
 
-            for (int i = 0; i < npcSpriteListForBuilding.Count; i++)
-            {  
-                SetTreeAlpha(npcSpriteListForBuilding[i], 0f); 
-                if(npcSpriteListForBuilding[i].GetComponent<SpriteRenderer>().sortingLayerName == "Level0")
-                {
-                    SetTreeSortingLayer(npcSpriteListForBuilding[i], "Default");
-                }
-            }  
+            // for (int i = 0; i < npcSpriteListForBuilding.Count; i++)
+            // {  
+            //     SetTreeAlpha(npcSpriteListForBuilding[i], 0f); 
+            //     if(npcSpriteListForBuilding[i].GetComponent<SpriteRenderer>().sortingLayerName == "Level0")
+            //     {
+            //         SetTreeSortingLayer(npcSpriteListForBuilding[i], "Default");
+            //     }
+            // }  
+            // for (int i = 0; i < npcListForBuilding.Count; i++)
+            // {
+            //     npcListForBuilding[i].GetComponent<IsoSpriteSorting>().dontSort = true;
+            // } 
+
             for (int i = 0; i < npcListForBuilding.Count; i++)
             {
-                npcListForBuilding[i].GetComponent<IsoSpriteSorting>().dontSort = true;
-                // if (npcListForBuilding[i].GetComponent<CharacterMovement>().npcRandomMovementCoro != null)
-                // {
-                //     npcListForBuilding[i].GetComponent<CharacterMovement>().StopCoroutine(npcListForBuilding[i].GetComponent<CharacterMovement>().npcRandomMovementCoro);
-                //     npcListForBuilding[i].GetComponent<CharacterMovement>().change = Vector3.zero;
-                //     npcListForBuilding[i].GetComponent<CharacterMovement>().npcRandomMovementCoro = null;
-                // }
-            } 
-
+                SetTreeAlpha(npcListForBuilding[i], 0f);
+            }
 
             for (int i = 0; i < innerBuildingSpriteList.Count; i++)
             {     
@@ -411,24 +402,53 @@ public class BuildingScript : MonoBehaviour
             //     allOtherBuildings[i].SetDontSort(allOtherBuildings[i].outerSpriteSortingScriptObj, true);            
             // }
             // cameraMovement.currentBuilding = this;    
+                // Debug.Log(npc.Count);
 
-
-            for (int i = 0; i < npcSpriteListForBuilding.Count; i++)
-            {
-                SetTreeAlpha(npcSpriteListForBuilding[i], npcColorListForBuilding[i].a);
-                if(npcSpriteListForBuilding[i].GetComponent<SpriteRenderer>().sortingLayerName == "Default")
-                {
-                    SetTreeSortingLayer(npcSpriteListForBuilding[i], "Level0");
-                }
-            }
             for (int i = 0; i < npcListForBuilding.Count; i++)
             {
-                npcListForBuilding[i].GetComponent<IsoSpriteSorting>().dontSort = false;
-                // if (npcListForBuilding[i].GetComponent<CharacterMovement>().npcRandomMovementCoro == null)
-                // {
-                //     npcListForBuilding[i].GetComponent<CharacterMovement>().npcRandomMovementCoro = StartCoroutine(npcListForBuilding[i].GetComponent<CharacterMovement>().MoveCharacterRandomly());
-                // }
+                CharacterAnimation NPCca = npcListForBuilding[i].GetComponent<CharacterAnimation>();
+
+                for (int j = 0; j < NPCca.characterSpriteList.Count; j++)
+                {
+                    SetTreeAlpha(NPCca.characterSpriteList[j], NPCca.initialChrctrColorList[j].a);
+                }
             }
+
+            //     for (int j = 0; j < NPCca.characterSpriteList.Count; j++)
+            //             {
+            //                 SpriteRenderer NPCsr = NPCca.characterSpriteList[j].GetComponent<SpriteRenderer>();
+            //                 Color col = NPCsr.color;
+
+            //                 // if(MYcm.currentBuilding == NPCcm.currentBuilding) // we are both inside
+            //                 // {
+            //                     col.a = NPCca.initialChrctrColorList[i].a;
+            //                 // }
+            //                 // else if(MYcm.currentBuilding == null && NPCcm.currentBuilding == null) // both outside
+            //                 // {
+            //                 //     col.a = enter ? 0f : NPCca.initialChrctrColorList[i].a;
+            //                 // }
+            //                 // else if(MYcm.currentBuilding != null && NPCcm.currentBuilding == null) // i'm inside, npc outside
+            //                 // {
+            //                 //     col.a = enter ? NPCca.initialChrctrColorList[i].a : NPCca.initialChrctrColorList[i].a;
+            //                 // }
+            //                 // else if(MYcm.currentBuilding == null && NPCcm.currentBuilding != null) // i'm outside, npc inside
+            //                 // {
+            //                 //     col.a = enter ? 0f : NPCca.initialChrctrColorList[i].a;
+            //                 // }
+            //                 // else if(MYcm.currentBuilding != NPCcm.currentBuilding) // we are both inside but different buildings
+            //                 // {
+            //                 //     col.a = enter ? 0f : NPCca.initialChrctrColorList[i].a;
+            //                 // }
+            //                 // Adjust alpha
+
+            //                 NPCsr.color = col; // Apply updated color to SpriteRenderer
+            //             }
+
+            // }
+            // for (int i = 0; i < npcListForBuilding.Count; i++)
+            // {
+            //     npcListForBuilding[i].GetComponent<IsoSpriteSorting>().dontSort = false;
+            // }
 
 
             for (int i = 0; i < innerBuildingSpriteList.Count; i++)
@@ -485,11 +505,11 @@ public class BuildingScript : MonoBehaviour
                         sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, alpha.Value);
                     }
                 }
-                else if (myCharacterMovement.playerIsOutside) 
+                else if (MYcm.playerIsOutside) 
                 {
                     // // Set alpha value from the color list instantly without lerping
                     // sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, colorList[i].a);
-                    // // Alternatively, you can directly assign the color from the list
+                    // // Alternatively, you NPCcan directly assign the color from the list
                     sr.color = colorList[i];
                 }               
             }  
@@ -518,8 +538,8 @@ public class BuildingScript : MonoBehaviour
             for (int i = 0; i < balconyManager.balconyList.Count; i++)
             { 
 
-                    SpriteRenderer spriteRenderer = balconyManager.balconyList[i].GetComponent<SpriteRenderer>();
-                    spriteRenderer.color = balconyManager.balconyInitialColorList[i];
+                SpriteRenderer spriteRenderer = balconyManager.balconyList[i].GetComponent<SpriteRenderer>();
+                spriteRenderer.color = balconyManager.balconyInitialColorList[i];
             }
 
 
@@ -549,7 +569,7 @@ public class BuildingScript : MonoBehaviour
 
         SpriteRenderer sr = sprite.GetComponent<SpriteRenderer>();
 
-        // Calculate duration based on the alpha difference
+        // NPCcalculate duration based on the alpha difference
         float alphaDiff = Mathf.Abs(sr.color.a - alpha);
         float duration = alphaDiff; // Assuming alpha ranges from 0 to 1
         float elapsedTime = 0.0f;
@@ -672,7 +692,32 @@ public class BuildingScript : MonoBehaviour
 
 
 
-    private void GetSpritesAndAddToLists(GameObject obj, List<GameObject> spriteList, List<GameObject> excludeList, List<Color> colorList)
+    // private void GetSpritesAndApplyToLists(GameObject obj, List<GameObject> spriteList, List<GameObject> excludeList, List<Color> colorList)
+    // {
+    //     Stack<GameObject> stack = new Stack<GameObject>();
+    //     stack.Push(obj);
+
+    //     while (stack.Count > 0)
+    //     {
+    //         GameObject currentNode = stack.Pop();
+    //         SpriteRenderer sr = currentNode.GetComponent<SpriteRenderer>();
+
+    //         if (sr != null)
+    //         {
+    //             Color col = sr.color;
+    //             spriteList.Add(currentNode);
+    //             colorList.Add(col);
+    //         }
+
+    //         foreach (Transform child in currentNode.transform)
+    //         {
+    //             if (!excludeList.Contains(child.gameObject)){
+    //                 stack.Push(child.gameObject);
+    //             }
+    //         }
+    //     }
+    // }
+    private void GetSpritesAndApplyToLists(GameObject obj, List<GameObject> spriteList, List<GameObject> excludeList, List<Color> colorList, bool add)
     {
         Stack<GameObject> stack = new Stack<GameObject>();
         stack.Push(obj);
@@ -685,8 +730,16 @@ public class BuildingScript : MonoBehaviour
             if (sr != null)
             {
                 Color col = sr.color;
-                spriteList.Add(currentNode);
-                colorList.Add(col);
+                if(add)
+                {
+                    spriteList.Add(currentNode);
+                    colorList.Add(col);
+                }
+                else
+                {
+                    spriteList.Remove(currentNode);
+                    colorList.Remove(col);
+                }
             }
 
             foreach (Transform child in currentNode.transform)
@@ -788,20 +841,20 @@ public class BuildingScript : MonoBehaviour
 
         // FindAllChildrenWithTagAndAddToList(this.gameObject, "NPC");
         
-        foreach(GameObject obj in npcListForBuilding) {
-            GetSpritesAndAddToLists(obj, npcSpriteListForBuilding, new List<GameObject>(), npcColorListForBuilding);
-        }
+        // foreach(GameObject obj in npcListForBuilding) {
+        //     GetSpritesAndApplyToLists(obj, npcSpriteListForBuilding, new List<GameObject>(), npcColorListForBuilding, true);
+        // }
 
 
-        for (int i = 0; i < npcSpriteListForBuilding.Count; i++)
-        {  
-            SetTreeAlpha(npcSpriteListForBuilding[i], 0f);
-        } 
+        // for (int i = 0; i < npcSpriteListForBuilding.Count; i++)
+        // {  
+        //     SetTreeAlpha(npcSpriteListForBuilding[i], 0f);
+        // } 
 
-        for (int i = 0; i < npcListForBuilding.Count; i++)
-        {  
-            SetZToZero(npcListForBuilding[i]);
-        } 
+        // for (int i = 0; i < npcListForBuilding.Count; i++)
+        // {  
+        //     SetZToZero(npcListForBuilding[i]);
+        // } 
     }
 
     static void SetTreeSortingLayer(GameObject gameObject, string sortingLayerName)
@@ -824,6 +877,22 @@ public class BuildingScript : MonoBehaviour
         }
         SpriteRenderer sr = treeNode.GetComponent<SpriteRenderer>();
         if (sr != null)
+        {
+            sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, alpha);
+        }
+        foreach (Transform child in treeNode.transform)
+        {
+            SetTreeAlpha(child.gameObject, alpha);
+        }
+    }
+    public void SetNPCTreeAlpha(GameObject treeNode, float alpha)
+    {
+        if (treeNode == null)
+        {
+            return; // TODO: remove this
+        }
+        SpriteRenderer sr = treeNode.GetComponent<SpriteRenderer>();
+        if (sr != null && treeNode != transform.Find("bike"))
         {
             sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, alpha);
         }
@@ -914,4 +983,76 @@ public class BuildingScript : MonoBehaviour
             SetZToZero(child.gameObject);
         }
     }
+
+
+
+    public void npcEnterExitBuilding(GameObject character, bool enter)
+    {
+        CharacterAnimation NPCca = character.GetComponent<CharacterAnimation>();
+        CharacterMovement NPCcm = character.GetComponent<CharacterMovement>();
+
+        SetTreeSortingLayer(character, enter?"Level0":"Default");
+
+
+        if (enter)
+            {npcListForBuilding.Add(character);
+            NPCcm.currentBuilding = this;}
+        else
+            {npcListForBuilding.Remove(character);
+            // NPCcm.currentRoom.npcListForRoom.Remove(character);
+            NPCcm.currentLevel.npcListForLevel.Remove(character);
+            // NPCcm.currentRoom = null;
+            NPCcm.currentRoom.NpcExitRoom(character);
+            NPCcm.currentLevel = null;
+            NPCcm.currentBuilding = null;
+            }
+        // innerBuildingSpriteList.Clear();
+        // innerBuildingInitialColorList.Clear();
+        // GetSpritesAndApplyToLists(character, innerBuildingSpriteList, new List<GameObject>(), innerBuildingInitialColorList, true);
+
+        for (int i = 0; i < NPCca.characterSpriteList.Count; i++)
+        {
+            SpriteRenderer NPCsr = NPCca.characterSpriteList[i].GetComponent<SpriteRenderer>();
+            Color col = NPCsr.color;
+
+            if(MYcm.currentBuilding == NPCcm.currentBuilding) // we are both inside
+            {
+                col.a = enter ? NPCca.initialChrctrColorList[i].a : NPCca.initialChrctrColorList[i].a;
+            }
+            else if(MYcm.currentBuilding == null && NPCcm.currentBuilding == null) // both outside
+            {
+                col.a = enter ? 0f : NPCca.initialChrctrColorList[i].a;
+            }
+            else if(MYcm.currentBuilding != null && NPCcm.currentBuilding == null) // i'm inside, npc outside
+            {
+                col.a = enter ? NPCca.initialChrctrColorList[i].a : NPCca.initialChrctrColorList[i].a;
+            }
+            else if(MYcm.currentBuilding == null && NPCcm.currentBuilding != null) // i'm outside, npc inside
+            {
+                col.a = enter ? 0f : NPCca.initialChrctrColorList[i].a;
+            }
+            else if(MYcm.currentBuilding != NPCcm.currentBuilding) // we are both inside but different buildings
+            {
+                col.a = enter ? 0f : NPCca.initialChrctrColorList[i].a;
+            }
+            // Adjust alpha
+
+            NPCsr.color = col; // Apply updated color to SpriteRenderer
+        }
+
+
+    }
+
+    // IEnumerator WaitAFrameAndSetAlpha()
+    // {
+    //     yield return new WaitForEndOfFrame();
+    //     yield return new WaitForEndOfFrame();
+    //     yield return new WaitForEndOfFrame();
+    //     for (int i = 0; i < npcSpriteListForBuilding.Count; i++)
+    //     {  
+    //         SetTreeAlpha(npcSpriteListForBuilding[i], 0f);
+    //     } 
+    // }
+
+
 }

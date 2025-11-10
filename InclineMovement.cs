@@ -33,10 +33,10 @@ public class InclineMovement : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        CharacterMovement cm = other.transform.parent.GetComponent<CharacterMovement>();
-
         if (other.CompareTag("PlayerCollider"))
         {
+            CharacterMovement cm = other.transform.parent.GetComponent<CharacterMovement>();
+
             cm.playerOnThresh = true;
 
             if (!itsALadder) // if it's not a ladder
@@ -232,6 +232,8 @@ public class InclineMovement : MonoBehaviour
         }
         if (other.CompareTag("NPCCollider"))
         {
+            CharacterMovement cm = other.transform.parent.GetComponent<CharacterMovement>();
+
             cm.playerOnThresh = true;
 
             if (!itsALadder) // if it's not a ladder
@@ -282,26 +284,30 @@ public class InclineMovement : MonoBehaviour
                 // alter the collider layer and sprite sorting layer that is active with the player
                 if(IsCrossingUp(cm) && topOfStairCase)
                 {
-                    gameObject.layer = LayerMask.NameToLayer(higherColliderLayerName);
-                    SetCollisionLayer(higherColliderLayerName);
+                    // gameObject.layer = LayerMask.NameToLayer(higherColliderLayerName);
+                    // SetCollisionLayer(higherColliderLayerName);
+                    SetTreeObjectLayer(other.transform.parent.gameObject, LayerMask.NameToLayer(higherColliderLayerName));
                     SetTreeSortingLayer(other.transform.parent.gameObject, higherSortingLayerToAssign);
                 }
                 else if(IsCrossingUp(cm) && !topOfStairCase)
                 {
-                    gameObject.layer = LayerMask.NameToLayer(higherColliderLayerName);
-                    SetCollisionLayer(higherColliderLayerName);
+                    // gameObject.layer = LayerMask.NameToLayer(higherColliderLayerName);
+                    // SetCollisionLayer(higherColliderLayerName);
+                    SetTreeObjectLayer(other.transform.parent.gameObject, LayerMask.NameToLayer(higherColliderLayerName));
                     SetTreeSortingLayer(other.transform.parent.gameObject, higherSortingLayerToAssign);
                 }                       
                 else if(!IsCrossingUp(cm) && topOfStairCase)
                 {
-                    gameObject.layer = LayerMask.NameToLayer(lowerColliderLayerName);
+                    // gameObject.layer = LayerMask.NameToLayer(lowerColliderLayerName);
                     SetCollisionLayer(lowerColliderLayerName);
+                    SetTreeObjectLayer(other.transform.parent.gameObject, LayerMask.NameToLayer(lowerColliderLayerName));
                     SetTreeSortingLayer(other.transform.parent.gameObject, lowerSortingLayerToAssign);
                 } 
                 else if(!IsCrossingUp(cm) && !topOfStairCase)
                 {
-                    gameObject.layer = LayerMask.NameToLayer(higherColliderLayerName);
-                    SetCollisionLayer(higherColliderLayerName);
+                    // gameObject.layer = LayerMask.NameToLayer(higherColliderLayerName);
+                    // SetCollisionLayer(higherColliderLayerName);
+                    SetTreeObjectLayer(other.transform.parent.gameObject, LayerMask.NameToLayer(higherColliderLayerName));
                     SetTreeSortingLayer(other.transform.parent.gameObject, higherSortingLayerToAssign);
                 } 
 
@@ -372,8 +378,9 @@ public class InclineMovement : MonoBehaviour
                             cm.motionDirection = "downLadder";
                         }
                         //add certain animation and anchoring here
-                        gameObject.layer = LayerMask.NameToLayer(higherColliderLayerName);
-                        SetCollisionLayer(higherColliderLayerName);
+                        // gameObject.layer = LayerMask.NameToLayer(higherColliderLayerName);
+                        // SetCollisionLayer(higherColliderLayerName);
+                        SetTreeObjectLayer(other.transform.parent.gameObject, LayerMask.NameToLayer(higherColliderLayerName));
                     }
                     else if(!IsCrossingUp(cm))
                     {
@@ -387,8 +394,9 @@ public class InclineMovement : MonoBehaviour
                             cm.motionDirection = "downLadder";
                             
                         }
-                        gameObject.layer = LayerMask.NameToLayer(higherColliderLayerName);
-                        SetCollisionLayer(higherColliderLayerName);
+                        // gameObject.layer = LayerMask.NameToLayer(higherColliderLayerName);
+                        // SetCollisionLayer(higherColliderLayerName);
+                        SetTreeObjectLayer(other.transform.parent.gameObject, LayerMask.NameToLayer(higherColliderLayerName));
                     }
                     isoSpriteSortingScript.isMovable = false;
                 }
@@ -653,21 +661,24 @@ public class InclineMovement : MonoBehaviour
 
                     if(IsCrossingUp(cm) && topOfStairCase)
                     {
-                        gameObject.layer = LayerMask.NameToLayer(higherColliderLayerName);
-                        SetCollisionLayer(higherColliderLayerName);
+                        // gameObject.layer = LayerMask.NameToLayer(higherColliderLayerName);
+                        // SetCollisionLayer(higherColliderLayerName);
                         SetTreeSortingLayer(other.transform.parent.gameObject, higherSortingLayerToAssign);
+                        SetTreeObjectLayer(other.transform.parent.gameObject, LayerMask.NameToLayer(higherColliderLayerName));
                     }            
                     else if(!IsCrossingUp(cm) && !topOfStairCase)
                     {
-                        gameObject.layer = LayerMask.NameToLayer(lowerColliderLayerName);
-                        SetCollisionLayer(lowerColliderLayerName);
+                        // gameObject.layer = LayerMask.NameToLayer(lowerColliderLayerName);
+                        // SetCollisionLayer(lowerColliderLayerName);
                         SetTreeSortingLayer(other.transform.parent.gameObject, lowerSortingLayerToAssign);
+                        SetTreeObjectLayer(other.transform.parent.gameObject, LayerMask.NameToLayer(lowerColliderLayerName));
                     }
                     else if(!IsCrossingUp(cm) && topOfStairCase)
                     {
-                        gameObject.layer = LayerMask.NameToLayer(lowerColliderLayerName);
-                        SetCollisionLayer(lowerColliderLayerName);
+                        // gameObject.layer = LayerMask.NameToLayer(lowerColliderLayerName);
+                        // SetCollisionLayer(lowerColliderLayerName);
                         SetTreeSortingLayer(other.transform.parent.gameObject, lowerSortingLayerToAssign);
+                        SetTreeObjectLayer(other.transform.parent.gameObject, LayerMask.NameToLayer(lowerColliderLayerName));
                     }
                     
                     // un-fix the player in \/ left/right diag way upon collider exit. 
@@ -680,13 +691,15 @@ public class InclineMovement : MonoBehaviour
                     {
                         if(topOfStairCase)
                         {
-                            gameObject.layer = LayerMask.NameToLayer(higherColliderLayerName);
-                            SetCollisionLayer(higherColliderLayerName);
+                            // gameObject.layer = LayerMask.NameToLayer(higherColliderLayerName);
+                            // SetCollisionLayer(higherColliderLayerName);
+                            SetTreeObjectLayer(other.transform.parent.gameObject, LayerMask.NameToLayer(higherColliderLayerName));
                         }
                         else
                         {
-                            gameObject.layer = LayerMask.NameToLayer(lowerColliderLayerName);
-                            SetCollisionLayer(lowerColliderLayerName);
+                            // gameObject.layer = LayerMask.NameToLayer(lowerColliderLayerName);
+                            // SetCollisionLayer(lowerColliderLayerName);
+                            SetTreeObjectLayer(other.transform.parent.gameObject, LayerMask.NameToLayer(lowerColliderLayerName));
                         }
                     }
                     else if (cm.motionDirection != "normal") // if it's going ladder movemento 
@@ -696,8 +709,9 @@ public class InclineMovement : MonoBehaviour
                             if (!IsCrossingUp(cm))
                             {
                                 cm.motionDirection = "normal";  
-                                gameObject.layer = LayerMask.NameToLayer(lowerColliderLayerName);
-                                SetCollisionLayer(lowerColliderLayerName);
+                                // gameObject.layer = LayerMask.NameToLayer(lowerColliderLayerName);
+                                // SetCollisionLayer(lowerColliderLayerName);
+                                SetTreeObjectLayer(other.transform.parent.gameObject, LayerMask.NameToLayer(lowerColliderLayerName));
                                 isoSpriteSortingScript.isMovable = true;
                                 SetTreeSortingLayer(other.transform.parent.gameObject, lowerSortingLayerToAssign);
                             }
@@ -707,14 +721,16 @@ public class InclineMovement : MonoBehaviour
                             if (IsCrossingUp(cm))
                             {
                                 cm.motionDirection = "normal";  
-                                gameObject.layer = LayerMask.NameToLayer(higherColliderLayerName);
-                                SetCollisionLayer(higherColliderLayerName);
+                                // gameObject.layer = LayerMask.NameToLayer(higherColliderLayerName);
+                                // SetCollisionLayer(higherColliderLayerName);
+                                SetTreeObjectLayer(other.transform.parent.gameObject, LayerMask.NameToLayer(higherColliderLayerName));
                                 isoSpriteSortingScript.isMovable = true;
                             }
                             else
                             {
-                                gameObject.layer = LayerMask.NameToLayer(lowerColliderLayerName);
-                                SetCollisionLayer(lowerColliderLayerName);
+                                // gameObject.layer = LayerMask.NameToLayer(lowerColliderLayerName);
+                                // SetCollisionLayer(lowerColliderLayerName);
+                                SetTreeObjectLayer(other.transform.parent.gameObject, LayerMask.NameToLayer(lowerColliderLayerName));
                             }
                         }
                     }
@@ -737,6 +753,15 @@ public class InclineMovement : MonoBehaviour
             InclineMovement.SetTreeSortingLayer(child.gameObject, sortingLayerName);
         }
     }
+    static void SetTreeObjectLayer(GameObject gameObject, int layerIndex)
+    {
+        gameObject.layer = layerIndex;
+
+        foreach (Transform child in gameObject.transform)
+        {
+            SetTreeObjectLayer(child.gameObject, layerIndex);
+        }
+    }
 
     private bool IsCrossingUp(CharacterMovement cm)
     {
@@ -752,10 +777,12 @@ public class InclineMovement : MonoBehaviour
         for (int i = 0; i < 32; i++)
         {
                 Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Player"), i, true);
+                // Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("NPC"), i, true);
         }
 
         // Re-enable other with the target layer
         Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Player"), targetLayerIndex, false);
+        // Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("NPC"), targetLayerIndex, false);
     }
 
     public GameObject FindSiblingWithTag(string tag, Transform transform = null) 

@@ -123,6 +123,15 @@ public class LevelScript : MonoBehaviour
             }
         }
     }
+    public void npcEnterLevel(GameObject character)
+    {
+        if(character.GetComponent<CharacterMovement>().currentLevel != null)
+        {character.GetComponent<CharacterMovement>().currentLevel.npcListForLevel.Remove(character);}
+        character.GetComponent<CharacterMovement>().currentLevel = null;
+        character.GetComponent<CharacterMovement>().currentLevel = this;
+        character.GetComponent<CharacterMovement>().currentLevel.npcListForLevel.Add(character);
+    }
+
 
     public void ResetLevels() //move levels to initial positions
     {

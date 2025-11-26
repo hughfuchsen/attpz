@@ -7,10 +7,11 @@ public class RoomScript : MonoBehaviour
     public SurfaceType roomSurface = SurfaceType.Carpet; // Default value 
     public BuildingScript building;
     public LevelScript level = null;
+    [HideInInspector] public Vector3 levelOffset = Vector3.zero;
     [HideInInspector] public CameraMovement cameraMovement;
     [HideInInspector] public CharacterMovement myCM;
-    [HideInInspector] public bool isMovingg = false;
-    [HideInInspector] public bool isDown = false;
+    [HideInInspector] public bool roomIsMoving = false;
+     public bool isDown = false;
     public List<RoomScript> roomsSameOrAbove = new List<RoomScript>();
     public List<RoomScript> roomsBelow = new List<RoomScript>();
     private List<GameObject> roomSpriteList = new List<GameObject>();
@@ -54,7 +55,6 @@ public class RoomScript : MonoBehaviour
         initialPosition = this.gameObject.transform.localPosition;
 
         building = FindParentByBuildingScriptComponent();
- 
         level = FindParentByLevelScriptComponent();
 
         FindColliderObjects(transform);
@@ -124,6 +124,7 @@ public class RoomScript : MonoBehaviour
         }
 
         cameraMovement.currentRoom = this;
+        myCM.currentRoom = this;
     }
     public void NpcEnterRoom(GameObject character)
     {
@@ -131,49 +132,102 @@ public class RoomScript : MonoBehaviour
         var NPCcm = character.GetComponent<CharacterMovement>();
         var npcIsoSS = character.GetComponent<IsoSpriteSorting>();
 
+        
         // if NPC was already in another room
         if (NPCcm.currentRoom != null)
         {
-            RoomScript previousRoom = NPCcm.currentRoom;
-            bool previousRoomWasDown = previousRoom.isDown;
-
+            NPCcm.previousRoom = NPCcm.currentRoom;
+            bool previousRoomWasDown = NPCcm.previousRoom.isDown;
             // Remove from old room
-            previousRoom.npcListForRoom.Remove(character);
-
+            NPCcm.previousRoom.npcListForRoom.Remove(character);
             // Assign to this room
             NPCcm.currentRoom = this;
             npcListForRoom.Add(character);
 
+            
+            
+            // Assign level if entering building
+            if(NPCcm.currentBuilding == null)
+            {
+                if(building != null)
+                {
+                    NPCcm.currentBuilding = this.building;
+                    NPCcm.currentBuilding.NpcEnterExitBuilding(character, true);
+                }
+            }
+
+            if(level != null)
+            {
+                if(level.isDisplacedAngular)
+                {
+                    levelOffset = level.angularEquation;
+                }
+                else if (level.isDisplacedVertical)
+                {
+                    levelOffset = new Vector3(0, -level.wallHeight, 0);
+                }
+                else
+                    {levelOffset = Vector3.zero;}
+
+            }
+
             // Adjust sprite & sorting offsets if room vertical state changed
             for (int i = 0; i < NPCca.characterSpriteList.Count; i++)
             {
-                Vector3 basePos = NPCca.initialChrctrSpriteTransformList[i].localPosition;
+                Vector3 basePos = NPCca.initialChrctrSpriteTransformList[i] + levelOffset;
 
                 if (!isDown && previousRoomWasDown)
                 {
                     // Moved up
-                    NPCca.characterSpriteList[i].transform.localPosition = basePos + new Vector3(0, wallHeight, 0);
+                    NPCca.characterSpriteList[i].transform.localPosition = basePos;
                 }
                 else if (isDown && !previousRoomWasDown)
                 {
                     // Moved down
                     NPCca.characterSpriteList[i].transform.localPosition = basePos + new Vector3(0, -wallHeight, 0);
                 }
-                else
+                else if (isDown && previousRoomWasDown)
+                {
+                    // Same vertical level — keep original
+                    NPCca.characterSpriteList[i].transform.localPosition = basePos + new Vector3(0, -wallHeight, 0);
+                }
+                else 
                 {
                     // Same vertical level — keep original
                     NPCca.characterSpriteList[i].transform.localPosition = basePos;
                 }
             }
+
+            Vector3 baseOffset = new Vector3(8, -28, 0) + levelOffset;
+
             if (!isDown && previousRoomWasDown)
             {
                 // Moved up
-                npcIsoSS.SorterPositionOffset.y += wallHeight;
+                // if(!level.isDisplacedAngular && level.isDisplacedVertical)
+                //     baseOffset += new Vector3(0, wallHeight, 0);
             }
             else if (isDown && !previousRoomWasDown)
             {
                 // Moved down
-                npcIsoSS.SorterPositionOffset.y -= wallHeight;
+                baseOffset -= new Vector3(0, wallHeight, 0);
+            }
+            else if (isDown && previousRoomWasDown)
+            {
+                // Moved down
+                baseOffset -= new Vector3(0, wallHeight, 0);
+            }
+
+            npcIsoSS.SorterPositionOffset = baseOffset;
+
+
+            // Assign level if entering building
+            if(NPCcm.previousLevel != level)
+            {
+                if(level != null)
+                {
+                    // Debug.Log("entering");
+                    level.NpcEnterLevel(character, this);
+                }
             }
         }
         else
@@ -182,10 +236,66 @@ public class RoomScript : MonoBehaviour
             NPCcm.currentRoom = this;
             npcListForRoom.Add(character);
 
+            // Assign level if entering building
+            if(NPCcm.previousLevel != level)
+            {
+                
+                if(level != null)
+                {
+                    if(level.isDisplacedAngular)
+                    {
+                        levelOffset = level.angularEquation;
+                    }
+                    else if (level.isDisplacedVertical)
+                    {
+                        levelOffset = new Vector3(0, -level.wallHeight, 0);
+                    }
+                    else
+                        {levelOffset = Vector3.zero;}
+
+                    level.NpcEnterLevel(character, this);
+                }
+
+                // Adjust sprite & sorting offsets if room vertical state changed
+                for (int i = 0; i < NPCca.characterSpriteList.Count; i++)
+                {
+                    Vector3 basePos = NPCca.initialChrctrSpriteTransformList[i] + levelOffset;
+
+                    if (!isDown)
+                    {
+                        // Moved up
+                        NPCca.characterSpriteList[i].transform.localPosition = basePos;
+                    }
+                    else if (isDown)
+                    {
+                        // Moved down
+                        NPCca.characterSpriteList[i].transform.localPosition = basePos + new Vector3(0, -wallHeight, 0);
+                    }
+                    else
+                    {
+                        // Same vertical level — keep original
+                        NPCca.characterSpriteList[i].transform.localPosition = basePos;
+                    }
+                }
+
+            }
+
+            // Assign building
+            if(NPCcm.currentBuilding == null)
+            {
+                if(building != null)
+                {
+                    NPCcm.currentBuilding = this.building;
+                    NPCcm.currentBuilding.NpcEnterExitBuilding(character, true);
+                }
+            }
+
+
+
             // Adjust sprite & sorting offsets if room vertical state changed
             for (int i = 0; i < NPCca.characterSpriteList.Count; i++)
             {
-                Vector3 basePos = NPCca.initialChrctrSpriteTransformList[i].localPosition;
+                Vector3 basePos = NPCca.initialChrctrSpriteTransformList[i] + levelOffset;
 
                 if (isDown)
                 {
@@ -198,12 +308,27 @@ public class RoomScript : MonoBehaviour
                     NPCca.characterSpriteList[i].transform.localPosition = basePos;
                 }
             }
+
+            Vector3 baseOffset = new Vector3(8, -28, 0) + levelOffset;
+
             if (isDown)
             {
                 // Moved down
-                npcIsoSS.SorterPositionOffset.y -= wallHeight;
+                baseOffset -= new Vector3(0, wallHeight, 0);
             }
+
+            npcIsoSS.SorterPositionOffset = baseOffset;
         }
+        if(NPCcm.currentRoom == myCM.currentRoom)
+        {
+            HandleDoorFade();
+        }
+        else if(NPCcm.previousRoom == myCM.currentRoom)
+        {
+            myCM.currentRoom.HandleDoorFade();
+        }
+
+
     }
     public void NpcExitRoom(GameObject character)
     {
@@ -214,23 +339,29 @@ public class RoomScript : MonoBehaviour
         // if NPC was already in another room
         if (NPCcm.currentRoom != null)
         {
-            RoomScript previousRoom = NPCcm.currentRoom;
-            // bool previousRoomWasDown = previousRoom.isDown;
+            
+            // Assign level if entering building
+            if(NPCcm.currentBuilding != null)
+            {
+                if(building != null)
+                {
+                    NPCcm.currentBuilding.NpcEnterExitBuilding(character, false);
+                }
+            }
 
+            // bool previousRoomWasDown = NPCcm.previousRoom.isDown;
             // Remove from old room
-            previousRoom.npcListForRoom.Remove(character);
-
-            NPCcm.currentRoom = null;
+            // NPCcm.currentRoom = null;
 
             // Adjust sprite & sorting offsets if room vertical state changed
             for (int i = 0; i < NPCca.characterSpriteList.Count; i++)
             {
-                Vector3 basePos = NPCca.initialChrctrSpriteTransformList[i].localPosition;
+                Vector3 basePos = NPCca.initialChrctrSpriteTransformList[i];
                 // Moved up
-                if (previousRoom.isDown)
+                if (NPCcm.previousRoom.isDown)
                 {
                     // previous room is down down!!! down
-                    NPCca.characterSpriteList[i].transform.localPosition = basePos + new Vector3(0, wallHeight, 0);
+                    NPCca.characterSpriteList[i].transform.localPosition = basePos;
                 }
                 else
                 {
@@ -240,6 +371,10 @@ public class RoomScript : MonoBehaviour
             }
             npcIsoSS.SorterPositionOffset.y = -28f;
 
+        }
+        if(NPCcm.previousRoom == myCM.currentRoom)
+        {
+            myCM.currentRoom.HandleDoorFade();
         }
     }
 
@@ -257,8 +392,8 @@ public class RoomScript : MonoBehaviour
             {
                 NPCca.characterSpriteList[i].transform.localPosition = 
                 isDown ? 
-                (NPCca.initialChrctrSpriteTransformList[i].localPosition + new Vector3(0, -wallHeight, 0)) 
-                : NPCca.initialChrctrSpriteTransformList[i].localPosition;
+                (NPCca.initialChrctrSpriteTransformList[i] + new Vector3(0, -wallHeight, 0)) 
+                : NPCca.initialChrctrSpriteTransformList[i];
             }
             npcIsoSS.SorterPositionOffset.y = 
                 isDown ? 
@@ -299,9 +434,10 @@ public class RoomScript : MonoBehaviour
         if (currentMotionCoroutine != null)
         {
             StopCoroutine(currentMotionCoroutine);
+            FinalizeRoomStateInstantly(); // ensure isDown matches current partial displacement
         }
 
-        currentMotionCoroutine = StartCoroutine(Displace(false, null, this.gameObject, initialPosition, movingUp));
+        currentMotionCoroutine = StartCoroutine(LerpRoomPositions(false, null, this.gameObject, initialPosition, movingUp));
         // isDown = false;
     }
     
@@ -310,6 +446,7 @@ public class RoomScript : MonoBehaviour
         if (currentMotionCoroutine != null)
         {
             StopCoroutine(currentMotionCoroutine);
+            FinalizeRoomStateInstantly();
         }
         // if (currentColorCoroutine != null)
         // {
@@ -319,7 +456,7 @@ public class RoomScript : MonoBehaviour
         if (waitTime.HasValue)
         {
             // Move the parent object down
-            currentMotionCoroutine = StartCoroutine(Displace(shouldWait, waitTime.Value, this.gameObject, initialPosition + new Vector3(0, -wallHeight, 0), movingUp));
+            currentMotionCoroutine = StartCoroutine(LerpRoomPositions(shouldWait, waitTime.Value, this.gameObject, initialPosition + new Vector3(0, -wallHeight, 0), movingUp));
 
         }
         else
@@ -329,43 +466,141 @@ public class RoomScript : MonoBehaviour
         }
         // isDown = true;
     }
-    public IEnumerator Displace(bool shouldWait, float? waitTime, GameObject obj, Vector3 targetRoomPosition, bool movingUp)
-    {
-        isMovingg = true;
 
-        // Wait if requested
+
+    private void FinalizeRoomStateInstantly()
+    {
+        // Snap the room to wherever it currently is
+        Vector3 pos = transform.localPosition;
+        float halfway = initialPosition.y - wallHeight / 2f;
+
+        // Check which side of the halfway point we’re on
+        if (pos.y < halfway)
+            isDown = true;
+        else
+            isDown = false;
+    }
+    // public IEnumerator LerpRoomPositions(bool shouldWait, float? waitTime, GameObject obj, Vector3 targetRoomPosition, bool movingUp)
+    // {
+    //     roomIsMoving = true;
+
+    //     // Wait if requested
+    //     if (shouldWait && waitTime.HasValue)
+    //         yield return new WaitForSeconds(waitTime.Value);
+
+    //     // Capture the starting position of the room
+    //     Vector3 startRoomPos = obj.transform.localPosition;
+
+    //     float timeToReachTarget = 0.3f;
+    //     float elapsedTime = 0f;
+
+    //     bool isMoving = Mathf.Abs(startRoomPos.y - targetRoomPosition.y) > 0.001f;
+
+    //     // Take a snapshot of NPCs to avoid issues if npcListForRoom changes mid-coroutine
+    //     var movingNPCs = new List<GameObject>(npcListForRoom);
+
+    //     // Capture current sprite positions and SorterPositionOffsets at start
+    //     List<List<Vector3>> npcSpriteStartPositions = new List<List<Vector3>>();
+    //     List<float> npcStartOffsets = new List<float>();
+
+    //     foreach (var npc in movingNPCs)
+    //     {
+    //         var ca = npc.GetComponent<CharacterAnimation>();
+    //         var iso = npc.GetComponent<IsoSpriteSorting>();
+
+    //         List<Vector3> spritePositions = new List<Vector3>();
+    //         foreach (var sprite in ca.characterSpriteList)
+    //             spritePositions.Add(sprite.transform.localPosition);
+    //         npcSpriteStartPositions.Add(spritePositions);
+
+    //         npcStartOffsets.Add(iso.SorterPositionOffset.y);
+    //     }
+
+    //     // --- Main motion loop ---
+    //     while (elapsedTime < timeToReachTarget)
+    //     {
+    //         elapsedTime += Time.deltaTime;
+    //         float t = Mathf.Clamp01(elapsedTime / timeToReachTarget);
+
+    //         // Move the room
+    //         obj.transform.localPosition = Vector3.Lerp(startRoomPos, targetRoomPosition, t);
+
+    //         // Keep non-NPC colliders fixed
+    //         for (int j = 0; j < childColliders.Count; j++)
+    //             childColliders[j].position = childColliderInitialPositions[j];
+
+    //         // Move NPCs
+    //         for (int i = 0; i < movingNPCs.Count; i++)
+    //         {
+    //             var npc = movingNPCs[i];
+    //             var ca = npc.GetComponent<CharacterAnimation>();
+    //             var cm = npc.GetComponent<CharacterMovement>();
+    //             var iso = npc.GetComponent<IsoSpriteSorting>();
+
+    //             for (int k = 0; k < ca.characterSpriteList.Count; k++)
+    //             {
+    //                 var spriteChild = ca.characterSpriteList[k];
+    //                 Vector3 startPos = npcSpriteStartPositions[i][k];
+    //                 Vector3 targetPos = startPos;
+
+    //                 if (isMoving)
+    //                 {
+    //                     if (!isDown && !movingUp)
+    //                         targetPos += new Vector3(0, -wallHeight, 0); // move down
+    //                     else if (isDown && movingUp)
+    //                         targetPos += new Vector3(0, wallHeight, 0);  // move up
+    //                 }
+
+    //                 spriteChild.transform.localPosition = Vector3.Lerp(startPos, targetPos, t);
+    //             }
+
+    //             // Move the sorter offset relative to current value
+    //             float startOffset = npcStartOffsets[i];
+    //             float targetOffset = startOffset;
+
+    //             if (isMoving)
+    //             {
+    //                 if (!isDown && !movingUp)
+    //                     targetOffset -= wallHeight;
+    //                 else if (isDown && movingUp)
+    //                     targetOffset += wallHeight;
+    //             }
+
+    //             iso.SorterPositionOffset.y = Mathf.Lerp(startOffset, targetOffset, t);
+
+    //             cm.change = Vector3.zero;
+    //         }
+
+    //         yield return null;
+    //     }
+
+    //     // --- Finalize positions ---
+    //     obj.transform.localPosition = targetRoomPosition;
+
+    //     for (int j = 0; j < childColliders.Count; j++)
+    //         childColliders[j].position = childColliderInitialPositions[j];
+
+    //     // Update flags
+    //     roomIsMoving = false;
+    //     isDown = !movingUp;
+    // }
+
+    public IEnumerator LerpRoomPositions(bool shouldWait, float? waitTime, GameObject obj, Vector3 targetRoomPosition, bool movingUp)
+    {
+        roomIsMoving = true;
+
+        // Optional pre-wait
         if (shouldWait && waitTime.HasValue)
             yield return new WaitForSeconds(waitTime.Value);
 
         // Capture the starting position of the room
         Vector3 startRoomPos = obj.transform.localPosition;
-
         float timeToReachTarget = 0.3f;
         float elapsedTime = 0f;
 
         bool isMoving = Mathf.Abs(startRoomPos.y - targetRoomPosition.y) > 0.001f;
 
-        // Take a snapshot of NPCs to avoid issues if npcListForRoom changes mid-coroutine
-        var movingNPCs = new List<GameObject>(npcListForRoom);
-
-        // Capture current sprite positions and SorterPositionOffsets at start
-        List<List<Vector3>> npcSpriteStartPositions = new List<List<Vector3>>();
-        List<float> npcStartOffsets = new List<float>();
-
-        foreach (var npc in movingNPCs)
-        {
-            var ca = npc.GetComponent<CharacterAnimation>();
-            var iso = npc.GetComponent<IsoSpriteSorting>();
-
-            List<Vector3> spritePositions = new List<Vector3>();
-            foreach (var sprite in ca.characterSpriteList)
-                spritePositions.Add(sprite.transform.localPosition);
-            npcSpriteStartPositions.Add(spritePositions);
-
-            npcStartOffsets.Add(iso.SorterPositionOffset.y);
-        }
-
-        // --- Main motion loop ---
+        // --- Motion loop ---
         while (elapsedTime < timeToReachTarget)
         {
             elapsedTime += Time.deltaTime;
@@ -379,9 +614,9 @@ public class RoomScript : MonoBehaviour
                 childColliders[j].position = childColliderInitialPositions[j];
 
             // Move NPCs
-            for (int i = 0; i < movingNPCs.Count; i++)
+            for (int i = 0; i < npcListForRoom.Count; i++)
             {
-                var npc = movingNPCs[i];
+                var npc = npcListForRoom[i];
                 var ca = npc.GetComponent<CharacterAnimation>();
                 var cm = npc.GetComponent<CharacterMovement>();
                 var iso = npc.GetComponent<IsoSpriteSorting>();
@@ -389,33 +624,53 @@ public class RoomScript : MonoBehaviour
                 for (int k = 0; k < ca.characterSpriteList.Count; k++)
                 {
                     var spriteChild = ca.characterSpriteList[k];
-                    Vector3 startPos = npcSpriteStartPositions[i][k];
+
+                    // Always start from the true base transform
+                    Vector3 startPos = ca.initialChrctrSpriteTransformList[k];
                     Vector3 targetPos = startPos;
 
                     if (isMoving)
                     {
-                        if (!isDown && !movingUp)
-                            targetPos += new Vector3(0, -wallHeight, 0); // move down
+                        if (isDown && movingUp && !level.isDisplacedAngular && cm.currentLevel != myCM.currentLevel)
+                            {targetPos += level.angularEquation; // moving down
+                            startPos += new Vector3(0, -wallHeight, 0);}
+                        else if (!isDown && !movingUp)
+                            targetPos += new Vector3(0, -wallHeight, 0); // moving down
                         else if (isDown && movingUp)
-                            targetPos += new Vector3(0, wallHeight, 0);  // move up
+                            startPos += new Vector3(0, -wallHeight, 0); // moving up    
+
+                        spriteChild.transform.localPosition = Vector3.Lerp(startPos, targetPos, t);
                     }
 
-                    spriteChild.transform.localPosition = Vector3.Lerp(startPos, targetPos, t);
                 }
 
-                // Move the sorter offset relative to current value
-                float startOffset = npcStartOffsets[i];
-                float targetOffset = startOffset;
+
+                // Sorter offset
+                Vector3 startOffset = new Vector3(8f, -28f, 0f);
+                Vector3 targetOffset = startOffset;
 
                 if (isMoving)
                 {
-                    if (!isDown && !movingUp)
-                        targetOffset -= wallHeight;
+                    if (isDown && movingUp && !level.isDisplacedAngular && cm.currentLevel != myCM.currentLevel)
+                    {
+                        targetOffset += new Vector3(level.angularEquation.x, level.angularEquation.y, 0f);
+                        startOffset += new Vector3(0f, -wallHeight,  0f); 
+                    }
+                    else if (!isDown && !movingUp)
+                    {
+                        targetOffset += new Vector3(0f, -wallHeight, 0f);
+                    }
                     else if (isDown && movingUp)
-                        targetOffset += wallHeight;
+                    {
+                        startOffset += new Vector3(0f, -wallHeight, 0f);
+                    }
+
+                    // Lerp the offset (Vector3)
+                    Vector3 sorterOffset = Vector3.Lerp(startOffset, targetOffset, t);
+
+                    iso.SorterPositionOffset = sorterOffset;
                 }
 
-                iso.SorterPositionOffset.y = Mathf.Lerp(startOffset, targetOffset, t);
 
                 cm.change = Vector3.zero;
             }
@@ -423,20 +678,55 @@ public class RoomScript : MonoBehaviour
             yield return null;
         }
 
-        // --- Finalize positions ---
+        // --- FINALIZE ---
         obj.transform.localPosition = targetRoomPosition;
 
+        // Reset colliders
         for (int j = 0; j < childColliders.Count; j++)
             childColliders[j].position = childColliderInitialPositions[j];
 
-        // Update flags
-        isMovingg = false;
+        // Finalize NPC positions + sorter offsets
+        // for (int i = 0; i < npcListForRoom.Count; i++)
+        // {
+        //     var npc = npcListForRoom[i];
+        //     var ca = npc.GetComponent<CharacterAnimation>();
+        //     var iso = npc.GetComponent<IsoSpriteSorting>();
+
+        //     for (int k = 0; k < ca.characterSpriteList.Count; k++)
+        //     {
+        //         Vector3 finalPos = ca.initialChrctrSpriteTransformList[k];
+
+        //         if (!isDown && !movingUp)
+        //             finalPos += new Vector3(0, -wallHeight, 0); // moved down
+        //         else if (isDown && movingUp)
+        //             finalPos = ca.initialChrctrSpriteTransformList[k]; // back to start
+
+        //         ca.characterSpriteList[k].transform.localPosition = finalPos;
+        //     }
+
+        //     float finalOffset = -28f;
+        //     if (!isDown && !movingUp)
+        //         finalOffset -= wallHeight;
+        //     else if (isDown && movingUp)
+        //         finalOffset = -28f; // back to normal
+
+        //     Vector3 finalSorterOffset = iso.SorterPositionOffset;
+        //     finalSorterOffset.y = finalOffset;
+        //     iso.SorterPositionOffset = finalSorterOffset;
+        // }
+
+        // --- Update state ---
+        roomIsMoving = false;
         isDown = !movingUp;
+
+        // Debug.Log(gameObject.name + " isDown: " + isDown);    
+        
     }
 
-    // public IEnumerator Displace(bool shouldWait, float? waitTime, GameObject obj, Vector3 targetRoomPosition, bool movingUp)
+
+    // public IEnumerator LerpRoomPositions(bool shouldWait, float? waitTime, GameObject obj, Vector3 targetRoomPosition, bool movingUp)
     // {
-    //     isMovingg = true;
+    //     roomIsMoving = true;
 
     //     if (shouldWait)
     //         yield return new WaitForSeconds(waitTime.Value);
@@ -511,7 +801,7 @@ public class RoomScript : MonoBehaviour
     //     for (int i = 0; i < childColliders.Count; i++)
     //         childColliders[i].position = childColliderInitialPositions[i];
 
-    //     isMovingg = false;
+    //     roomIsMoving = false;
     //     isDown = !movingUp;
     // }
 
@@ -702,6 +992,15 @@ public class RoomScript : MonoBehaviour
             }
         }
 
+
+    public void HandleDoorFade()
+    {
+        for (int i = 0; i < doorsBelow.Count; i++)
+        {
+            doorsBelow[i].SetPlayerIsInRoomAbove(true);
+            doorsBelow[i].SetPlayerIsInDoorway(false);
+        }
+    }
     // IEnumerator LateStartCoroForNonPlayerCharacters()
     // {
     //     yield return new WaitForEndOfFrame();

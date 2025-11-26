@@ -9,6 +9,7 @@ public class TreeFadeTrigger : MonoBehaviour
   [SerializeField] GameObject Player;  
   public GameObject obj;
   public float defaultFadeAlphaFloat = 0.15f;
+  // public bool shouldWait = false;
   private Coroutine fadeCoro;
   private Coroutine resetTagsCoro;
 
@@ -27,10 +28,9 @@ public class TreeFadeTrigger : MonoBehaviour
 
     if (obj != null)
     {
-      GetSprites(obj, objListToFade);
-      setTreeAlpha(objListToFade, initialAlphaFloatList);
+      GetSpritesAndApplyToLists(obj, objListToFade);
+      fadeCoro = StartCoroutine(SetTreeAlpha(objListToFade, initialAlphaFloatList, false));
     }
-
 
   }
 
@@ -38,13 +38,19 @@ public class TreeFadeTrigger : MonoBehaviour
   {
     if(other.CompareTag("PlayerCollider"))
     {
+      if (fadeCoro != null)
+      {
+          StopCoroutine(fadeCoro);
+      }
+
+
       // StopAllCoros();
-      setTreeAlpha(objListToFade, fadedAlphaFloatList);
+      // setTreeAlpha(objListToFade, fadedAlphaFloatList);
 
       if(myCharacterMovement.playerOnBuildingThresh == false) // if player is not on building threshold
       {
-        // fadeCoro = StartCoroutine(treeFade(objListToFade, fadedAlphaFloatList));
-        setTreeAlpha(objListToFade, fadedAlphaFloatList);
+        fadeCoro = StartCoroutine(SetTreeAlpha(objListToFade, fadedAlphaFloatList, false));
+        // setTreeAlpha(objListToFade, fadedAlphaFloatList);
 
       }
       else
@@ -58,29 +64,38 @@ public class TreeFadeTrigger : MonoBehaviour
   {
     if(other.CompareTag("PlayerCollider"))
     {  
-      // StopAllCoros();
-        if(myCharacterMovement.playerOnBuildingThresh == false)
+
+      if (fadeCoro != null)
+      {
+          StopCoroutine(fadeCoro);
+      }
+
+
+      if(myCharacterMovement.playerOnBuildingThresh == false)
+      {
+        // fadeCoro = StartCoroutine(SetTreeAlpha(objListToFade, initialAlphaFloatList, true));
+        if(!myCharacterMovement.playerOnFurniture)
         {
-          // fadeCoro = StartCoroutine(treeFade(objListToFade, initialAlphaFloatList));
-          if(!myCharacterMovement.playerOnFurniture)
-          {
-            setTreeAlpha(objListToFade, initialAlphaFloatList);
-          }
-          obj.tag = "Untagged";
-          TagChildrenOfTaggedParents("Untagged");
+          fadeCoro = StartCoroutine(SetTreeAlpha(objListToFade, initialAlphaFloatList, true));
         }
-        else
-        {
-          obj.tag = "AlphaZeroEntExt";
-          TagChildrenOfTaggedParents("AlphaZeroEntExt");
-          resetTagsCoro = StartCoroutine(resetTagsToUntaggedAfterWait()); //maybe something to do with balcony door?
-        }
+        obj.tag = "Untagged";
+        TagChildrenOfTaggedParents("Untagged");
+      }
+      else
+      {
+        obj.tag = "AlphaZeroEntExt";
+        TagChildrenOfTaggedParents("AlphaZeroEntExt");
+        resetTagsCoro = StartCoroutine(resetTagsToUntaggedAfterWait()); //maybe something to do with balcony door?
+      }
     }
   }
 
 
-  void setTreeAlpha(List<GameObject> spriteList, List<float> fadeTo) 
+  IEnumerator SetTreeAlpha(List<GameObject> spriteList, List<float> fadeTo, bool shouldWait) 
   {
+    if(shouldWait)
+      yield return new WaitForSeconds(0.3f);
+
     for (int i = 0; i < spriteList.Count; i++)
     {
       SpriteRenderer sr = spriteList[i].GetComponent<SpriteRenderer>();
@@ -89,8 +104,7 @@ public class TreeFadeTrigger : MonoBehaviour
           sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, fadeTo[i]);
       }
     }
-
-
+    yield return null;
   }   
   
   // IEnumerator treeFade(
@@ -172,7 +186,7 @@ public class TreeFadeTrigger : MonoBehaviour
   }
 
 
-  private void GetSprites(GameObject root, List<GameObject> spriteList) // gets the sprites and adds to lists
+  private void GetSpritesAndApplyToLists(GameObject root, List<GameObject> spriteList) // gets the sprites and adds to lists
   {
       if(root != null)
       {

@@ -39,7 +39,7 @@ public class CharacterMovement : MonoBehaviour
 
   [HideInInspector] public BoxCollider2D boxCollider;
 
-  [HideInInspector] public string motionDirection = "normal";
+ public string motionDirection = "normal";
   [HideInInspector] public Vector3 change;
 
   [HideInInspector] public bool playerOnThresh = false;
@@ -77,8 +77,18 @@ public class CharacterMovement : MonoBehaviour
   public Direction controlDirection = Direction.Nothing; // Default value should never be used
 
   public BuildingScript currentBuilding = null;
+  public BuildingScript previouseBuilding = null;
+  public BuildingThreshColliderScript currentBuildingThreshold = null;
+
   public LevelScript currentLevel = null;
+  public LevelScript previousLevel = null;
+  public LevelThreshColliderScript currentLevelThreshhold = null;
+
   public RoomScript currentRoom = null;
+  public RoomScript previousRoom = null;
+  public RoomThresholdColliderScript currentRoomThreshold = null;
+
+  public InclineThresholdColliderScript currentInclineThreshold = null;
 
 
   // Start is called before the first frame update

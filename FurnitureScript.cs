@@ -246,6 +246,7 @@ public class FurnitureScript : MonoBehaviour
 
         // Re-enable collision with the target layer
         Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Player"), currentLayerIndex, false);
+        Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Player"), LayerMask.NameToLayer("InclineTrigger"), false);
 
         gameObject.layer = currentLayerIndex;
     }

@@ -35,6 +35,7 @@ public class BuildingScript : MonoBehaviour
 
     public List<RoomScript> roomScripts; 
     public List<LevelScript> levelScripts; 
+    public List<InclineThresholdColliderScript> inclineThresholdColliderScripts;
 
     public List<GameObject> npcListForBuilding = new List<GameObject>();
     [HideInInspector] public List<GameObject> npcSpriteListForBuilding = new List<GameObject>();
@@ -47,7 +48,7 @@ public class BuildingScript : MonoBehaviour
     { 
         Player = GameObject.FindGameObjectWithTag("Player");
         MYcm = Player.GetComponent<CharacterMovement>(); 
-        balconyManager = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<BalconyManager>(); 
+        balconyManager = FindFirstObjectByType<BalconyManager>();
 
         soundtrackScript = GameObject.FindGameObjectWithTag("SoundtrackScript").GetComponent<SoundtrackScript>();
 
@@ -63,8 +64,8 @@ public class BuildingScript : MonoBehaviour
         GetIsoSpriteSortComponentsAndAddToLists(innerBuilding, innerSpriteSortingScriptObj, gameObjectsToShowWhileOutside);
         GetIsoSpriteSortComponentsAndAddToLists(outerBuilding, outerSpriteSortingScriptObj, new List<GameObject>());
 
-        FindChildrenByRoomScriptComponent();
-        FindChildrenByLevelScriptComponent();
+        FindChildrenByScriptComponent();
+
         
         TagChildrenOfTaggedParents("OpenDoor");
         TagChildrenOfTaggedParents("ClosedDoor");
@@ -154,7 +155,20 @@ public class BuildingScript : MonoBehaviour
     }
     public void ExitBuilding(float waitTimeInside, float waitTimeOutside, bool exitingFromBehindAlreadyOutside)
     {
+        foreach(LevelScript level in levelScripts)
+        {
+            foreach(InclineThresholdColliderScript inclineEntrance in level.inclineEntrances)
+            {
+                BoxCollider2D inclineCol = inclineEntrance.gameObject.GetComponent<BoxCollider2D>();
+                BoxCollider2D myCol = MYcm.gameObject.GetComponentInChildren<BoxCollider2D>();
+                if(myCol.CompareTag("PlayerCollider"))
+                    Physics2D.IgnoreCollision(myCol, inclineCol, true);
+            }
+        }
+
+
         MYcm.currentBuilding = null;
+        MYcm.currentRoom = null;
         if(cameraMovement.currentBuilding != null)
             cameraMovement.currentBuilding = null;
         if(cameraMovement.currentBuilding != null)
@@ -223,6 +237,9 @@ public class BuildingScript : MonoBehaviour
     }
     public void GoBehindBuilding()
     {
+        MYcm.currentBuilding = null;
+        MYcm.currentRoom = null;
+
         cameraMovement.currentBuilding = null;
         cameraMovement.currentLevel = null;
 
@@ -284,12 +301,6 @@ public class BuildingScript : MonoBehaviour
         }
         if (exitingBuilding)
         {
-            // for (int i = 0; i < allOtherBuildings.Count; i++)
-            // {     
-            //     // allOtherBuildings[i].SetDontSort(allOtherBuildings[i].innerSpriteSortingScriptObj, false);
-            //     allOtherBuildings[i].SetDontSort(allOtherBuildings[i].outerSpriteSortingScriptObj, false);
-            // }
-
             for (int i = 0; i < innerBuildingSpriteList.Count; i++)
             {     
                 SetTreeSortingLayer(innerBuildingSpriteList[i], "Default");
@@ -385,25 +396,12 @@ public class BuildingScript : MonoBehaviour
                     SetTreeAlpha(gameObjectsToShowWhileOutsideSpriteList[i], 0f);
                 }
             }    
-
-            // cameraMovement.currentRoom = null;
-            // cameraMovement.currentLevel = null;
-            // cameraMovement.currentBuilding = null;    
-            // Your code after the wait time elapses
         }
 
 
 
         else// if entering the building
         {
-            // for (int i = 0; i < allOtherBuildings.Count; i++)
-            // {     
-            //     // allOtherBuildings[i].SetDontSort(allOtherBuildings[i].innerSpriteSortingScriptObj, true);
-            //     allOtherBuildings[i].SetDontSort(allOtherBuildings[i].outerSpriteSortingScriptObj, true);            
-            // }
-            // cameraMovement.currentBuilding = this;    
-                // Debug.Log(npc.Count);
-
             for (int i = 0; i < npcListForBuilding.Count; i++)
             {
                 CharacterAnimation NPCca = npcListForBuilding[i].GetComponent<CharacterAnimation>();
@@ -413,43 +411,6 @@ public class BuildingScript : MonoBehaviour
                     SetTreeAlpha(NPCca.characterSpriteList[j], NPCca.initialChrctrColorList[j].a);
                 }
             }
-
-            //     for (int j = 0; j < NPCca.characterSpriteList.Count; j++)
-            //             {
-            //                 SpriteRenderer NPCsr = NPCca.characterSpriteList[j].GetComponent<SpriteRenderer>();
-            //                 Color col = NPCsr.color;
-
-            //                 // if(MYcm.currentBuilding == NPCcm.currentBuilding) // we are both inside
-            //                 // {
-            //                     col.a = NPCca.initialChrctrColorList[i].a;
-            //                 // }
-            //                 // else if(MYcm.currentBuilding == null && NPCcm.currentBuilding == null) // both outside
-            //                 // {
-            //                 //     col.a = enter ? 0f : NPCca.initialChrctrColorList[i].a;
-            //                 // }
-            //                 // else if(MYcm.currentBuilding != null && NPCcm.currentBuilding == null) // i'm inside, npc outside
-            //                 // {
-            //                 //     col.a = enter ? NPCca.initialChrctrColorList[i].a : NPCca.initialChrctrColorList[i].a;
-            //                 // }
-            //                 // else if(MYcm.currentBuilding == null && NPCcm.currentBuilding != null) // i'm outside, npc inside
-            //                 // {
-            //                 //     col.a = enter ? 0f : NPCca.initialChrctrColorList[i].a;
-            //                 // }
-            //                 // else if(MYcm.currentBuilding != NPCcm.currentBuilding) // we are both inside but different buildings
-            //                 // {
-            //                 //     col.a = enter ? 0f : NPCca.initialChrctrColorList[i].a;
-            //                 // }
-            //                 // Adjust alpha
-
-            //                 NPCsr.color = col; // Apply updated color to SpriteRenderer
-            //             }
-
-            // }
-            // for (int i = 0; i < npcListForBuilding.Count; i++)
-            // {
-            //     npcListForBuilding[i].GetComponent<IsoSpriteSorting>().dontSort = false;
-            // }
-
 
             for (int i = 0; i < innerBuildingSpriteList.Count; i++)
             {                                       
@@ -925,7 +886,50 @@ public class BuildingScript : MonoBehaviour
         }
     }
 
-    public void FindChildrenByRoomScriptComponent()
+    // public void FindChildrenByRoomScriptComponent()
+    // {
+    //     Stack<Transform> stack = new Stack<Transform>();
+    //     stack.Push(transform);
+
+    //     while (stack.Count > 0)
+    //     {
+    //         Transform current = stack.Pop();
+            
+    //         if (roomScript != null)
+    //         {
+    //             roomScripts.Add(roomScript);
+    //         }
+
+    //         // Push each child of the current transform onto the stack
+    //         foreach (Transform child in current)
+    //         {
+    //             stack.Push(child);
+    //         }
+    //     }
+    // }
+    // public void FindChildrenByLevelScriptComponent()
+    // {
+    //     Stack<Transform> stack = new Stack<Transform>();
+    //     stack.Push(transform);
+
+    //     while (stack.Count > 0)
+    //     {
+    //         Transform current = stack.Pop();
+    //         LevelScript levelScript = current.GetComponent<LevelScript>();
+            
+    //         if (levelScript != null)
+    //         {
+    //             levelScripts.Add(levelScript);
+    //         }
+
+    //         // Push each child of the current transform onto the stack
+    //         foreach (Transform child in current)
+    //         {
+    //             stack.Push(child);
+    //         }
+    //     }
+    // }
+    public void FindChildrenByScriptComponent()
     {
         Stack<Transform> stack = new Stack<Transform>();
         stack.Push(transform);
@@ -933,30 +937,18 @@ public class BuildingScript : MonoBehaviour
         while (stack.Count > 0)
         {
             Transform current = stack.Pop();
+
             RoomScript roomScript = current.GetComponent<RoomScript>();
-            
-            if (roomScript != null)
-            {
-                roomScripts.Add(roomScript);
-            }
-
-            // Push each child of the current transform onto the stack
-            foreach (Transform child in current)
-            {
-                stack.Push(child);
-            }
-        }
-    }
-    public void FindChildrenByLevelScriptComponent()
-    {
-        Stack<Transform> stack = new Stack<Transform>();
-        stack.Push(transform);
-
-        while (stack.Count > 0)
-        {
-            Transform current = stack.Pop();
             LevelScript levelScript = current.GetComponent<LevelScript>();
-            
+            InclineThresholdColliderScript inclineThreshScript = current.GetComponent<InclineThresholdColliderScript>();
+
+            if (roomScript != null)
+                roomScripts.Add(roomScript);
+            if (levelScript != null)
+                levelScripts.Add(levelScript);
+            if (inclineThreshScript != null)
+                inclineThresholdColliderScripts.Add(inclineThreshScript);
+
             if (levelScript != null)
             {
                 levelScripts.Add(levelScript);
@@ -986,34 +978,46 @@ public class BuildingScript : MonoBehaviour
 
 
 
-    public void npcEnterExitBuilding(GameObject character, bool enter)
+    public void NpcEnterExitBuilding(GameObject character, bool enter)
     {
         CharacterAnimation NPCca = character.GetComponent<CharacterAnimation>();
         CharacterMovement NPCcm = character.GetComponent<CharacterMovement>();
 
-        SetTreeSortingLayer(character, enter?"Level0":"Default");
+        SetTreeSortingLayer(character, enter?"Level0":"Default"); // assuming entrance is ground flloooooorrr
 
 
         if (enter)
-            {npcListForBuilding.Add(character);
-            NPCcm.currentBuilding = this;}
-        else
-            {npcListForBuilding.Remove(character);
-            // NPCcm.currentRoom.npcListForRoom.Remove(character);
-            NPCcm.currentLevel.npcListForLevel.Remove(character);
-            // NPCcm.currentRoom = null;
-            NPCcm.currentRoom.NpcExitRoom(character);
-            NPCcm.currentLevel = null;
-            NPCcm.currentBuilding = null;
+            {
+                npcListForBuilding.Add(character);
+                NPCcm.currentBuilding = this;
             }
-        // innerBuildingSpriteList.Clear();
-        // innerBuildingInitialColorList.Clear();
-        // GetSpritesAndApplyToLists(character, innerBuildingSpriteList, new List<GameObject>(), innerBuildingInitialColorList, true);
+        else
+            {
+                                            // Debug.Log("asdfdasfgds");
+
+                NPCcm.previousRoom = NPCcm.currentRoom;
+                NPCcm.previousRoom.npcListForRoom.Remove(character);
+                // NPCcm.previousRoom = null;
+                NPCcm.currentRoom = null;
+
+                
+                NPCcm.previousLevel = NPCcm.currentLevel;
+                if(NPCcm.previousLevel != null)
+                {NPCcm.previousLevel.npcListForLevel.Remove(character);}
+                NPCcm.previousLevel = null;
+                NPCcm.currentLevel = null;
+                
+                NPCcm.previouseBuilding = this;
+                NPCcm.previouseBuilding.npcListForBuilding.Remove(character);
+                NPCcm.currentBuilding = null;
+            }
 
         for (int i = 0; i < NPCca.characterSpriteList.Count; i++)
         {
             SpriteRenderer NPCsr = NPCca.characterSpriteList[i].GetComponent<SpriteRenderer>();
             Color col = NPCsr.color;
+
+            if(!enter)col = NPCca.initialChrctrColorList[i];
 
             if(MYcm.currentBuilding == NPCcm.currentBuilding) // we are both inside
             {
@@ -1021,18 +1025,22 @@ public class BuildingScript : MonoBehaviour
             }
             else if(MYcm.currentBuilding == null && NPCcm.currentBuilding == null) // both outside
             {
+                // if(!enter)col = NPCca.initialChrctrColorList[i];
                 col.a = enter ? 0f : NPCca.initialChrctrColorList[i].a;
             }
             else if(MYcm.currentBuilding != null && NPCcm.currentBuilding == null) // i'm inside, npc outside
             {
+                // if(!enter)col = NPCca.initialChrctrColorList[i];
                 col.a = enter ? NPCca.initialChrctrColorList[i].a : NPCca.initialChrctrColorList[i].a;
             }
             else if(MYcm.currentBuilding == null && NPCcm.currentBuilding != null) // i'm outside, npc inside
             {
+                // if(!enter)col = NPCca.initialChrctrColorList[i];
                 col.a = enter ? 0f : NPCca.initialChrctrColorList[i].a;
             }
             else if(MYcm.currentBuilding != NPCcm.currentBuilding) // we are both inside but different buildings
             {
+                // if(!enter)col = NPCca.initialChrctrColorList[i];
                 col.a = enter ? 0f : NPCca.initialChrctrColorList[i].a;
             }
             // Adjust alpha

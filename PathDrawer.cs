@@ -9,6 +9,8 @@ public class PathDrawer : MonoBehaviour
     public Color pathColor = Color.yellow;
     public float handleSize = 0.2f;
     public bool snapToGrid = true;
+    public LayerMask obstacleMask;
+    public bool detectCollisions = true;
 
     private void OnDrawGizmos()
     {

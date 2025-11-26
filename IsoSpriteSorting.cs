@@ -56,7 +56,7 @@ public class IsoSpriteSorting : MonoBehaviour
 
     public SortType sortType = SortType.Point;
     
-    [HideInInspector] public Vector3 initialSorterPositionOffset1;
+    [HideInInspector] public Vector3 initialSorterPositionOffset1 = new Vector3();
     public Vector3 SorterPositionOffset = new Vector3();
     public Vector3 SorterPositionOffset2 = new Vector3();
     public Renderer[] renderersToSort;

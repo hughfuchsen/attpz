@@ -11,7 +11,7 @@ public class CharacterAnimation : MonoBehaviour
   [HideInInspector] public float animationSpeed = 0.09f; // Time between frames
 
    public List<GameObject> characterSpriteList = new List<GameObject>();
-   public List<Transform> initialChrctrSpriteTransformList = new List<Transform>();
+   public List<Vector3> initialChrctrSpriteTransformList = new List<Vector3>();
   [HideInInspector] public List<GameObject> zeroInitialAlphaSpriteList = new List<GameObject>();
   [HideInInspector] public List<Color> initialChrctrColorList = new List<Color>();
  
@@ -561,7 +561,7 @@ public class CharacterAnimation : MonoBehaviour
       }
   } 
 
-  public void GetSpritesAndAddToLists(GameObject obj, List<GameObject> spriteList, List<GameObject> excludeList, List<Color> colorList, List<Transform> transformList)
+  public void GetSpritesAndAddToLists(GameObject obj, List<GameObject> spriteList, List<GameObject> excludeList, List<Color> colorList, List<Vector3> transformList)
   {
     // Clear the lists before repopulating
     spriteList.Clear();
@@ -581,7 +581,7 @@ public class CharacterAnimation : MonoBehaviour
             Color col = sr.color;
             spriteList.Add(currentNode);
             colorList.Add(col);
-            transformList.Add(tr);
+            transformList.Add(tr.localPosition);
         }
 
         foreach (Transform child in currentNode.transform)

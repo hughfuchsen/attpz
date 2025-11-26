@@ -2,21 +2,40 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
+
+public enum DisplacementType
+{
+    Initializing,
+    Angular,
+    Vertical
+}
+
 public class LevelScript : MonoBehaviour
 {
-    CharacterMovement playerMovement;
-    [SerializeField] GameObject Player;
+    public BuildingScript building;
+    CharacterMovement myCM;
+    [SerializeField] GameObject player;
     private float perspectiveAngle = Mathf.Atan(0.5f);
     [HideInInspector] public CameraMovement cameraMovement;
     public List<LevelScript> levelsAbove = new List<LevelScript>();
     public List<LevelScript> levelsBelow = new List<LevelScript>();
+    public List<InclineThresholdColliderScript> inclineEntrances = new List<InclineThresholdColliderScript>();
     private List<Transform> childColliders = new List<Transform>(); // Separate list for child colliders
     public int roomWidthX = 30;
     public int wallHeight = 31;
     public bool oppositeMovement;
+
+    [HideInInspector] public bool isDisplacedVertical = false;
+    [HideInInspector] public bool isDisplacedAngular = false;
+    public Vector3 angularEquation;
     public bool groundFloor;
     private bool displaced;
+
+    public bool desaturateBoolean = false;
     private Vector3 initialPosition;
+
+    private Vector3 targetLevelPosition;
     private List<Vector3> childColliderInitialPositions = new List<Vector3>();
     private List<GameObject> spriteList = new List<GameObject>();
     private List<Color> initialColorList = new List<Color>();
@@ -47,13 +66,15 @@ public class LevelScript : MonoBehaviour
         }
 
 
-        Player = GameObject.FindGameObjectWithTag("Player");
-        playerMovement = Player.GetComponent<CharacterMovement>();
+        player = GameObject.FindGameObjectWithTag("Player");
+        myCM = player.GetComponent<CharacterMovement>();
         wallHeight = 70;
+        roomWidthX += 10;
                 
     }
     void Start()
     {
+        building = FindParentByBuildingScriptComponent();
         innerBuildingBackDropColor = GameObject.FindGameObjectWithTag("InnerBuildingBackdrop").GetComponent<SpriteRenderer>().color;
         Color.RGBToHSV(innerBuildingBackDropColor, out float bdh, out float bds, out float bdv);
         
@@ -72,6 +93,16 @@ public class LevelScript : MonoBehaviour
         }
 
         initialPosition = this.gameObject.transform.localPosition;
+
+        if (oppositeMovement)
+        {
+            perspectiveAngle = Mathf.Atan(-0.5f);
+            roomWidthX = Mathf.Abs(roomWidthX) * -1;
+            angularEquation = new Vector3(roomWidthX, roomWidthX / Mathf.Cos(perspectiveAngle) * Mathf.Sin(perspectiveAngle) + 1, 0);
+        }
+        else
+            angularEquation = new Vector3(roomWidthX, roomWidthX / Mathf.Cos(perspectiveAngle) * Mathf.Sin(perspectiveAngle) + 1, 0);
+
 
         FindColliderObjects(transform);
 
@@ -103,8 +134,11 @@ public class LevelScript : MonoBehaviour
     public void EnterLevel(bool shouldWait, bool shouldMoveDown)
     {
         cameraMovement.currentLevel = this;
+        myCM.currentLevel = this;
 
-        this.MoveIn(false, null);
+        HandleInclineCollisionIgnoring(player);
+
+        this.InitializeLevelPosition(false, null);
         if (levelsAbove != null)
         {
             for (int i = 0; i < levelsAbove.Count; i++)
@@ -123,13 +157,43 @@ public class LevelScript : MonoBehaviour
             }
         }
     }
-    public void npcEnterLevel(GameObject character)
+    // public void npcEnterLevel(GameObject character)
+    // {
+    //     if(character.GetComponent<CharacterMovement>().currentLevel != null)
+    //     {character.GetComponent<CharacterMovement>().currentLevel.npcListForLevel.Remove(character);}
+    //     character.GetComponent<CharacterMovement>().currentLevel = null;
+    //     character.GetComponent<CharacterMovement>().currentLevel = this;
+    //     character.GetComponent<CharacterMovement>().currentLevel.npcListForLevel.Add(character);
+    // }
+
+    public void NpcEnterLevel(GameObject character, RoomScript room)
     {
-        if(character.GetComponent<CharacterMovement>().currentLevel != null)
-        {character.GetComponent<CharacterMovement>().currentLevel.npcListForLevel.Remove(character);}
-        character.GetComponent<CharacterMovement>().currentLevel = null;
-        character.GetComponent<CharacterMovement>().currentLevel = this;
-        character.GetComponent<CharacterMovement>().currentLevel.npcListForLevel.Add(character);
+        var NPCca = character.GetComponent<CharacterAnimation>();
+        var NPCcm = character.GetComponent<CharacterMovement>();
+        var npcIsoSS = character.GetComponent<IsoSpriteSorting>();
+
+        HandleInclineCollisionIgnoring(character);
+
+        // if NPC was already in another room
+        if (NPCcm.currentLevel != null)
+        {
+            //Set variables
+            NPCcm.previousLevel = NPCcm.currentLevel;
+            NPCcm.currentLevel = this;
+
+            // Remove and assign from old room to new room
+            NPCcm.previousLevel.npcListForLevel.Remove(character);
+            npcListForLevel.Add(character);
+
+            // if(NPCcm)
+            NpcDesaturateOrSaturate();
+        }
+        else
+        {
+            NPCcm.currentLevel = this;
+            npcListForLevel.Add(character);
+            NpcDesaturateOrSaturate();
+        }
     }
 
 
@@ -139,23 +203,23 @@ public class LevelScript : MonoBehaviour
         {
             for (int i = 0; i < levelsAbove.Count; i++)
             {
-                levelsAbove[i].MoveUp();
-                levelsAbove[i].MoveIn(false, null);
+                // levelsAbove[i].MoveUp();
+                levelsAbove[i].InitializeLevelPosition(false, null);
             }
         }
         if (levelsBelow != null)
         {
             for (int i = 0; i < levelsBelow.Count; i++)
             {
-                levelsBelow[i].MoveUp();
-                levelsBelow[i].MoveIn(false, null);
+                // levelsBelow[i].MoveUp();
+                levelsBelow[i].InitializeLevelPosition(false, null);
             }
         }
 
-        this.MoveUp();
-        this.MoveIn(false, null);
+        // this.MoveUp();
+        this.InitializeLevelPosition(false, null);
     }
-    public void MoveIn(bool shouldWait, float? waitTime)
+    public void InitializeLevelPosition(bool shouldWait, float? waitTime)
     {
         if (currentMotionCoroutine != null)
         {
@@ -164,21 +228,22 @@ public class LevelScript : MonoBehaviour
 
         if (waitTime.HasValue) // Check if waitTime has a value
         {
-            currentMotionCoroutine = StartCoroutine(LerpPosAndSetSaturationValue(shouldWait, waitTime.Value, false, this.gameObject, initialPosition, false));
+            currentMotionCoroutine = StartCoroutine(LerpPosAndSetSaturationValue(shouldWait, waitTime.Value, DisplacementType.Initializing, false, false, this.gameObject, initialPosition, false));
         }
         else
         {
-            currentMotionCoroutine = StartCoroutine(LerpPosAndSetSaturationValue(shouldWait, 0f, false, this.gameObject, initialPosition, false)); // Default to 0 if waitTime is not specified
+            currentMotionCoroutine = StartCoroutine(LerpPosAndSetSaturationValue(shouldWait, 0f, DisplacementType.Initializing, false, false, this.gameObject, initialPosition, false)); // Default to 0 if waitTime is not specified
         }
     }
 
     public void MoveOut(bool shouldWait, float? waitTime)
     {
-        if (oppositeMovement)
-        {
-            perspectiveAngle = Mathf.Atan(-0.5f);
-            roomWidthX = Mathf.Abs(roomWidthX) * -1;
-        }
+        // if (oppositeMovement)
+        // {
+        //     perspectiveAngle = Mathf.Atan(-0.5f);
+        //     roomWidthX = Mathf.Abs(roomWidthX) * -1;
+        //     angularEquation = new Vector3(roomWidthX, roomWidthX / Mathf.Cos(perspectiveAngle) * Mathf.Sin(perspectiveAngle) + 1, 0);
+        // }
 
         if (currentMotionCoroutine != null)
         {
@@ -187,24 +252,14 @@ public class LevelScript : MonoBehaviour
 
         if (waitTime.HasValue) // Check if waitTime has a value
         {
-            currentMotionCoroutine = StartCoroutine(LerpPosAndSetSaturationValue(shouldWait, waitTime.Value, true, this.gameObject, initialPosition + new Vector3(roomWidthX, roomWidthX / Mathf.Cos(perspectiveAngle) * Mathf.Sin(perspectiveAngle) + 1, 0), true));
+            currentMotionCoroutine = StartCoroutine(LerpPosAndSetSaturationValue(shouldWait, waitTime.Value, DisplacementType.Angular, true, false, this.gameObject, initialPosition + angularEquation, true));
         }
         else
         {
-            currentMotionCoroutine = StartCoroutine(LerpPosAndSetSaturationValue(shouldWait, 0f, true, this.gameObject, initialPosition + new Vector3(roomWidthX, roomWidthX / Mathf.Cos(perspectiveAngle) * Mathf.Sin(perspectiveAngle) + 1, 0), true)); // Default to 0 if waitTime is not specified
+            currentMotionCoroutine = StartCoroutine(LerpPosAndSetSaturationValue(shouldWait, 0f, DisplacementType.Angular, true, false, this.gameObject, initialPosition + angularEquation, true)); // Default to 0 if waitTime is not specified
         }
     }
 
-
-    public void MoveUp()
-    {
-        if (currentMotionCoroutine != null)
-        {
-            StopCoroutine(currentMotionCoroutine);
-        }
-
-        currentMotionCoroutine = StartCoroutine(LerpPosAndSetSaturationValue(false, null, false, this.gameObject, initialPosition, false));
-    }
 
     public void MoveDown(bool shouldWait, float? waitTime)
     {
@@ -214,26 +269,32 @@ public class LevelScript : MonoBehaviour
         }
         if (waitTime.HasValue) // Check if waitTime has a value
         {
-            currentMotionCoroutine = StartCoroutine(LerpPosAndSetSaturationValue(shouldWait, waitTime.Value, true, this.gameObject, initialPosition + new Vector3(0, -wallHeight, 0), true));
+            currentMotionCoroutine = StartCoroutine(LerpPosAndSetSaturationValue(shouldWait, waitTime.Value, DisplacementType.Vertical, false, true, this.gameObject, initialPosition + new Vector3(0, -wallHeight, 0), true));
         }
         else
         {
-            currentMotionCoroutine = StartCoroutine(LerpPosAndSetSaturationValue(false, 0f, true, this.gameObject, initialPosition + new Vector3(0, -wallHeight, 0), true));
+            currentMotionCoroutine = StartCoroutine(LerpPosAndSetSaturationValue(false, 0f, DisplacementType.Vertical, false, true, this.gameObject, initialPosition + new Vector3(0, -wallHeight, 0), true));
         }
         // Move the parent object down
     }
 
 
-    private IEnumerator LerpPosAndSetSaturationValue(bool shouldWait, float? waitTime, bool movingOut, GameObject obj, Vector3 targetPosition, bool desaturate)
+    private IEnumerator LerpPosAndSetSaturationValue(bool shouldWait, float? waitTime, DisplacementType displacementType, bool movingOut, bool movingDown, GameObject obj, Vector3 targetLevelPos, bool desaturate)
     {
-        Vector3 currentPosition = obj.transform.localPosition;
-        float displaceDistace = (currentPosition - targetPosition).magnitude;
+        
+        Vector3 startLevelPos = obj.transform.localPosition;
+        float displaceDistace = (startLevelPos - targetLevelPos).magnitude;
         float timeToReachTarget = 0.3f;
         float elapsedTime = 0f;
+
+        bool isMoving = Mathf.Abs(startLevelPos.y - targetLevelPos.y) > 0.001f;
+
+
         if (shouldWait)
         {
             yield return new WaitForSeconds(waitTime.Value);
         }
+
 
         while (elapsedTime < timeToReachTarget)
         {
@@ -247,21 +308,181 @@ public class LevelScript : MonoBehaviour
             // initial + (target - initial) * t
             // initial + target * t - initial * t
             // initial * (1 - t) + target * t
-            obj.transform.localPosition = currentPosition * (1 - t) + targetPosition * t;
+            obj.transform.localPosition = startLevelPos * (1 - t) + targetLevelPos * t;
 
             for (int i = 0; i < childColliders.Count; i++)
             {
                 childColliders[i].position = childColliderInitialPositions[i];
             }
+
+            // Move NPCs
+            for (int i = 0; i < npcListForLevel.Count; i++)
+            {
+                var npc = npcListForLevel[i];
+                var ca = npc.GetComponent<CharacterAnimation>();
+                var cm = npc.GetComponent<CharacterMovement>();
+                var iso = npc.GetComponent<IsoSpriteSorting>();
+
+                for (int k = 0; k < ca.characterSpriteList.Count; k++)
+                {
+                    var spriteChild = ca.characterSpriteList[k];
+
+                    // Always start from the true base transform
+                    Vector3 startPos = ca.initialChrctrSpriteTransformList[k];
+                    Vector3 targetPos = startPos;
+
+                  if (isMoving)
+                    {
+                        switch (displacementType)
+                        {
+                            case DisplacementType.Angular:
+                                if (!isDisplacedAngular && movingOut)
+                                    targetPos += angularEquation;
+                                // else if (isDisplacedAngular && !movingOut)
+                                //     startPos += angularEquation;
+                                break;
+
+                            case DisplacementType.Vertical:
+                                if (!isDisplacedVertical && movingDown)
+                                    targetPos += new Vector3(0, -wallHeight, 0); // moving up
+                                // else if (!isDisplacedVertical && movingDown)
+                                //     targetPos += new Vector3(0, -wallHeight, 0); // moving down
+                                break;
+
+                            case DisplacementType.Initializing: // initializing position
+                                if (isDisplacedAngular && !movingOut)
+                                    startPos += angularEquation;
+                                else if (isDisplacedVertical && !movingDown)
+                                    startPos += new Vector3(0, -wallHeight, 0); 
+                                break;
+                        }
+
+                        spriteChild.transform.localPosition = Vector3.Lerp(startPos, targetPos, t);
+                    }
+
+                }
+
+                // Sorter offset
+                Vector3 startOffset = new Vector3(8, -28, 0);
+                Vector3 targetOffset = startOffset;
+
+                if (isMoving)
+                {
+                    switch (displacementType)
+                    {
+                        case DisplacementType.Angular:
+                            if (!isDisplacedAngular && movingOut)
+                                targetOffset += angularEquation;
+                            break;
+
+                        case DisplacementType.Vertical:
+                            if (!isDisplacedVertical && movingDown)
+                                targetOffset += new Vector3(0, -wallHeight, 0); // moving up
+                            break;
+
+                        case DisplacementType.Initializing: // initializing position
+                            if (isDisplacedAngular && !movingOut)
+                                startOffset += angularEquation;
+                            else if (isDisplacedVertical && !movingDown)
+                                startOffset += new Vector3(0, -wallHeight, 0); 
+                            break;
+                    }
+
+                    iso.SorterPositionOffset = Vector3.Lerp(startOffset, targetOffset, t);               
+                }
+                cm.change = Vector3.zero;
+            }
+
             yield return null;
         }
 
-        obj.transform.localPosition = targetPosition; // Ensure the object reaches the exact target position
+
+        // ---FINALIZE----
+        obj.transform.localPosition = targetLevelPos; // Ensure the object reaches the exact target position
 
         for (int i = 0; i < childColliders.Count; i++)
         {
             childColliders[i].position = childColliderInitialPositions[i]; // Ensure the object reaches the exact target position
         }
+
+
+
+        // --- FINALIZE NPC POSITIONS AND SORTER OFFSETS ---
+        for (int i = 0; i < npcListForLevel.Count; i++)
+        {
+            var npc = npcListForLevel[i];
+            var ca = npc.GetComponent<CharacterAnimation>();
+            var cm = npc.GetComponent<CharacterMovement>();
+            var iso = npc.GetComponent<IsoSpriteSorting>();
+
+            // Finalize sprite positions
+            for (int k = 0; k < ca.characterSpriteList.Count; k++)
+            {
+                var spriteChild = ca.characterSpriteList[k];
+
+                // Always use true initial base
+                Vector3 startPos = ca.initialChrctrSpriteTransformList[k];
+                Vector3 targetPos = startPos;
+
+                if (isMoving)
+                {
+                    switch (displacementType)
+                    {
+                        case DisplacementType.Angular:
+                            if (!isDisplacedAngular && movingOut)
+                                targetPos += angularEquation;
+                            break;
+
+                        case DisplacementType.Vertical:
+                            if (!isDisplacedVertical && movingDown)
+                                targetPos += new Vector3(0, -wallHeight, 0);
+                            break;
+
+                        case DisplacementType.Initializing:
+                            if (isDisplacedAngular && !movingOut)
+                                startPos += angularEquation;
+                            else if (isDisplacedVertical && !movingDown)
+                                startPos += new Vector3(0, -wallHeight, 0);
+                            break;
+                    }
+                }
+
+                // FIX — snap to final
+                // spriteChild.transform.localPosition = targetPos;
+            }
+
+            // Finalize sorter offset
+            Vector3 startOffset = new Vector3(8, -28, 0);
+            Vector3 targetOffset = startOffset;
+
+            if (isMoving)
+            {
+                switch (displacementType)
+                {
+                    case DisplacementType.Angular:
+                        if (!isDisplacedAngular && movingOut)
+                            targetOffset += angularEquation;
+                        break;
+
+                    case DisplacementType.Vertical:
+                        if (!isDisplacedVertical && movingDown)
+                            targetOffset += new Vector3(0, -wallHeight, 0);
+                        break;
+
+                    case DisplacementType.Initializing:
+                        if (isDisplacedAngular && !movingOut)
+                            startOffset += angularEquation;
+                        else if (isDisplacedVertical && !movingDown)
+                            startOffset += new Vector3(0, -wallHeight, 0);
+                        break;
+                }
+            }
+
+            // iso.SorterPositionOffset = targetOffset; // FIX — snap final sorter offset
+
+            cm.change = Vector3.zero;
+        }
+
 
         if (desaturate == true)
         {
@@ -272,22 +493,42 @@ public class LevelScript : MonoBehaviour
             Resaturate();
         }
         yield return null;
+
+        // --- STATE MANAGEMENT ---
+        // movingOut means we’re displacing outward (true -> becomes displaced)
+        // movingDown means we’re returning upward (false -> no longer displaced)
+        switch (displacementType)
+        {
+            case DisplacementType.Angular:
+                isDisplacedAngular = movingOut;
+                isDisplacedVertical = false;
+                break;
+
+            case DisplacementType.Vertical:
+                isDisplacedVertical = movingDown;
+                isDisplacedAngular = false;
+                break;
+
+            default:
+                isDisplacedAngular = false;
+                isDisplacedVertical = false;
+                break;
+        }
     }
 
     private void Resaturate()
     {
+        // --- Resaturate regular scene sprites ---
         for (int i = 0; i < spriteList.Count; i++)
         {
             SpriteRenderer sr = spriteList[i].GetComponent<SpriteRenderer>();
+            if (sr == null) continue;
 
             if (spriteList[i].CompareTag("OpenDoor") || spriteList[i].CompareTag("AlphaZeroEntExt"))
             {
-                if (sr != null)
-                {
-                    Color newColor = sr.color; // Get the current color
-                    newColor.a = 0; // Set the alpha component
-                    sr.color = newColor; // Assign the modified color
-                }
+                Color newColor = sr.color;
+                newColor.a = 0; // stay invisible
+                sr.color = newColor;
             }
             else if (sr.color.a == 0f)
             {
@@ -298,26 +539,147 @@ public class LevelScript : MonoBehaviour
                 sr.color = initialColorList[i];
             }
         }
+
+        if(myCM.currentBuilding == this.building)
+        {
+            // --- Resaturate NPC sprites ---
+            for (int i = 0; i < npcListForLevel.Count; i++)
+            {
+                var npc = npcListForLevel[i];
+                var ca = npc.GetComponent<CharacterAnimation>();
+                if (ca == null) continue;
+
+                for (int j = 0; j < ca.characterSpriteList.Count; j++)
+                {
+                    var spriteChild = ca.characterSpriteList[j];
+                    var initialColor = ca.initialChrctrColorList[j];
+                    SpriteRenderer sr = spriteChild.GetComponent<SpriteRenderer>();
+                    if (sr == null) continue;
+
+                    
+                    Color newColor = sr.color;
+                    newColor = initialColor; // still hidden
+                    sr.color = newColor;
+                }
+            }
+        }
+            
+        desaturateBoolean = false;
     }
+   
 
     private void Desaturate()
     {
+        // --- Desaturate regular scene sprites ---
         for (int i = 0; i < spriteList.Count; i++)
         {
             SpriteRenderer sr = spriteList[i].GetComponent<SpriteRenderer>();
 
             if (spriteList[i].CompareTag("OpenDoor") || spriteList[i].CompareTag("AlphaZeroEntExt"))
             {
-                Color newColor = sr.color; // Get the current color
-                newColor.a = 0; // Set the alpha component
-                sr.color = newColor; // Assign the modified color
+                Color newColor = sr.color;
+                newColor.a = 0; // make fully transparent
+                sr.color = newColor;
             }
             else
             {
-                sr.color = desaturatedColorList[i]; // Assign the previously calculated desaturated color
+                sr.color = desaturatedColorList[i]; // assign stored desaturateBoolean color
+            }
+        }
+
+        // --- Desaturate NPC sprites ---
+        for (int i = 0; i < npcListForLevel.Count; i++)
+        {
+            var npc = npcListForLevel[i];
+            var ca = npc.GetComponent<CharacterAnimation>();
+            if (ca == null) continue;
+
+            for (int j = 0; j < ca.characterSpriteList.Count; j++)
+            {
+                var spriteChild = ca.characterSpriteList[j];
+                var originalColor = ca.initialChrctrColorList[j];
+                SpriteRenderer sr = spriteChild.GetComponent<SpriteRenderer>();
+                if (sr == null) continue;
+
+                if (sr.color.a != 0)
+                {
+                    // Convert RGB → HSV
+                    Color.RGBToHSV(originalColor, out float h, out float s, out float v);
+
+                    // Halve saturation and brightness
+                    s *= 0.5f;
+                    v *= 0.5f;
+
+                    // Convert back to RGB (preserve alpha)
+                    Color desatColor = Color.HSVToRGB(h, s, v);
+                    desatColor.a = sr.color.a;
+
+                    sr.color = desatColor;
+                }
+            }
+        }
+
+        desaturateBoolean = true;
+    }
+
+
+    private void NpcDesaturateOrSaturate()
+    {
+        // --- Desaturate NPC sprites ---
+        for (int i = 0; i < npcListForLevel.Count; i++)
+        {
+            var npc = npcListForLevel[i];
+            var ca = npc.GetComponent<CharacterAnimation>();
+            var cm = npc.GetComponent<CharacterMovement>();
+            if (ca == null) continue;
+
+            if(desaturateBoolean)
+            {
+                for (int j = 0; j < ca.characterSpriteList.Count; j++)
+                {
+                    var spriteChild = ca.characterSpriteList[j];
+                    var originalColor = ca.initialChrctrColorList[j];
+                    SpriteRenderer sr = spriteChild.GetComponent<SpriteRenderer>();
+                    if (sr == null) continue;
+
+                    if (sr.color.a != 0)
+                    {
+                        // Convert RGB → HSV
+                        Color.RGBToHSV(originalColor, out float h, out float s, out float v);
+
+                        // Halve saturation and brightness
+                        s *= 0.5f;
+                        v *= 0.5f;
+
+                        // Convert back to RGB (preserve alpha)
+                        Color desatColor = Color.HSVToRGB(h, s, v);
+                        desatColor.a = sr.color.a;
+
+                        sr.color = desatColor;
+                    }
+                }
+            }
+            else
+            {
+                for (int j = 0; j < ca.characterSpriteList.Count; j++)
+                {
+                    var spriteChild = ca.characterSpriteList[j];
+                    var initialColor = ca.initialChrctrColorList[j];
+                    SpriteRenderer sr = spriteChild.GetComponent<SpriteRenderer>();
+                    if (sr == null) continue;
+
+                    // if (sr.color.a != 0)
+                    // {
+                        Color newColor = sr.color;
+                        newColor = initialColor; // still hidden
+                        if(myCM.currentBuilding == cm.currentBuilding)
+                            {sr.color = newColor;}
+                    // }
+                }
             }
         }
     }
+
 
     void SetSaturationAndValue()
     {
@@ -438,5 +800,94 @@ public class LevelScript : MonoBehaviour
             }
         }
     }
+
+    public BuildingScript FindParentByBuildingScriptComponent()
+    {
+        Transform current = transform;
+
+        while (current != null)
+        {
+            if (current.GetComponent<BuildingScript>() != null)
+            {
+                return current.GetComponent<BuildingScript>();
+            }
+            current = current.parent; // Move up to the next parent
+        }
+
+        return null; // Return null if no matching parent is found
+    }
+
+    public void HandleInclineCollisionIgnoring(GameObject character)
+    {
+        // Get the NPC's collider
+        BoxCollider2D characterCol = character.GetComponentInChildren<BoxCollider2D>(true);
+
+        if (characterCol == null)
+        {
+            Debug.LogWarning("Character has no Collider2D!");
+            return;
+        }
+
+        // foreach(LevelScript level in levelsAbove)
+        // {
+        //     foreach(InclineThresholdColliderScript inclineEntrance in level.inclineEntrances)
+        //     {
+        //         BoxCollider2D inclineCol = inclineEntrance.gameObject.GetComponent<BoxCollider2D>();
+        //         // ignore collision only if this incline is NOT in this script’s list
+        //         if (!inclineEntrances.Contains(inclineEntrance))
+        //         {
+        //             Physics2D.IgnoreCollision(characterCol, inclineCol, true);
+        //         }
+        //         else
+        //         {
+        //             Physics2D.IgnoreCollision(characterCol, inclineCol, false);
+        //         }                
+        //     }
+        // }
+        // foreach(LevelScript level in levelsBelow)
+        // {
+        //     foreach(InclineThresholdColliderScript inclineEntrance in level.inclineEntrances)
+        //     {
+        //         BoxCollider2D inclineCol = inclineEntrance.gameObject.GetComponent<BoxCollider2D>();
+        //         // ignore collision only if this incline is NOT in this script’s list
+        //         if (!inclineEntrances.Contains(inclineEntrance))
+        //         {
+        //             Physics2D.IgnoreCollision(characterCol, inclineCol, true);
+        //         }
+        //         else
+        //         {
+        //             Physics2D.IgnoreCollision(characterCol, inclineCol, false);
+        //         }    
+        //     }
+        // }
+        
+        // Loop through all incline thresholds
+        foreach (InclineThresholdColliderScript incThresh in inclineEntrances)
+        {
+            BoxCollider2D inclineCol = incThresh.GetComponent<BoxCollider2D>();
+            if (inclineCol == null) 
+                continue;
+
+            Physics2D.IgnoreCollision(characterCol, inclineCol, false);
+            Debug.Log("GONG");
+        }
+    }
+
+    public void IgnoreSiblingInclineMoevementScripts
+    (InclineThresholdColliderScript incThresh, BoxCollider2D characterCol, bool ignoreCollision)
+    {
+        foreach (Transform sibling in incThresh.transform.parent) // or transform if same level
+        {
+            if (sibling.CompareTag("Trigger"))
+            {
+                BoxCollider2D siblingCollider = sibling.GetComponent<BoxCollider2D>();
+                if (siblingCollider != null)
+                {
+                    Physics2D.IgnoreCollision(characterCol, siblingCollider, ignoreCollision);
+                }
+            }
+        }
+    }
+
 }
 

@@ -14,7 +14,6 @@ public class LevelThreshColliderScript : MonoBehaviour
 
     public LevelScript levelBelowOrEntering;
 
-
     public bool plyrCrsngLeft = false;
 
     public Coroutine thresholdSortingSequenceCoro;
@@ -38,6 +37,7 @@ public class LevelThreshColliderScript : MonoBehaviour
         if(other.CompareTag("PlayerCollider") || other.CompareTag("NPCCollider"))
         {
             CharacterMovement cm = other.transform.parent.GetComponent<CharacterMovement>();
+            cm.currentLevelThreshhold = this;
 
             bool isAbove = !IsCrossingUp(cm); // if crossing down, they’re above
 
@@ -82,6 +82,7 @@ public class LevelThreshColliderScript : MonoBehaviour
         if(other.CompareTag("PlayerCollider"))
         {
             CharacterMovement cm = other.transform.parent.GetComponent<CharacterMovement>();
+            cm.currentLevelThreshhold = null;
 
             bool aboveCollider = aboveColliderByCharacter.ContainsKey(other.gameObject) && aboveColliderByCharacter[other.gameObject];
 
@@ -190,6 +191,7 @@ public class LevelThreshColliderScript : MonoBehaviour
             GameObject character = other.transform.parent.gameObject;
 
             CharacterMovement cm = other.transform.parent.GetComponent<CharacterMovement>();
+            cm.currentLevelThreshhold = null;
 
             bool aboveCollider = aboveColliderByCharacter.ContainsKey(other.gameObject) && aboveColliderByCharacter[other.gameObject];
             
@@ -202,6 +204,7 @@ public class LevelThreshColliderScript : MonoBehaviour
                 {
                     if(levelAboveOrEntering != null)
                     {
+                        // levelAboveOrEntering.NpcEnterLevel(character);
                         // for (int i = 0; i < levelAboveOrEntering.Count; i++)
                         // {                       
                             // levelAboveOrEntering[i].ResetLevels();
@@ -209,6 +212,7 @@ public class LevelThreshColliderScript : MonoBehaviour
                     }
                     else if(levelBelowOrEntering != null)
                     {
+                        // levelBelowOrEntering.NpcEnterLevel(character);
                         // for (int i = 0; i < levelBelowOrEntering.Count; i++)
                         // {                        
                             // levelBelowOrEntering[i].ResetLevels();
@@ -220,16 +224,16 @@ public class LevelThreshColliderScript : MonoBehaviour
                 {
                     if(levelAboveOrEntering != null)
                     {                     
-                        cm.currentLevel = levelAboveOrEntering;
+                        // levelAboveOrEntering.NpcEnterLevel(character);
                     }
                     else if(levelBelowOrEntering != null)
                     {
-                        cm.currentLevel = levelBelowOrEntering;
+                        // levelBelowOrEntering.NpcEnterLevel(character);
                     }
                 }
                 else if(levelAboveOrEntering != null)
                 {
-                    cm.currentLevel = levelAboveOrEntering;
+                    // levelAboveOrEntering.NpcEnterLevel(character);
                 }  
 
             }
@@ -240,6 +244,8 @@ public class LevelThreshColliderScript : MonoBehaviour
                     // insert only the level you are going through my dog!
                     if(levelBelowOrEntering != null)
                     {
+                        // levelBelowOrEntering.NpcEnterLevel(character);
+
                         // for (int i = 0; i < levelBelowOrEntering.Count; i++)
                         // {      
                         //     levelBelowOrEntering[i].ResetLevels();
@@ -247,6 +253,8 @@ public class LevelThreshColliderScript : MonoBehaviour
                     }        
                     if(levelAboveOrEntering != null)
                     {
+                        // levelAboveOrEntering.NpcEnterLevel(character);
+
                         // for (int i = 0; i < levelAboveOrEntering.Count; i++)
                         // {  
                         //     levelAboveOrEntering[i].ResetLevels();
@@ -257,16 +265,16 @@ public class LevelThreshColliderScript : MonoBehaviour
                 {
                     if(levelAboveOrEntering != null)
                     {
-                        cm.currentLevel = levelAboveOrEntering;
+                        // levelAboveOrEntering.NpcEnterLevel(character);
                     }   
                     else if(levelBelowOrEntering != null)
                     {
-                        cm.currentLevel = levelBelowOrEntering;
+                        // levelBelowOrEntering.NpcEnterLevel(character);
                     }        
                 }
                 else if(levelBelowOrEntering != null)
                 {
-                    cm.currentLevel = levelBelowOrEntering;
+                    // levelBelowOrEntering.NpcEnterLevel(character);
                 }       
 
             }
@@ -276,7 +284,7 @@ public class LevelThreshColliderScript : MonoBehaviour
             // }
            
         }
-        aboveColliderByCharacter.Remove(other.gameObject);
+        aboveColliderByCharacter.Remove(other.gameObject); // bool logic
     }
 
     IEnumerator ThresholdLayerSortingSequence(

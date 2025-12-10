@@ -10,7 +10,7 @@ public class BuildingThreshColliderScript : MonoBehaviour
     public bool backOfBuilding;
     public bool rooftopLadder;
 
-    SoundtrackScript soundtrackScript;
+    // SoundtrackScript soundtrackScript;
 
     private Dictionary<GameObject, bool> aboveColliderByCharacter = new Dictionary<GameObject, bool>();
 
@@ -20,7 +20,7 @@ public class BuildingThreshColliderScript : MonoBehaviour
     {
         Player = GameObject.FindGameObjectWithTag("Player");
         // cm = Player.GetComponent<CharacterMovement>(); 
-        soundtrackScript = GameObject.FindGameObjectWithTag("SoundtrackScript").GetComponent<SoundtrackScript>();
+        // soundtrackScript = GameObject.FindGameObjectWithTag("SoundtrackScript").GetComponent<SoundtrackScript>();
 
     }
 
@@ -103,7 +103,7 @@ public class BuildingThreshColliderScript : MonoBehaviour
                             if(this.GetComponent<RoomThresholdColliderScript>().roomAbove == null)
                             {        
                                 building.GoBehindBuilding(); // go outside behind the buildinng
-                                soundtrackScript.FadeOutIn(soundtrackScript.track2, soundtrackScript.track1);
+                                // soundtrackScript.FadeOutIn(soundtrackScript.track2, soundtrackScript.track1);
                                 cm.playerIsOutside = true;
                             }
                         }
@@ -142,7 +142,7 @@ public class BuildingThreshColliderScript : MonoBehaviour
                                 if(this.GetComponent<RoomThresholdColliderScript>().roomBelow == null)
                                 {
                                     building.GoBehindBuilding(); // go outside behind the buildinng
-                                    soundtrackScript.FadeOutIn(soundtrackScript.track2, soundtrackScript.track1);
+                                    // soundtrackScript.FadeOutIn(soundtrackScript.track2, soundtrackScript.track1);
                                     cm.playerIsOutside = true;  
                                 }          
                             }

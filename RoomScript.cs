@@ -631,7 +631,7 @@ public class RoomScript : MonoBehaviour
 
                     if (isMoving)
                     {
-                        if (isDown && movingUp && !level.isDisplacedAngular && cm.currentLevel != myCM.currentLevel)
+                        if (isDown && movingUp && (level != null && !level.isDisplacedAngular && cm.currentLevel != myCM.currentLevel))
                             {targetPos += level.angularEquation; // moving down
                             startPos += new Vector3(0, -wallHeight, 0);}
                         else if (!isDown && !movingUp)
@@ -651,7 +651,7 @@ public class RoomScript : MonoBehaviour
 
                 if (isMoving)
                 {
-                    if (isDown && movingUp && !level.isDisplacedAngular && cm.currentLevel != myCM.currentLevel)
+                    if (isDown && movingUp && (level != null && !level.isDisplacedAngular && cm.currentLevel != myCM.currentLevel))
                     {
                         targetOffset += new Vector3(level.angularEquation.x, level.angularEquation.y, 0f);
                         startOffset += new Vector3(0f, -wallHeight,  0f); 
@@ -997,8 +997,11 @@ public class RoomScript : MonoBehaviour
     {
         for (int i = 0; i < doorsBelow.Count; i++)
         {
-            doorsBelow[i].SetPlayerIsInRoomAbove(true);
-            doorsBelow[i].SetPlayerIsInDoorway(false);
+            if(myCM.currentRoomThreshold != doorsBelow[i])
+            {
+                doorsBelow[i].SetPlayerIsInRoomAbove(true);
+                doorsBelow[i].SetPlayerIsInDoorway(false);
+            }
         }
     }
     // IEnumerator LateStartCoroForNonPlayerCharacters()

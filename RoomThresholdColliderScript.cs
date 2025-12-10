@@ -8,7 +8,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
+using UnityEngine; 
 
 public class RoomThresholdColliderScript : MonoBehaviour
 {
@@ -194,7 +194,8 @@ public class RoomThresholdColliderScript : MonoBehaviour
                 if(ThisThresholdIsAnEntranceToTheBuildingOrLevel() 
                     || (cm.currentLevel == myCM.currentLevel && cm.currentBuilding == myCM.currentBuilding))
                 {
-                    OpenDoor();
+                    if(myCM.currentRoomThreshold != this)
+                        OpenDoor();
                 }
             }
             else // if it is a ladder
@@ -382,15 +383,17 @@ public class RoomThresholdColliderScript : MonoBehaviour
                     {
                         if (roomBelow != null && roomAbove == null) // if player is exiting the back of the building
                         { 
-                            CloseDoor();
+                            if(myCM.currentRoomThreshold != this)
+                                CloseDoor();
                         }  
                         else if (roomAbove != null) // if player is entering the building from the fro
                         {
 
-                            CloseDoor();
+                            if(myCM.currentRoomThreshold != this)
+                                CloseDoor();
 
                             // if(roomAbove.building != null)
-                                roomAbove.NpcEnterRoom(character);
+                            roomAbove.NpcEnterRoom(character);
 
                             // {roomAbove.building.NpcEnterExitBuilding(character, true);}   
 
@@ -405,8 +408,9 @@ public class RoomThresholdColliderScript : MonoBehaviour
                     else // if this threshold is just the entrance to a room and not a building entrance
                     {    
                         if(cm.currentBuilding == myCM.currentBuilding)
-                        {           
-                            CloseDoor();
+                        {    
+                            if(myCM.currentRoomThreshold != this)       
+                                CloseDoor();
                         } 
 
                         if (roomBelow != null) // this first in order to correctly assign the current room
@@ -434,7 +438,8 @@ public class RoomThresholdColliderScript : MonoBehaviour
                         // roomAbove.npcListForRoom.Remove(other.transform.parent.gameObject);
                         if(cm.currentBuilding == myCM.currentBuilding)
                         {
-                            CloseDoor();
+                            if(myCM.currentRoomThreshold != this)
+                                CloseDoor();
                         }
                     }
 
@@ -442,10 +447,11 @@ public class RoomThresholdColliderScript : MonoBehaviour
                     {
                         if (roomBelow == null && roomAbove != null) // if the player IS inside bulding and ABOVE collider prior to collider exit
                         {
-                            if(cm.previouseBuilding == myCM.currentBuilding)
-                            {
-                                CloseDoor();
-                            }
+                            // if(cm.previouseBuilding == myCM.currentBuilding)
+                            // {
+                                if(myCM.currentRoomThreshold != this)
+                                    CloseDoor();
+                            // }
 
                             // if(roomAbove.building != null)
                             // {roomAbove.building.NpcEnterExitBuilding(character, false);}   
@@ -789,13 +795,16 @@ public class RoomThresholdColliderScript : MonoBehaviour
             {                    
                 for (int i = 0; i < roomAbove.doorsBelow.Count; i++)
                 {
-                    for (int j = 0; j < roomAbove.doorsBelow[i].closedDoorSpriteList.Count; j++)
+                    if(myCM.currentRoomThreshold != roomAbove.doorsBelow[i])
                     {
-                        this.closedDoorFadeCoroutine = StartCoroutine(treeFade(roomAbove.doorsBelow[i].closedDoorSpriteList[j], 0.4f, 0.3f));
-                    }  
-                    for (int k = 0; k < roomAbove.doorsBelow[i].closedDoorSpriteList.Count; k++)
-                    {
-                        SetTreeAlpha(roomAbove.doorsBelow[i].openDoorSpriteList[k], 0);
+                        for (int j = 0; j < roomAbove.doorsBelow[i].closedDoorSpriteList.Count; j++)
+                        {
+                            this.closedDoorFadeCoroutine = StartCoroutine(treeFade(roomAbove.doorsBelow[i].closedDoorSpriteList[j], 0.4f, 0.3f));
+                        }  
+                        for (int k = 0; k < roomAbove.doorsBelow[i].closedDoorSpriteList.Count; k++)
+                        {
+                            SetTreeAlpha(roomAbove.doorsBelow[i].openDoorSpriteList[k], 0);
+                        }
                     }
                   
                 }
@@ -814,13 +823,16 @@ public class RoomThresholdColliderScript : MonoBehaviour
             {
                 for (int i = 0; i < roomAbove.doorsBelow.Count; i++)
                 {
-                    for (int j = 0; j < roomAbove.doorsBelow[i].closedDoorSpriteList.Count; j++)
+                    if(myCM.currentRoomThreshold != roomAbove.doorsBelow[i])
                     {
-                        if(roomAbove.doorsBelow[i].ThisThresholdIsAnEntranceToTheBuildingOrLevel())
+                        for (int j = 0; j < roomAbove.doorsBelow[i].closedDoorSpriteList.Count; j++)
                         {
-                            this.closedDoorFadeCoroutine = StartCoroutine(treeFade(roomAbove.doorsBelow[i].closedDoorSpriteList[j], 
-                                                                            roomAbove.doorsBelow[i].initialClosedDoorAlpha[j], 0.4f, 0.3f)); 
-                            // SetTreeAlpha(roomAbove.doorsBelow[i].closedDoorSpriteList[j], roomAbove.doorsBelow[i].initialClosedDoorAlpha[j]);
+                            if(roomAbove.doorsBelow[i].ThisThresholdIsAnEntranceToTheBuildingOrLevel())
+                            {
+                                this.closedDoorFadeCoroutine = StartCoroutine(treeFade(roomAbove.doorsBelow[i].closedDoorSpriteList[j], 
+                                                                                roomAbove.doorsBelow[i].initialClosedDoorAlpha[j], 0.4f, 0.3f)); 
+                                // SetTreeAlpha(roomAbove.doorsBelow[i].closedDoorSpriteList[j], roomAbove.doorsBelow[i].initialClosedDoorAlpha[j]);
+                            }
                         }
                     } 
                 }   
@@ -832,12 +844,15 @@ public class RoomThresholdColliderScript : MonoBehaviour
             {
                 for (int i = 0; i < roomAbove.doorsBelow.Count; i++)
                 {
-                    for (int j = 0; j < roomAbove.doorsBelow[i].closedDoorSpriteList.Count; j++)
+                    if(myCM.currentRoomThreshold != roomAbove.doorsBelow[i])
                     {
-                        this.closedDoorFadeCoroutine = StartCoroutine(treeFade(roomAbove.doorsBelow[i].closedDoorSpriteList[j], 
-                                                                        roomAbove.doorsBelow[i].initialClosedDoorAlpha[j], 0.3f)); 
-                        // SetTreeAlpha(roomAbove.doorsBelow[i].closedDoorSpriteList[j], roomAbove.doorsBelow[i].initialClosedDoorAlpha[j]);
-                    } 
+                        for (int j = 0; j < roomAbove.doorsBelow[i].closedDoorSpriteList.Count; j++)
+                        {
+                            this.closedDoorFadeCoroutine = StartCoroutine(treeFade(roomAbove.doorsBelow[i].closedDoorSpriteList[j], 
+                                                                            roomAbove.doorsBelow[i].initialClosedDoorAlpha[j], 0.3f)); 
+                            // SetTreeAlpha(roomAbove.doorsBelow[i].closedDoorSpriteList[j], roomAbove.doorsBelow[i].initialClosedDoorAlpha[j]);
+                        } 
+                    }
                 }   
             }              
         }

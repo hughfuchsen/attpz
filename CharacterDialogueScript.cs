@@ -17,12 +17,15 @@ public class CharacterDialogueScript : MonoBehaviour
     public Image dialogueBGrndImage;
     private int currentDialogueIndex = 0;
     public List<string> dialogues;
-    private bool isPlayerInRange = false;
+    public bool isPlayerInRange = false;
     private Color zeroAlphaColor;
+
+    
 
     private Coroutine npcStareAtPlayerCoro;
     private Coroutine stopNpcStareAtPlayerCoro;
-    private bool staring = false;
+    public bool staring = false;
+    private float staringTime = 0f;
 
     public CharacterAnimation characterAnimation;
 
@@ -32,6 +35,7 @@ public class CharacterDialogueScript : MonoBehaviour
 
     public float typingSpeed = 0.03f; // normal typing speed
     private Coroutine typingCoroutine;
+    private Coroutine displayGoodbyeCoro;
     private bool isTyping = false;
     private bool fastForward = false;
 
@@ -139,6 +143,7 @@ public class CharacterDialogueScript : MonoBehaviour
                 fastForward = Input.GetKey(KeyCode.Space);
             }
         }
+
     }
 
     void ShowNextDialogue()
@@ -152,6 +157,23 @@ public class CharacterDialogueScript : MonoBehaviour
         typingCoroutine = StartCoroutine(TypeDialogue(dialogues[currentDialogueIndex]));
 
         currentDialogueIndex = (currentDialogueIndex + 1) % dialogues.Count;
+    }
+    IEnumerator ShowByeDialogue()
+    {
+        if (typingCoroutine != null)
+            StopCoroutine(typingCoroutine);
+
+        dialogueDisplay.text = "";
+        dialogueNameDisplay.text = nameText + ":";
+
+        typingCoroutine = StartCoroutine(TypeDialogue("ByeBYE"));
+
+        yield return new WaitForSeconds(1f);
+
+        dialogueDisplay.text = "";
+        dialogueNameDisplay.text = "";
+
+        dialogueBGrndImage.color = zeroAlphaColor;
     }
 
     IEnumerator TypeDialogue(string sentence)
@@ -177,20 +199,7 @@ public class CharacterDialogueScript : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("PlayerCollider"))
-        {
-            isPlayerInRange = true;
-            currentDialogueIndex = Random.Range(0,4); // Reset dialogue index on re-entry
-
-            // Stop the NPC movement coroutine if it's running
-            if (characterMovement.npcRandomMovementCoro != null)
-            {
-                characterMovement.StopCoroutine(characterMovement.npcRandomMovementCoro);
-                characterMovement.change = Vector3.zero;
-                characterMovement.npcRandomMovementCoro = null;
-            }
-
-
-            staring = true; //initiate staring;
+        {   
             if (stopNpcStareAtPlayerCoro != null)
             {
                 StopCoroutine(StopNpcStareAtPlayer());
@@ -201,10 +210,54 @@ public class CharacterDialogueScript : MonoBehaviour
                 StopCoroutine(NpcStareAtPlayer());
                 npcStareAtPlayerCoro = null;
             }
-            
-            if (npcStareAtPlayerCoro == null)
+
+
+            if(myCharacterMovement.change != Vector3.zero 
+            && (myCharacterMovement.currentRoom == characterMovement.currentRoom))
+                {
+                    isPlayerInRange = true;
+                    staring = true; //initiate staring;
+                    npcStareAtPlayerCoro = StartCoroutine(NpcStareAtPlayer());
+                }
+
+            currentDialogueIndex = Random.Range(0,4); // Reset dialogue index on re-entry
+
+            // Stop the NPC movement coroutine if it's running
+            if (characterMovement.npcRandomMovementCoro != null)
             {
-                npcStareAtPlayerCoro = StartCoroutine(NpcStareAtPlayer());
+                characterMovement.StopCoroutine(characterMovement.npcRandomMovementCoro);
+                characterMovement.change = Vector3.zero;
+                characterMovement.npcRandomMovementCoro = null;
+            }
+        }
+    }
+
+    private void OnTriggerStay2D(Collider2D other)
+    {
+        if (other.CompareTag("PlayerCollider"))
+        {  
+            if(myCharacterMovement.change != Vector3.zero 
+            && (myCharacterMovement.currentRoom == characterMovement.currentRoom))
+            {
+                if (stopNpcStareAtPlayerCoro != null)
+                {
+                    StopCoroutine(StopNpcStareAtPlayer());
+                    stopNpcStareAtPlayerCoro = null;
+                }
+
+                isPlayerInRange = true;
+                staring = true;
+                if(npcStareAtPlayerCoro == null)
+                    npcStareAtPlayerCoro = StartCoroutine(NpcStareAtPlayer());
+            }
+            else if (myCharacterMovement.currentRoom != characterMovement.currentRoom)
+            {
+                isPlayerInRange = false;
+            }
+            else if(myCharacterMovement.change == Vector3.zero)
+            {
+                if(stopNpcStareAtPlayerCoro == null && staring == true)
+                    stopNpcStareAtPlayerCoro = StartCoroutine(StopNpcStareAtPlayer(true));
             }
         }
     }
@@ -214,14 +267,38 @@ public class CharacterDialogueScript : MonoBehaviour
         if (other.CompareTag("PlayerCollider"))
         {
             isPlayerInRange = false;
-            dialogueNameDisplay.text = ""; // Clear the name display when player leaves
-            dialogueDisplay.text = ""; // Clear the dialogue display when player leaves
-            // dialogueBGrndImage.SetActive(false);
-            
-            dialogueBGrndImage.color = zeroAlphaColor;
-            
             // initiate the stopping of the staring at the player
+            // if(dialogueDisplay.text != "")
+
+            if (stopNpcStareAtPlayerCoro != null)
+            {
+                StopCoroutine(StopNpcStareAtPlayer());
+                stopNpcStareAtPlayerCoro = null;
+            }
             stopNpcStareAtPlayerCoro = StartCoroutine(StopNpcStareAtPlayer());
+
+            if(dialogueDisplay.text != "")
+            {
+                //stop typing coro
+                // if(typingCoroutine != null)
+                // {StopCoroutine(typingCoroutine); isTyping = false;}
+
+                displayGoodbyeCoro = StartCoroutine(ShowByeDialogue());
+            }
+            else
+            {
+                dialogueNameDisplay.text = ""; // Clear the name display when player leaves
+                dialogueDisplay.text = ""; // Clear the dialogue display when player leaves
+                // dialogueBGrndImage.SetActive(false);
+                
+                dialogueBGrndImage.color = zeroAlphaColor;
+                
+                
+
+                //stop typing coro
+                if(typingCoroutine != null)
+                {StopCoroutine(typingCoroutine); isTyping = false;}
+            }
 
         }
     }
@@ -231,6 +308,8 @@ public class CharacterDialogueScript : MonoBehaviour
     {
         while (staring)  // Keep looping
         {
+            staringTime += Time.deltaTime;
+
             Vector2 directionToPlayer = myCharacterTransform.position - transform.position;
             float angle = (Mathf.Atan2(directionToPlayer.y, directionToPlayer.x) * Mathf.Rad2Deg + 90) % 360;
             if (angle < 0) angle += 360; // Normalize angle to 0-360 range
@@ -265,20 +344,31 @@ public class CharacterDialogueScript : MonoBehaviour
         }
     }
 
-    private IEnumerator StopNpcStareAtPlayer()
+    private IEnumerator StopNpcStareAtPlayer(bool waitSpecificTime = false)
     {
-        yield return new WaitForSeconds(Random.Range(6,10)); // Wait a random time
+        if(!waitSpecificTime)
+        {
+            if(staringTime < 1f)
+            {yield return null;}
+            else if (staringTime < 2f)
+            {yield return new WaitForSeconds(Random.Range(1, 2f));}
+            else if (staringTime < 3f)
+            {yield return new WaitForSeconds(Random.Range(2, 3f));}
+            else if (staringTime < 5f)
+            {yield return new WaitForSeconds(Random.Range(4, 6f));}
+            else 
+            {yield return new WaitForSeconds(Random.Range(2, 6f));}
+        }
+        else yield return new WaitForSeconds(Random.Range(2, 6f));
             
         // Restart the NPC movement coroutine when the player leaves
-        if (characterMovement.npcRandomMovementCoro == null && isPlayerInRange == false)
+        if ((isPlayerInRange == false || myCharacterMovement.change == Vector3.zero) && dialogueDisplay.text == "")
         {
             // characterMovement.npcRandomMovementCoro = characterMovement.StartCoroutine(characterMovement.MoveCharacterRandomly());
             staring = false;
+            staringTime = 0f;
         }
-        // if(isPlayerInRange == false)
-        // {
-        //     staring = false;
-        // }
+
     }
 
 

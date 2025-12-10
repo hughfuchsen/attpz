@@ -42,7 +42,7 @@ public class BuildingScript : MonoBehaviour
     [HideInInspector] public List<Color> npcColorListForBuilding = new List<Color>();
 
 
-    SoundtrackScript soundtrackScript;
+    // SoundtrackScript soundtrackScript;
 
     public void Awake()
     { 
@@ -50,7 +50,7 @@ public class BuildingScript : MonoBehaviour
         MYcm = Player.GetComponent<CharacterMovement>(); 
         balconyManager = FindFirstObjectByType<BalconyManager>();
 
-        soundtrackScript = GameObject.FindGameObjectWithTag("SoundtrackScript").GetComponent<SoundtrackScript>();
+        // soundtrackScript = GameObject.FindGameObjectWithTag("SoundtrackScript").GetComponent<SoundtrackScript>();
 
         foreach(GameObject obj in gameObjectsToShowWhileOutside) {
             GetSpritesAndApplyToLists(obj, gameObjectsToShowWhileOutsideSpriteList, new List<GameObject>(), gameObjectsToShowWhileOutsideColorList, true);
@@ -105,7 +105,7 @@ public class BuildingScript : MonoBehaviour
     {
         MYcm.currentBuilding = this;
 
-        soundtrackScript.FadeOutIn(soundtrackScript.track1, soundtrackScript.track2);
+        // soundtrackScript.FadeOutIn(soundtrackScript.track1, soundtrackScript.track2);
 
 
 
@@ -174,10 +174,10 @@ public class BuildingScript : MonoBehaviour
         if(cameraMovement.currentBuilding != null)
             cameraMovement.currentLevel = null;
 
-        if(soundtrackScript != null)
-        {
-            soundtrackScript.FadeOutIn(soundtrackScript.track2, soundtrackScript.track1);
-        }
+        // if(soundtrackScript != null)
+        // {
+        //     soundtrackScript.FadeOutIn(soundtrackScript.track2, soundtrackScript.track1);
+        // }
 
         if(this.innerBuildingFadeCoroutine != null)
         {

@@ -9,6 +9,7 @@ public class NPCPathFollower : MonoBehaviour
     public bool stopMoving = false; // ✅ new toggle for testing
 
     private CharacterMovement npcCM;
+    private CharacterDialogueScript npcCD;
     private CharacterMovement myCM;
     private IsoSpriteSorting isoSpriteSortingScript;
 
@@ -21,8 +22,10 @@ public class NPCPathFollower : MonoBehaviour
     {
         yield return null; // wait one frame for components to init
         npcCM = GetComponent<CharacterMovement>();
+        npcCD = GetComponent<CharacterDialogueScript>();
         isoSpriteSortingScript = GetComponent<IsoSpriteSorting>();
         myCM = GameObject.FindGameObjectWithTag("Player").GetComponent<CharacterMovement>();
+
 
         if (path == null || path.pathPoints.Count < 2)
         {
@@ -68,7 +71,10 @@ public class NPCPathFollower : MonoBehaviour
                 if ((myCM.currentRoom != null && myCM.currentRoom.roomIsMoving) 
                     || 
                 (myCM.currentInclineThreshold != null && myCM.currentInclineThreshold == npcCM.currentInclineThreshold)
-                || stopMoving == true)
+                    ||
+                npcCD.staring == true
+                    || 
+                stopMoving == true)
                 {
                     npcCM.change = Vector3.zero; // freeze during room motion
                 }

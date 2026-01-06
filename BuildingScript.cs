@@ -88,6 +88,7 @@ public class BuildingScript : MonoBehaviour
     // Start is NPCcalled before the first frame update
     void Start() 
     {
+        HandleCollisionIgnoring(true); // need to apply to all characters depending on where they are situated
         StartCoroutine(LateStartCoroForNonPlayerCharacters());
 
 
@@ -106,7 +107,7 @@ public class BuildingScript : MonoBehaviour
         MYcm.currentBuilding = this;
 
         // soundtrackScript.FadeOutIn(soundtrackScript.track1, soundtrackScript.track2);
-
+        HandleCollisionIgnoring(false);// need to apply to all characters depending on where they are situated
 
 
         if(this.innerBuildingFadeCoroutine != null)
@@ -155,16 +156,18 @@ public class BuildingScript : MonoBehaviour
     }
     public void ExitBuilding(float waitTimeInside, float waitTimeOutside, bool exitingFromBehindAlreadyOutside)
     {
-        foreach(LevelScript level in levelScripts)
-        {
-            foreach(InclineThresholdColliderScript inclineEntrance in level.inclineEntrances)
-            {
-                BoxCollider2D inclineCol = inclineEntrance.gameObject.GetComponent<BoxCollider2D>();
-                BoxCollider2D myCol = MYcm.gameObject.GetComponentInChildren<BoxCollider2D>();
-                if(myCol.CompareTag("PlayerCollider"))
-                    Physics2D.IgnoreCollision(myCol, inclineCol, true);
-            }
-        }
+        HandleCollisionIgnoring(true); // need to apply to an NPC or the player depending
+
+        // foreach(LevelScript level in levelScripts)
+        // {
+        //     foreach(InclineThresholdColliderScript inclineEntrance in level.inclineEntrances)
+        //     {
+        //         BoxCollider2D inclineCol = inclineEntrance.gameObject.GetComponent<BoxCollider2D>();
+        //         BoxCollider2D myCol = MYcm.gameObject.GetComponentInChildren<BoxCollider2D>();
+        //         if(myCol.CompareTag("PlayerCollider"))
+        //             Physics2D.IgnoreCollision(myCol, inclineCol, true);
+        //     }
+        // }
 
 
         MYcm.currentBuilding = null;
@@ -1050,6 +1053,25 @@ public class BuildingScript : MonoBehaviour
 
 
     }
+
+
+    public void HandleCollisionIgnoring(bool ignore)
+    {
+        BoxCollider2D characterCol = Player.GetComponentInChildren<BoxCollider2D>(true);
+
+        if (characterCol == null) return;
+
+        Collider2D[] colliders = GetComponentsInChildren<Collider2D>(true);
+
+        foreach (Collider2D col in colliders)
+        {
+            if (col.CompareTag("Trigger") && col.GetComponent<BuildingThreshColliderScript>() == null)
+            {
+                Physics2D.IgnoreCollision(characterCol, col, ignore);
+            }
+        }
+    }
+
 
     // IEnumerator WaitAFrameAndSetAlpha()
     // {

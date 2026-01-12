@@ -96,6 +96,9 @@ public class RoomScript : MonoBehaviour
 
     public void EnterRoom(bool shouldWait, float? waitTime)
     {
+        
+
+
         for (int i = 0; i < roomsSameOrAbove.Count; i++)
         {
             roomsSameOrAbove[i].MoveUp();
@@ -902,7 +905,7 @@ public class RoomScript : MonoBehaviour
             }
             current = current.parent; // Move up to the next parent
         }
-
+        Debug.Log("didn't get the building");
         return null; // Return null if no matching parent is found
     }
     public LevelScript FindParentByLevelScriptComponent()

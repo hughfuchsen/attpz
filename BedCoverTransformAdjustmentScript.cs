@@ -20,13 +20,6 @@ public class BedCoverTransformAdjustmentScript : MonoBehaviour
     }
 
 
-//   public int rightDownAnim;
-//   public int leftDownAnim;
-//   public int rightAnim;
-//   public int leftAnim;
-//   public int upRightAnim;
-//   public int upLeftAnim;
-
     public void HandlePlayerBedTransform()
     {
         

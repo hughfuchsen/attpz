@@ -43,7 +43,7 @@ public class BuildingThreshColliderScript : MonoBehaviour
                     if (!cm.playerIsOutside)
                     {           
                         // Debug.Log("exiting");     
-                        building.ExitBuilding(0.3f, 0.3f, false);
+                        building.PlayerExitBuilding(0.3f, 0.3f, false);
                         cm.playerIsOutside = true;  
                     }
                 // }
@@ -68,7 +68,7 @@ public class BuildingThreshColliderScript : MonoBehaviour
                     if (!cm.playerIsOutside)
                     {           
                         // Debug.Log("exiting");     
-                        // building.ExitBuilding(0.3f, 0.3f, false);
+                        // building.PlayerExitBuilding(0.3f, 0.3f, false);
                         // building.npcListForBuilding.Remove(other.transform.parent.gameObject);
                         building.NpcEnterExitBuilding(character, false);
                         cm.playerIsOutside = true;  
@@ -151,11 +151,11 @@ public class BuildingThreshColliderScript : MonoBehaviour
                         {
                             if (LayerMask.LayerToName(this.gameObject.layer) != "Default") // if player is not exiting building on the ground level
                             {
-                                building.ExitBuilding(0.3f, 0.3f, false);
+                                building.PlayerExitBuilding(0.3f, 0.3f, false);
                             }
                             else      // if player is exiting building on the ground level
                             {
-                                building.ExitBuilding(0.3f, 0.3f, false); //
+                                building.PlayerExitBuilding(0.3f, 0.3f, false); //
                             }
                             cm.playerIsOutside = true;
                         }
@@ -174,7 +174,7 @@ public class BuildingThreshColliderScript : MonoBehaviour
                     }
                     else if (!cm.playerIsOutside)
                     {
-                        building.ExitBuilding(0.3f, 0.3f, false);
+                        building.PlayerExitBuilding(0.3f, 0.3f, false);
                         cm.playerIsOutside = true;  
                     }
 
@@ -251,13 +251,13 @@ public class BuildingThreshColliderScript : MonoBehaviour
                         {
                             if (LayerMask.LayerToName(this.gameObject.layer) != "Default") // if player is not exiting building on the ground level
                             {
-                                // building.ExitBuilding(0.3f, 0.3f, false);
+                                // building.PlayerExitBuilding(0.3f, 0.3f, false);
                                 // building.npcListForBuilding.Remove(other.transform.parent.gameObject);
                                 // building.NpcEnterExitBuilding(character, false);
                             }
                             else      // if player is exiting building on the ground level
                             {
-                                // building.ExitBuilding(0.3f, 0.3f, false); //
+                                // building.PlayerExitBuilding(0.3f, 0.3f, false); //
                                 // building.npcListForBuilding.Remove(other.transform.parent.gameObject);
                                 // building.NpcEnterExitBuilding(character, false);
                             }
@@ -280,7 +280,7 @@ public class BuildingThreshColliderScript : MonoBehaviour
                     }
                     else if (!cm.playerIsOutside)
                     {
-                        // building.ExitBuilding(0.3f, 0.3f, false);
+                        // building.PlayerExitBuilding(0.3f, 0.3f, false);
                         // building.npcListForBuilding.Remove(other.transform.parent.gameObject);
                         // building.NpcEnterExitBuilding(character, false);
                         cm.playerIsOutside = true;  

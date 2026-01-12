@@ -14,7 +14,7 @@ public class BuildingScript : MonoBehaviour
     [SerializeField] public List<GameObject> gameObjectsToShowWhileOutside = new List<GameObject>();
     BalconyManager balconyManager;
     CharacterMovement MYcm;
-    [SerializeField] GameObject Player;
+    [SerializeField] GameObject player;
     [HideInInspector] public List<GameObject> gameObjectsToShowWhileOutsideSpriteList = new List<GameObject>();
     // private List<GameObject> gameObjectsToHideWhileInsideSpriteList = new List<GameObject>();
     [HideInInspector] public List<Color> gameObjectsToShowWhileOutsideColorList = new List<Color>();
@@ -46,8 +46,8 @@ public class BuildingScript : MonoBehaviour
 
     public void Awake()
     { 
-        Player = GameObject.FindGameObjectWithTag("Player");
-        MYcm = Player.GetComponent<CharacterMovement>(); 
+        player = GameObject.FindGameObjectWithTag("Player");
+        MYcm = player.GetComponent<CharacterMovement>(); 
         balconyManager = FindFirstObjectByType<BalconyManager>();
 
         // soundtrackScript = GameObject.FindGameObjectWithTag("SoundtrackScript").GetComponent<SoundtrackScript>();
@@ -88,7 +88,7 @@ public class BuildingScript : MonoBehaviour
     // Start is NPCcalled before the first frame update
     void Start() 
     {
-        HandleCollisionIgnoring(true); // need to apply to all characters depending on where they are situated
+        // HandleCollisionIgnoring(true); // need to apply to all characters depending on where they are situated
         StartCoroutine(LateStartCoroForNonPlayerCharacters());
 
 
@@ -98,7 +98,7 @@ public class BuildingScript : MonoBehaviour
        
         cameraMovement = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraMovement>();
 
-        this.ExitBuilding(0f, 0f, false);
+        this.PlayerExitBuilding(0f, 0f, false);
 
     }
 
@@ -107,7 +107,7 @@ public class BuildingScript : MonoBehaviour
         MYcm.currentBuilding = this;
 
         // soundtrackScript.FadeOutIn(soundtrackScript.track1, soundtrackScript.track2);
-        HandleCollisionIgnoring(false);// need to apply to all characters depending on where they are situated
+        // HandleCollisionIgnoring(false);// need to apply to all characters depending on where they are situated
 
 
         if(this.innerBuildingFadeCoroutine != null)
@@ -154,9 +154,9 @@ public class BuildingScript : MonoBehaviour
         setDontSortForAllOuterBuildingsCoro = StartCoroutine(SetDontSortForAllOtherOuterBuildings(true, true));
 
     }
-    public void ExitBuilding(float waitTimeInside, float waitTimeOutside, bool exitingFromBehindAlreadyOutside)
+    public void PlayerExitBuilding(float waitTimeInside, float waitTimeOutside, bool exitingFromBehindAlreadyOutside)
     {
-        HandleCollisionIgnoring(true); // need to apply to an NPC or the player depending
+        HandleInclineCollisionIgnoring(player, true); // need to apply to an NPC or the player depending
 
         // foreach(LevelScript level in levelScripts)
         // {
@@ -165,7 +165,7 @@ public class BuildingScript : MonoBehaviour
         //         BoxCollider2D inclineCol = inclineEntrance.gameObject.GetComponent<BoxCollider2D>();
         //         BoxCollider2D myCol = MYcm.gameObject.GetComponentInChildren<BoxCollider2D>();
         //         if(myCol.CompareTag("PlayerCollider"))
-        //             Physics2D.IgnoreCollision(myCol, inclineCol, true);
+        //             (myCol, inclineCol, true);
         //     }
         // }
 
@@ -315,9 +315,9 @@ public class BuildingScript : MonoBehaviour
                         SetTreeSortingLayer(gameObjectsToShowWhileOutsideSpriteList[i], "Default");
                     }
             }
-            if (Player.transform.Find("head").GetComponent<SpriteRenderer>().sortingLayerName == "Level0") // if the player exits building from the ground floor
+            if (player.transform.Find("head").GetComponent<SpriteRenderer>().sortingLayerName == "Level0") // if the player exits building from the ground floor
             {
-                SetTreeSortingLayer(Player, "Default");
+                SetTreeSortingLayer(player, "Default");
             }
             for (int i = 0; i < gameObjectsToShowWhileOutsideSpriteList.Count; i++)
             {
@@ -388,9 +388,9 @@ public class BuildingScript : MonoBehaviour
                         SetTreeSortingLayer(gameObjectsToShowWhileOutsideSpriteList[i], "Default");
                     }
             }
-            if (Player.transform.Find("head").GetComponent<SpriteRenderer>().sortingLayerName == "Level0") // if the player exits building from the ground flow
+            if (player.transform.Find("head").GetComponent<SpriteRenderer>().sortingLayerName == "Level0") // if the player exits building from the ground flow
             {
-                SetTreeSortingLayer(Player, "Default");
+                SetTreeSortingLayer(player, "Default");
             }
             for (int i = 0; i < gameObjectsToShowWhileOutsideSpriteList.Count; i++)
             {
@@ -433,9 +433,9 @@ public class BuildingScript : MonoBehaviour
                         SetTreeSortingLayer(gameObjectsToShowWhileOutsideSpriteList[i], "Level0");
                     }
             }
-            if (Player.transform.Find("head").GetComponent<SpriteRenderer>().sortingLayerName == "Default") // if the player enters building at the ground flow
+            if (player.transform.Find("head").GetComponent<SpriteRenderer>().sortingLayerName == "Default") // if the player enters building at the ground flow
             {
-                SetTreeSortingLayer(Player, "Level0");
+                SetTreeSortingLayer(player, "Level0");
             }
             for (int i = 0; i < gameObjectsToShowWhileOutsideSpriteList.Count; i++)
             {
@@ -1055,17 +1055,17 @@ public class BuildingScript : MonoBehaviour
     }
 
 
-    public void HandleCollisionIgnoring(bool ignore)
+    public void HandleInclineCollisionIgnoring(GameObject character, bool ignore)
     {
-        BoxCollider2D characterCol = Player.GetComponentInChildren<BoxCollider2D>(true);
+        BoxCollider2D characterCol = character.GetComponentInChildren<BoxCollider2D>(true);
 
         if (characterCol == null) return;
 
-        Collider2D[] colliders = GetComponentsInChildren<Collider2D>(true);
-
-        foreach (Collider2D col in colliders)
+        foreach (InclineThresholdColliderScript incThresh in inclineThresholdColliderScripts)
         {
-            if (col.CompareTag("Trigger") && col.GetComponent<BuildingThreshColliderScript>() == null)
+            BoxCollider2D col = incThresh.GetComponent<BoxCollider2D>();
+
+            if (col != null && incThresh.GetComponent<BuildingThreshColliderScript>() == null)
             {
                 Physics2D.IgnoreCollision(characterCol, col, ignore);
             }

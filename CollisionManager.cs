@@ -65,16 +65,16 @@ public class CollisionManager : MonoBehaviour
     {
             player = GameObject.FindGameObjectWithTag("Player");
 
-            // Find the child collider tagged NPCCollider
+            // Find the child collider tagged PlayerCollider
             BoxCollider2D playerCol = player.GetComponentInChildren<BoxCollider2D>(true);
 
             if (playerCol == null || !playerCol.CompareTag("PlayerCollider"))
                 return;
 
-            // Ignore collision between this NPC and every incline collider
+            // Ignore collision between this Player and every incline collider
             foreach (var inclineCol in inclineColliders)
             {
-                if(inclineCol.GetComponent<InclineThresholdColliderScript>().building != null)
+                if(inclineCol.GetComponent<InclineThresholdColliderScript>().isIndoors == true) // if it has a building
                 Physics2D.IgnoreCollision(playerCol, inclineCol, true);
             }
     }

@@ -63,7 +63,7 @@ public class BehindBuildingSwitchColliderScript : MonoBehaviour
                 }
                 else
                 {   
-                    building.ExitBuilding(0.1f, 0.1f, true);
+                    building.PlayerExitBuilding(0.1f, 0.1f, true);
                 }
             }
         }        

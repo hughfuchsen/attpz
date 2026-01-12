@@ -44,24 +44,12 @@ public class ActivateCharacterUITrigger : MonoBehaviour
         thnxMessageUI = GameObject.Find("Thnx Message");
         thnxMessageUI.SetActive(true);
 
-        // buildingScripts.AddRange(FindObjectsOfType<BuildingScript>());
-
-
-
-
-        // playerMovement = player.GetComponent<PlayerMovement>();
     }
 
     void Update()
     {
         if (playerInRange)
         {
-            // if (Input.GetKeyDown(KeyCode.Space) || 
-            //     Input.GetKeyDown(KeyCode.JoystickButton0)) // A button
-            // {
-            //     loadCSVData.DisplayRandomRow();
-            // }
-        
             if ((Input.GetKeyDown(KeyCode.Space) || 
                         Input.GetKeyDown(KeyCode.JoystickButton0) ||  // A button
                         Input.GetKeyDown(KeyCode.JoystickButton1) ||  // B button
@@ -80,7 +68,6 @@ public class ActivateCharacterUITrigger : MonoBehaviour
                         loadCSVData.DisplayRandomRow();
                         myCharacterAnimation.GetSpritesAndAddToLists(Player, myCharacterAnimation.characterSpriteList, new List<GameObject>(), myCharacterAnimation.initialChrctrColorList, myCharacterAnimation.initialChrctrSpriteTransformList);
                     }
-            
                 }
         }
     }
@@ -112,22 +99,6 @@ public class ActivateCharacterUITrigger : MonoBehaviour
         }
     }
 
-    // void OnTriggerStay2D(Collider2D player)
-    // {
-    //     if(player.CompareTag("PlayerCollider"))
-    //     {
-
-    //         if ((Input.GetKeyDown(KeyCode.Space) || 
-    //         Input.GetKeyDown(KeyCode.JoystickButton0) // A button
-    //         //   Input.GetKeyUp(KeyCode.JoystickButton1) ||  // B button
-    //         //   Input.GetKeyUp(KeyCode.JoystickButton2) ||  // X button
-    //         //   Input.GetKeyUp(KeyCode.JoystickButton3)
-    //         ))
-    //         {
-    //             loadCSVData.DisplayRandomRow();   
-    //         }
-    //     }
-    // }
 
     void OnTriggerExit2D(Collider2D player)
     {

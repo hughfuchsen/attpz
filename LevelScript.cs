@@ -828,38 +828,38 @@ public class LevelScript : MonoBehaviour
             return;
         }
 
-        // foreach(LevelScript level in levelsAbove)
-        // {
-        //     foreach(InclineThresholdColliderScript inclineEntrance in level.inclineEntrances)
-        //     {
-        //         BoxCollider2D inclineCol = inclineEntrance.gameObject.GetComponent<BoxCollider2D>();
-        //         // ignore collision only if this incline is NOT in this script’s list
-        //         if (!inclineEntrances.Contains(inclineEntrance))
-        //         {
-        //             Physics2D.IgnoreCollision(characterCol, inclineCol, true);
-        //         }
-        //         else
-        //         {
-        //             Physics2D.IgnoreCollision(characterCol, inclineCol, false);
-        //         }                
-        //     }
-        // }
-        // foreach(LevelScript level in levelsBelow)
-        // {
-        //     foreach(InclineThresholdColliderScript inclineEntrance in level.inclineEntrances)
-        //     {
-        //         BoxCollider2D inclineCol = inclineEntrance.gameObject.GetComponent<BoxCollider2D>();
-        //         // ignore collision only if this incline is NOT in this script’s list
-        //         if (!inclineEntrances.Contains(inclineEntrance))
-        //         {
-        //             Physics2D.IgnoreCollision(characterCol, inclineCol, true);
-        //         }
-        //         else
-        //         {
-        //             Physics2D.IgnoreCollision(characterCol, inclineCol, false);
-        //         }    
-        //     }
-        // }
+        foreach(LevelScript level in levelsAbove)
+        {
+            foreach(InclineThresholdColliderScript inclineEntrance in level.inclineEntrances)
+            {
+                BoxCollider2D inclineCol = inclineEntrance.gameObject.GetComponent<BoxCollider2D>();
+                // ignore collision only if this incline is NOT in this script’s list
+                if (!inclineEntrances.Contains(inclineEntrance))
+                {
+                    Physics2D.IgnoreCollision(characterCol, inclineCol, true);
+                }
+                else
+                {
+                    Physics2D.IgnoreCollision(characterCol, inclineCol, false);
+                }                
+            }
+        }
+        foreach(LevelScript level in levelsBelow)
+        {
+            foreach(InclineThresholdColliderScript inclineEntrance in level.inclineEntrances)
+            {
+                BoxCollider2D inclineCol = inclineEntrance.gameObject.GetComponent<BoxCollider2D>();
+                // ignore collision only if this incline is NOT in this script’s list
+                if (!inclineEntrances.Contains(inclineEntrance))
+                {
+                    Physics2D.IgnoreCollision(characterCol, inclineCol, true);
+                }
+                else
+                {
+                    Physics2D.IgnoreCollision(characterCol, inclineCol, false);
+                }    
+            }
+        }
         
         // Loop through all incline thresholds
         foreach (InclineThresholdColliderScript incThresh in inclineEntrances)

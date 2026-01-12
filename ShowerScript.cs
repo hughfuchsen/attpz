@@ -44,8 +44,12 @@ public class ShowerScript : MonoBehaviour
         while (isShowering)
         {
             Vector3 spawnPos = dropletSpawnPoint.position + new Vector3(xOffset, 0f, 0f);
-            GameObject droplet = Instantiate(dropletPrefab, spawnPos, Quaternion.identity);
-
+            GameObject droplet = Instantiate(
+                dropletPrefab,
+                spawnPos,
+                Quaternion.identity,
+                transform.parent   // same parent → sibling of this object
+            );
             // Color tweak
             SpriteRenderer sr = droplet.GetComponent<SpriteRenderer>();
             if (sr != null)

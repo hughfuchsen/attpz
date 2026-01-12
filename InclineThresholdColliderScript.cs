@@ -18,6 +18,7 @@ public class InclineThresholdColliderScript : MonoBehaviour
     public string higherSortingLayerToAssign;
     public string lowerColliderLayerName; // The name of the layer you want to switch to
     public string higherColliderLayerName; // The name of the layer you want to switch to
+    public bool isIndoors = true;
     public bool topOfIncline;
     public bool middleOfIncline;
     public bool itsALadder;
@@ -974,7 +975,7 @@ public class InclineThresholdColliderScript : MonoBehaviour
             InclineThresholdColliderScript.SetTreeSortingLayer(child.gameObject, sortingLayerName);
         }
     }
-    static void SetTreeObjectLayer(GameObject gameObject, int layerIndex)
+    static void SetTreeObjectLayer(GameObject gameObject, int layerIndex) // 
     {
         gameObject.layer = layerIndex;
 

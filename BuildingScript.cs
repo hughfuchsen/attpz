@@ -172,10 +172,6 @@ public class BuildingScript : MonoBehaviour
 
         MYcm.currentBuilding = null;
         MYcm.currentRoom = null;
-        if(cameraMovement.currentBuilding != null)
-            cameraMovement.currentBuilding = null;
-        if(cameraMovement.currentBuilding != null)
-            cameraMovement.currentLevel = null;
 
         // if(soundtrackScript != null)
         // {
@@ -232,10 +228,6 @@ public class BuildingScript : MonoBehaviour
         outerBuildingFadeCoroutine = StartCoroutine(FadeThenSetDontSort(true, false, false, outerSpriteSortingScriptObj, false, true, waitTimeOutside, false, outerBuildingSpriteList, outerBuildingInitialColorList, null, tagsToExludeEntExt));
         setDontSortForAllOuterBuildingsCoro = StartCoroutine(SetDontSortForAllOtherOuterBuildings(false, false));
 
-        // cameraMovement.currentRoom = null;
-        // cameraMovement.currentLevel = null;
-        // cameraMovement.currentBuilding = null;
-        
 
     }
     public void GoBehindBuilding()
@@ -243,8 +235,6 @@ public class BuildingScript : MonoBehaviour
         MYcm.currentBuilding = null;
         MYcm.currentRoom = null;
 
-        cameraMovement.currentBuilding = null;
-        cameraMovement.currentLevel = null;
 
         if(this.innerBuildingFadeCoroutine != null)
         {
@@ -284,10 +274,7 @@ public class BuildingScript : MonoBehaviour
         setDontSortForAllOuterBuildingsCoro = StartCoroutine(SetDontSortForAllOtherOuterBuildings(false, false));
         // innerBuildingFadeCoroutine = StartCoroutine(BuildingSequence(true, 0.3f, true, innerBuildingSpriteList, null, 0f));
         // outerBuildingFadeCoroutine = StartCoroutine(BuildingSequence(true, 0.3f, true, outerBuildingSpriteList, null, 0.35f, tagsToExludeEntExt));
-        
-        // cameraMovement.currentRoom = null;
-        // cameraMovement.currentLevel = null;
-        // cameraMovement.currentBuilding = null;
+
     }
 
 
@@ -344,10 +331,6 @@ public class BuildingScript : MonoBehaviour
             // {
             //     npcListForBuilding[i].GetComponent<IsoSpriteSorting>().dontSort = true;
             // }
-
-            // cameraMovement.currentRoom = null;
-            // cameraMovement.currentLevel = null;
-            // cameraMovement.currentBuilding = null;
 
             // Your code after the wait time elapses
         }

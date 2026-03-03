@@ -562,6 +562,7 @@ public class InclineThresholdColliderScript : MonoBehaviour
             {
                 CharacterMovement cm = other.transform.parent.GetComponent<CharacterMovement>();
                 cm.currentInclineThreshold = null;
+                cm.previousInclineThreshold = this;
 
                 BoxCollider2D bc = other.GetComponent<BoxCollider2D>();// this is the playa's collider
                 BoxCollider2D thisCollider = GetComponent<BoxCollider2D>(); // this collider belongs to the trigger
@@ -800,6 +801,7 @@ public class InclineThresholdColliderScript : MonoBehaviour
                 // Debug.Log("Exited");
                 CharacterMovement cm = other.transform.parent.GetComponent<CharacterMovement>();
                 cm.currentInclineThreshold = null;
+                cm.previousInclineThreshold = this;
 
 
                 BoxCollider2D bc = other.GetComponent<BoxCollider2D>();// this is the npc's collider

@@ -37,7 +37,7 @@ public class LevelThreshColliderScript : MonoBehaviour
         if(other.CompareTag("PlayerCollider") || other.CompareTag("NPCCollider"))
         {
             CharacterMovement cm = other.transform.parent.GetComponent<CharacterMovement>();
-            cm.currentLevelThreshhold = this;
+            cm.currentLevelThreshold = this;
 
             bool isAbove = !IsCrossingUp(cm); // if crossing down, they’re above
 
@@ -82,7 +82,8 @@ public class LevelThreshColliderScript : MonoBehaviour
         if(other.CompareTag("PlayerCollider"))
         {
             CharacterMovement cm = other.transform.parent.GetComponent<CharacterMovement>();
-            cm.currentLevelThreshhold = null;
+            cm.currentLevelThreshold = null;
+            cm.previousLevelThreshold = this;
 
             bool aboveCollider = aboveColliderByCharacter.ContainsKey(other.gameObject) && aboveColliderByCharacter[other.gameObject];
 
@@ -191,7 +192,7 @@ public class LevelThreshColliderScript : MonoBehaviour
             GameObject character = other.transform.parent.gameObject;
 
             CharacterMovement cm = other.transform.parent.GetComponent<CharacterMovement>();
-            cm.currentLevelThreshhold = null;
+            cm.currentLevelThreshold = null;
 
             bool aboveCollider = aboveColliderByCharacter.ContainsKey(other.gameObject) && aboveColliderByCharacter[other.gameObject];
             

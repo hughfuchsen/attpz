@@ -133,7 +133,7 @@ public class CharacterAudioController : MonoBehaviour
         else
         {
             // Render default layers for indoor surfaces
-            if (cameraMovement.currentRoom != null)
+            if (characterMovement.currentRoom != null)
             {  
                 surfaceCamera.cullingMask = LayerMask.GetMask("Everything");
             }    
@@ -166,9 +166,9 @@ public class CharacterAudioController : MonoBehaviour
         {
             surface = GetLeadingFootSurface();
         }
-        else if (cameraMovement.currentRoom != null)
+        else if (characterMovement.currentRoom != null)
         {
-            surface = cameraMovement.currentRoom.roomSurface;
+            surface = characterMovement.currentRoom.roomSurface;
         }
 
             AudioClip[] clipsToUse = footstepClips;

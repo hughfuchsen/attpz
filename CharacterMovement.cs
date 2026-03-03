@@ -82,13 +82,15 @@ public class CharacterMovement : MonoBehaviour
 
   public LevelScript currentLevel = null;
   public LevelScript previousLevel = null;
-  public LevelThreshColliderScript currentLevelThreshhold = null;
+  public LevelThreshColliderScript currentLevelThreshold = null;
+  public LevelThreshColliderScript previousLevelThreshold = null;
 
   public RoomScript currentRoom = null;
   public RoomScript previousRoom = null;
   public RoomThresholdColliderScript currentRoomThreshold = null;
 
   public InclineThresholdColliderScript currentInclineThreshold = null;
+  public InclineThresholdColliderScript previousInclineThreshold = null;
 
 
   // Start is called before the first frame update

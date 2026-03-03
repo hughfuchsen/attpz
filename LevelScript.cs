@@ -133,7 +133,6 @@ public class LevelScript : MonoBehaviour
 
     public void EnterLevel(bool shouldWait, bool shouldMoveDown)
     {
-        cameraMovement.currentLevel = this;
         myCM.currentLevel = this;
 
         HandleInclineCollisionIgnoring(player);
@@ -819,8 +818,9 @@ public class LevelScript : MonoBehaviour
 
     public void HandleInclineCollisionIgnoring(GameObject character)
     {
-        // Get the NPC's collider
+        // Get the characters's collider
         BoxCollider2D characterCol = character.GetComponentInChildren<BoxCollider2D>(true);
+        CharacterMovement cm = character.GetComponent<CharacterMovement>();
 
         if (characterCol == null)
         {
@@ -832,15 +832,15 @@ public class LevelScript : MonoBehaviour
         {
             foreach(InclineThresholdColliderScript inclineEntrance in level.inclineEntrances)
             {
-                BoxCollider2D inclineCol = inclineEntrance.gameObject.GetComponent<BoxCollider2D>();
+                BoxCollider2D inclineEnt = inclineEntrance.gameObject.GetComponent<BoxCollider2D>();
                 // ignore collision only if this incline is NOT in this script’s list
-                if (!inclineEntrances.Contains(inclineEntrance))
+                if (!this.inclineEntrances.Contains(inclineEntrance) && cm.previousInclineThreshold != inclineEntrance)
                 {
-                    Physics2D.IgnoreCollision(characterCol, inclineCol, true);
+                    Physics2D.IgnoreCollision(characterCol, inclineEnt, true);
                 }
                 else
                 {
-                    Physics2D.IgnoreCollision(characterCol, inclineCol, false);
+                    Physics2D.IgnoreCollision(characterCol, inclineEnt, false);
                 }                
             }
         }
@@ -848,15 +848,15 @@ public class LevelScript : MonoBehaviour
         {
             foreach(InclineThresholdColliderScript inclineEntrance in level.inclineEntrances)
             {
-                BoxCollider2D inclineCol = inclineEntrance.gameObject.GetComponent<BoxCollider2D>();
+                BoxCollider2D inclineEnt = inclineEntrance.gameObject.GetComponent<BoxCollider2D>();
                 // ignore collision only if this incline is NOT in this script’s list
-                if (!inclineEntrances.Contains(inclineEntrance))
+                if (!this.inclineEntrances.Contains(inclineEntrance) && cm.previousInclineThreshold != inclineEntrance)
                 {
-                    Physics2D.IgnoreCollision(characterCol, inclineCol, true);
+                    Physics2D.IgnoreCollision(characterCol, inclineEnt, true);
                 }
                 else
                 {
-                    Physics2D.IgnoreCollision(characterCol, inclineCol, false);
+                    Physics2D.IgnoreCollision(characterCol, inclineEnt, false);
                 }    
             }
         }
@@ -864,11 +864,11 @@ public class LevelScript : MonoBehaviour
         // Loop through all incline thresholds
         foreach (InclineThresholdColliderScript incThresh in inclineEntrances)
         {
-            BoxCollider2D inclineCol = incThresh.GetComponent<BoxCollider2D>();
-            if (inclineCol == null) 
+            BoxCollider2D inclineEnt = incThresh.GetComponent<BoxCollider2D>();
+            if (inclineEnt == null) 
                 continue;
 
-            Physics2D.IgnoreCollision(characterCol, inclineCol, false);
+            Physics2D.IgnoreCollision(characterCol, inclineEnt, false);
             Debug.Log("GONG");
         }
     }

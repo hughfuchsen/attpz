@@ -96,9 +96,6 @@ public class RoomScript : MonoBehaviour
 
     public void EnterRoom(bool shouldWait, float? waitTime)
     {
-        
-
-
         for (int i = 0; i < roomsSameOrAbove.Count; i++)
         {
             roomsSameOrAbove[i].MoveUp();
@@ -126,7 +123,6 @@ public class RoomScript : MonoBehaviour
             // StartCoroutine(HandleNPCsInRooms(npcListForRoom[i]));
         }
 
-        cameraMovement.currentRoom = this;
         myCM.currentRoom = this;
     }
     public void NpcEnterRoom(GameObject character)
@@ -414,7 +410,6 @@ public class RoomScript : MonoBehaviour
             doorsBelow[i].SetPlayerIsInRoomAbove(false);
             doorsBelow[i].SetPlayerIsInDoorway(false);
         }
-        cameraMovement.currentRoom = null;
     }
     
     public void ResetRoomPositions() //move rooms to initial positions

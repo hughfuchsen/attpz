@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class CameraMovement : MonoBehaviour
 {
-    [SerializeField] GameObject Player;
+    [SerializeField] GameObject player;
+    [SerializeField] CharacterMovement cm;
     public Transform target;
 
     public float smoothing = 1000f;
@@ -19,10 +20,6 @@ public class CameraMovement : MonoBehaviour
 
     private bool isZoomingIn = true;
 
-    public RoomScript currentRoom;
-    public LevelScript currentLevel;
-    public BuildingScript currentBuilding;
-
     [SerializeField] GameObject innerBuildingBackdrop;
     [SerializeField] GameObject activateCharacterUI;
     private ActivateCharacterUITrigger activateCharacterUITriggerScript;
@@ -35,9 +32,6 @@ public class CameraMovement : MonoBehaviour
     void Awake()
     {
         innerBuildingBackdrop.SetActive(true);
-        currentRoom = null;
-        currentLevel = null;
-        currentBuilding = null;
     }
 
     void Start()
@@ -47,7 +41,8 @@ public class CameraMovement : MonoBehaviour
         GetComponent<Camera>().orthographicSize = zoomSize;
         targetPosition = transform.localPosition;
 
-        Player = GameObject.FindGameObjectWithTag("Player");
+        player = GameObject.FindGameObjectWithTag("Player");
+        cm = player.GetComponent<CharacterMovement>();
         activateCharacterUITriggerScript = activateCharacterUI.GetComponent<ActivateCharacterUITrigger>();
 
         Cursor.SetCursor(cursorTexture, hotSpot, CursorMode.Auto);
@@ -65,35 +60,35 @@ public class CameraMovement : MonoBehaviour
         
             if (Input.GetKeyDown(KeyCode.G)) 
             {
-                if(!Player.GetComponent<CharacterMovement>().playerIsOutside)
+                if(!player.GetComponent<CharacterMovement>().playerIsOutside)
                 {
-                    if(currentLevel != null)
+                    if(cm.currentLevel != null)
                     {
-                        currentLevel.ResetLevels();
+                        cm.currentLevel.ResetLevels();
                     }
-                    if(currentRoom != null)
+                    if(cm.currentRoom != null)
                     {
-                        currentRoom.ResetRoomPositions();
+                        cm.currentRoom.ResetRoomPositions();
                     }
                 }
-                    initialMotionDirection = Player.GetComponent<CharacterMovement>().motionDirection;
-                    Player.GetComponent<CharacterMovement>().motionDirection = "none";
+                    initialMotionDirection = player.GetComponent<CharacterMovement>().motionDirection;
+                    player.GetComponent<CharacterMovement>().motionDirection = "none";
             }
 
             if (Input.GetKeyUp(KeyCode.G)) 
             {
-                if(!Player.GetComponent<CharacterMovement>().playerIsOutside)
+                if(!player.GetComponent<CharacterMovement>().playerIsOutside)
                 {
-                    if(currentLevel != null)
+                    if(cm.currentLevel != null)
                     {
-                        currentLevel.EnterLevel(false, true);
+                        cm.currentLevel.EnterLevel(false, true);
                     }
-                    if(currentRoom != null)
+                    if(cm.currentRoom != null)
                     {
-                        currentRoom.EnterRoom(false, 0.3f);
+                        cm.currentRoom.EnterRoom(false, 0.3f);
                     }
                 }
-                Player.GetComponent<CharacterMovement>().motionDirection = initialMotionDirection;
+                player.GetComponent<CharacterMovement>().motionDirection = initialMotionDirection;
             }
         
     }

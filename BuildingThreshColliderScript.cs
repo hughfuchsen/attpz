@@ -70,7 +70,7 @@ public class BuildingThreshColliderScript : MonoBehaviour
                         // Debug.Log("exiting");     
                         // building.PlayerExitBuilding(0.3f, 0.3f, false);
                         // building.npcListForBuilding.Remove(other.transform.parent.gameObject);
-                        building.NpcEnterExitBuilding(character, false);
+                        // building.NpcEnterExitBuilding(character, false);
                         cm.playerIsOutside = true;  
                     }
                 // }
@@ -207,16 +207,16 @@ public class BuildingThreshColliderScript : MonoBehaviour
                             {        
                                 // building.GoBehindBuilding(); // go outside behind the buildinng
                                 // building.npcListForBuilding.Remove(other.transform.parent.gameObject);
-                                // building.NpcEnterExitBuilding(character, false);
+                                building.NpcEnterExitBuilding(character, false);
                                 cm.playerIsOutside = true;
                             }
                         }
-                        else
+                        else //  if player inside
                         {
                             if(this.GetComponent<RoomThresholdColliderScript>().roomAbove != null)
                             {           
                                 // building.npcListForBuilding.Add(other.transform.parent.gameObject);
-                                // building.NpcEnterExitBuilding(character, true);
+                                building.NpcEnterExitBuilding(character, true);
                                 cm.playerIsOutside = false;
                             }
                         }
@@ -227,7 +227,7 @@ public class BuildingThreshColliderScript : MonoBehaviour
                         {     
                             // building.EnterBuilding();
                             // building.npcListForBuilding.Add(other.transform.parent.gameObject);
-                            // building.NpcEnterExitBuilding(character, true);
+                            building.NpcEnterExitBuilding(character, true);
                         }                
                         cm.playerIsOutside = false;            
                     }
@@ -242,7 +242,7 @@ public class BuildingThreshColliderScript : MonoBehaviour
                                 {
                                     // building.EnterBuilding();
                                     // building.npcListForBuilding.Add(other.transform.parent.gameObject);
-                                    // building.NpcEnterExitBuilding(character, true);
+                                    building.NpcEnterExitBuilding(character, true);
                                     cm.playerIsOutside = false;  
                                 }          
                             }
@@ -252,7 +252,7 @@ public class BuildingThreshColliderScript : MonoBehaviour
                                 {
                                     // building.GoBehindBuilding(); // go outside behind the buildinng
                                     // building.npcListForBuilding.Remove(other.transform.parent.gameObject);
-                                    // building.NpcEnterExitBuilding(character, false);
+                                    building.NpcEnterExitBuilding(character, false);
                                     cm.playerIsOutside = true;  
                                 }          
                             }

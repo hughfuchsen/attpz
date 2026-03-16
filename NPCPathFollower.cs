@@ -10,17 +10,17 @@ public class NPCPathFollower : MonoBehaviour
     public GridGenerator gridGenerator;
 
     [Header("Patrol Nodes")]
-    public List<GridNode> patrolNodes = new List<GridNode>();
+    public List<GridNodeData> patrolNodes = new List<GridNodeData>();
     int patrolIndex = 0;
 
     [Header("Movement")]
     public float pauseTime = 0.1f;
 
-    Queue<GridNode> pathQueue = new Queue<GridNode>();
+    Queue<GridNodeData> pathQueue = new Queue<GridNodeData>();
 
     Vector3 gridOffset = new Vector3(-8, 28, 0);
 
-    public GridNode currentNode;
+    public GridNodeData currentNode;
 
     CharacterMovement npcCM;
     CharacterDialogueScript npcCD;
@@ -47,7 +47,7 @@ public class NPCPathFollower : MonoBehaviour
         }
     }
 
-    public void SetTargetNode(GridNode target)
+    public void SetTargetNode(GridNodeData target)
     {
         if (target == null || currentNode == null)
             return;
@@ -72,8 +72,8 @@ public class NPCPathFollower : MonoBehaviour
                 blockedGrid,
                 gridGenerator.width,
                 gridGenerator.height,
-                currentNode.GridPosition,
-                target.GridPosition
+                currentNode.gridPos,
+                target.gridPos
             );
         
         if (pathIndices == null || pathIndices.Count == 0)
@@ -99,7 +99,7 @@ public class NPCPathFollower : MonoBehaviour
                 continue;
             }
 
-            GridNode node = gridGenerator.nodes[pos.x, pos.y];
+            GridNodeData node = gridGenerator.nodes[pos.x, pos.y];
 
             if (node != null)
                 pathQueue.Enqueue(node);
@@ -115,9 +115,9 @@ public class NPCPathFollower : MonoBehaviour
     {
         while (pathQueue.Count > 0)
         {
-            GridNode node = pathQueue.Dequeue();
+            GridNodeData node = pathQueue.Dequeue();
         
-            Vector3 targetPos = node.transform.position + gridOffset;
+            Vector3 targetPos = node.worldPos + gridOffset;
 
             while (Vector3.Distance(transform.position, targetPos) > 1f)
             {
@@ -161,19 +161,19 @@ public class NPCPathFollower : MonoBehaviour
         SetTargetNode(patrolNodes[patrolIndex]);
     }
 
-    GridNode GetClosestNode(Vector3 worldPos)
+    GridNodeData GetClosestNode(Vector3 worldPos)
     {
-        GridNode closest = null;
+        GridNodeData closest = null;
         float minDist = float.MaxValue;
 
         for (int x = 0; x < gridGenerator.width; x++)
         {
             for (int y = 0; y < gridGenerator.height; y++)
             {
-                GridNode node = gridGenerator.nodes[x, y];
+                GridNodeData node = gridGenerator.nodes[x, y];
                 if (node == null) continue;
 
-                float dist = Vector3.Distance(worldPos, node.transform.position);
+                float dist = Vector3.Distance(worldPos, node.worldPos);
 
                 if (dist < minDist)
                 {
@@ -263,7 +263,7 @@ public class NPCPathFollower : MonoBehaviour
             if (x < 0 || y < 0 || x >= gridGenerator.width || y >= gridGenerator.height)
                 return false;
 
-            GridNode node = gridGenerator.nodes[x, y];
+            GridNodeData node = gridGenerator.nodes[x, y];
 
             if (node == null || node.isBlocked)
                 return false;

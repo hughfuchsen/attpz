@@ -22,7 +22,7 @@ public class NPCClickMover : MonoBehaviour
             Vector3 mouseWorld = mainCamera.ScreenToWorldPoint(Input.mousePosition);
             mouseWorld.z = 0f;
 
-            GridNode closestNode = GetClosestNode(mouseWorld);
+            GridNodeData closestNode = GetClosestNode(mouseWorld);
 
             if (closestNode != null && !closestNode.isBlocked)
             {
@@ -31,19 +31,19 @@ public class NPCClickMover : MonoBehaviour
         }
     }
 
-    GridNode GetClosestNode(Vector3 worldPos)
+    GridNodeData GetClosestNode(Vector3 worldPos)
     {
-        GridNode closest = null;
+        GridNodeData closest = null;
         float minDist = float.MaxValue;
 
         for (int x = 0; x < gridGenerator.width; x++)
         {
             for (int y = 0; y < gridGenerator.height; y++)
             {
-                GridNode node = gridGenerator.nodes[x, y];
+                GridNodeData node = gridGenerator.nodes[x, y];
                 if (node == null || node.isBlocked) continue;
 
-                float dist = Vector3.Distance(worldPos, node.transform.position);
+                float dist = Vector3.Distance(worldPos, node.worldPos);
 
                 if (dist < minDist)
                 {

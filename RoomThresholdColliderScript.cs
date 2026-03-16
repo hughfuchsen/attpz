@@ -464,10 +464,10 @@ public class RoomThresholdColliderScript : MonoBehaviour
                         else
                         if (!cm.playerIsOutside && roomBelow != null) // if the npc IS inside bulding and ABOVE collider, going down stairs and entering room downstairs
                         {
-                            if(roomBelow.building != null)
+                            // if(roomBelow.building != null)
                             // {roomBelow.building.NpcEnterExitBuilding(character, true);}   
 
-                            if(roomBelow.level != null)
+                            // if(roomBelow.level != null)
                             // {roomBelow.level.NpcEnterLevel(character);}
 
                             roomBelow.NpcEnterRoom(character);
@@ -478,7 +478,11 @@ public class RoomThresholdColliderScript : MonoBehaviour
                                 { 
                                     SetTreeAlpha(this.FindSiblingWithTag("OpenDoor"), 0);
                                 }  
-                        }    
+                        }  
+                        else if(roomBelow != null) 
+                        {
+                            roomBelow.NpcEnterRoom(character);
+                        } 
                     }
                     else if (roomBelow != null) // entering a room going down while inside building
                     {

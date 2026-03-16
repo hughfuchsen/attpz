@@ -211,42 +211,187 @@
 // }
 
 
+// using UnityEngine;
+
+// public class GridGenerator : MonoBehaviour
+// {
+//     public GameObject gridNodePrefab;
+
+//     public int width = 4;
+//     public int height = 4;
+
+//     public bool[,] map;
+//     public GridNode[,] nodes;
+
+//     [Header("Isometric Settings")]
+//     public float tileWidth = 2f;
+//     public float tileHeight = 1f;
+
+//     Vector3 GridToIso(int x, int y)
+//     {
+//         float isoX = (x - y) * tileWidth;
+//         float isoY = (x + y) * tileHeight;
+
+//         return new Vector3(isoX, isoY, 0);
+//     }
+
+//     void Awake()
+//     {
+//         if (map == null || map.Length == 0)
+//         {
+//             map = new bool[width, height];
+
+//             for (int x = 0; x < width; x++)
+//                 for (int y = 0; y < height; y++)
+//                     map[x, y] = true;
+//         }
+
+//         nodes = new GridNode[width, height];
+
+//         GenerateNodes();
+//     }
+
+//     void GenerateNodes()
+//     {
+//         for (int x = 0; x < width; x++)
+//         {
+//             for (int y = 0; y < height; y++)
+//             {
+//                 if (!map[x, y]) continue;
+
+//                 Vector3 isoPos = GridToIso(x, y) + transform.position;
+
+//                 GameObject obj = Instantiate(
+//                     gridNodePrefab,
+//                     isoPos,
+//                     Quaternion.identity,
+//                     transform
+//                 );
+
+//                 GridNode node = obj.GetComponent<GridNode>();
+
+//                 node.column = (char)('a' + x);
+//                 node.row = y + 1;
+
+//                 nodes[x, y] = node;
+//             }
+//         }
+//     }
+
+//     public void UpdateNodeViability(GameObject character, LevelScript currentLevel)
+//     {
+//         int levelLayer = currentLevel != null ? currentLevel.gameObject.layer : character.layer;
+
+//         for (int x = 0; x < width; x++)
+//         {
+//             for (int y = 0; y < height; y++)
+//             {
+//                 GridNode node = nodes[x, y];
+//                 if (node == null) continue;
+
+//                 Collider2D[] hits = Physics2D.OverlapCircleAll(node.transform.position, tileHeight);
+
+//                 bool blocked = false;
+//                 bool touchingThreshold = false;
+
+//                 foreach (var hit in hits)
+//                 {
+//                     if (hit == null) continue;
+
+//                     // 🔹 If a threshold touches the node, it overrides everything
+//                     if  
+//                     (hit.GetComponent<RoomThresholdColliderScript>() != null 
+//                     || hit.GetComponent<LevelThreshColliderScript>() != null
+//                     || hit.GetComponent<BuildingThreshColliderScript>() != null)
+//                     {
+//                         touchingThreshold = true;
+//                         break;
+//                     }
+
+//                     // Ignore player/NPC colliders
+//                     if (hit.CompareTag("PlayerCollider") || hit.CompareTag("NPCCollider") || hit.CompareTag("NPC"))
+//                         continue;
+                   
+//                     if (hit.isTrigger)
+//                         continue;
+
+//                     // Only consider objects on the current level
+//                     if (hit.gameObject.layer != levelLayer)
+//                         continue;
+
+//                     blocked = true;
+//                 }
+
+//                 // Trigger presence overrides blocking
+//                 node.isBlocked = touchingThreshold ? false : blocked;
+//             }
+//         }
+//     }
+
+    // void OnDrawGizmos()
+    // {
+    //     if (width <= 0 || height <= 0)
+    //         return;
+
+    //     for (int x = 0; x < width; x++)
+    //     {
+    //         for (int y = 0; y < height; y++)
+    //         {
+    //             Vector3 pos = GridToIso(x, y) + transform.position;
+
+    //             // Draw tile diamond
+    //             Gizmos.color = Color.yellow;
+    //             DrawIsoTile(pos);
+
+    //             // Draw node state if nodes exist
+    //             if (nodes != null &&
+    //                 x < nodes.GetLength(0) &&
+    //                 y < nodes.GetLength(1))
+    //             {
+    //                 GridNode node = nodes[x, y];
+
+    //                 if (node != null)
+    //                 {
+    //                     Gizmos.color = node.isBlocked ? Color.red : Color.green;
+    //                     Gizmos.DrawWireSphere(node.transform.position, tileHeight);
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }
+
+    // void DrawIsoTile(Vector3 center)
+    // {
+    //     Vector3 top = center + new Vector3(0, tileHeight, 0);
+    //     Vector3 right = center + new Vector3(tileWidth, 0, 0);
+    //     Vector3 bottom = center + new Vector3(0, -tileHeight, 0);
+    //     Vector3 left = center + new Vector3(-tileWidth, 0, 0);
+
+    //     Gizmos.DrawLine(top, right);
+    //     Gizmos.DrawLine(right, bottom);
+    //     Gizmos.DrawLine(bottom, left);
+    //     Gizmos.DrawLine(left, top);
+    // }
+// }
+
 using UnityEngine;
 
 public class GridGenerator : MonoBehaviour
 {
-    public GameObject gridNodePrefab;
-
-    public int width = 4;
-    public int height = 4;
-
-    public bool[,] map;
-    public GridNode[,] nodes;
+    [Header("Grid Settings")]
+    public int width = 1000;
+    public int height = 1000;
 
     [Header("Isometric Settings")]
-    public float tileWidth = 2f;
-    public float tileHeight = 1f;
+    public float tileWidth = 4f;
+    public float tileHeight = 2f;
 
-    Vector3 GridToIso(int x, int y)
-    {
-        float isoX = (x - y) * tileWidth;
-        float isoY = (x + y) * tileHeight;
-
-        return new Vector3(isoX, isoY, 0);
-    }
+    // Data-only grid
+    public GridNodeData[,] nodes;
 
     void Awake()
     {
-        if (map == null || map.Length == 0)
-        {
-            map = new bool[width, height];
-
-            for (int x = 0; x < width; x++)
-                for (int y = 0; y < height; y++)
-                    map[x, y] = true;
-        }
-
-        nodes = new GridNode[width, height];
+        nodes = new GridNodeData[width, height];
 
         GenerateNodes();
     }
@@ -257,27 +402,24 @@ public class GridGenerator : MonoBehaviour
         {
             for (int y = 0; y < height; y++)
             {
-                if (!map[x, y]) continue;
-
-                Vector3 isoPos = GridToIso(x, y) + transform.position;
-
-                GameObject obj = Instantiate(
-                    gridNodePrefab,
-                    isoPos,
-                    Quaternion.identity,
-                    transform
-                );
-
-                GridNode node = obj.GetComponent<GridNode>();
-
-                node.column = (char)('a' + x);
-                node.row = y + 1;
-
-                nodes[x, y] = node;
+                nodes[x, y] = new GridNodeData
+                {
+                    gridPos = new Vector2Int(x, y),
+                    worldPos = GridToIso(x, y) + transform.position,
+                    isBlocked = false
+                };
             }
         }
     }
 
+    Vector3 GridToIso(int x, int y)
+    {
+        float isoX = (x - y) * tileWidth;
+        float isoY = (x + y) * tileHeight;
+        return new Vector3(isoX, isoY, 0f);
+    }
+
+    // Updates blocking info for pathfinding
     public void UpdateNodeViability(GameObject character, LevelScript currentLevel)
     {
         int levelLayer = currentLevel != null ? currentLevel.gameObject.layer : character.layer;
@@ -286,10 +428,10 @@ public class GridGenerator : MonoBehaviour
         {
             for (int y = 0; y < height; y++)
             {
-                GridNode node = nodes[x, y];
+                GridNodeData node = nodes[x, y];
                 if (node == null) continue;
 
-                Collider2D[] hits = Physics2D.OverlapCircleAll(node.transform.position, tileHeight);
+                Collider2D[] hits = Physics2D.OverlapCircleAll(node.worldPos, tileHeight);
 
                 bool blocked = false;
                 bool touchingThreshold = false;
@@ -298,78 +440,55 @@ public class GridGenerator : MonoBehaviour
                 {
                     if (hit == null) continue;
 
-                    // 🔹 If a threshold touches the node, it overrides everything
-                    if  
-                    (hit.GetComponent<RoomThresholdColliderScript>() != null 
-                    || hit.GetComponent<LevelThreshColliderScript>() != null
-                    || hit.GetComponent<BuildingThreshColliderScript>() != null)
+                    // Thresholds override blocking
+                    if (hit.GetComponent<RoomThresholdColliderScript>() != null ||
+                        hit.GetComponent<LevelThreshColliderScript>() != null ||
+                        hit.GetComponent<BuildingThreshColliderScript>() != null)
                     {
                         touchingThreshold = true;
                         break;
                     }
 
-                    // Ignore player/NPC colliders
                     if (hit.CompareTag("PlayerCollider") || hit.CompareTag("NPCCollider") || hit.CompareTag("NPC"))
                         continue;
-                   
+
                     if (hit.isTrigger)
                         continue;
 
-                    // Only consider objects on the current level
                     if (hit.gameObject.layer != levelLayer)
                         continue;
 
                     blocked = true;
                 }
 
-                // Trigger presence overrides blocking
                 node.isBlocked = touchingThreshold ? false : blocked;
             }
         }
     }
 
-    void OnDrawGizmos()
-    {
-        if (width <= 0 || height <= 0)
-            return;
+    // Optional: draw debug grid
+    // void OnDrawGizmos()
+    // {
+    //     if (nodes == null) return;
 
-        for (int x = 0; x < width; x++)
-        {
-            for (int y = 0; y < height; y++)
-            {
-                Vector3 pos = GridToIso(x, y) + transform.position;
+    //     for (int x = 0; x < width; x++)
+    //     {
+    //         for (int y = 0; y < height; y++)
+    //         {
+    //             GridNodeData node = nodes[x, y];
+    //             if (node == null) continue;
 
-                // Draw tile diamond
-                Gizmos.color = Color.yellow;
-                DrawIsoTile(pos);
+    //             Gizmos.color = node.isBlocked ? Color.red : Color.green;
+    //             Gizmos.DrawWireSphere(node.worldPos, tileHeight * 0.25f);
+    //         }
+    //     }
+    // }
+}
 
-                // Draw node state if nodes exist
-                if (nodes != null &&
-                    x < nodes.GetLength(0) &&
-                    y < nodes.GetLength(1))
-                {
-                    GridNode node = nodes[x, y];
-
-                    if (node != null)
-                    {
-                        Gizmos.color = node.isBlocked ? Color.red : Color.green;
-                        Gizmos.DrawWireSphere(node.transform.position, tileHeight);
-                    }
-                }
-            }
-        }
-    }
-
-    void DrawIsoTile(Vector3 center)
-    {
-        Vector3 top = center + new Vector3(0, tileHeight, 0);
-        Vector3 right = center + new Vector3(tileWidth, 0, 0);
-        Vector3 bottom = center + new Vector3(0, -tileHeight, 0);
-        Vector3 left = center + new Vector3(-tileWidth, 0, 0);
-
-        Gizmos.DrawLine(top, right);
-        Gizmos.DrawLine(right, bottom);
-        Gizmos.DrawLine(bottom, left);
-        Gizmos.DrawLine(left, top);
-    }
+// Lightweight data-only node class
+public class GridNodeData
+{
+    public Vector2Int gridPos; // node coordinates
+    public Vector3 worldPos;   // actual world position
+    public bool isBlocked;     // blocked for pathfinding
 }

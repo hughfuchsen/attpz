@@ -13,7 +13,9 @@ public class ThresholdSelectorMenu
 
         foreach (var threshold in allThresholds)
         {
-            if (!threshold.plyrCrsngLeft)
+           if (!threshold.plyrCrsngLeft && 
+                threshold.transform.parent != null && 
+                threshold.transform.parent.localScale.x < 0)
             {
                 selectedObjects.Add(threshold.gameObject);
             }

@@ -135,6 +135,7 @@ public class RoomScript : MonoBehaviour
         // if NPC was already in another room
         if (NPCcm.currentRoom != null)
         {
+            Debug.Log("first");
             NPCcm.previousRoom = NPCcm.currentRoom;
             bool previousRoomWasDown = NPCcm.previousRoom.isDown;
             // Remove from old room
@@ -231,6 +232,9 @@ public class RoomScript : MonoBehaviour
         }
         else
         {
+
+                        Debug.Log("second");
+
             // First room entry (no previous room)
             NPCcm.currentRoom = this;
             npcListForRoom.Add(character);

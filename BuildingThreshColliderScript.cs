@@ -80,14 +80,17 @@ public class BuildingThreshColliderScript : MonoBehaviour
     }
     void OnTriggerExit2D(Collider2D other)
     {
-        GameObject character = other.transform.parent.gameObject;
-
-        CharacterMovement cm = other.transform.parent.GetComponent<CharacterMovement>(); // how do i control multiple of these?
         
-        bool aboveCollider = aboveColliderByCharacter.ContainsKey(other.gameObject) && aboveColliderByCharacter[other.gameObject];
 
         if(other.CompareTag("PlayerCollider"))
         {
+            GameObject character = other.transform.parent.gameObject;
+
+            CharacterMovement cm = other.transform.parent.GetComponent<CharacterMovement>(); // how do i control multiple of these?
+        
+            bool aboveCollider = aboveColliderByCharacter.ContainsKey(other.gameObject) && aboveColliderByCharacter[other.gameObject];
+
+
             cm.playerOnBuildingThresh = false;
 
             cm.currentBuildingThreshold = null;
@@ -181,7 +184,14 @@ public class BuildingThreshColliderScript : MonoBehaviour
             }
         }
         else if (other.CompareTag("NPCCollider")) //if it's an NPC
-        {
+        {   
+            GameObject character = other.transform.parent.gameObject;
+
+            CharacterMovement cm = other.transform.parent.GetComponent<CharacterMovement>(); // how do i control multiple of these?
+        
+            bool aboveCollider = aboveColliderByCharacter.ContainsKey(other.gameObject) && aboveColliderByCharacter[other.gameObject];
+
+
             cm.playerOnBuildingThresh = false;
             cm.currentBuildingThreshold = null;
 

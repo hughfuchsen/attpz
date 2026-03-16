@@ -1,111 +1,3 @@
-// using System.Collections;
-// using UnityEngine;
-
-// public class NPCPathFollower : MonoBehaviour
-// {
-//     public PathDrawer path;
-//     public float pauseTime = 0.3f;
-//     public bool stopAtEnd = false; // ✅ new toggle for testing
-//     public bool stopMoving = false; // ✅ new toggle for testing
-
-//     private CharacterMovement npcCM;
-//     private CharacterDialogueScript npcCD;
-//     private CharacterMovement myCM;
-//     private IsoSpriteSorting isoSpriteSortingScript;
-
-//     public GridNode currentNode;
-
-//     private void Start()
-//     {
-//         StartCoroutine(LateStart());
-//     }
-
-//     public IEnumerator LateStart()
-//     {
-//         yield return null; // wait one frame for components to init
-//         npcCM = GetComponent<CharacterMovement>();
-//         npcCD = GetComponent<CharacterDialogueScript>();
-//         isoSpriteSortingScript = GetComponent<IsoSpriteSorting>();
-//         myCM = GameObject.FindGameObjectWithTag("Player").GetComponent<CharacterMovement>();
-
-
-//         if (path == null || path.pathPoints.Count < 2)
-//         {
-//             Debug.LogWarning("NPCPathFollower: Path is missing or too short!");
-//             yield break;
-//         }
-
-//         // ✅ if stopAtEnd = true, only go forward once
-//         if (stopAtEnd)
-//         {
-//             yield return StartCoroutine(FollowPath(forward: true));
-//             yield break;
-//         }
-
-//         // otherwise, loop continuously
-//         while (true)
-//         {
-//             yield return StartCoroutine(FollowPath(forward: true));   // go forward
-//             yield return StartCoroutine(FollowPath(forward: false));  // then backward
-//         }
-//     }
-
-//     private IEnumerator FollowPath(bool forward)
-//     {
-//         int startIndex = forward ? 0 : path.pathPoints.Count - 1;
-//         int endIndex = forward ? path.pathPoints.Count - 1 : 0;
-//         int step = forward ? 1 : -1;
-
-//         for (int i = startIndex; i != endIndex; i += step)
-//         {
-//             Vector3 start = path.transform.TransformPoint(path.pathPoints[i]);
-//             Vector3 end = path.transform.TransformPoint(path.pathPoints[i + step]);
-
-//             // Optional offset adjustment (depending on sprite setup)
-//             end -= new Vector3(8, -28, 0);
-
-//             // --- Move toward endpoint ---
-//             while (Vector3.Distance(transform.position, end) > 1f)
-//             {
-//                 Vector3 dir = (end - transform.position).normalized;
-
-//                 // --- Handle temporary pauses ---
-//                 if ((myCM.currentRoom != null && myCM.currentRoom.roomIsMoving) 
-//                     || 
-//                 (myCM.currentInclineThreshold != null && myCM.currentInclineThreshold == npcCM.currentInclineThreshold)
-//                     ||
-//                 npcCD.staring == true
-//                     || 
-//                 stopMoving == true)
-//                 {
-//                     npcCM.change = Vector3.zero; // freeze during room motion
-//                 }
-//                 else
-//                 {
-//                     npcCM.change = dir; // normal path following
-//                 }
-
-//                 yield return null;
-//             }
-
-//             // Snap exactly to end
-//             transform.position = end;
-
-//             // Pause at each waypoint
-//             if (npcCM != null)
-//                 npcCM.change = Vector3.zero;
-
-//             yield return new WaitForSeconds(pauseTime);
-//         }
-
-//         // ✅ Stop completely when reaching end (for testing)
-//         if (stopAtEnd && forward)
-//         {
-//             if (npcCM != null)
-//                 npcCM.change = Vector3.zero;
-//         }
-//     }
-// }
 
 
 using System.Collections;
@@ -114,126 +6,286 @@ using UnityEngine;
 
 public class NPCPathFollower : MonoBehaviour
 {
-    [Header("Grid Setup")]
-    public GridGenerator gridGenerator;    // Assign your grid
-    public char startColumn = 'a';
-    public int startRow = 1;
-    public char targetColumn = 'd';
-    public int targetRow = 4;
+    [Header("Grid")]
+    public GridGenerator gridGenerator;
 
-    [Header("Movement Settings")]
+    [Header("Patrol Nodes")]
+    public List<GridNode> patrolNodes = new List<GridNode>();
+    int patrolIndex = 0;
+
+    [Header("Movement")]
     public float pauseTime = 0.1f;
-    public bool stopAtEnd = false;         // Stop at end or loop
-    public bool stopMoving = false;        // Freeze NPC
 
-    private Queue<GridNode> pathQueue = new Queue<GridNode>();
+    Queue<GridNode> pathQueue = new Queue<GridNode>();
 
-    // Character scripts
-    private CharacterMovement npcCM;
-    private CharacterDialogueScript npcCD;
-    private CharacterMovement myCM;
+    Vector3 gridOffset = new Vector3(-8, 28, 0);
 
+    public GridNode currentNode;
 
-    private void Start()
+    CharacterMovement npcCM;
+    CharacterDialogueScript npcCD;
+    CharacterMovement playerCM;
+
+    Coroutine pathFollowCoro;
+
+    void Start()
     {
-        // Get required components
         npcCM = GetComponent<CharacterMovement>();
         npcCD = GetComponent<CharacterDialogueScript>();
-        myCM = GameObject.FindGameObjectWithTag("Player").GetComponent<CharacterMovement>();
+        playerCM = GameObject.FindGameObjectWithTag("Player")
+            .GetComponent<CharacterMovement>();
 
         gridGenerator = FindObjectOfType<GridGenerator>();
-        // Initialize the path
-        InitializePath();
 
-        if (pathQueue.Count > 0)
-            StartCoroutine(FollowPathCoroutine());
+        currentNode = GetClosestNode(transform.position - gridOffset);
+        
+        gridGenerator.UpdateNodeViability(this.gameObject, npcCM.currentLevel);
+
+        if (patrolNodes.Count > 0)
+        {
+            SetTargetNode(patrolNodes[0]);;
+        }
     }
 
-    private void InitializePath()
+    public void SetTargetNode(GridNode target)
     {
-        GridNode startNode = gridGenerator.nodes[startColumn - 'a', startRow - 1];
-        GridNode targetNode = gridGenerator.nodes[targetColumn - 'a', targetRow - 1];
-
-        if (startNode == null || targetNode == null)
-        {
-            Debug.LogWarning("Start or Target node is null!");
+        if (target == null || currentNode == null)
             return;
-        }
 
-        // Build blocked map
-        bool[,] blockedGrid = new bool[gridGenerator.width, gridGenerator.height];
+        // gridGenerator.UpdateNodeViability(this.gameObject, npcCM.currentLevel);
+
+        bool[,] blockedGrid =
+            new bool[gridGenerator.width, gridGenerator.height];
+
         for (int x = 0; x < gridGenerator.width; x++)
-            for (int y = 0; y < gridGenerator.height; y++)
-                blockedGrid[x, y] = gridGenerator.nodes[x, y] == null || gridGenerator.nodes[x, y].isBlocked;
-
-        List<Vector2Int> pathIndices = Pathfinding.FindPath(blockedGrid, gridGenerator.width, gridGenerator.height,
-                                                           new Vector2Int(startColumn - 'a', startRow - 1),
-                                                           new Vector2Int(targetColumn - 'a', targetRow - 1));
-
-        if (pathIndices == null || pathIndices.Count == 0)
         {
-            Debug.LogWarning("No path found!");
-            return;
+            for (int y = 0; y < gridGenerator.height; y++)
+            {
+                blockedGrid[x, y] =
+                    gridGenerator.nodes[x, y] == null ||
+                    gridGenerator.nodes[x, y].isBlocked;
+            }
         }
+
+        List<Vector2Int> pathIndices =
+            Pathfinding.FindPath(
+                blockedGrid,
+                gridGenerator.width,
+                gridGenerator.height,
+                currentNode.GridPosition,
+                target.GridPosition
+            );
+        
+        if (pathIndices == null || pathIndices.Count == 0)
+            return;
+
+        pathIndices = ExtractCorners(pathIndices);
+        pathIndices = SmoothPath(pathIndices);
 
         pathQueue.Clear();
-        foreach (Vector2Int pos in pathIndices)
+
+        if (currentNode == null)
         {
-            pathQueue.Enqueue(gridGenerator.nodes[pos.x, pos.y]);
+            currentNode = GetClosestNode(transform.position - gridOffset);
         }
 
-        // Snap NPC to start node
-        transform.position = startNode.transform.position;
+        foreach (Vector2Int pos in pathIndices)
+        {
+            if (pos.x < 0 || pos.y < 0 ||
+                pos.x >= gridGenerator.width ||
+                pos.y >= gridGenerator.height)
+            {
+                Debug.LogWarning($"Path node out of bounds: {pos}");
+                continue;
+            }
+
+            GridNode node = gridGenerator.nodes[pos.x, pos.y];
+
+            if (node != null)
+                pathQueue.Enqueue(node);
+        }
+
+        if (pathFollowCoro != null)
+            StopCoroutine(pathFollowCoro);
+
+        pathFollowCoro = StartCoroutine(FollowPath());
     }
 
-    private IEnumerator FollowPathCoroutine()
+    IEnumerator FollowPath()
     {
-        do
+        while (pathQueue.Count > 0)
         {
-            Queue<GridNode> tempQueue = new Queue<GridNode>(pathQueue); // copy for looping if needed
+            GridNode node = pathQueue.Dequeue();
+        
+            Vector3 targetPos = node.transform.position + gridOffset;
 
-            while (tempQueue.Count > 0)
+            while (Vector3.Distance(transform.position, targetPos) > 1f)
             {
-                GridNode node = tempQueue.Dequeue();
-                Vector3 targetPos = node.transform.position;
+                Vector3 dir = (targetPos - transform.position).normalized;
 
-                while (Vector3.Distance(transform.position, targetPos) > 0.1f)
+                if ((playerCM.currentRoom != null &&
+                     playerCM.currentRoom.roomIsMoving) ||
+                    npcCD.staring)
                 {
-                    Vector3 dir = (targetPos - transform.position).normalized;
-
-                    // Handle temporary pauses
-                    if ((myCM.currentRoom != null && myCM.currentRoom.roomIsMoving)
-                        || (myCM.currentInclineThreshold != null && myCM.currentInclineThreshold == npcCM.currentInclineThreshold)
-                        || npcCD.staring
-                        || stopMoving)
-                    {
-                        npcCM.change = Vector3.zero;
-                    }
-                    else
-                    {
-                        npcCM.change = dir;
-                    }
-
-                    yield return null;
+                    npcCM.change = Vector3.zero;
+                }
+                else
+                {
+                    npcCM.change = dir;
                 }
 
-                // Snap exactly to node
-                transform.position = targetPos;
-                if (npcCM != null)
-                    npcCM.change = Vector3.zero;
-
-                yield return new WaitForSeconds(pauseTime);
+                yield return null;
             }
 
-            if (!stopAtEnd)
+            transform.position = targetPos;
+
+            npcCM.change = Vector3.zero;
+
+            currentNode = node;
+
+            yield return new WaitForSeconds(pauseTime);
+        }
+
+        NextPatrolNode();
+    }
+
+    void NextPatrolNode()
+    {
+        if (patrolNodes.Count == 0) return;
+
+        patrolIndex++;
+
+        if (patrolIndex >= patrolNodes.Count)
+            patrolIndex = 0;
+
+        SetTargetNode(patrolNodes[patrolIndex]);
+    }
+
+    GridNode GetClosestNode(Vector3 worldPos)
+    {
+        GridNode closest = null;
+        float minDist = float.MaxValue;
+
+        for (int x = 0; x < gridGenerator.width; x++)
+        {
+            for (int y = 0; y < gridGenerator.height; y++)
             {
-                // reverse path for back-and-forth looping
-                Queue<GridNode> reversed = new Queue<GridNode>(pathQueue);
-                var arr = reversed.ToArray();
-                System.Array.Reverse(arr);
-                pathQueue = new Queue<GridNode>(arr);
+                GridNode node = gridGenerator.nodes[x, y];
+                if (node == null) continue;
+
+                float dist = Vector3.Distance(worldPos, node.transform.position);
+
+                if (dist < minDist)
+                {
+                    minDist = dist;
+                    closest = node;
+                }
+            }
+        }
+
+        return closest;
+    }
+
+
+    List<Vector2Int> ExtractCorners(List<Vector2Int> path)
+    {
+        List<Vector2Int> result = new List<Vector2Int>();
+
+        if (path.Count == 0)
+            return result;
+
+        result.Add(path[0]);
+
+        Vector2Int prevDir = Vector2Int.zero;
+
+        for (int i = 1; i < path.Count; i++)
+        {
+            Vector2Int dir = path[i] - path[i - 1];
+
+            if (dir != prevDir)
+            {
+                result.Add(path[i - 1]);
             }
 
-        } while (!stopAtEnd);
+            prevDir = dir;
+        }
+
+        result.Add(path[path.Count - 1]);
+
+        return result;
+    }
+
+    List<Vector2Int> SmoothPath(List<Vector2Int> path)
+    {
+        if (path.Count <= 2)
+            return path;
+
+        List<Vector2Int> result = new List<Vector2Int>();
+        result.Add(path[0]);
+
+        int currentIndex = 0;
+
+        while (currentIndex < path.Count - 1)
+        {
+            int nextIndex = currentIndex + 1;
+
+            for (int i = path.Count - 1; i > nextIndex; i--)
+            {
+                if (HasLineOfSight(path[currentIndex], path[i]))
+                {
+                    nextIndex = i;
+                    break;
+                }
+            }
+
+            result.Add(path[nextIndex]);
+            currentIndex = nextIndex;
+        }
+
+        return result;
+    }
+
+    bool HasLineOfSight(Vector2Int a, Vector2Int b)
+    {
+        int dx = Mathf.Abs(b.x - a.x);
+        int dy = Mathf.Abs(b.y - a.y);
+
+        int sx = a.x < b.x ? 1 : -1;
+        int sy = a.y < b.y ? 1 : -1;
+
+        int err = dx - dy;
+
+        int x = a.x;
+        int y = a.y;
+
+        while (true)
+        {
+            if (x < 0 || y < 0 || x >= gridGenerator.width || y >= gridGenerator.height)
+                return false;
+
+            GridNode node = gridGenerator.nodes[x, y];
+
+            if (node == null || node.isBlocked)
+                return false;
+
+            if (x == b.x && y == b.y)
+                break;
+
+            int e2 = 2 * err;
+
+            if (e2 > -dy)
+            {
+                err -= dy;
+                x += sx;
+            }
+
+            if (e2 < dx)
+            {
+                err += dx;
+                y += sy;
+            }
+        }
+
+        return true;
     }
 }

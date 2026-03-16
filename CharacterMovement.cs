@@ -467,6 +467,7 @@ public class CharacterMovement : MonoBehaviour
           if(facingLeft == true)
           {
             controlDirection = Direction.DownFacingLeft;
+            Debug.Log("bingingingingin");
           }
           else
           {

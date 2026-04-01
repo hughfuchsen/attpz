@@ -440,15 +440,16 @@ public class GridGenerator : MonoBehaviour
                 {
                     if (hit == null) continue;
 
-                    // Thresholds override blocking
+                    // Detect threshold triggers
                     if (hit.GetComponent<RoomThresholdColliderScript>() != null ||
                         hit.GetComponent<LevelThreshColliderScript>() != null ||
                         hit.GetComponent<BuildingThreshColliderScript>() != null)
                     {
                         touchingThreshold = true;
-                        break;
+                        continue; // keep checking other colliders
                     }
 
+                    // Ignore moving characters and triggers
                     if (hit.CompareTag("PlayerCollider") || hit.CompareTag("NPCCollider") || hit.CompareTag("NPC"))
                         continue;
 
@@ -458,31 +459,35 @@ public class GridGenerator : MonoBehaviour
                     if (hit.gameObject.layer != levelLayer)
                         continue;
 
+                    // Any non-threshold collider blocks
                     blocked = true;
                 }
 
-                node.isBlocked = touchingThreshold ? false : blocked;
+                // Decide node state:
+                // If blocked by a non-threshold collider → blocked
+                // Otherwise, touching only threshold → unblocked
+                node.isBlocked = blocked;
             }
         }
     }
 
     // Optional: draw debug grid
-    // void OnDrawGizmos()
-    // {
-    //     if (nodes == null) return;
+    void OnDrawGizmos()
+    {
+        if (nodes == null) return;
 
-    //     for (int x = 0; x < width; x++)
-    //     {
-    //         for (int y = 0; y < height; y++)
-    //         {
-    //             GridNodeData node = nodes[x, y];
-    //             if (node == null) continue;
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                GridNodeData node = nodes[x, y];
+                if (node == null || !node.isBlocked) continue;
 
-    //             Gizmos.color = node.isBlocked ? Color.red : Color.green;
-    //             Gizmos.DrawWireSphere(node.worldPos, tileHeight * 0.25f);
-    //         }
-    //     }
-    // }
+                Gizmos.color = Color.red;
+                Gizmos.DrawWireSphere(node.worldPos, tileHeight * 0.25f);
+            }
+        }
+    }
 }
 
 // Lightweight data-only node class

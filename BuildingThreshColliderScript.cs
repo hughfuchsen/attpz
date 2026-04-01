@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class BuildingThreshColliderScript : MonoBehaviour
 {
-    public BuildingScript building;
-    // CharacterMovement cm;
-    [SerializeField] GameObject Player;
-    public bool backOfBuilding;
+    [HideInInspector] public BuildingScript building;
+    [HideInInspector] public RoomThresholdColliderScript rts;
+    [HideInInspector] public GameObject player;
+    [HideInInspector] public bool backOfBuilding = false;
     public bool rooftopLadder;
 
     // SoundtrackScript soundtrackScript;
@@ -15,17 +15,37 @@ public class BuildingThreshColliderScript : MonoBehaviour
     private Dictionary<GameObject, bool> aboveColliderByCharacter = new Dictionary<GameObject, bool>();
 
 
+    void Awake()
+    {
+        if(!enabled)
+        return;
+
+        building = GetComponentInParent<BuildingScript>();
+        rts = GetComponent<RoomThresholdColliderScript>();
+
+        
+        if(rts != null && rts.roomAbove == null)
+        {
+            backOfBuilding = true;
+        }
+    }
 
     void Start()
     {
-        Player = GameObject.FindGameObjectWithTag("Player");
-        // cm = Player.GetComponent<CharacterMovement>(); 
+        if(!enabled)
+        return;
+
+        player = GameObject.FindGameObjectWithTag("Player");
+        // cm = player.GetComponent<CharacterMovement>(); 
         // soundtrackScript = GameObject.FindGameObjectWithTag("SoundtrackScript").GetComponent<SoundtrackScript>();
 
     }
 
     void OnTriggerEnter2D(Collider2D other)
     {
+        if(!enabled)
+        return;
+
         if(other.CompareTag("PlayerCollider"))
         {
             CharacterMovement cm = other.transform.parent.GetComponent<CharacterMovement>();
@@ -80,7 +100,8 @@ public class BuildingThreshColliderScript : MonoBehaviour
     }
     void OnTriggerExit2D(Collider2D other)
     {
-        
+        if(!enabled)
+        return;
 
         if(other.CompareTag("PlayerCollider"))
         {
@@ -303,4 +324,20 @@ public class BuildingThreshColliderScript : MonoBehaviour
     {
         return cm.change.y > 0;
     }
+
+    // BuildingScript FetchBuilding()
+    // {
+    //     Transform current = transform;
+
+    //     while (current != null)
+    //     {
+    //         building = current.GetComponent<BuildingScript>();
+    //         if (building != null)
+    //             return building;
+
+    //         current = current.parent;
+    //     }
+
+    //     return null;
+    // }
 }

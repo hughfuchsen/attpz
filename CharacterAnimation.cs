@@ -241,13 +241,13 @@ public class CharacterAnimation : MonoBehaviour
 
 
 
-    currentSkinColor = (HexToColor("#F5CBA7"));
-    currentHairColor = (HexToColor("#F5CBA7"));
-    currentHatColor = (HexToColor("#ffffff"));
-    currentShirtColor = (HexToColor("#aaaaaa"));
-    currentPantsColor = (HexToColor("#00B6FF"));
-    currentShoeColor = (HexToColor("#AB4918"));
-    currentJakettoColor = (HexToColor("#AB4918"));
+    currentSkinColor = (HexToColor("#000000"));
+    currentHairColor = (HexToColor("#000000"));
+    currentHatColor = (HexToColor("#000000"));
+    currentShirtColor = (HexToColor("#000000"));
+    currentPantsColor = (HexToColor("#000000"));
+    currentShoeColor = (HexToColor("#000000"));
+    currentJakettoColor = (HexToColor("#000000"));
     eyeSprite.color = HexToColor("#000000");
 
 

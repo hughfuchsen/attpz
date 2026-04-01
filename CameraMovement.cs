@@ -32,6 +32,26 @@ public class CameraMovement : MonoBehaviour
     void Awake()
     {
         innerBuildingBackdrop.SetActive(true);
+
+        // // Remove all disabled LevelThreshColliderScript components
+        // LevelThreshColliderScript[] levelColliders = FindObjectsOfType<LevelThreshColliderScript>(true);
+        // foreach (var comp in levelColliders)
+        // {
+        //     if (!comp.enabled)
+        //     {
+        //         Destroy(comp); // destroys the component, not the GameObject
+        //     }
+        // }
+
+        // // Remove all disabled BuildingThreshColliderScript components
+        // BuildingThreshColliderScript[] buildingColliders = FindObjectsOfType<BuildingThreshColliderScript>(true);
+        // foreach (var comp in buildingColliders)
+        // {
+        //     if (!comp.enabled)
+        //     {
+        //         Destroy(comp);
+        //     }
+        // }
     }
 
     void Start()

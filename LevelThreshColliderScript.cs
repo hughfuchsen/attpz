@@ -4,9 +4,8 @@ using UnityEngine;
 
 public class LevelThreshColliderScript : MonoBehaviour
 {
-    [SerializeField] GameObject Player;
-
-    // public string initialSortingLayerUponEntry;
+    [HideInInspector] public GameObject player;
+    [HideInInspector] public BuildingScript building;
 
     public bool itsALadder;
 
@@ -14,18 +13,29 @@ public class LevelThreshColliderScript : MonoBehaviour
 
     public LevelScript levelBelowOrEntering;
 
-    public bool plyrCrsngLeft = false;
+    [HideInInspector] public bool plyrCrsngLeft = false;
 
     public Coroutine thresholdSortingSequenceCoro;
 
     private string initialSortingLayer;
 
+    void Awake()
+    {
+        if(!enabled)
+        return;
 
+        plyrCrsngLeft = this.CompareTag("CrossLeft");
+
+        building = GetComponentInParent<BuildingScript>();
+    }
     
     // Start is called before the first frame update
     void Start()
     {
-        Player = GameObject.FindGameObjectWithTag("Player");
+        if(!enabled)
+        return;
+
+        player = GameObject.FindGameObjectWithTag("Player");
     }
 
     // private bool aboveCollider;
@@ -34,7 +44,10 @@ public class LevelThreshColliderScript : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        if(other.CompareTag("PlayerCollider") || other.CompareTag("NPCCollider"))
+        if(!enabled)
+        return;
+
+        if((other.CompareTag("PlayerCollider") || other.CompareTag("NPCCollider")))
         {
             CharacterMovement cm = other.transform.parent.GetComponent<CharacterMovement>();
             cm.currentLevelThreshold = this;
@@ -79,6 +92,9 @@ public class LevelThreshColliderScript : MonoBehaviour
     }
     void OnTriggerExit2D(Collider2D other)
     {
+        if(!enabled)
+        return;
+
         if(other.CompareTag("PlayerCollider"))
         {
             CharacterMovement cm = other.transform.parent.GetComponent<CharacterMovement>();
@@ -183,7 +199,7 @@ public class LevelThreshColliderScript : MonoBehaviour
             }
             if(this.transform.parent.GetComponentInChildren<BuildingThreshColliderScript>() == null)
             {
-                thresholdSortingSequenceCoro = StartCoroutine(ThresholdLayerSortingSequence(0.3f, Player, "ThresholdSequence"));
+                thresholdSortingSequenceCoro = StartCoroutine(ThresholdLayerSortingSequence(0.3f, player, "ThresholdSequence"));
             }
 
         }
@@ -281,7 +297,7 @@ public class LevelThreshColliderScript : MonoBehaviour
             }
             // if(this.transform.parent.GetComponentInChildren<BuildingThreshColliderScript>() == null)
             // {
-            //     thresholdSortingSequenceCoro = StartCoroutine(ThresholdLayerSortingSequence(0.3f, Player, "ThresholdSequence"));
+            //     thresholdSortingSequenceCoro = StartCoroutine(ThresholdLayerSortingSequence(0.3f, player, "ThresholdSequence"));
             // }
            
         }
@@ -293,14 +309,14 @@ public class LevelThreshColliderScript : MonoBehaviour
     GameObject gameObject,
     string newSortingLayer) 
     {  
-        initialSortingLayer = Player.transform.Find("head").GetComponent<SpriteRenderer>().sortingLayerName; 
+        initialSortingLayer = player.transform.Find("head").GetComponent<SpriteRenderer>().sortingLayerName; 
         // initialSortingLayer = LayerMask.LayerToName(this.gameObject.layer);
 
         SetTreeSortingLayer(gameObject, newSortingLayer);
 
         yield return new WaitForSeconds(waitTime);
 
-        if (Player.transform.Find("head").GetComponent<SpriteRenderer>().sortingLayerName == newSortingLayer)
+        if (player.transform.Find("head").GetComponent<SpriteRenderer>().sortingLayerName == newSortingLayer)
         {
             SetTreeSortingLayer(gameObject, initialSortingLayer);
         }

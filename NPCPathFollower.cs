@@ -49,10 +49,13 @@ public class NPCPathFollower : MonoBehaviour
 
     public void SetTargetNode(GridNodeData target)
     {
-        if (target == null || currentNode == null)
-            return;
+        if (target == null)
+        return;
 
-        // gridGenerator.UpdateNodeViability(this.gameObject, npcCM.currentLevel);
+        currentNode = GetClosestNode(transform.position - gridOffset);
+
+        if (currentNode == null)
+            return;
 
         bool[,] blockedGrid =
             new bool[gridGenerator.width, gridGenerator.height];
@@ -81,6 +84,11 @@ public class NPCPathFollower : MonoBehaviour
 
         pathIndices = ExtractCorners(pathIndices);
         pathIndices = SmoothPath(pathIndices);
+
+        if (pathIndices.Count > 0)
+        {
+            pathIndices.RemoveAt(0);
+        }
 
         pathQueue.Clear();
 

@@ -5,15 +5,29 @@ using UnityEngine;
 public class RoomScript : MonoBehaviour
 {
     public SurfaceType roomSurface = SurfaceType.Carpet; // Default value 
-    public BuildingScript building;
+    public BuildingScript building = null;
     public LevelScript level = null;
     [HideInInspector] public Vector3 levelOffset = Vector3.zero;
     [HideInInspector] public CameraMovement cameraMovement;
     [HideInInspector] public CharacterMovement myCM;
     [HideInInspector] public bool roomIsMoving = false;
      public bool isDown = false;
+    [HideInInspector] public Bounds floorBounds;
+
+    [Header("Auto-calculated rooms")]
     public List<RoomScript> roomsSameOrAbove = new List<RoomScript>();
     public List<RoomScript> roomsBelow = new List<RoomScript>();
+    public List<RoomScript> roomsToLeft = new List<RoomScript>();
+    public List<RoomScript> roomsToRight = new List<RoomScript>();
+
+    [HideInInspector] public SpriteRenderer[] floorRenderers; // 👈 HERE
+    [HideInInspector] public float depthValue;
+    float depthMin;
+    float depthMax;
+
+
+    [HideInInspector] public GameObject floorObj = null;
+
     private List<GameObject> roomSpriteList = new List<GameObject>();
     private List<Color> initialColorList = new List<Color>();
     private List<Color> desaturatedColorList = new List<Color>();
@@ -21,7 +35,7 @@ public class RoomScript : MonoBehaviour
     private List<Transform> childColliders = new List<Transform>(); // Separate list for child colliders
     private List<Vector3> childColliderInitialPositions = new List<Vector3>();
 
-    public List<RoomThresholdColliderScript> doorsBelow = new List<RoomThresholdColliderScript>();
+    public List<RoomThresholdColliderScript> bottomEdgeDoors = new List<RoomThresholdColliderScript>();
     private List<Coroutine> doorsBelowCoros = new List<Coroutine>();
     public int wallHeight = 31;
     private Vector3 initialPosition;
@@ -36,6 +50,12 @@ public class RoomScript : MonoBehaviour
 
     void Awake()
     {
+
+        roomsSameOrAbove.Clear();
+        roomsBelow.Clear();
+        roomsToLeft.Clear();
+        roomsToRight.Clear();
+
         GetSpritesAndAddToLists(this.gameObject, roomSpriteList);
         for (int i = 0; i < roomSpriteList.Count; i++)
         {
@@ -48,14 +68,48 @@ public class RoomScript : MonoBehaviour
                 // initialColorListToBeChangedWithLevelMovements.Add(initialColor);
             // }
         }
+        GetBottomEdgeDoorsAndAddToList(this.gameObject);
+
+
+    // Step 1: find Floor-tagged object
+
+        foreach (Transform t in transform)
+        {
+            if (t.CompareTag("Floor"))
+            {
+                floorObj = t.gameObject;
+                break;
+            }
+        }
+
+        if (floorObj == null)
+        {
+            Debug.LogWarning(name + " has no Floor tagged child.");
+            return;
+        }
+
+        // Step 2: encapsulate bounds of children SpriteRenderers
+        floorRenderers = floorObj.GetComponentsInChildren<SpriteRenderer>();
+        if (floorRenderers.Length == 0)
+        {
+            Debug.LogWarning(floorObj.name + " has no SpriteRenderers.");
+            return;
+        }
+
+        floorBounds = floorRenderers[0].bounds;
+        foreach (var sr in floorRenderers)
+        {
+            floorBounds.Encapsulate(sr.bounds);
+        }
+        
+        StartCoroutine(ComputeFloorBounds());
     }
 
     void Start()
     {
         initialPosition = this.gameObject.transform.localPosition;
 
-        building = FindParentByBuildingScriptComponent();
-        level = FindParentByLevelScriptComponent();
+        level = GetComponentInParent<LevelScript>();
 
         FindColliderObjects(transform);
 
@@ -113,10 +167,34 @@ public class RoomScript : MonoBehaviour
             }        
         }
 
-        for (int i = 0; i < doorsBelow.Count; i++)
+        for (int i = 0; i < roomsToLeft.Count; i++)
         {
-            doorsBelow[i].SetPlayerIsInRoomAbove(true);
-            doorsBelow[i].SetPlayerIsInDoorway(false);
+            if (waitTime.HasValue)
+            {
+                roomsToLeft[i].MoveOut(shouldWait, waitTime.Value);
+            }
+            else
+            {
+                roomsToLeft[i].MoveOut(false, 0f);
+            }        
+        }
+
+        for (int i = 0; i < roomsToRight.Count; i++)
+        {
+            if (waitTime.HasValue)
+            {
+                roomsToRight[i].MoveOut(shouldWait, waitTime.Value);
+            }
+            else
+            {
+                roomsToRight[i].MoveOut(false, 0f);
+            }        
+        }
+
+        for (int i = 0; i < bottomEdgeDoors.Count; i++)
+        {
+            bottomEdgeDoors[i].SetPlayerIsInRoomAbove(true);
+            bottomEdgeDoors[i].SetPlayerIsInDoorway(false);
         }
         for (int i = 0; i < npcListForRoom.Count; i++)
         {
@@ -322,11 +400,11 @@ public class RoomScript : MonoBehaviour
 
             npcIsoSS.SorterPositionOffset = baseOffset;
         }
-        if(NPCcm.currentRoom == myCM.currentRoom)
+        if(NPCcm.currentRoom == myCM.currentRoom && myCM.currentRoom != null)
         {
             HandleDoorFade();
         }
-        else if(NPCcm.previousRoom == myCM.currentRoom)
+        else if(NPCcm.previousRoom == myCM.currentRoom && myCM.currentRoom != null)
         {
             myCM.currentRoom.HandleDoorFade();
         }
@@ -409,10 +487,10 @@ public class RoomScript : MonoBehaviour
     
     public void ExitRoomAndSetDoorwayInstances() 
     {
-        for (int i = 0; i < doorsBelow.Count; i++)
+        for (int i = 0; i < bottomEdgeDoors.Count; i++)
         {
-            doorsBelow[i].SetPlayerIsInRoomAbove(false);
-            doorsBelow[i].SetPlayerIsInDoorway(false);
+            bottomEdgeDoors[i].SetPlayerIsInRoomAbove(false);
+            bottomEdgeDoors[i].SetPlayerIsInDoorway(false);
         }
     }
     
@@ -459,6 +537,32 @@ public class RoomScript : MonoBehaviour
         {
             // Move the parent object down
             currentMotionCoroutine = StartCoroutine(LerpRoomPositions(shouldWait, waitTime.Value, this.gameObject, initialPosition + new Vector3(0, -wallHeight, 0), movingUp));
+
+        }
+        else
+        {
+            // Handle the case where waitTime is null (optional)
+            // Debug.LogError("waitTime is null. You should handle this case appropriately.");
+        }
+        // isDown = true;
+    }
+
+    public void MoveOut(bool shouldWait, float? waitTime, bool movingUp = false)
+    {
+        if (currentMotionCoroutine != null)
+        {
+            StopCoroutine(currentMotionCoroutine);
+            FinalizeRoomStateInstantly();
+        }
+        // if (currentColorCoroutine != null)
+        // {
+        //     StopCoroutine(currentColorCoroutine);
+        // }
+
+        if (waitTime.HasValue)
+        {
+            // Move the parent object down
+            currentMotionCoroutine = StartCoroutine(LerpRoomPositions(shouldWait, waitTime.Value, this.gameObject, initialPosition + new Vector3(Mathf.Abs(floorBounds.max.x - floorBounds.min.x), 0, 0), movingUp));
 
         }
         else
@@ -891,37 +995,6 @@ public class RoomScript : MonoBehaviour
         }
     }
 
-        // Finds the parent GameObject by tag
-    public BuildingScript FindParentByBuildingScriptComponent()
-    {
-        Transform current = transform;
-
-        while (current != null)
-        {
-            if (current.GetComponent<BuildingScript>() != null)
-            {
-                return current.GetComponent<BuildingScript>();
-            }
-            current = current.parent; // Move up to the next parent
-        }
-        Debug.Log("didn't get the building");
-        return null; // Return null if no matching parent is found
-    }
-    public LevelScript FindParentByLevelScriptComponent()
-    {
-        Transform current = transform;
-
-        while (current != null)
-        {
-            if (current.GetComponent<LevelScript>() != null)
-            {
-                return current.GetComponent<LevelScript>();
-            }
-            current = current.parent; // Move up to the next parent
-        }
-
-        return null; // Return null if no matching parent is found
-    }
 
     IEnumerator LateStartCoroForNonPlayerCharacters()
     {
@@ -954,6 +1027,28 @@ public class RoomScript : MonoBehaviour
             if (sr != null && !currentNode.CompareTag("ClosedDoor"))
             {
                 spriteList.Add(currentNode);
+            }
+
+            foreach (Transform child in currentNode.transform)
+            {
+                stack.Push(child.gameObject);
+            }
+        }
+    }
+    private void GetBottomEdgeDoorsAndAddToList(GameObject obj)
+    {
+        Stack<GameObject> stack = new Stack<GameObject>();
+        stack.Push(obj);
+
+        while (stack.Count > 0)
+        {
+            GameObject currentNode = stack.Pop();
+            RoomThresholdColliderScript rts = currentNode.GetComponent<RoomThresholdColliderScript>();
+            BuildingThreshColliderScript bts = currentNode.GetComponent<BuildingThreshColliderScript>();
+
+            if (rts != null && bts != null && (!bts.enabled || !bts.backOfBuilding))
+            {
+                bottomEdgeDoors.Add(rts);
             }
 
             foreach (Transform child in currentNode.transform)
@@ -997,14 +1092,406 @@ public class RoomScript : MonoBehaviour
 
     public void HandleDoorFade()
     {
-        for (int i = 0; i < doorsBelow.Count; i++)
+        for (int i = 0; i < bottomEdgeDoors.Count; i++)
         {
-            if(myCM.currentRoomThreshold != doorsBelow[i])
+            if(myCM.currentRoomThreshold != bottomEdgeDoors[i])
             {
-                doorsBelow[i].SetPlayerIsInRoomAbove(true);
-                doorsBelow[i].SetPlayerIsInDoorway(false);
+                bottomEdgeDoors[i].SetPlayerIsInRoomAbove(true);
+                bottomEdgeDoors[i].SetPlayerIsInDoorway(false);
             }
         }
+    }
+
+    IEnumerator ComputeFloorBounds()
+    {   
+        yield return null; // wait one frame
+        ComputeDepth();
+        ComputeAdjacency();
+    }
+
+    void ComputeDepth()
+    {
+        depthMin = float.MaxValue;
+        depthMax = float.MinValue;
+
+        foreach (var sr in floorRenderers)
+        {
+            Bounds b = sr.bounds;
+
+            Vector2[] corners = {
+                new Vector2(b.min.x, b.min.y),
+                new Vector2(b.max.x, b.min.y),
+                new Vector2(b.min.x, b.max.y),
+                new Vector2(b.max.x, b.max.y)
+            };
+
+            foreach (var c in corners)
+            {
+                // float d = -c.y;
+                float d = c.x + 2f * c.y;
+
+                if (d < depthMin) depthMin = d;
+                if (d > depthMax) depthMax = d;
+            }
+            // Vector3[] corners = { b.min, new Vector3(b.max.x,b.min.y,0), new Vector3(b.min.x,b.max.y,0), b.max };
+            // float roomMin = float.MaxValue;
+            // float roomMax = float.MinValue;
+
+            // foreach (var c in corners)
+            // {
+            //     float d = c.x + 2f * c.y;
+            //     roomMin = Mathf.Min(roomMin, d);
+            //     roomMax = Mathf.Max(roomMax, d);
+            // }
+
+            // // Then set depthMin / depthMax for the room
+            // depthMin = roomMin;
+            // depthMax = roomMax;
+        }
+    }
+
+    void ComputeAdjacency()
+    {
+        roomsSameOrAbove.Clear();
+        roomsBelow.Clear();
+
+        roomsSameOrAbove.Add(this);
+
+        BuildingScript building = GetComponentInParent<BuildingScript>();
+        if (building == null) return;
+
+        RoomScript[] allRooms = building.GetComponentsInChildren<RoomScript>();
+        float epsilon = 0.01f;
+
+        foreach (RoomScript other in allRooms)
+        {
+            if (other == this) continue;
+
+            // Compare front and back edges for robust sorting
+            if (other.depthMin > depthMax + epsilon)
+            {
+                // other is completely behind this room
+                roomsBelow.Add(other);
+            }
+            else if (other.depthMax < depthMin - epsilon)
+            {
+                // other is completely in front of this room
+                roomsSameOrAbove.Add(other);
+            }
+            else
+            {
+                Debug.Log("other");
+                // overlapping depths → fallback to center
+                float thisCenter = (depthMin + depthMax) * 0.5f;
+                float otherCenter = (other.depthMin + other.depthMax) * 0.5f;
+
+                if (otherCenter > thisCenter + epsilon)
+                    roomsBelow.Add(other);
+                else
+                    roomsSameOrAbove.Add(other);
+            }
+        }
+    }
+
+    // void ComputeAdjacency()
+    // {
+    //     roomsSameOrAbove.Clear();
+    //     roomsBelow.Clear();
+
+    //     roomsSameOrAbove.Add(this);
+
+    //     BuildingScript building = GetComponentInParent<BuildingScript>();
+    //     RoomScript[] allRooms = building.GetComponentsInChildren<RoomScript>();
+
+    //     float epsilon = 0.01f;
+
+    //     Debug.Log($"THIS center: {(depthMin + depthMax) * 0.5f}");
+
+    //     foreach (RoomScript other in allRooms)
+    //     {
+    //         if (other == this) continue;
+
+    //         float thisDepth = depthMin;
+    //         float otherDepth = other.depthMin;
+
+    //         if (otherDepth > thisDepth + 0.01f)
+    //             roomsBelow.Add(other);
+    //         else
+    //             roomsSameOrAbove.Add(other);
+    //     }
+    // }
+
+    // void ComputeAdjacency()
+    // {
+    //     roomsSameOrAbove.Add(this);   
+
+    //     BuildingScript building = GetComponentInParent<BuildingScript>();
+    //     RoomScript[] allRooms = building.GetComponentsInChildren<RoomScript>();
+
+    //     foreach (RoomScript other in allRooms)
+    //     {
+    //         if (other == this) continue;
+
+    //         if (other.floorBounds.center.y > floorBounds.center.y)
+    //         {
+    //             if(other.floorBounds.max.y > floorBounds.max.y)
+    //             {
+    //                 roomsSameOrAbove.Add(other);
+    //             }
+    //             else if(other.floorBounds.center.x > floorBounds.center.x)
+    //             {
+    //                 if(Mathf.Abs(other.floorBounds.min.x - floorBounds.min.x) 
+    //                 < Mathf.Abs(other.floorBounds.max.x - floorBounds.max.x))
+    //                 {
+    //                     roomsSameOrAbove.Add(other);
+    //                 }
+    //                 else
+    //                 {
+    //                     roomsBelow.Add(other);
+    //                 }  
+    //             }
+    //             else if(other.floorBounds.center.x < floorBounds.center.x)
+    //             {
+    //                 if(Mathf.Abs(other.floorBounds.min.x - floorBounds.min.x) 
+    //                 < Mathf.Abs(other.floorBounds.max.x - floorBounds.max.x))
+    //                 {
+    //                     roomsSameOrAbove.Add(other);
+    //                 }
+    //                 else
+    //                 {
+    //                     roomsBelow.Add(other);
+    //                 }
+    //             }
+    //         }
+    //         else if (other.floorBounds.center.y < floorBounds.center.y)
+    //         {
+    //             if(other.floorBounds.max.y < floorBounds.max.y)
+    //             {
+    //                 if(other.floorBounds.max.y > floorBounds.center.y)
+    //                 {
+    //                     if(other.floorBounds.center.x > floorBounds.center.x)
+    //                     {
+    //                         if(other.floorBounds.min.x > floorBounds.center.x)
+    //                         {
+    //                             // if(other.floorBounds.min.x < floorBounds.max.x && other.floorBounds.max.x > floorBounds.max.x)
+    //                             // if(Mathf.Abs(other.floorBounds.min.x - floorBounds.center.x) 
+    //                             // < Mathf.Abs(other.floorBounds.min.x - other.floorBounds.center.x))                           
+    //                             // {
+    //                                 roomsToRight.Add(other);
+    //                             // }
+    //                         }
+    //                         else
+    //                         {
+    //                             roomsBelow.Add(other);
+    //                         }
+    //                     }
+    //                     else if(other.floorBounds.center.x < floorBounds.center.x)
+    //                     {
+    //                         if(other.floorBounds.max.x > floorBounds.center.x)
+    //                         {
+    //                             // if(other.floorBounds.min.x < floorBounds.max.x && other.floorBounds.max.x > floorBounds.max.x)
+    //                             // if(Mathf.Abs(other.floorBounds.min.x - floorBounds.center.x) 
+    //                             // < Mathf.Abs(other.floorBounds.min.x - other.floorBounds.center.x))                           
+    //                             // {
+    //                                 roomsToRight.Add(other);
+    //                             // }
+    //                         }
+    //                         else
+    //                         {
+    //                             roomsBelow.Add(other);
+    //                         }   
+    //                     }
+
+    //                 }
+
+
+    //             }
+    //             else if(other.floorBounds.center.x > floorBounds.center.x)
+    //             {
+    //                 if(Mathf.Abs(other.floorBounds.min.x - floorBounds.min.x) 
+    //                 < Mathf.Abs(other.floorBounds.max.x - floorBounds.max.x))
+    //                 {
+    //                     roomsBelow.Add(other);
+    //                 }
+    //                 else
+    //                 {
+    //                     roomsSameOrAbove.Add(other);
+    //                 }  
+    //             }
+    //             else if(other.floorBounds.center.x < floorBounds.center.x)
+    //             {
+    //                 if(Mathf.Abs(other.floorBounds.min.x - floorBounds.min.x) 
+    //                 < Mathf.Abs(other.floorBounds.max.x - floorBounds.max.x))
+    //                 {
+    //                     roomsSameOrAbove.Add(other);
+    //                 }
+    //                 else
+    //                 {
+    //                     roomsBelow.Add(other);
+    //                 }
+    //             }
+    //         }
+
+    //         // if (other.floorBounds.min.x < floorBounds.min.x)
+    //         //     roomsToLeft.Add(other);
+
+    //         // if (other.floorBounds.max.x > floorBounds.max.x)
+    //         //     roomsToRight.Add(other);
+    //     }
+    // }
+
+    // void ComputeAdjacency()
+    // {
+    //     roomsSameOrAbove.Add(this);
+
+    //     BuildingScript building = GetComponentInParent<BuildingScript>();
+    //     RoomScript[] allRooms = building.GetComponentsInChildren<RoomScript>();
+
+    //     foreach (RoomScript other in allRooms)
+    //     {
+    //         if (other == this) continue;
+
+    //         float verticalOffset = other.floorBounds.center.y - floorBounds.center.y;
+
+    //         bool horizontalOverlap = other.floorBounds.max.x > floorBounds.min.x &&
+    //                                  other.floorBounds.min.x < floorBounds.max.x;
+
+    //         // if (horizontalOverlap)
+    //         // {
+    //             if (verticalOffset > 0)
+    //                 roomsSameOrAbove.Add(other);
+    //             else
+    //                 roomsBelow.Add(other);
+    //         // }
+    //         // else
+    //         // {
+    //         //     roomsSameOrAbove.Add(other);
+    //             // // if no overlap, maybe still mark as left/right
+    //             // if (other.floorBounds.center.x > floorBounds.center.x)
+    //             //     roomsToRight.Add(other);
+    //             // else
+    //             //     roomsToLeft.Add(other);
+    //         // }
+    //     }
+    // }
+
+
+
+
+
+    
+
+    // void ComputeAdjacency()
+    // {
+    //     roomsSameOrAbove.Add(this);
+
+    //     BuildingScript building = GetComponentInParent<BuildingScript>();
+    //     RoomScript[] allRooms = building.GetComponentsInChildren<RoomScript>();
+
+    //     foreach (RoomScript other in allRooms)
+    //     {
+    //         if (other == this) continue;
+
+    //         // --- ABOVE ---
+    //         if (other.floorBounds.center.y > floorBounds.center.y)
+    //         {
+    //             if (other.floorBounds.max.y > floorBounds.max.y)
+    //             {
+    //                 roomsSameOrAbove.Add(other);
+    //             }
+    //             else if (other.floorBounds.center.x > floorBounds.center.x)
+    //             {
+    //                 if (Mathf.Abs(other.floorBounds.min.x - floorBounds.min.x) <
+    //                     Mathf.Abs(other.floorBounds.max.x - floorBounds.max.x))
+    //                 {
+    //                     roomsSameOrAbove.Add(other);
+    //                 }
+    //                 else
+    //                 {
+    //                     roomsBelow.Add(other);
+    //                 }
+    //             }
+    //             else if (other.floorBounds.center.x < floorBounds.center.x)
+    //             {
+    //                 if (Mathf.Abs(other.floorBounds.min.x - floorBounds.min.x) <
+    //                     Mathf.Abs(other.floorBounds.max.x - floorBounds.max.x))
+    //                 {
+    //                     roomsSameOrAbove.Add(other);
+    //                 }
+    //                 else
+    //                 {
+    //                     roomsBelow.Add(other);
+    //                 }
+    //             }
+    //         }
+    //         // --- BELOW ---
+    //         else if (other.floorBounds.center.y < floorBounds.center.y)
+    //         {
+    //             if (other.floorBounds.max.y < floorBounds.max.y)
+    //             {
+    //                 if (other.floorBounds.max.y > floorBounds.center.y)
+    //                 {
+    //                     if (other.floorBounds.center.x > floorBounds.center.x)
+    //                     {
+    //                         if (other.floorBounds.min.x > floorBounds.center.x)
+    //                         {
+    //                             if (Mathf.Abs(other.floorBounds.min.x - floorBounds.center.x) <
+    //                                 Mathf.Abs(other.floorBounds.min.x - other.floorBounds.center.x))
+    //                             {
+    //                                 roomsToRight.Add(other);
+    //                             }
+    //                         }
+    //                         else
+    //                         {
+    //                             roomsBelow.Add(other);
+    //                         }
+    //                     }
+    //                 }
+    //             }
+    //             else if (other.floorBounds.center.x > floorBounds.center.x)
+    //             {
+    //                 if (Mathf.Abs(other.floorBounds.min.x - floorBounds.min.x) <
+    //                     Mathf.Abs(other.floorBounds.max.x - floorBounds.max.x))
+    //                 {
+    //                     roomsBelow.Add(other);
+    //                 }
+    //                 else
+    //                 {
+    //                     roomsSameOrAbove.Add(other);
+    //                 }
+    //             }
+    //             else if (other.floorBounds.center.x < floorBounds.center.x)
+    //             {
+    //                 if (Mathf.Abs(other.floorBounds.min.x - floorBounds.min.x) <
+    //                     Mathf.Abs(other.floorBounds.max.x - floorBounds.max.x))
+    //                 {
+    //                     roomsSameOrAbove.Add(other);
+    //                 }
+    //                 else
+    //                 {
+    //                     roomsBelow.Add(other);
+    //                 }
+    //             }
+    //         }
+
+    //         // --- OPTIONAL HORIZONTAL (commented out) ---
+    //         // if (other.floorBounds.min.x < floorBounds.min.x)
+    //         //     roomsToLeft.Add(other);
+
+    //         // if (other.floorBounds.max.x > floorBounds.max.x)
+    //         //     roomsToRight.Add(other);
+    //     }
+    // }
+    
+    void OnDrawGizmos()
+    {
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireCube(floorBounds.center, floorBounds.size);
+
+        // optional: draw corners
+        // Gizmos.color = Color.red;
+        // Gizmos.DrawSphere(floorBounds.min, 0.05f);
+        // Gizmos.DrawSphere(floorBounds.max, 0.05f);
     }
     // IEnumerator LateStartCoroForNonPlayerCharacters()
     // {

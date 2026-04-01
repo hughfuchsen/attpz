@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class BuildingScript : MonoBehaviour
 {
-    public List<BuildingScript> allOtherBuildings = new List<BuildingScript>();
+    [HideInInspector] public List<BuildingScript> allOtherBuildings = new List<BuildingScript>();
 
     [HideInInspector] public CameraMovement cameraMovement;
 

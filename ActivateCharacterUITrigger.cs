@@ -9,7 +9,7 @@ public class ActivateCharacterUITrigger : MonoBehaviour
     public GameObject createChrctrObj;
 
     [SerializeField] GameObject backdrop;
-    [SerializeField] GameObject Player;
+    [SerializeField] GameObject player;
     [SerializeField] GameObject platform;
     [SerializeField] GameObject thnxMessageUI;
     [SerializeField] LoadCSVDataWeb loadCSVData;
@@ -33,9 +33,9 @@ public class ActivateCharacterUITrigger : MonoBehaviour
     {
         StartCoroutine (LateStart());
 
-        Player = GameObject.FindGameObjectWithTag("Player");
+        player = GameObject.FindGameObjectWithTag("Player");
 
-        myCharacterAnimation = Player.GetComponent<CharacterAnimation>();
+        myCharacterAnimation = player.GetComponent<CharacterAnimation>();
 
         backdrop = GameObject.FindGameObjectWithTag("InnerBuildingBackdrop");
 
@@ -55,18 +55,18 @@ public class ActivateCharacterUITrigger : MonoBehaviour
                         Input.GetKeyDown(KeyCode.JoystickButton1) ||  // B button
                         Input.GetKeyDown(KeyCode.JoystickButton2)   // X button
                         // Input.GetKeyDown(KeyCode.JoystickButton3)
-                        ) && !Player.GetComponent<CharacterMovement>().IsInputFieldFocused())           
+                        ) && !player.GetComponentInChildren<CharacterMovement>().IsInputFieldFocused())           
                 {  
                     if (GameObject.Find("creationUIWeb")?.activeSelf == true)
                     {
-                        Player.GetComponent<CharacterCustomization>().UpdateRandom();
-                        // Player.GetComponent<CharacterAnimation>().characterSpriteList.Clear;
-                        // Player.GetComponent<CharacterAnimation>().initialChrctrColorList.Clear;
+                        player.GetComponent<CharacterCustomization>().UpdateRandom();
+                        // player.GetComponent<CharacterAnimation>().characterSpriteList.Clear;
+                        // player.GetComponent<CharacterAnimation>().initialChrctrColorList.Clear;
                     }
                     else
                     {
                         loadCSVData.DisplayRandomRow();
-                        myCharacterAnimation.GetSpritesAndAddToLists(Player, myCharacterAnimation.characterSpriteList, new List<GameObject>(), myCharacterAnimation.initialChrctrColorList, myCharacterAnimation.initialChrctrSpriteTransformList);
+                        myCharacterAnimation.GetSpritesAndAddToLists(player, myCharacterAnimation.characterSpriteList, new List<GameObject>(), myCharacterAnimation.initialChrctrColorList, myCharacterAnimation.initialChrctrSpriteTransformList);
                     }
                 }
         }
@@ -81,9 +81,9 @@ public class ActivateCharacterUITrigger : MonoBehaviour
         createChrctrObj.SetActive(false);
     }
 
-    void OnTriggerEnter2D(Collider2D player)
+    void OnTriggerEnter2D(Collider2D collision)
     {
-        if(player.CompareTag("PlayerCollider") && !Player.GetComponent<CharacterMovement>().playerOnBike)
+        if(collision.CompareTag("PlayerCollider") && !player.GetComponent<CharacterMovement>().playerOnBike)
         {
             if(backdropFadeCoroutine != null)
             {
@@ -100,9 +100,9 @@ public class ActivateCharacterUITrigger : MonoBehaviour
     }
 
 
-    void OnTriggerExit2D(Collider2D player)
+    void OnTriggerExit2D(Collider2D collision)
     {
-        if(player.CompareTag("PlayerCollider"))
+        if(collision.CompareTag("PlayerCollider"))
         {
             if(backdropFadeCoroutine != null)
             {
@@ -144,7 +144,7 @@ public class ActivateCharacterUITrigger : MonoBehaviour
                 // browseChrctrObj.SetActive(true);
 
                 SetTreeSortingLayer(backdrop, "UI1");
-                SetTreeSortingLayer(Player, "UI2");
+                SetTreeSortingLayer(player, "UI2");
                 SetTreeSortingLayer(platform, "UI2");
 
                 thnxMessageUI.SetActive(false);
@@ -196,7 +196,7 @@ public class ActivateCharacterUITrigger : MonoBehaviour
 
 
                 SetTreeSortingLayer(backdrop, "Backdrop");
-                SetTreeSortingLayer(Player, "Default");
+                SetTreeSortingLayer(player, "Default");
                 SetTreeSortingLayer(platform, "Default");
 
                 thnxMessageUI.SetActive(true);

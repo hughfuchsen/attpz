@@ -3,8 +3,11 @@ using UnityEngine;
 public class NPCClickMover : MonoBehaviour
 {
     public NPCPathFollower npc;
-    public Camera mainCamera;
-    public GridGenerator gridGenerator;
+
+    [HideInInspector] public Camera mainCamera;
+    [HideInInspector] public GridGenerator gridGenerator;
+    [HideInInspector] public ActivateCharacterUITrigger characterCustomizer;
+
 
     void Start()
     {
@@ -13,11 +16,14 @@ public class NPCClickMover : MonoBehaviour
 
         if (gridGenerator == null)
             gridGenerator = FindObjectOfType<GridGenerator>();
+        
+        if (characterCustomizer == null)
+            characterCustomizer = FindObjectOfType<ActivateCharacterUITrigger>();
     }
 
     void Update()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0) && !characterCustomizer.playerInRange)
         {
             Vector3 mouseWorld = mainCamera.ScreenToWorldPoint(Input.mousePosition);
             mouseWorld.z = 0f;

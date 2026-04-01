@@ -4,13 +4,10 @@ using UnityEngine;
 
 public class InclineThresholdColliderScript : MonoBehaviour
 {
-    // CharacterMovement cm;
     CharacterAnimation myCharacterAnimation;
     IsoSpriteSorting isoSpriteSortingScript;
     [SerializeField] GameObject Player;
-
     [HideInInspector] public BuildingScript building = null;
-
     [SerializeField] LevelScript levelItLeaves;
     public string motionDirection;
     public Coroutine thresholdSortingSequenceCoro;
@@ -23,7 +20,7 @@ public class InclineThresholdColliderScript : MonoBehaviour
     public bool middleOfIncline;
     public bool itsALadder;
     public int ladderHeight = 0;
-    public bool plyrCrsngLeft = false; 
+    [HideInInspector] public bool plyrCrsngLeft = false; 
     public bool straightMiddleLanding = false; 
     public enum InFrontOrBehindLadder {none, inFrontOfLadder, behindLadder}
     public InFrontOrBehindLadder inFrontOrBehindLadder;
@@ -40,6 +37,8 @@ public class InclineThresholdColliderScript : MonoBehaviour
             CheckIfTheStairsHaveAStraightMiddleLanding();
 
         building = FindParentByBuildingScriptComponent();
+
+        plyrCrsngLeft = this.CompareTag("CrossLeft"); // CrossRight is default
     }
 
     void Start()

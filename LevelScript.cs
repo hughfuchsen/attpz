@@ -74,7 +74,7 @@ public class LevelScript : MonoBehaviour
     }
     void Start()
     {
-        building = FindParentByBuildingScriptComponent();
+        building = GetComponentInParent<BuildingScript>();
         innerBuildingBackDropColor = GameObject.FindGameObjectWithTag("InnerBuildingBackdrop").GetComponent<SpriteRenderer>().color;
         Color.RGBToHSV(innerBuildingBackDropColor, out float bdh, out float bds, out float bdv);
         
@@ -800,21 +800,6 @@ public class LevelScript : MonoBehaviour
         }
     }
 
-    public BuildingScript FindParentByBuildingScriptComponent()
-    {
-        Transform current = transform;
-
-        while (current != null)
-        {
-            if (current.GetComponent<BuildingScript>() != null)
-            {
-                return current.GetComponent<BuildingScript>();
-            }
-            current = current.parent; // Move up to the next parent
-        }
-
-        return null; // Return null if no matching parent is found
-    }
 
     public void HandleInclineCollisionIgnoring(GameObject character)
     {

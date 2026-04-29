@@ -250,7 +250,7 @@ public class RoomThresholdColliderScript : MonoBehaviour
                             if(roomAbove.level != null)
                                 cm.currentLevel = roomAbove.level;
                             if(roomBelow.level != null)
-                            cm.previousLevel = roomBelow.level;
+                                cm.previousLevel = roomBelow.level;
                         }
                         else if (roomBelow != null && roomAbove == null) // if player is exiting the back of the building
                         { 
@@ -259,9 +259,11 @@ public class RoomThresholdColliderScript : MonoBehaviour
                             CloseDoor();
                             cm.currentRoom = null;
                             cm.previousRoom = roomBelow;
-                            cm.previouseBuilding = roomBelow.building;
                             if(roomBelow.level != null)
                                 cm.previousLevel = roomBelow.level;
+
+                            cm.previouseBuilding = roomBelow.building;
+                            cm.currentBuilding = null;
                         }  
                         else if (roomAbove != null) // if player is entering the building from the fro
                         {

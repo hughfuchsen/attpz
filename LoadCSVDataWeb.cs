@@ -144,6 +144,8 @@ public class LoadCSVDataWeb : MonoBehaviour
     {
         foreach (GameObject npc in npcList)
         {
+            // if(npc.GetComponent<CharacterAnimation>() != null)
+            // && npc.GetComponent<CharacterAnimation>().characterType != 0) // need to optimise 10/04/26
             UpdateNPC(npc);
         }
     }   

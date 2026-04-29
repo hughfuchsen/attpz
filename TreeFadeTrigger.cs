@@ -6,10 +6,10 @@ public class TreeFadeTrigger : MonoBehaviour
 
 {
   CharacterMovement myCharacterMovement;
-  GameObject Player;
-  public GameObject foliage;
-  public GameObject canopy;
-  public float defaultFadeAlphaFloat = 0.15f;
+  GameObject player;
+  GameObject foliage;
+  GameObject canopy;
+  float defaultFadeAlphaFloat = 0.5f;
   private Coroutine leafFadeCoro;
   private Coroutine canopyFadeCoro;
   private Coroutine resetTagsCoro;
@@ -26,20 +26,23 @@ public class TreeFadeTrigger : MonoBehaviour
 
   void Awake()
   {
-      Player = GameObject.FindGameObjectWithTag("Player");
-      myCharacterMovement = Player.GetComponent<CharacterMovement>();
+    player = GameObject.FindGameObjectWithTag("Player");
+    foliage = FindChildWithTag(transform.parent, "Foliage");
+    canopy = FindChildWithTag(transform.parent, "Canopy");
+
+    myCharacterMovement = player.GetComponent<CharacterMovement>();
 
 
-      if (foliage != null)
-      {
-          GetSpritesAndApplyToLists(foliage, foliageListToFade, initialFoliageAlphaFloatList, fadedFoliageFloatList);
-          leafFadeCoro = StartCoroutine(SetTreeAlpha(foliageListToFade, initialFoliageAlphaFloatList, false));
-      }
-      if (canopy != null)
-      {
-          GetSpritesAndApplyToLists(canopy, canopyListToFade, initialCanopyAlphaFloatList, fadedCanopyFloatList);
-          canopyFadeCoro = StartCoroutine(SetTreeAlpha(canopyListToFade, initialCanopyAlphaFloatList, false));
-      }
+    if (foliage != null)
+    {
+        GetSpritesAndApplyToLists(foliage, foliageListToFade, initialFoliageAlphaFloatList, fadedFoliageFloatList);
+        leafFadeCoro = StartCoroutine(SetTreeAlpha(foliageListToFade, initialFoliageAlphaFloatList, false));
+    }
+    if (canopy != null)
+    {
+        GetSpritesAndApplyToLists(canopy, canopyListToFade, initialCanopyAlphaFloatList, fadedCanopyFloatList);
+        canopyFadeCoro = StartCoroutine(SetTreeAlpha(canopyListToFade, initialCanopyAlphaFloatList, false));
+    }
 
   }
 
@@ -49,40 +52,54 @@ public class TreeFadeTrigger : MonoBehaviour
       {
           StopAllCoros();
 
-          if (myCharacterMovement.playerOnBuildingThresh == false) // if player is not on building threshold
-          {
+          // if (myCharacterMovement.playerOnBuildingThresh == false) // if player is not on building threshold
+          // {
+            if (foliage != null)
+            {
               leafFadeCoro = StartCoroutine(SetTreeAlpha(foliageListToFade, fadedFoliageFloatList, false));
+            }
+            
+            if (canopy != null)
+            {
               canopyFadeCoro = StartCoroutine(SetTreeAlpha(canopyListToFade, null, false));
+            }
 
-          }
-          else
-          {
-              transform.parent.tag = "AlphaZeroEntExt";
-              TagChildrenOfTaggedParents("AlphaZeroEntExt");
-          }
+          // }
+          // else
+          // {
+          //     transform.parent.tag = "AlphaZeroEntExt";
+          //     TagChildrenOfTaggedParents("AlphaZeroEntExt");
+          // }
       }
   }
   void OnTriggerExit2D(Collider2D other)
   {
       if (other.CompareTag("PlayerCollider"))
       {
-          if (myCharacterMovement.playerOnBuildingThresh == false)
-          {
+          // if (myCharacterMovement.playerOnBuildingThresh == false)
+          // {
               // leafFadeCoro = StartCoroutine(SetTreeAlpha(foliageListToFade, initialFoliageAlphaFloatList, true));
               if (!myCharacterMovement.playerOnFurniture)
               {
-                  leafFadeCoro = StartCoroutine(SetTreeAlpha(foliageListToFade, initialFoliageAlphaFloatList, true));
-                  canopyFadeCoro = StartCoroutine(SetTreeAlpha(canopyListToFade, initialCanopyAlphaFloatList, true));
+                if (foliage != null)
+                {
+                  leafFadeCoro = StartCoroutine(SetTreeAlpha(foliageListToFade, initialFoliageAlphaFloatList, false));
+                }
+                
+                if (canopy != null)
+                {
+                  canopyFadeCoro = StartCoroutine(SetTreeAlpha(canopyListToFade, initialCanopyAlphaFloatList, false));
+                }
               }
-              transform.parent.tag = "Untagged";
-              TagChildrenOfTaggedParents("Untagged");
-          }
-          else
-          {
-              transform.parent.tag = "AlphaZeroEntExt";
-              TagChildrenOfTaggedParents("AlphaZeroEntExt");
-              resetTagsCoro = StartCoroutine(resetTagsToUntaggedAfterWait()); //maybe something to do with balcony door?
-          }
+              // transform.parent.tag = "Untagged";
+              // TagChildrenOfTaggedParents("Untagged");
+          // }
+          // else
+          // {
+          //     transform.parent.tag = "AlphaZeroEntExt";
+          //     TagChildrenOfTaggedParents("AlphaZeroEntExt");
+          //     resetTagsCoro = StartCoroutine(resetTagsToUntaggedAfterWait()); //maybe something to do with balcony door?
+          // }
       }
   }
 
@@ -204,5 +221,19 @@ public class TreeFadeTrigger : MonoBehaviour
               stack.Push(child.gameObject);
           }
       }
+  }
+
+  GameObject FindChildWithTag(Transform parent, string tag)
+  {
+      foreach (Transform child in parent)
+      {
+          if (child.CompareTag(tag))
+              return child.gameObject;
+
+          GameObject result = FindChildWithTag(child, tag);
+          if (result != null)
+              return result;
+      }
+      return null;
   }
 }

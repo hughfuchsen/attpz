@@ -110,49 +110,13 @@ public class IsoSpriteSortingEditor : Editor
         }
     }
 
-    // private Vector3 DrawSnappedHandle(IsoSpriteSorting target, Vector3 offset, float snap)
-    // {
-    //     Vector3 worldPos = target.transform.position + offset;
-
-    //     Handles.color = new Color(1f, 1f, 1f, 1f); // white, 40% opacity
-
-    //     // draw handle and get the new world position
-    //     Vector3 newWorldPos = Handles.FreeMoveHandle(
-    //         worldPos,
-    //         Quaternion.identity,
-    //         0.08f * HandleUtility.GetHandleSize(worldPos),
-    //         Vector3.zero,
-    //         Handles.DotHandleCap
-    //     );
-
-    //     // only apply snap *after* dragging
-    //     if (snap > 0f && newWorldPos != worldPos)
-    //     {
-    //         newWorldPos = SnapToGrid(newWorldPos, snap);
-    //     }
-
-    //     // return offset relative to parent
-    //     return newWorldPos - target.transform.position;
-    // }
-
     private Vector3 DrawSnappedHandle(IsoSpriteSorting target, Vector3 offset, float snap)
     {
-        Transform t = target.transform;
+        Vector3 worldPos = target.transform.position + offset;
 
-        // 🔥 handle negative scale (flip compensation)
-        Vector3 scaleSign = new Vector3(
-            Mathf.Sign(t.localScale.x),
-            Mathf.Sign(t.localScale.y),
-            1f
-        );
+        Handles.color = new Color(1f, 1f, 1f, 1f); // white, 40% opacity
 
-        // apply sign so flipping doesn't move handle
-        Vector3 correctedOffset = Vector3.Scale(offset, scaleSign);
-
-        Vector3 worldPos = t.position + correctedOffset;
-
-        Handles.color = new Color(1f, 1f, 1f, 1f);
-
+        // draw handle and get the new world position
         Vector3 newWorldPos = Handles.FreeMoveHandle(
             worldPos,
             Quaternion.identity,
@@ -161,17 +125,53 @@ public class IsoSpriteSortingEditor : Editor
             Handles.DotHandleCap
         );
 
+        // only apply snap *after* dragging
         if (snap > 0f && newWorldPos != worldPos)
         {
             newWorldPos = SnapToGrid(newWorldPos, snap);
         }
 
-        // convert back into local offset space (reapply flip)
-        Vector3 newOffset = newWorldPos - t.position;
-        newOffset = Vector3.Scale(newOffset, scaleSign);
-
-        return newOffset;
+        // return offset relative to parent
+        return newWorldPos - target.transform.position;
     }
+
+    // private Vector3 DrawSnappedHandle(IsoSpriteSorting target, Vector3 offset, float snap)
+    // {
+    //     Transform t = target.transform;
+
+    //     // 🔥 handle negative scale (flip compensation)
+    //     Vector3 scaleSign = new Vector3(
+    //         Mathf.Sign(t.localScale.x),
+    //         Mathf.Sign(t.localScale.y),
+    //         1f
+    //     );
+
+    //     // apply sign so flipping doesn't move handle
+    //     Vector3 correctedOffset = Vector3.Scale(offset, scaleSign);
+
+    //     Vector3 worldPos = t.position + correctedOffset;
+
+    //     Handles.color = new Color(1f, 1f, 1f, 1f);
+
+    //     Vector3 newWorldPos = Handles.FreeMoveHandle(
+    //         worldPos,
+    //         Quaternion.identity,
+    //         0.08f * HandleUtility.GetHandleSize(worldPos),
+    //         Vector3.zero,
+    //         Handles.DotHandleCap
+    //     );
+
+    //     if (snap > 0f && newWorldPos != worldPos)
+    //     {
+    //         newWorldPos = SnapToGrid(newWorldPos, snap);
+    //     }
+
+    //     // convert back into local offset space (reapply flip)
+    //     Vector3 newOffset = newWorldPos - t.position;
+    //     newOffset = Vector3.Scale(newOffset, scaleSign);
+
+    //     return newOffset;
+    // }
 
     private Vector3 SnapToGrid(Vector3 position, float gridSize)
     {

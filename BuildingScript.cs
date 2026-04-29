@@ -302,7 +302,7 @@ public class BuildingScript : MonoBehaviour
                         SetTreeSortingLayer(gameObjectsToShowWhileOutsideSpriteList[i], "Default");
                     }
             }
-            if (player.transform.Find("head").GetComponent<SpriteRenderer>().sortingLayerName == "Level0") // if the player exits building from the ground floor
+            if (player.transform.Find("headParent").transform.Find("head").GetComponent<SpriteRenderer>().sortingLayerName == "Level0") // if the player exits building from the ground floor
             {
                 SetTreeSortingLayer(player, "Default");
             }
@@ -371,7 +371,7 @@ public class BuildingScript : MonoBehaviour
                         SetTreeSortingLayer(gameObjectsToShowWhileOutsideSpriteList[i], "Default");
                     }
             }
-            if (player.transform.Find("head").GetComponent<SpriteRenderer>().sortingLayerName == "Level0") // if the player exits building from the ground flow
+            if (player.transform.Find("headParent").transform.Find("head").GetComponent<SpriteRenderer>().sortingLayerName == "Level0") // if the player exits building from the ground flow
             {
                 SetTreeSortingLayer(player, "Default");
             }
@@ -416,7 +416,7 @@ public class BuildingScript : MonoBehaviour
                         SetTreeSortingLayer(gameObjectsToShowWhileOutsideSpriteList[i], "Level0");
                     }
             }
-            if (player.transform.Find("head").GetComponent<SpriteRenderer>().sortingLayerName == "Default") // if the player enters building at the ground flow
+            if (player.transform.Find("headParent").transform.Find("head").GetComponent<SpriteRenderer>().sortingLayerName == "Default") // if the player enters building at the ground flow
             {
                 SetTreeSortingLayer(player, "Level0");
             }

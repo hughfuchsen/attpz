@@ -33,8 +33,7 @@ public class CharacterMovement : MonoBehaviour
 { 
   CharacterAnimation characterAnimation;
   CharacterCustomization characterCustomization;
-  [HideInInspector] public int movementSpeed = 30;
-  [HideInInspector] public int initialMovementSpeed;
+  [HideInInspector] public int movementSpeed = 1;
   [HideInInspector] public Rigidbody2D myRigidbody; 
 
   [HideInInspector] public BoxCollider2D boxCollider;
@@ -53,6 +52,7 @@ public class CharacterMovement : MonoBehaviour
   public bool playerIsOutside = false;
 
   [HideInInspector] public bool facingLeft;
+  [HideInInspector] public bool facingUp;
 
   [HideInInspector] public bool playerOnBike = false;
 
@@ -101,14 +101,12 @@ public class CharacterMovement : MonoBehaviour
       // Find all input fields in the scene
       inputFields = FindObjectsOfType<TMP_InputField>();
 
-      initialMovementSpeed = movementSpeed;
-
       characterAnimation = GetComponent<CharacterAnimation>();
       characterCustomization = GetComponent<CharacterCustomization>();
       
       if(this.gameObject.tag != "Player")
       {
-          // npcRandomMovementCoro = StartCoroutine(MoveCharacterRandomly());
+          npcRandomMovementCoro = StartCoroutine(MoveCharacterRandomly());
           // npcRandomMovementCoro = null;
       }
 
@@ -391,45 +389,8 @@ public class CharacterMovement : MonoBehaviour
     // Convert negative angles to positive angles (0 to 360 degrees)
     if (angle < 0) angle += 360;
 
-    if(playerOnBike)
-    {
-        // Map the angle to movement directions and animations
-        if (angle > 0f && angle <= 90f)           { change = new Vector3(-1f,0.5f,0f); characterAnimation.currentAnimationDirection = characterAnimation.upLeftAnim; facingLeft = true; } // Inverted right-up to left-up      
-        else if (angle > 90f && angle <= 135f)    { change = new Vector3(-1f,-0.5f,0f); characterAnimation.currentAnimationDirection = characterAnimation.leftAnim; facingLeft = true; } // Inverted right to left
-        else if (angle > 135f && angle < 180)    { change = new Vector3(-1f,-0.5f,0f); characterAnimation.currentAnimationDirection = characterAnimation.leftDownAnim; facingLeft = true; } // Inverted right-down to left-down
-        else if (angle > 180f && angle <= 225f)   { change = new Vector3(1f,-0.5f,0f); characterAnimation.currentAnimationDirection = characterAnimation.rightDownAnim; facingLeft = false; }  // Inverted left-down to right-down
-        else if ((angle == 180f))   
-          { 
-            if(facingLeft == true)
-            {
-              change = new Vector3(-1f,-0.5f,0f); characterAnimation.currentAnimationDirection = characterAnimation.leftDownAnim; facingLeft = true;  // Up
-            }
-            else
-            {
-              change = new Vector3(1f,-0.5f,0f); characterAnimation.currentAnimationDirection = characterAnimation.rightDownAnim; facingLeft = false; // Up
-            }
-          }
-        else if (angle > 225f && angle <= 270f)   { change = new Vector3(1f,-0.5f,0f); characterAnimation.currentAnimationDirection = characterAnimation.rightAnim; facingLeft = false; }  // Inverted left-down to right-down
-        else if ((angle > 270f && angle <= 360f)) { change = new Vector3(1f,0.5f,0f); characterAnimation.currentAnimationDirection = characterAnimation.upRightAnim; facingLeft = false; } // Up
-        else if ((angle == 0f))   
-                { 
-                  if(facingLeft == true)
-                  {
-                    change = new Vector3(-1f,0.5f,0f); characterAnimation.currentAnimationDirection = characterAnimation.upLeftAnim; facingLeft = true;  // Up
-                  }
-                  else
-                  {
-                    change = new Vector3(1f,0.5f,0f); characterAnimation.currentAnimationDirection = characterAnimation.upRightAnim; facingLeft = false; // Up
-                  }
-                }
-        
-        else if (angle > 225f && angle <= 270f) { change = new Vector3(1f,-0.5f,0f); characterAnimation.currentAnimationDirection = characterAnimation.rightAnim; facingLeft = false; } // Inverted left to right
 
-        // Handle animation and movement
-        characterAnimation.Animate(characterAnimation.movementStartIndex, characterAnimation.movementFrameCount, characterAnimation.currentAnimationDirection, characterAnimation.bodyTypeNumber);
-        myRigidbody.MovePosition(transform.position + change * movementSpeed * Time.deltaTime);
-    }
-    else // main walking
+    if(!playerOnBike) // main walking
     {
         if ((angle > 0f && angle <= 22.5f))   
         { 
@@ -467,7 +428,6 @@ public class CharacterMovement : MonoBehaviour
           if(facingLeft == true)
           {
             controlDirection = Direction.DownFacingLeft;
-            Debug.Log("bingingingingin");
           }
           else
           {
@@ -505,7 +465,46 @@ public class CharacterMovement : MonoBehaviour
         // Handle animation and movement
         characterAnimation.Animate(characterAnimation.movementStartIndex, characterAnimation.movementFrameCount, characterAnimation.currentAnimationDirection, characterAnimation.bodyTypeNumber);
         myRigidbody.MovePosition(transform.position + change * movementSpeed * Time.deltaTime);
-    };
+    }
+    else if(playerOnBike)
+    {
+        // Map the angle to movement directions and animations
+        if (angle > 0f && angle <= 90f)           { change = new Vector3(-1f,0.5f,0f); characterAnimation.currentAnimationDirection = characterAnimation.upLeftAnim; facingLeft = true; } // Inverted right-up to left-up      
+        else if (angle > 90f && angle <= 135f)    { change = new Vector3(-1f,-0.5f,0f); characterAnimation.currentAnimationDirection = characterAnimation.leftAnim; facingLeft = true; } // Inverted right to left
+        else if (angle > 135f && angle < 180)    { change = new Vector3(-1f,-0.5f,0f); characterAnimation.currentAnimationDirection = characterAnimation.leftDownAnim; facingLeft = true; } // Inverted right-down to left-down
+        else if (angle > 180f && angle <= 225f)   { change = new Vector3(1f,-0.5f,0f); characterAnimation.currentAnimationDirection = characterAnimation.rightDownAnim; facingLeft = false; }  // Inverted left-down to right-down
+        else if ((angle == 180f))   
+          { 
+            if(facingLeft == true)
+            {
+              change = new Vector3(-1f,-0.5f,0f); characterAnimation.currentAnimationDirection = characterAnimation.leftDownAnim; facingLeft = true;  // Up
+            }
+            else
+            {
+              change = new Vector3(1f,-0.5f,0f); characterAnimation.currentAnimationDirection = characterAnimation.rightDownAnim; facingLeft = false; // Up
+            }
+          }
+        else if (angle > 225f && angle <= 270f)   { change = new Vector3(1f,-0.5f,0f); characterAnimation.currentAnimationDirection = characterAnimation.rightAnim; facingLeft = false; }  // Inverted left-down to right-down
+        else if ((angle > 270f && angle <= 360f)) { change = new Vector3(1f,0.5f,0f); characterAnimation.currentAnimationDirection = characterAnimation.upRightAnim; facingLeft = false; } // Up
+        else if ((angle == 0f))   
+                { 
+                  if(facingLeft == true)
+                  {
+                    change = new Vector3(-1f,0.5f,0f); characterAnimation.currentAnimationDirection = characterAnimation.upLeftAnim; facingLeft = true;  // Up
+                  }
+                  else
+                  {
+                    change = new Vector3(1f,0.5f,0f); characterAnimation.currentAnimationDirection = characterAnimation.upRightAnim; facingLeft = false; // Up
+                  }
+                }
+        
+        else if (angle > 225f && angle <= 270f) { change = new Vector3(1f,-0.5f,0f); characterAnimation.currentAnimationDirection = characterAnimation.rightAnim; facingLeft = false; } // Inverted left to right
+
+        // Handle animation and movement
+        characterAnimation.Animate(characterAnimation.movementStartIndex, characterAnimation.movementFrameCount, characterAnimation.currentAnimationDirection, characterAnimation.bodyTypeNumber);
+        myRigidbody.MovePosition(myRigidbody.position + (Vector2)change * movementSpeed * Time.deltaTime);
+        // myRigidbody.MovePosition(transform.position + change * movementSpeed * Time.deltaTime);
+    }
   } 
 
   private Direction HandleQuadrantContact(Direction controlDirection, ContactQuadrant contactQuadrant)
@@ -584,31 +583,31 @@ public class CharacterMovement : MonoBehaviour
     if(this.gameObject.tag == "Player")
     {
       Direction playerDirection = controlDirectionToPlayerDirection[controlDirection];
-      if      (playerDirection == Direction.UpFacingLeft) { change = new Vector3(0f,1f,0f); characterAnimation.currentAnimationDirection = characterAnimation.upLeftAnim; facingLeft = true; }
-      else if (playerDirection == Direction.UpFacingRight) { change = new Vector3(0f,1f,0f); characterAnimation.currentAnimationDirection = characterAnimation.upRightAnim; facingLeft = false; }
-      else if (playerDirection == Direction.UpRight) { change = new Vector3(1f,0.5f,0f); characterAnimation.currentAnimationDirection = characterAnimation.upRightAnim; facingLeft = false; }
-      else if (playerDirection == Direction.Right) { change = new Vector3(1f,0f,0f); characterAnimation.currentAnimationDirection = characterAnimation.rightAnim; facingLeft = false; }
-      else if (playerDirection == Direction.RightDown) { change = new Vector3(1f,-0.5f,0f); characterAnimation.currentAnimationDirection = characterAnimation.rightDownAnim; facingLeft = false; }
-      else if (playerDirection == Direction.DownFacingRight) { change = new Vector3(0f,-1f,0f); characterAnimation.currentAnimationDirection = characterAnimation.rightDownAnim; facingLeft = false; }
-      else if (playerDirection == Direction.DownFacingLeft) { change = new Vector3(0f,-1f,0f); characterAnimation.currentAnimationDirection = characterAnimation.leftDownAnim; facingLeft = true; }
-      else if (playerDirection == Direction.DownLeft) { change = new Vector3(-1f,-0.5f,0f); characterAnimation.currentAnimationDirection = characterAnimation.leftDownAnim; facingLeft = true; }
-      else if (playerDirection == Direction.Left) { change = new Vector3(-1f,0f,0f); characterAnimation.currentAnimationDirection = characterAnimation.leftAnim; facingLeft = true; }
-      else if (playerDirection == Direction.UpLeft) { change = new Vector3(-1f,0.5f,0f); characterAnimation.currentAnimationDirection = characterAnimation.upLeftAnim; facingLeft = true; }
+      if      (playerDirection == Direction.UpFacingLeft) { change = new Vector3(0f,1f,0f); characterAnimation.currentAnimationDirection = characterAnimation.upLeftAnim; facingLeft = true; facingUp = true;}
+      else if (playerDirection == Direction.UpFacingRight) { change = new Vector3(0f,1f,0f); characterAnimation.currentAnimationDirection = characterAnimation.upRightAnim; facingLeft = false; facingUp = true;}
+      else if (playerDirection == Direction.UpRight) { change = new Vector3(1f,0.5f,0f); characterAnimation.currentAnimationDirection = characterAnimation.upRightAnim; facingLeft = false; facingUp = true;}
+      else if (playerDirection == Direction.Right) { change = new Vector3(1f,0f,0f); characterAnimation.currentAnimationDirection = characterAnimation.rightAnim; facingLeft = false; facingUp = false;}
+      else if (playerDirection == Direction.RightDown) { change = new Vector3(1f,-0.5f,0f); characterAnimation.currentAnimationDirection = characterAnimation.rightDownAnim; facingLeft = false; facingUp = false;}
+      else if (playerDirection == Direction.DownFacingRight) { change = new Vector3(0f,-1f,0f); characterAnimation.currentAnimationDirection = characterAnimation.rightDownAnim; facingLeft = false; facingUp = false;}
+      else if (playerDirection == Direction.DownFacingLeft) { change = new Vector3(0f,-1f,0f); characterAnimation.currentAnimationDirection = characterAnimation.leftDownAnim; facingLeft = true; facingUp = false;}
+      else if (playerDirection == Direction.DownLeft) { change = new Vector3(-1f,-0.5f,0f); characterAnimation.currentAnimationDirection = characterAnimation.leftDownAnim; facingLeft = true; facingUp = false;}
+      else if (playerDirection == Direction.Left) { change = new Vector3(-1f,0f,0f); characterAnimation.currentAnimationDirection = characterAnimation.leftAnim; facingLeft = true; facingUp = false;}
+      else if (playerDirection == Direction.UpLeft) { change = new Vector3(-1f,0.5f,0f); characterAnimation.currentAnimationDirection = characterAnimation.upLeftAnim; facingLeft = true; facingUp = true; }
       else if (playerDirection == Direction.Nothing) { change = Vector3.zero; }
     }
     else if(this.gameObject.tag == "NPC")
     {
      Direction playerDirection = controlDirectionToPlayerDirection[controlDirection];
-      if      (playerDirection == Direction.UpFacingLeft) { characterAnimation.currentAnimationDirection = characterAnimation.upLeftAnim; facingLeft = true; }
-      else if (playerDirection == Direction.UpFacingRight) { characterAnimation.currentAnimationDirection = characterAnimation.upRightAnim; facingLeft = false; }
-      else if (playerDirection == Direction.UpRight) { characterAnimation.currentAnimationDirection = characterAnimation.upRightAnim; facingLeft = false; }
-      else if (playerDirection == Direction.Right) { characterAnimation.currentAnimationDirection = characterAnimation.rightAnim; facingLeft = false; }
-      else if (playerDirection == Direction.RightDown) { characterAnimation.currentAnimationDirection = characterAnimation.rightDownAnim; facingLeft = false; }
-      else if (playerDirection == Direction.DownFacingRight) { characterAnimation.currentAnimationDirection = characterAnimation.rightDownAnim; facingLeft = false; }
-      else if (playerDirection == Direction.DownFacingLeft) { characterAnimation.currentAnimationDirection = characterAnimation.leftDownAnim; facingLeft = true; }
-      else if (playerDirection == Direction.DownLeft) { characterAnimation.currentAnimationDirection = characterAnimation.leftDownAnim; facingLeft = true; }
-      else if (playerDirection == Direction.Left) { characterAnimation.currentAnimationDirection = characterAnimation.leftAnim; facingLeft = true; }
-      else if (playerDirection == Direction.UpLeft) { characterAnimation.currentAnimationDirection = characterAnimation.upLeftAnim; facingLeft = true; }
+      if      (playerDirection == Direction.UpFacingLeft) { characterAnimation.currentAnimationDirection = characterAnimation.upLeftAnim; facingLeft = true; facingUp = true;}
+      else if (playerDirection == Direction.UpFacingRight) { characterAnimation.currentAnimationDirection = characterAnimation.upRightAnim; facingLeft = false; facingUp = true;}
+      else if (playerDirection == Direction.UpRight) { characterAnimation.currentAnimationDirection = characterAnimation.upRightAnim; facingLeft = false; facingUp = true;}
+      else if (playerDirection == Direction.Right) { characterAnimation.currentAnimationDirection = characterAnimation.rightAnim; facingLeft = false; facingUp = false;}
+      else if (playerDirection == Direction.RightDown) { characterAnimation.currentAnimationDirection = characterAnimation.rightDownAnim; facingLeft = false; facingUp = false;}
+      else if (playerDirection == Direction.DownFacingRight) { characterAnimation.currentAnimationDirection = characterAnimation.rightDownAnim; facingLeft = false; facingUp = false;}
+      else if (playerDirection == Direction.DownFacingLeft) { characterAnimation.currentAnimationDirection = characterAnimation.leftDownAnim; facingLeft = true; facingUp = false;}
+      else if (playerDirection == Direction.DownLeft) { characterAnimation.currentAnimationDirection = characterAnimation.leftDownAnim; facingLeft = true; facingUp = false;}
+      else if (playerDirection == Direction.Left) { characterAnimation.currentAnimationDirection = characterAnimation.leftAnim; facingLeft = true; facingUp = false;}
+      else if (playerDirection == Direction.UpLeft) { characterAnimation.currentAnimationDirection = characterAnimation.upLeftAnim; facingLeft = true; facingUp = true;}
       else if (playerDirection == Direction.Nothing) { change = Vector3.zero; } 
     }
   }
@@ -646,10 +645,10 @@ public class CharacterMovement : MonoBehaviour
 
     // if(!myCharacterMovement.playerOnThresh)
     // {
-      yield return new WaitForSeconds(Random.Range(5,7));
+      yield return new WaitForSeconds(Random.Range(5,16));
 
-      change.x = Random.Range(-10,10);
-      change.y = Random.Range(-10,10);
+      change.x = Random.Range(-1, 2);     
+      change.y = Random.Range(-1, 2);
 
       yield return new WaitForSeconds(Random.Range(1,4));
     // }
@@ -659,7 +658,6 @@ public class CharacterMovement : MonoBehaviour
     yield return new WaitForSeconds(Random.Range(5,8));
 
     npcRandomMovementCoro = StartCoroutine(MoveCharacterRandomly()); 
-    // npcRandomMovementCoro = null;
   }
 
 
@@ -675,6 +673,7 @@ public class CharacterMovement : MonoBehaviour
     }
     else if (gameObject.CompareTag("NPC"))
     {
+        Debug.Log("hizzy");
         if (Random.value < 0.5f)
         {
             ReverseDirection(false);

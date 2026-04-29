@@ -51,10 +51,12 @@ public class RoomScript : MonoBehaviour
     void Awake()
     {
 
-        roomsSameOrAbove.Clear();
-        roomsBelow.Clear();
-        roomsToLeft.Clear();
-        roomsToRight.Clear();
+        // roomsSameOrAbove.Clear();
+        // roomsBelow.Clear();
+        // roomsToLeft.Clear();
+        // roomsToRight.Clear();
+
+        building = GetComponentInParent<BuildingScript>();
 
         GetSpritesAndAddToLists(this.gameObject, roomSpriteList);
         for (int i = 0; i < roomSpriteList.Count; i++)
@@ -102,7 +104,7 @@ public class RoomScript : MonoBehaviour
             floorBounds.Encapsulate(sr.bounds);
         }
         
-        StartCoroutine(ComputeFloorBounds());
+        // StartCoroutine(ComputeFloorBounds());
     }
 
     void Start()
@@ -420,7 +422,6 @@ public class RoomScript : MonoBehaviour
         // if NPC was already in another room
         if (NPCcm.currentRoom != null)
         {
-            
             // Assign level if entering building
             if(NPCcm.currentBuilding != null)
             {
@@ -439,7 +440,7 @@ public class RoomScript : MonoBehaviour
             {
                 Vector3 basePos = NPCca.initialChrctrSpriteTransformList[i];
                 // Moved up
-                if (NPCcm.previousRoom.isDown)
+                if (NPCcm.previousRoom != null && NPCcm.previousRoom.isDown)
                 {
                     // previous room is down down!!! down
                     NPCca.characterSpriteList[i].transform.localPosition = basePos;
@@ -453,7 +454,7 @@ public class RoomScript : MonoBehaviour
             npcIsoSS.SorterPositionOffset.y = -28f;
 
         }
-        if(NPCcm.previousRoom == myCM.currentRoom)
+        if(myCM.currentRoom != null && NPCcm.previousRoom == myCM.currentRoom)
         {
             myCM.currentRoom.HandleDoorFade();
         }
@@ -1157,7 +1158,6 @@ public class RoomScript : MonoBehaviour
 
         roomsSameOrAbove.Add(this);
 
-        BuildingScript building = GetComponentInParent<BuildingScript>();
         if (building == null) return;
 
         RoomScript[] allRooms = building.GetComponentsInChildren<RoomScript>();

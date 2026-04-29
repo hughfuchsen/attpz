@@ -52,7 +52,7 @@ public class CharacterCustomization : MonoBehaviour
     public Image pantsColorButton;
     public Image jackettoColorButton;
 
-
+ 
     [HideInInspector] public int currentBodyTypeIndex = 0; // Index to track current body type
     [HideInInspector] public int currentHeightIndex = 0;   // Index to track current height
     [HideInInspector] public int currentWidthIndex = 0;    // Index to track current currentWidthIndex
@@ -76,6 +76,8 @@ public class CharacterCustomization : MonoBehaviour
         // characterAnimation = GetComponent<CharacterMovement>(); 
         characterAnimation = GetComponent<CharacterAnimation>(); 
         // characterAnimation = playerMovement;
+        if(characterAnimation.characterType != 0) // if it's not a humannnnn
+        return;
       
         int[] bodyTypeIndex1 = {5,17,29};
         int[] bodyTypeIndex2 = {9,21,33};
@@ -128,7 +130,6 @@ public class CharacterCustomization : MonoBehaviour
             currentBodyTypeIndex = 0; // Wrap around to the first body type option
         }
         SetBodyType();
-        // SetBodyType();
     }
 
     // public void PreviousBodyType()
@@ -258,7 +259,6 @@ public class CharacterCustomization : MonoBehaviour
             currentWidthIndex = 0; // Wrap around to the first currentWidthIndex option
         }
         SetBodyType();
-        // SetBodyType();
     }
 
     public void PreviousWidth()
@@ -269,15 +269,8 @@ public class CharacterCustomization : MonoBehaviour
             currentWidthIndex = widthIndexSet.Length - 1; 
         }
         SetBodyType();
-        // SetBodyType();
     }
 
-    // private void SetWidth()
-    // {
-    //     int[] availableWidths = widthOptions[bodyTypeNumber];
-    //     bodyTypeNumber = availableWidths[currentWidthIndex];
-    //     Debug.Log("Width: " + bodyTypeNumber); // Log current currentWidthIndex
-    // }
 
 
     public void NextHairStyle()
@@ -1077,69 +1070,72 @@ private void UpdateLockImage()
                                 int jakettoCol, 
                                 int skinCol)
     {
-            currentPantsColorIndex = pantsCol;
-            UpdatePantsColor();
-        
-            currentShirtColorIndex = shirtCol;
-            UpdateShirtColor();
-
-            currentJakettoColorIndex = jakettoCol;
-            // UpdateJakettoColor();
-
-            currentHairColorIndex = hairCol;
-            UpdateHairColor();
-
-            currentSkinColorIndex = skinCol;
-            UpdateSkinColor();
-
-
-            currentShirtIndex = shirt;
-            // UpdateShirt();
-
-            currentJakettoIndex = jaketto;
-            UpdateJakettoColor();
-
-            // UpdateShirt();
-
+        if(characterAnimation.characterType != 0) // if it's not a humannnnn
+        return;
             
-            currentFeetIndex = feet;
-            UpdateFeet();
-       
-            // currentPantsIndex = pants;
-            // UpdatePants();
-       
-            currentWaistIndex = waist;
-            UpdateWaist();
-      
+        currentPantsColorIndex = pantsCol;
+        UpdatePantsColor();
+    
+        currentShirtColorIndex = shirtCol;
+        UpdateShirtColor();
 
-       
-            currentHeightIndex = height;
-            SetBodyType();
-       
-            currentBodyTypeIndex = bodyType;
-            SetBodyType();
-       
-            currentWidthIndex = width;
-            SetBodyType();
-      
-            currentPantsColorIndex = pantsCol;
-            UpdatePantsColor();
+        currentJakettoColorIndex = jakettoCol;
+        // UpdateJakettoColor();
 
-            currentPantsIndex = pants;
-            UpdatePants();
+        currentHairColorIndex = hairCol;
+        UpdateHairColor();
+
+        currentSkinColorIndex = skinCol;
+        UpdateSkinColor();
+
+
+        currentShirtIndex = shirt;
+        // UpdateShirt();
+
+        currentJakettoIndex = jaketto;
+        UpdateJakettoColor();
+
+        // UpdateShirt();
+
         
-            currentShirtColorIndex = shirtCol;
-            UpdateShirtColor();
-       
-            currentHatIndex = hat;
-            UpdateHat();
+        currentFeetIndex = feet;
+        UpdateFeet();
+    
+        // currentPantsIndex = pants;
+        // UpdatePants();
+    
+        currentWaistIndex = waist;
+        UpdateWaist();
+    
 
-            currentHairStyleIndex = hairStyle;
-            UpdateHairStyle();
+    
+        currentHeightIndex = height;
+        SetBodyType();
+    
+        currentBodyTypeIndex = bodyType;
+        SetBodyType();
+    
+        currentWidthIndex = width;
+        SetBodyType();
+    
+        currentPantsColorIndex = pantsCol;
+        UpdatePantsColor();
 
-     
-            // currentJakettoIndex = jaketto;
-            // UpdateJakettoColor();
+        currentPantsIndex = pants;
+        UpdatePants();
+    
+        currentShirtColorIndex = shirtCol;
+        UpdateShirtColor();
+    
+        currentHatIndex = hat;
+        UpdateHat();
+
+        currentHairStyleIndex = hairStyle;
+        UpdateHairStyle();
+
+    
+        // currentJakettoIndex = jaketto;
+        // UpdateJakettoColor();
 
     }
 
@@ -2062,7 +2058,7 @@ private void UpdateLockImage()
 
     public void SetHairColor1()
     {
-        Transform hair = characterAnimation.transform.Find("hair");
+        Transform hair = characterAnimation.transform.Find("headParent").transform.Find("hair");
         if (hair != null)
         {
             foreach (Transform child in hair)
@@ -2084,7 +2080,7 @@ private void UpdateLockImage()
 
     public void SetHairColor2()
     {
-        Transform hair = characterAnimation.transform.Find("hair");
+        Transform hair = characterAnimation.transform.Find("headParent").transform.Find("hair");
         if (hair != null)
         {
             foreach (Transform child in hair)
@@ -2106,7 +2102,7 @@ private void UpdateLockImage()
 
     public void SetHairColor3()
     {
-        Transform hair = characterAnimation.transform.Find("hair");
+        Transform hair = characterAnimation.transform.Find("headParent").transform.Find("hair");
         if (hair != null)
         {
             foreach (Transform child in hair)
@@ -2128,7 +2124,7 @@ private void UpdateLockImage()
 
     public void SetHairColor4()
     {
-        Transform hair = characterAnimation.transform.Find("hair");
+        Transform hair = characterAnimation.transform.Find("headParent").transform.Find("hair");
         if (hair != null)
         {
             foreach (Transform child in hair)
@@ -2150,7 +2146,7 @@ private void UpdateLockImage()
 
     public void SetHairColor5()
     {
-        Transform hair = characterAnimation.transform.Find("hair");
+        Transform hair = characterAnimation.transform.Find("headParent").transform.Find("hair");
         if (hair != null)
         {
             foreach (Transform child in hair)
@@ -2172,7 +2168,7 @@ private void UpdateLockImage()
 
     public void SetHairColor6()
     {
-        Transform hair = characterAnimation.transform.Find("hair");
+        Transform hair = characterAnimation.transform.Find("headParent").transform.Find("hair");
         if (hair != null)
         {
             foreach (Transform child in hair)
@@ -2194,7 +2190,7 @@ private void UpdateLockImage()
 
     public void SetHairColor7()
     {
-        Transform hair = characterAnimation.transform.Find("hair");
+        Transform hair = characterAnimation.transform.Find("headParent").transform.Find("hair");
         if (hair != null)
         {
             foreach (Transform child in hair)
@@ -2216,7 +2212,7 @@ private void UpdateLockImage()
 
     public void SetHairColor8()
     {
-        Transform hair = characterAnimation.transform.Find("hair");
+        Transform hair = characterAnimation.transform.Find("headParent").transform.Find("hair");
         if (hair != null)
         {
             foreach (Transform child in hair)
@@ -2238,7 +2234,7 @@ private void UpdateLockImage()
 
     public void SetHairColor9()
     {
-        Transform hair = characterAnimation.transform.Find("hair");
+        Transform hair = characterAnimation.transform.Find("headParent").transform.Find("hair");
         if (hair != null)
         {
             foreach (Transform child in hair)
@@ -2260,7 +2256,7 @@ private void UpdateLockImage()
 
     public void SetHairColor10()
     {
-        Transform hair = characterAnimation.transform.Find("hair");
+        Transform hair = characterAnimation.transform.Find("headParent").transform.Find("hair");
         if (hair != null)
         {
             foreach (Transform child in hair)
@@ -2284,7 +2280,7 @@ private void UpdateLockImage()
 
     public void SetHairStyle1()
     {
-        Transform hair = characterAnimation.transform.Find("hair");
+        Transform hair = characterAnimation.transform.Find("headParent").transform.Find("hair");
         if (hair != null)
         {
             foreach (Transform child in hair)
@@ -2312,7 +2308,7 @@ private void UpdateLockImage()
 
     public void SetHairStyle2()
     {
-        Transform hair = characterAnimation.transform.Find("hair");
+        Transform hair = characterAnimation.transform.Find("headParent").transform.Find("hair");
         if (hair != null)
         {
             foreach (Transform child in hair)
@@ -2342,7 +2338,7 @@ private void UpdateLockImage()
 
     public void SetHairStyle3()
     {
-        Transform hair = characterAnimation.transform.Find("hair");
+        Transform hair = characterAnimation.transform.Find("headParent").transform.Find("hair");
         if (hair != null)
         {
             foreach (Transform child in hair)
@@ -2372,7 +2368,7 @@ private void UpdateLockImage()
 
     public void SetHairStyle4()
     {
-        Transform hair = characterAnimation.transform.Find("hair");
+        Transform hair = characterAnimation.transform.Find("headParent").transform.Find("hair");
         if (hair != null)
         {
             foreach (Transform child in hair)
@@ -2401,7 +2397,7 @@ private void UpdateLockImage()
 
     public void SetHairStyle5()
     {
-        Transform hair = characterAnimation.transform.Find("hair");
+        Transform hair = characterAnimation.transform.Find("headParent").transform.Find("hair");
         if (hair != null)
         {
             foreach (Transform child in hair)
@@ -2429,7 +2425,7 @@ private void UpdateLockImage()
 
     public void SetHairStyle6()
     {
-        Transform hair = characterAnimation.transform.Find("hair");
+        Transform hair = characterAnimation.transform.Find("headParent").transform.Find("hair");
         if (hair != null)
         {
             foreach (Transform child in hair)
@@ -2457,7 +2453,7 @@ private void UpdateLockImage()
 
     public void SetHairStyle7()
     {
-        Transform hair = characterAnimation.transform.Find("hair");
+        Transform hair = characterAnimation.transform.Find("headParent").transform.Find("hair");
         if (hair != null)
         {
             foreach (Transform child in hair)
@@ -2485,7 +2481,7 @@ private void UpdateLockImage()
 
     public void SetHairStyle8()
     {
-        Transform hair = characterAnimation.transform.Find("hair");
+        Transform hair = characterAnimation.transform.Find("headParent").transform.Find("hair");
         if (hair != null)
         {
             foreach (Transform child in hair)
@@ -2512,7 +2508,7 @@ private void UpdateLockImage()
     }
     public void SetHairStyle9()
     {
-        Transform hair = characterAnimation.transform.Find("hair");
+        Transform hair = characterAnimation.transform.Find("headParent").transform.Find("hair");
         if (hair != null)
         {
             foreach (Transform child in hair)
@@ -2539,7 +2535,7 @@ private void UpdateLockImage()
     }
     public void SetHairStyle10()
     {
-        Transform hair = characterAnimation.transform.Find("hair");
+        Transform hair = characterAnimation.transform.Find("headParent").transform.Find("hair");
         if (hair != null)
         {
             foreach (Transform child in hair)
@@ -2567,7 +2563,7 @@ private void UpdateLockImage()
     }
     public void SetHairStyle11()
     {
-        Transform hair = characterAnimation.transform.Find("hair");
+        Transform hair = characterAnimation.transform.Find("headParent").transform.Find("hair");
         if (hair != null)
         {
             foreach (Transform child in hair)
@@ -2594,7 +2590,7 @@ private void UpdateLockImage()
     }
     public void SetHairStyle12()
     {
-        Transform hair = characterAnimation.transform.Find("hair");
+        Transform hair = characterAnimation.transform.Find("headParent").transform.Find("hair");
         if (hair != null)
         {
             foreach (Transform child in hair)
@@ -2621,7 +2617,7 @@ private void UpdateLockImage()
     }
     public void SetHairStyle13()
     {
-        Transform hair = characterAnimation.transform.Find("hair");
+        Transform hair = characterAnimation.transform.Find("headParent").transform.Find("hair");
         if (hair != null)
         {
             foreach (Transform child in hair)
@@ -2640,7 +2636,7 @@ private void UpdateLockImage()
 
     public void SetNoHat()
     {
-        Transform hair = characterAnimation.transform.Find("hair");
+        Transform hair = characterAnimation.transform.Find("headParent").transform.Find("hair");
         if (hair != null)
         {
             foreach (Transform child in hair)
@@ -2663,7 +2659,7 @@ private void UpdateLockImage()
 
     public void SetHat1()
     {
-        Transform hair = characterAnimation.transform.Find("hair");
+        Transform hair = characterAnimation.transform.Find("headParent").transform.Find("hair");
         if (hair != null)
         {
             foreach (Transform child in hair)

@@ -28,8 +28,8 @@ public class CharacterDialogueScript : MonoBehaviour
     private float staringTime = 0f;
 
     public CharacterAnimation characterAnimation;
-
     private CharacterMovement characterMovement;
+    
     private CharacterMovement myCharacterMovement;
     private Transform myCharacterTransform;
 
@@ -312,33 +312,108 @@ public class CharacterDialogueScript : MonoBehaviour
 
             Vector2 directionToPlayer = myCharacterTransform.position - transform.position;
             float angle = (Mathf.Atan2(directionToPlayer.y, directionToPlayer.x) * Mathf.Rad2Deg + 90) % 360;
-            if (angle < 0) angle += 360; // Normalize angle to 0-360 range
+            if (angle < 0) angle += 360; // Normalize angle to 0-360 range // this angular stuff is functional but cooked atm lol
 
             // Determine the appropriate direction based on the angle
-            if (angle >= 0 && angle < 60)
+            if(characterAnimation.characterType == 0) // if it's a humannnnn
             {
-                characterAnimation.currentAnimationDirection = characterAnimation.rightDownAnim;
+                if (angle >= 0 && angle < 60)
+                {
+                    characterAnimation.currentAnimationDirection = characterAnimation.rightDownAnim;
+                }
+                else if (angle >= 60 && angle < 120)
+                {
+                    characterAnimation.currentAnimationDirection = characterAnimation.rightAnim;
+                }
+                else if (angle >= 120 && angle < 180)
+                {
+                    characterAnimation.currentAnimationDirection = characterAnimation.upRightAnim;
+                }
+                else if (angle >= 180 && angle < 240)
+                {
+                    characterAnimation.currentAnimationDirection = characterAnimation.upLeftAnim;
+                }
+                else if (angle >= 240 && angle < 300)
+                {
+                    characterAnimation.currentAnimationDirection = characterAnimation.leftAnim;
+                }
+                else if (angle >= 300 && angle < 360)
+                {
+                    characterAnimation.currentAnimationDirection = characterAnimation.leftDownAnim;
+                }
             }
-            else if (angle >= 60 && angle < 120)
+            else if(characterAnimation.characterType == CharacterAnimation.CharacterType.Chicken) // CHICKEN!
             {
-                characterAnimation.currentAnimationDirection = characterAnimation.rightAnim;
+                if (angle >= 0 && angle < 180)
+                {
+                    characterMovement.facingLeft = false;
+
+                    if (characterMovement.facingLeft != characterAnimation.isFacingLeft)
+                    {
+                        characterAnimation.isFacingLeft = characterMovement.facingLeft;
+                        characterAnimation.UpdateFlip();
+                    }
+                }
+                else if (angle >= 180 && angle < 360)
+                {
+                    characterMovement.facingLeft = true;
+
+                    if (characterMovement.facingLeft != characterAnimation.isFacingLeft)
+                    {
+                        characterAnimation.isFacingLeft = characterMovement.facingLeft;
+                        characterAnimation.UpdateFlip();
+                    }                
+                }
             }
-            else if (angle >= 120 && angle < 180)
+            else if(characterAnimation.characterType == CharacterAnimation.CharacterType.Pony) // PONY!
             {
-                characterAnimation.currentAnimationDirection = characterAnimation.upRightAnim;
+                if (angle >= 0 && angle < 90)
+                {
+                    characterMovement.facingLeft = false;
+                    characterMovement.facingUp = false;
+
+                    if (characterMovement.facingLeft != characterAnimation.isFacingLeft)
+                    {
+                        characterAnimation.isFacingLeft = characterMovement.facingLeft;
+                        characterAnimation.UpdateFlip();
+                    }
+                }
+                else if (angle >= 90 && angle < 180)
+                {
+                    characterMovement.facingLeft = false;
+                    characterMovement.facingUp = true;
+
+
+                    if (characterMovement.facingLeft != characterAnimation.isFacingLeft)
+                    {
+                        characterAnimation.isFacingLeft = characterMovement.facingLeft;
+                        characterAnimation.UpdateFlip();
+                    }                
+                }
+                else if (angle >= 180 && angle < 270)
+                {
+                    characterMovement.facingLeft = true;
+                    characterMovement.facingUp = true;
+
+                    if (characterMovement.facingLeft != characterAnimation.isFacingLeft)
+                    {
+                        characterAnimation.isFacingLeft = characterMovement.facingLeft;
+                        characterAnimation.UpdateFlip();
+                    }                
+                }
+                else if (angle >= 270 && angle < 360)
+                {
+                    characterMovement.facingLeft = true;
+                    characterMovement.facingUp = false;
+
+                    if (characterMovement.facingLeft != characterAnimation.isFacingLeft)
+                    {
+                        characterAnimation.isFacingLeft = characterMovement.facingLeft;
+                        characterAnimation.UpdateFlip();
+                    }                
+                }
             }
-            else if (angle >= 180 && angle < 240)
-            {
-                characterAnimation.currentAnimationDirection = characterAnimation.upLeftAnim;
-            }
-            else if (angle >= 240 && angle < 300)
-            {
-                characterAnimation.currentAnimationDirection = characterAnimation.leftAnim;
-            }
-            else if (angle >= 300 && angle < 360)
-            {
-                characterAnimation.currentAnimationDirection = characterAnimation.leftDownAnim;
-            }
+
 
             yield return null; // Wait until the next frame
         }
@@ -362,9 +437,9 @@ public class CharacterDialogueScript : MonoBehaviour
         else yield return new WaitForSeconds(Random.Range(2, 6f));
             
         // Restart the NPC movement coroutine when the player leaves
-        if ((isPlayerInRange == false || myCharacterMovement.change == Vector3.zero) && dialogueDisplay.text == "")
+        if (isPlayerInRange == false && dialogueDisplay.text == "")
         {
-            // characterMovement.npcRandomMovementCoro = characterMovement.StartCoroutine(characterMovement.MoveCharacterRandomly());
+            characterMovement.npcRandomMovementCoro = characterMovement.StartCoroutine(characterMovement.MoveCharacterRandomly());
             staring = false;
             staringTime = 0f;
         }

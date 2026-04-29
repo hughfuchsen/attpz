@@ -6,21 +6,19 @@ public class BikeTransformAdjustment : MonoBehaviour
 {
 
     CharacterAnimation characterAnimation;
-    [SerializeField] GameObject Player;
-    [SerializeField] GameObject bike;
+    [SerializeField] GameObject bike = null;
 
     public int rideBikeInt = 15;
 
 
-    public Vector3 initialBikeTransformPosition;
-    public Vector3 newBikeTransformPosition;
+    [HideInInspector] public Vector3 initialBikeTransformPosition;
+    [HideInInspector] public Vector3 newBikeTransformPosition;
 
     public void Start()
     {
-        Player = GameObject.FindGameObjectWithTag("Player");
-        characterAnimation = Player.GetComponent<CharacterAnimation>();  
+        characterAnimation = GetComponent<CharacterAnimation>();  
 
-        bike = transform.Find("bike").gameObject;
+        if(bike != null)
         initialBikeTransformPosition = bike.transform.localPosition;   
     }
 

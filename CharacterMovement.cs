@@ -33,17 +33,21 @@ public class CharacterMovement : MonoBehaviour
 { 
   CharacterAnimation characterAnimation;
   CharacterCustomization characterCustomization;
-  [HideInInspector] public int movementSpeed = 1;
-  [HideInInspector] public Rigidbody2D myRigidbody; 
+  public int movementSpeed = 65;
+  [HideInInspector] public int initialmovementSpeed = 65;
+  [HideInInspector] public Rigidbody2D rb; 
 
   [HideInInspector] public BoxCollider2D boxCollider;
 
  public string motionDirection = "normal";
   [HideInInspector] public Vector3 change;
+  [HideInInspector] public Vector3 initialPosition;
 
-  [HideInInspector] public bool playerOnThresh = false;
+  [HideInInspector] public bool characterOnThresh = false;
   [HideInInspector] public bool playerOnBuildingThresh = false;
   [HideInInspector] public bool movementAutopilot = false;
+  [HideInInspector] public bool isJoyStick = false;
+
 
 
   [HideInInspector] public bool fixedDirectionLeftDiagonal;
@@ -76,45 +80,59 @@ public class CharacterMovement : MonoBehaviour
   // Map the angle to control directions
   public Direction controlDirection = Direction.Nothing; // Default value should never be used
 
-  public BuildingScript currentBuilding = null;
-  public BuildingScript previouseBuilding = null;
-  public BuildingThreshColliderScript currentBuildingThreshold = null;
 
-  public LevelScript currentLevel = null;
-  public LevelScript previousLevel = null;
-  public LevelThreshColliderScript currentLevelThreshold = null;
-  public LevelThreshColliderScript previousLevelThreshold = null;
+  public PlatformAndTrainScript currentArea = null;
 
-  public RoomScript currentRoom = null;
-  public RoomScript previousRoom = null;
-  public RoomThresholdColliderScript currentRoomThreshold = null;
+  public PlatformAndTrainScript previousArea = null;
+  public ThresholdScript currentThreshold = null;
 
-  public InclineThresholdColliderScript currentInclineThreshold = null;
-  public InclineThresholdColliderScript previousInclineThreshold = null;
+  void SetLayerRecursively(GameObject obj, int newLayer)
+  {
+      obj.layer = newLayer;
 
+      foreach (Transform child in obj.transform)
+      {
+          SetLayerRecursively(child.gameObject, newLayer);
+      }
+  }
 
-  // Start is called before the first frame update
-  void Start()    
+  void Awake()    
     {
-      myRigidbody = GetComponent<Rigidbody2D>();
+      rb = GetComponent<Rigidbody2D>();
       boxCollider = GetComponentInChildren<BoxCollider2D>();
       // Find all input fields in the scene
       inputFields = FindObjectsOfType<TMP_InputField>();
 
       characterAnimation = GetComponent<CharacterAnimation>();
       characterCustomization = GetComponent<CharacterCustomization>();
+
+      initialPosition = GetComponent<Transform>().position;
+      initialmovementSpeed = movementSpeed;
       
-      if(this.gameObject.tag != "Player")
-      {
-          npcRandomMovementCoro = StartCoroutine(MoveCharacterRandomly());
-          // npcRandomMovementCoro = null;
-      }
+      // if (CompareTag("Player"))
+      // {
+          // rb.bodyType = RigidbodyType2D.Dynamic;
 
+          // SetLayerRecursively(gameObject, LayerMask.NameToLayer("Player"));
+
+          // FindObjectOfType<CameraMovement>().target = transform;
+      // }
+      // else if(CompareTag("NPC"))
+      // {
+        
+        // rb.bodyType = RigidbodyType2D.Kinematic;
+
+        // SetLayerRecursively(gameObject, LayerMask.NameToLayer("Default"));
+        // npcRandomMovementCoro = StartCoroutine(MoveCharacterRandomly());
+        // npcRandomMovementCoro = null;
+      // }
+
+
+    }
+  // Start is called before the first frame update
+  void Start()    
+    {
       currentContactQuadrant = ContactQuadrant.BottomRight;
-
-      StartCoroutine(LateStartSpawnInsideCoro());
-
-
     }
 
   // Update is called once per frame
@@ -152,16 +170,19 @@ public class CharacterMovement : MonoBehaviour
       }
       else if (Input.GetKey(KeyCode.W)||Input.GetKey(KeyCode.A)||Input.GetKey(KeyCode.S)||Input.GetKey(KeyCode.D))
       {
+        // isJoyStick = false;
         change.x = Input.GetAxisRaw("LeftSideHoriz1");
         change.y = Input.GetAxisRaw("LeftSideVert1");
       }
       else if (Input.GetKey(KeyCode.UpArrow)||Input.GetKey(KeyCode.LeftArrow)||Input.GetKey(KeyCode.DownArrow)||Input.GetKey(KeyCode.RightArrow))
       {
+        // isJoyStick = false;
         change.x = Input.GetAxisRaw("Horizontal");
         change.y = Input.GetAxisRaw("Vertical");
       }
       else
       {
+        // isJoyStick = true;
         change.x = Input.GetAxis("Horizontal");
         change.y = Input.GetAxis("Vertical");
       }
@@ -171,8 +192,7 @@ public class CharacterMovement : MonoBehaviour
       {
         if(motionDirection == "normal") 
         {
-            MoveCharacterNormalDirection();
-            // characterAnimation.Animate(characterAnimation.movementStartIndex, characterAnimation.movementFrameCount, characterAnimation.currentAnimationDirection, characterAnimation.bodyTypeNumber);
+          MoveCharacterNormalDirection();
         } 
         else if (motionDirection == "inclineLeftAway") {
             MoveCharacterVerticalInclineLeftAway();} 
@@ -245,7 +265,7 @@ public class CharacterMovement : MonoBehaviour
   else if ((angle == 0f)) { change = new Vector3(-0.7f,1f,0f); characterAnimation.currentAnimationDirection = characterAnimation.upLeftAnim; facingLeft = true; }
 
   characterAnimation.Animate(characterAnimation.movementStartIndex, characterAnimation.movementFrameCount, characterAnimation.currentAnimationDirection, characterAnimation.bodyTypeNumber);
-  myRigidbody.MovePosition(transform.position + change * movementSpeed * Time.deltaTime);
+  rb.MovePosition(transform.position + change * movementSpeed * Time.deltaTime);
   }
 
   void MoveCharacterVerticalInclineRightAway() // needs updating
@@ -272,7 +292,7 @@ public class CharacterMovement : MonoBehaviour
     else if ((angle == 0f)) { change = new Vector3(0.7f,1f,0f); characterAnimation.currentAnimationDirection = characterAnimation.upRightAnim; facingLeft = false; }
 
     characterAnimation.Animate(characterAnimation.movementStartIndex, characterAnimation.movementFrameCount, characterAnimation.currentAnimationDirection, characterAnimation.bodyTypeNumber);
-    myRigidbody.MovePosition(transform.position + change * movementSpeed * Time.deltaTime);    
+    rb.MovePosition(transform.position + change * movementSpeed * Time.deltaTime);    
 
   }
   // void MoveCharacterVerticalInclineLeftToward()
@@ -286,7 +306,7 @@ public class CharacterMovement : MonoBehaviour
   //   if (change == Vector3.down)               { change = new Vector3(1f,-0.2f,0f); }
   //   if (change == Vector3.left)               { change = new Vector3(-1f,0.2f,0f); }
   //   // AnimateMovement(movementStartIndex, movementFrameCount, currentAnimationDirection, bodyTypeNumber);
-  //   myRigidbody.MovePosition(transform.position + change * movementSpeed * Time.deltaTime);
+  //   rb.MovePosition(transform.position + change * movementSpeed * Time.deltaTime);
       
   // }
 
@@ -301,7 +321,7 @@ public class CharacterMovement : MonoBehaviour
   //   if (change == Vector3.down)               { change = new Vector3(1f,0.2f,0f); }
   //   if (change == Vector3.left)               { change = new Vector3(-1f,-0.2f,0f); }
   //   // AnimateMovement(movementStartIndex, movementFrameCount, currentAnimationDirection, bodyTypeNumber);
-  //   myRigidbody.MovePosition(transform.position + change * movementSpeed * Time.deltaTime);
+  //   rb.MovePosition(transform.position + change * movementSpeed * Time.deltaTime);
       
   // } 
   void MoveCharacterUpDownLadder()
@@ -315,7 +335,7 @@ public class CharacterMovement : MonoBehaviour
       if (change == Vector3.down)               { change = new Vector3(0f,-1f,0f);}
       if (change == Vector3.left)               { change = new Vector3(0f,-0f,0f);}
       characterAnimation.Animate(characterAnimation.movementStartIndex, characterAnimation.movementFrameCount, characterAnimation.currentAnimationDirection, characterAnimation.bodyTypeNumber);
-      myRigidbody.MovePosition(transform.position + change * movementSpeed * Time.deltaTime);
+      rb.MovePosition(transform.position + change * movementSpeed * Time.deltaTime);
   }
   void MoveCharacterUpLadder()
   { 
@@ -328,7 +348,7 @@ public class CharacterMovement : MonoBehaviour
       else if (change == Vector3.down)               { change = new Vector3(0f,1f,0f);}
       else if (change == Vector3.left)               { change = new Vector3(0f,1f,0f);}
       characterAnimation.Animate(characterAnimation.movementStartIndex, characterAnimation.movementFrameCount, characterAnimation.currentAnimationDirection, characterAnimation.bodyTypeNumber);
-      myRigidbody.MovePosition(transform.position + change * movementSpeed * Time.deltaTime);
+      rb.MovePosition(transform.position + change * movementSpeed * Time.deltaTime);
   }
   void MoveCharacterDownLadder()
   { 
@@ -341,7 +361,7 @@ public class CharacterMovement : MonoBehaviour
       else if (change == Vector3.down)               { change = new Vector3(0f,-1f,0f);}
       else if (change == Vector3.left)               { change = new Vector3(0f,-1f,0f);}
       characterAnimation.Animate(characterAnimation.movementStartIndex, characterAnimation.movementFrameCount, characterAnimation.currentAnimationDirection, characterAnimation.bodyTypeNumber);
-      myRigidbody.MovePosition(transform.position + change * movementSpeed * Time.deltaTime);
+      rb.MovePosition(transform.position + change * movementSpeed * Time.deltaTime);
   }
 
 
@@ -388,9 +408,38 @@ public class CharacterMovement : MonoBehaviour
 
     // Convert negative angles to positive angles (0 to 360 degrees)
     if (angle < 0) angle += 360;
+    
+    // if(isJoyStick && !playerOnBike) // joy stick
+    // {
+    //   if (angle > 0f && angle <= 90f)   
+    //   { 
+    //     controlDirection = Direction.UpLeft; 
+    //   } // Inverted right-up to left-up
+    //   else if (angle > 90f && angle < 180f)   
+    //   { 
+    //     controlDirection = Direction.DownLeft;
+    //   } // Down
+    //   else if (angle > 180f && angle <= 270f)   
+    //   { 
+    //     controlDirection = Direction.RightDown; 
+    //   }
+    //   else if ((angle > 270f && angle <= 360f)) 
+    //   { 
+    //     controlDirection = Direction.UpRight;
+    //   } // Up
+      
+    //   if (activeCollisions.Count > 0 && !characterOnThresh) {
+    //     controlDirection = HandleQuadrantContact(controlDirection, currentContactQuadrant);
+    //   }
 
-
-    if(!playerOnBike) // main walking
+    //   // Map control directions to player directions and animations
+    //   UpdateCharacterDirection(controlDirection);
+    //   // Handle animation and movement
+    //   characterAnimation.Animate(characterAnimation.movementStartIndex, characterAnimation.movementFrameCount, characterAnimation.currentAnimationDirection, characterAnimation.bodyTypeNumber);
+    //   rb.MovePosition(transform.position + change * movementSpeed * Time.deltaTime);
+    // }
+    // else 
+    if(!playerOnBike) // main walking (keyboard)
     {
         if ((angle > 0f && angle <= 22.5f))   
         { 
@@ -456,7 +505,7 @@ public class CharacterMovement : MonoBehaviour
         } // Up
 
 
-        if (activeCollisions.Count > 0 && !playerOnThresh) {
+        if (activeCollisions.Count > 0 && !characterOnThresh) {
           controlDirection = HandleQuadrantContact(controlDirection, currentContactQuadrant);
         }
 
@@ -464,7 +513,7 @@ public class CharacterMovement : MonoBehaviour
         UpdateCharacterDirection(controlDirection);
         // Handle animation and movement
         characterAnimation.Animate(characterAnimation.movementStartIndex, characterAnimation.movementFrameCount, characterAnimation.currentAnimationDirection, characterAnimation.bodyTypeNumber);
-        myRigidbody.MovePosition(transform.position + change * movementSpeed * Time.deltaTime);
+        rb.MovePosition(transform.position + change * movementSpeed * Time.deltaTime);
     }
     else if(playerOnBike)
     {
@@ -502,8 +551,8 @@ public class CharacterMovement : MonoBehaviour
 
         // Handle animation and movement
         characterAnimation.Animate(characterAnimation.movementStartIndex, characterAnimation.movementFrameCount, characterAnimation.currentAnimationDirection, characterAnimation.bodyTypeNumber);
-        myRigidbody.MovePosition(myRigidbody.position + (Vector2)change * movementSpeed * Time.deltaTime);
-        // myRigidbody.MovePosition(transform.position + change * movementSpeed * Time.deltaTime);
+        rb.MovePosition(rb.position + (Vector2)change * movementSpeed * Time.deltaTime);
+        // rb.MovePosition(transform.position + change * movementSpeed * Time.deltaTime);
     }
   } 
 
@@ -643,7 +692,7 @@ public class CharacterMovement : MonoBehaviour
 
     change = Vector3.zero;
 
-    // if(!myCharacterMovement.playerOnThresh)
+    // if(!myCharacterMovement.characterOnThresh)
     // {
       yield return new WaitForSeconds(Random.Range(5,16));
 
@@ -673,7 +722,6 @@ public class CharacterMovement : MonoBehaviour
     }
     else if (gameObject.CompareTag("NPC"))
     {
-        Debug.Log("hizzy");
         if (Random.value < 0.5f)
         {
             ReverseDirection(false);

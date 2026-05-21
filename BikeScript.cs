@@ -19,15 +19,12 @@ public class BikeScript : MonoBehaviour
 
 
     // public GameObject bikeCollider;
-    [SerializeField] GameObject Player;
+    [SerializeField] GameObject character = null;
 
 
     // Start is called before the first frame update
     public void Start()
     {
-      Player = GameObject.FindGameObjectWithTag("Player");
-      characterAnimation = Player.GetComponent<CharacterAnimation>();
-      characterMovement = Player.GetComponent<CharacterMovement>();
 
       bikeSprite = bike.transform.Find("bikeSprite").GetComponent<SpriteRenderer>();
       isoSpriteSorting = bike.GetComponent<IsoSpriteSorting>();
@@ -40,6 +37,10 @@ public class BikeScript : MonoBehaviour
 
     public void OnTriggerStay2D(Collider2D other)
     {
+        character = other.transform.parent.gameObject;
+        characterAnimation = character.GetComponent<CharacterAnimation>();
+        characterMovement = character.GetComponent<CharacterMovement>();
+
         if(other.CompareTag("PlayerCollider"))
         {    
             if (characterMovement.spaceBarDeactivated == false && characterMovement.change == Vector3.zero)
@@ -59,6 +60,26 @@ public class BikeScript : MonoBehaviour
                     bike.transform.Find("bikeCollider").gameObject.SetActive(false);
                 }
             }
+        }
+        else if(other.CompareTag("NPCCollider"))
+        {    
+            // if (characterMovement.spaceBarDeactivated == false && characterMovement.change == Vector3.zero)
+            // {
+            //       if ((Input.GetKey(KeyCode.Space) || 
+            //           Input.GetKey(KeyCode.JoystickButton0) ||  // A button
+            //           Input.GetKey(KeyCode.JoystickButton1) ||  // B button
+            //           Input.GetKey(KeyCode.JoystickButton2)  // X button
+            //           // Input.GetKey(KeyCode.JoystickButton3)
+            //           ) && characterMovement.playerIsOutside && !characterMovement.playerOnBike)
+            //     {
+            //         characterMovement.StartDeactivateSpaceBar(); // Use centralized method
+
+            //         characterMovement.playerOnBike = true;
+            //         bikeColor.a = 0f;
+            //         bikeSprite.color = bikeColor;
+            //         bike.transform.Find("bikeCollider").gameObject.SetActive(false);
+            //     }
+            // }
         }
     }
 

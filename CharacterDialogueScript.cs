@@ -6,17 +6,6 @@ using TMPro;
 
 public class CharacterDialogueScript : MonoBehaviour
 {
-    public string nameText;
-    public string dialogueText1;
-    public string dialogueText2;
-    public string dialogueText3;
-    public string dialogueText4;
-
-    private TextMeshProUGUI dialogueDisplay;
-    private TextMeshProUGUI dialogueNameDisplay;
-    public Image dialogueBGrndImage;
-    private int currentDialogueIndex = 0;
-    public List<string> dialogues;
     public bool isPlayerInRange = false;
     private Color zeroAlphaColor;
 
@@ -30,8 +19,9 @@ public class CharacterDialogueScript : MonoBehaviour
     public CharacterAnimation characterAnimation;
     private CharacterMovement characterMovement;
     
-    private CharacterMovement myCharacterMovement;
-    private Transform myCharacterTransform;
+    private CharacterMovement playerCM;
+    private Transform playerTransform;
+    private GameObject player;
 
     public float typingSpeed = 0.03f; // normal typing speed
     private Coroutine typingCoroutine;
@@ -44,9 +34,6 @@ public class CharacterDialogueScript : MonoBehaviour
     void Start()
     {
         // Find the TextMeshPro component in the scene (or assign it in the Inspector)
-        dialogueDisplay = GameObject.Find("DialogueText").GetComponent<TextMeshProUGUI>();
-        dialogueNameDisplay = GameObject.Find("NameTextForDialogueUI").GetComponent<TextMeshProUGUI>();
-        dialogueBGrndImage = GameObject.Find("bgImageForDialogue").GetComponent<Image>();
 
         GameObject[] responseTextObj = GameObject.FindGameObjectsWithTag("ResponseText");
         GameObject[] responseBGObjects = GameObject.FindGameObjectsWithTag("responseBGImage");
@@ -72,18 +59,16 @@ public class CharacterDialogueScript : MonoBehaviour
         }
 
         // Initialize the dialogue list
-        dialogues = new List<string> { dialogueText1, dialogueText2, dialogueText3, dialogueText4 };
+        // dialogues = new List<string> { dialogueText1, dialogueText2, dialogueText3, dialogueText4 };
 
         characterMovement = GetComponent<CharacterMovement>();
-        myCharacterMovement = GameObject.FindWithTag("Player").GetComponent<CharacterMovement>();
+        
+        
         characterAnimation = GetComponent<CharacterAnimation>();
 
-        myCharacterTransform = GameObject.FindWithTag("Player").transform;
 
     
 
-        dialogueNameDisplay.text = ""; // Clear the name display on start
-        dialogueDisplay.text = ""; // Clear the dialogue display on start
 
         foreach (TextMeshProUGUI txt in responseTextList)
         {
@@ -97,8 +82,6 @@ public class CharacterDialogueScript : MonoBehaviour
         zeroAlphaColor = Color.white;
         zeroAlphaColor.a = 0f;
 
-        dialogueBGrndImage.color = zeroAlphaColor;
-        // dialogueBGrndImage.SetActive(false);
 
         foreach (Image img in responseBGrndImages)
         {
@@ -113,78 +96,47 @@ public class CharacterDialogueScript : MonoBehaviour
 
    void Update()
     {
-        if (isPlayerInRange)
-        {
-            bool bothOutside = characterMovement.playerIsOutside && myCharacterMovement.playerIsOutside;
-            bool bothInside = !characterMovement.playerIsOutside && !myCharacterMovement.playerIsOutside;
+        // if (isPlayerInRange)
+        // {
+        //     bool bothOutside = characterMovement.playerIsOutside && playerCM.playerIsOutside;
+        //     bool bothInside = !characterMovement.playerIsOutside && !playerCM.playerIsOutside;
 
-            if (bothOutside || bothInside)
-            {
-                // Press Space or controller button
-                if (Input.GetKeyDown(KeyCode.Space) ||
-                    Input.GetKeyDown(KeyCode.JoystickButton0) ||
-                    Input.GetKeyDown(KeyCode.JoystickButton1) ||
-                    Input.GetKeyDown(KeyCode.JoystickButton2))
-                {
-                    if (isTyping)
-                    {
-                        // If text is typing, finish it instantly
-                        fastForward = true;
-                    }
-                    else
-                    {
-                        // Show next line
-                        ShowNextDialogue();
-                        dialogueBGrndImage.color = Color.white;
-                    }
-                }
+        //     if (bothOutside || bothInside)
+        //     {
+        //         // Press Space or controller button
+        //         if (Input.GetKeyDown(KeyCode.Space) ||
+        //             Input.GetKeyDown(KeyCode.JoystickButton0) ||
+        //             Input.GetKeyDown(KeyCode.JoystickButton1) ||
+        //             Input.GetKeyDown(KeyCode.JoystickButton2))
+        //         {
+        //             if (isTyping)
+        //             {
+        //                 // If text is typing, finish it instantly
+        //                 fastForward = true;
+        //             }
+        //             else
+        //             {
+        //                 // Show next line
+        //                 ShowNextDialogue();
+        //             }
+        //         }
 
-                // If player is holding space, speed up text
-                fastForward = Input.GetKey(KeyCode.Space);
-            }
-        }
+        //         // If player is holding space, speed up text
+        //         fastForward = Input.GetKey(KeyCode.Space);
+        //     }
+        // }
 
     }
 
-    void ShowNextDialogue()
-    {
-        if (typingCoroutine != null)
-            StopCoroutine(typingCoroutine);
 
-        dialogueDisplay.text = "";
-        dialogueNameDisplay.text = nameText + ":";
-
-        typingCoroutine = StartCoroutine(TypeDialogue(dialogues[currentDialogueIndex]));
-
-        currentDialogueIndex = (currentDialogueIndex + 1) % dialogues.Count;
-    }
-    IEnumerator ShowByeDialogue()
-    {
-        if (typingCoroutine != null)
-            StopCoroutine(typingCoroutine);
-
-        dialogueDisplay.text = "";
-        dialogueNameDisplay.text = nameText + ":";
-
-        typingCoroutine = StartCoroutine(TypeDialogue("ByeBYE"));
-
-        yield return new WaitForSeconds(1f);
-
-        dialogueDisplay.text = "";
-        dialogueNameDisplay.text = "";
-
-        dialogueBGrndImage.color = zeroAlphaColor;
-    }
 
     IEnumerator TypeDialogue(string sentence)
     {
         isTyping = true;
         fastForward = false;
-        dialogueDisplay.text = "";
 
         foreach (char letter in sentence)
         {
-            dialogueDisplay.text += letter;
 
             if (fastForward)
                 yield return new WaitForSeconds(typingSpeed / 20f); // faster while holding
@@ -198,8 +150,12 @@ public class CharacterDialogueScript : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("PlayerCollider"))
-        {   
+        if (other.transform.root.CompareTag("Player") && characterAnimation.characterType == CharacterAnimation.CharacterType.Commuter)
+        {  
+            player = other.transform.root.gameObject;
+            playerCM = player.GetComponent<CharacterMovement>();
+            playerTransform = player.transform;
+            //stop coros 
             if (stopNpcStareAtPlayerCoro != null)
             {
                 StopCoroutine(StopNpcStareAtPlayer());
@@ -212,15 +168,15 @@ public class CharacterDialogueScript : MonoBehaviour
             }
 
 
-            if(myCharacterMovement.change != Vector3.zero 
-            && (myCharacterMovement.currentRoom == characterMovement.currentRoom))
+            if(playerCM.change != Vector3.zero 
+            && (playerCM.currentArea == characterMovement.currentArea))
                 {
                     isPlayerInRange = true;
                     staring = true; //initiate staring;
                     npcStareAtPlayerCoro = StartCoroutine(NpcStareAtPlayer());
                 }
 
-            currentDialogueIndex = Random.Range(0,4); // Reset dialogue index on re-entry
+            // currentDialogueIndex = Random.Range(0,4); // Reset dialogue index on re-entry
 
             // Stop the NPC movement coroutine if it's running
             if (characterMovement.npcRandomMovementCoro != null)
@@ -234,10 +190,14 @@ public class CharacterDialogueScript : MonoBehaviour
 
     private void OnTriggerStay2D(Collider2D other)
     {
-        if (other.CompareTag("PlayerCollider"))
+        if (other.transform.root.CompareTag("Player") && characterAnimation.characterType == CharacterAnimation.CharacterType.Commuter)
         {  
-            if(myCharacterMovement.change != Vector3.zero 
-            && (myCharacterMovement.currentRoom == characterMovement.currentRoom))
+            player = other.transform.root.gameObject;
+            playerCM = player.GetComponent<CharacterMovement>();
+            playerTransform = player.transform;
+
+            if(playerCM.change != Vector3.zero 
+            && (playerCM.currentArea == characterMovement.currentArea))
             {
                 if (stopNpcStareAtPlayerCoro != null)
                 {
@@ -250,11 +210,11 @@ public class CharacterDialogueScript : MonoBehaviour
                 if(npcStareAtPlayerCoro == null)
                     npcStareAtPlayerCoro = StartCoroutine(NpcStareAtPlayer());
             }
-            else if (myCharacterMovement.currentRoom != characterMovement.currentRoom)
+            else if (playerCM.currentArea != characterMovement.currentArea)
             {
                 isPlayerInRange = false;
             }
-            else if(myCharacterMovement.change == Vector3.zero)
+            else if(playerCM.change == Vector3.zero)
             {
                 if(stopNpcStareAtPlayerCoro == null && staring == true)
                     stopNpcStareAtPlayerCoro = StartCoroutine(StopNpcStareAtPlayer(true));
@@ -264,7 +224,7 @@ public class CharacterDialogueScript : MonoBehaviour
 
     private void OnTriggerExit2D(Collider2D other)
     {
-        if (other.CompareTag("PlayerCollider"))
+        if (other.transform.root.CompareTag("Player") && characterAnimation.characterType == CharacterAnimation.CharacterType.Commuter)
         {
             isPlayerInRange = false;
             // initiate the stopping of the staring at the player
@@ -277,28 +237,26 @@ public class CharacterDialogueScript : MonoBehaviour
             }
             stopNpcStareAtPlayerCoro = StartCoroutine(StopNpcStareAtPlayer());
 
-            if(dialogueDisplay.text != "")
-            {
-                //stop typing coro
-                // if(typingCoroutine != null)
-                // {StopCoroutine(typingCoroutine); isTyping = false;}
+            // if(dialogueDisplay.text != "")
+            // {
+            //     //stop typing coro
+            //     // if(typingCoroutine != null)
+            //     // {StopCoroutine(typingCoroutine); isTyping = false;}
 
-                displayGoodbyeCoro = StartCoroutine(ShowByeDialogue());
-            }
-            else
-            {
-                dialogueNameDisplay.text = ""; // Clear the name display when player leaves
-                dialogueDisplay.text = ""; // Clear the dialogue display when player leaves
-                // dialogueBGrndImage.SetActive(false);
+            //     displayGoodbyeCoro = StartCoroutine(ShowByeDialogue());
+            // }
+            // else
+            // {
+            //     dialogueNameDisplay.text = ""; // Clear the name display when player leaves
+            //     dialogueDisplay.text = ""; // Clear the dialogue display when player leaves
                 
-                dialogueBGrndImage.color = zeroAlphaColor;
                 
                 
 
-                //stop typing coro
-                if(typingCoroutine != null)
-                {StopCoroutine(typingCoroutine); isTyping = false;}
-            }
+            //     //stop typing coro
+            //     if(typingCoroutine != null)
+            //     {StopCoroutine(typingCoroutine); isTyping = false;}
+            // }
 
         }
     }
@@ -306,11 +264,14 @@ public class CharacterDialogueScript : MonoBehaviour
 
     private IEnumerator NpcStareAtPlayer()
     {
+        // playerCM = GameObject.FindWithTag("Player").GetComponent<CharacterMovement>();
+        // playerTransform = GameObject.FindWithTag("Player").transform;
+
         while (staring)  // Keep looping
         {
             staringTime += Time.deltaTime;
 
-            Vector2 directionToPlayer = myCharacterTransform.position - transform.position;
+            Vector2 directionToPlayer = playerTransform.position - transform.position;
             float angle = (Mathf.Atan2(directionToPlayer.y, directionToPlayer.x) * Mathf.Rad2Deg + 90) % 360;
             if (angle < 0) angle += 360; // Normalize angle to 0-360 range // this angular stuff is functional but cooked atm lol
 
@@ -365,7 +326,8 @@ public class CharacterDialogueScript : MonoBehaviour
                     }                
                 }
             }
-            else if(characterAnimation.characterType == CharacterAnimation.CharacterType.Pony) // PONY!
+            else if(characterAnimation.characterType == CharacterAnimation.CharacterType.Pony 
+            || characterAnimation.characterType == CharacterAnimation.CharacterType.Pig) // PONY! or pig :):):):):)
             {
                 if (angle >= 0 && angle < 90)
                 {
@@ -437,12 +399,12 @@ public class CharacterDialogueScript : MonoBehaviour
         else yield return new WaitForSeconds(Random.Range(2, 6f));
             
         // Restart the NPC movement coroutine when the player leaves
-        if (isPlayerInRange == false && dialogueDisplay.text == "")
-        {
-            characterMovement.npcRandomMovementCoro = characterMovement.StartCoroutine(characterMovement.MoveCharacterRandomly());
-            staring = false;
-            staringTime = 0f;
-        }
+        // if (isPlayerInRange == false)
+        // {
+        //     characterMovement.npcRandomMovementCoro = characterMovement.StartCoroutine(characterMovement.MoveCharacterRandomly());
+        //     staring = false;
+        //     staringTime = 0f;
+        // }
 
     }
 

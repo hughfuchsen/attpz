@@ -1,25 +1,25 @@
 
-using UnityEngine;
-using FMODUnity;
-using FMOD.Studio;
+// using UnityEngine;
+// using FMODUnity;
+// using FMOD.Studio;
 
-public class MusicController : MonoBehaviour
-{
-    public EventReference musicEvent;
+// public class MusicController : MonoBehaviour
+// {
+//     public EventReference musicEvent;
 
-    private EventInstance musicInstance;
+//     private EventInstance musicInstance;
 
-    void Start()
-    {
-        musicInstance = RuntimeManager.CreateInstance(musicEvent);
-        musicInstance.start();
-    }
+//     void Start()
+//     {
+//         musicInstance = RuntimeManager.CreateInstance(musicEvent);
+//         musicInstance.start();
+//     }
 
-    public void SetBeatStyle(float value) // 0 = bossanova, 1 = straight
-    {
-        musicInstance.setParameterByName("BeatStyle", value);
-    }
-}
+//     public void SetBeatStyle(float value) // 0 = bossanova, 1 = straight
+//     {
+//         musicInstance.setParameterByName("BeatStyle", value);
+//     }
+// }
 
 
 // using System.Collections;

@@ -1,348 +1,348 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+// using System.Collections;
+// using System.Collections.Generic;
+// using UnityEngine;
 
-public class LevelThreshColliderScript : MonoBehaviour
-{
-    [HideInInspector] public GameObject player;
-    [HideInInspector] public BuildingScript building;
+// public class LevelThreshColliderScript : MonoBehaviour
+// {
+//     [HideInInspector] public GameObject player;
+//     [HideInInspector] public BuildingScript building;
 
-    public bool itsALadder;
+//     public bool itsALadder;
 
-    public LevelScript levelAboveOrEntering;
+//     public LevelScript levelAboveOrEntering;
 
-    public LevelScript levelBelowOrEntering;
+//     public LevelScript levelBelowOrEntering;
 
-    [HideInInspector] public bool plyrCrsngLeft = false;
+//     [HideInInspector] public bool plyrCrsngLeft = false;
 
-    public Coroutine thresholdSortingSequenceCoro;
+//     public Coroutine thresholdSortingSequenceCoro;
 
-    private string initialSortingLayer;
+//     private string initialSortingLayer;
 
-    void Awake()
-    {
-        if(!enabled)
-        return;
+//     void Awake()
+//     {
+//         if(!enabled)
+//         return;
 
-        plyrCrsngLeft = this.CompareTag("CrossLeft");
+//         plyrCrsngLeft = this.CompareTag("CrossLeft");
 
-        building = GetComponentInParent<BuildingScript>();
-    }
+//         building = GetComponentInParent<BuildingScript>();
+//     }
     
-    // Start is called before the first frame update
-    void Start()
-    {
-        if(!enabled)
-        return;
+//     // Start is called before the first frame update
+//     void Start()
+//     {
+//         if(!enabled)
+//         return;
 
-        player = GameObject.FindGameObjectWithTag("Player");
-    }
+//         player = GameObject.FindGameObjectWithTag("Player");
+//     }
 
-    // private bool aboveCollider;
+//     // private bool aboveCollider;
 
-    private Dictionary<GameObject, bool> aboveColliderByCharacter = new Dictionary<GameObject, bool>();
+//     private Dictionary<GameObject, bool> aboveColliderByCharacter = new Dictionary<GameObject, bool>();
 
-    void OnTriggerEnter2D(Collider2D other)
-    {
-        if(!enabled)
-        return;
+//     void OnTriggerEnter2D(Collider2D other)
+//     {
+//         if(!enabled)
+//         return;
 
-        if((other.CompareTag("PlayerCollider") || other.CompareTag("NPCCollider")))
-        {
-            CharacterMovement cm = other.transform.parent.GetComponent<CharacterMovement>();
-            cm.currentLevelThreshold = this;
+//         if((other.CompareTag("PlayerCollider") || other.CompareTag("NPCCollider")))
+//         {
+//             CharacterMovement cm = other.transform.parent.GetComponent<CharacterMovement>();
+//             cm.currentLevelThreshold = this;
 
-            bool isAbove = !IsCrossingUp(cm); // if crossing down, they’re above
+//             bool isAbove = !IsCrossingUp(cm); // if crossing down, they’re above
 
-            aboveColliderByCharacter[other.gameObject] = isAbove;
+//             aboveColliderByCharacter[other.gameObject] = isAbove;
 
 
-            if(plyrCrsngLeft) // is player going this \ (left diag) way or
-            // is player going this / (right diag) way :-)
-            {
-                // cm.fixedDirectionLeftDiagonal = true; // fix the player in \ left diag way while inside the collider
-                cm.controlDirectionToPlayerDirection[Direction.Left] = Direction.UpLeft;
-                cm.controlDirectionToPlayerDirection[Direction.UpLeft] = Direction.UpLeft;
-                cm.controlDirectionToPlayerDirection[Direction.UpFacingLeft] = Direction.UpLeft;
-                cm.controlDirectionToPlayerDirection[Direction.UpFacingRight] = Direction.UpLeft;
-                cm.controlDirectionToPlayerDirection[Direction.UpRight] = Direction.UpLeft;
-                cm.controlDirectionToPlayerDirection[Direction.Right] = Direction.RightDown;
-                cm.controlDirectionToPlayerDirection[Direction.RightDown] = Direction.RightDown;
-                cm.controlDirectionToPlayerDirection[Direction.DownFacingRight] = Direction.RightDown;
-                cm.controlDirectionToPlayerDirection[Direction.DownFacingLeft] = Direction.RightDown;
-                cm.controlDirectionToPlayerDirection[Direction.DownLeft] = Direction.RightDown;
-            }
-            else
-            {
-                // cm.fixedDirectionRightDiagonal = true; // fix the player in / right diag way while inside the collider
-                cm.controlDirectionToPlayerDirection[Direction.Left] = Direction.DownLeft;
-                cm.controlDirectionToPlayerDirection[Direction.UpLeft] = Direction.UpRight;
-                cm.controlDirectionToPlayerDirection[Direction.UpFacingLeft] = Direction.UpRight;
-                cm.controlDirectionToPlayerDirection[Direction.UpFacingRight] = Direction.UpRight;
-                cm.controlDirectionToPlayerDirection[Direction.UpRight] = Direction.UpRight;
-                cm.controlDirectionToPlayerDirection[Direction.Right] = Direction.UpRight;
-                cm.controlDirectionToPlayerDirection[Direction.RightDown] = Direction.DownLeft;
-                cm.controlDirectionToPlayerDirection[Direction.DownFacingRight] = Direction.DownLeft;
-                cm.controlDirectionToPlayerDirection[Direction.DownFacingLeft] = Direction.DownLeft;
-                cm.controlDirectionToPlayerDirection[Direction.DownLeft] = Direction.DownLeft;
-            }
-        }
-        // fixing the player's movement inside the collider ensures the correct conditions are met upon collider exit
+//             if(plyrCrsngLeft) // is player going this \ (left diag) way or
+//             // is player going this / (right diag) way :-)
+//             {
+//                 // cm.fixedDirectionLeftDiagonal = true; // fix the player in \ left diag way while inside the collider
+//                 cm.controlDirectionToPlayerDirection[Direction.Left] = Direction.UpLeft;
+//                 cm.controlDirectionToPlayerDirection[Direction.UpLeft] = Direction.UpLeft;
+//                 cm.controlDirectionToPlayerDirection[Direction.UpFacingLeft] = Direction.UpLeft;
+//                 cm.controlDirectionToPlayerDirection[Direction.UpFacingRight] = Direction.UpLeft;
+//                 cm.controlDirectionToPlayerDirection[Direction.UpRight] = Direction.UpLeft;
+//                 cm.controlDirectionToPlayerDirection[Direction.Right] = Direction.RightDown;
+//                 cm.controlDirectionToPlayerDirection[Direction.RightDown] = Direction.RightDown;
+//                 cm.controlDirectionToPlayerDirection[Direction.DownFacingRight] = Direction.RightDown;
+//                 cm.controlDirectionToPlayerDirection[Direction.DownFacingLeft] = Direction.RightDown;
+//                 cm.controlDirectionToPlayerDirection[Direction.DownLeft] = Direction.RightDown;
+//             }
+//             else
+//             {
+//                 // cm.fixedDirectionRightDiagonal = true; // fix the player in / right diag way while inside the collider
+//                 cm.controlDirectionToPlayerDirection[Direction.Left] = Direction.DownLeft;
+//                 cm.controlDirectionToPlayerDirection[Direction.UpLeft] = Direction.UpRight;
+//                 cm.controlDirectionToPlayerDirection[Direction.UpFacingLeft] = Direction.UpRight;
+//                 cm.controlDirectionToPlayerDirection[Direction.UpFacingRight] = Direction.UpRight;
+//                 cm.controlDirectionToPlayerDirection[Direction.UpRight] = Direction.UpRight;
+//                 cm.controlDirectionToPlayerDirection[Direction.Right] = Direction.UpRight;
+//                 cm.controlDirectionToPlayerDirection[Direction.RightDown] = Direction.DownLeft;
+//                 cm.controlDirectionToPlayerDirection[Direction.DownFacingRight] = Direction.DownLeft;
+//                 cm.controlDirectionToPlayerDirection[Direction.DownFacingLeft] = Direction.DownLeft;
+//                 cm.controlDirectionToPlayerDirection[Direction.DownLeft] = Direction.DownLeft;
+//             }
+//         }
+//         // fixing the player's movement inside the collider ensures the correct conditions are met upon collider exit
 
-    }
-    void OnTriggerExit2D(Collider2D other)
-    {
-        if(!enabled)
-        return;
+//     }
+//     void OnTriggerExit2D(Collider2D other)
+//     {
+//         if(!enabled)
+//         return;
 
-        if(other.CompareTag("PlayerCollider"))
-        {
-            CharacterMovement cm = other.transform.parent.GetComponent<CharacterMovement>();
-            cm.currentLevelThreshold = null;
-            cm.previousLevelThreshold = this;
+//         if(other.CompareTag("PlayerCollider"))
+//         {
+//             CharacterMovement cm = other.transform.parent.GetComponent<CharacterMovement>();
+//             cm.currentLevelThreshold = null;
+//             cm.previousLevelThreshold = this;
 
-            bool aboveCollider = aboveColliderByCharacter.ContainsKey(other.gameObject) && aboveColliderByCharacter[other.gameObject];
+//             bool aboveCollider = aboveColliderByCharacter.ContainsKey(other.gameObject) && aboveColliderByCharacter[other.gameObject];
 
-            // un-fix the player in \/ left/right diag way upon collider exit. 
-            cm.ResetPlayerMovement();     
+//             // un-fix the player in \/ left/right diag way upon collider exit. 
+//             cm.ResetPlayerMovement();     
             
-            if(IsCrossingUp(cm)) //crossing up bro
-            {
-                if(this.transform.parent.GetComponentInChildren<BuildingThreshColliderScript>() != null && cm.playerIsOutside)
-                {
-                    if(levelAboveOrEntering != null)
-                    {
-                        levelAboveOrEntering.ResetLevels();
-                    }
-                    else if(levelBelowOrEntering != null)
-                    {                            
-                        levelBelowOrEntering.ResetLevels();
-                    }
+//             if(IsCrossingUp(cm)) //crossing up bro
+//             {
+//                 if(this.transform.parent.GetComponentInChildren<BuildingThreshColliderScript>() != null && cm.playerIsOutside)
+//                 {
+//                     if(levelAboveOrEntering != null)
+//                     {
+//                         levelAboveOrEntering.ResetLevels();
+//                     }
+//                     else if(levelBelowOrEntering != null)
+//                     {                            
+//                         levelBelowOrEntering.ResetLevels();
+//                     }
 
-                }
-                else if(this.transform.parent.GetComponentInChildren<BuildingThreshColliderScript>() != null && !cm.playerIsOutside)
-                {
-                    if(levelAboveOrEntering != null)
-                    {
-                        // for (int i = 0; i < levelAboveOrEntering.Count; i++)
-                        // {                      
-                            levelAboveOrEntering.EnterLevel(true, true);
-                        // }
-                    }
-                    else if(levelBelowOrEntering != null)
-                    {
-                        // for (int i = 0; i < levelBelowOrEntering.Count; i++)
-                        // {                          
-                            levelBelowOrEntering.EnterLevel(true, true);
-                        // }
-                    }
-                }
-                else if(levelAboveOrEntering != null)
-                {
-                    // for (int i = 0; i < levelAboveOrEntering.Count; i++)
-                    // {                      
-                        levelAboveOrEntering.EnterLevel(false, true);
-                    // }
-                }  
-                // }
+//                 }
+//                 else if(this.transform.parent.GetComponentInChildren<BuildingThreshColliderScript>() != null && !cm.playerIsOutside)
+//                 {
+//                     if(levelAboveOrEntering != null)
+//                     {
+//                         // for (int i = 0; i < levelAboveOrEntering.Count; i++)
+//                         // {                      
+//                             levelAboveOrEntering.EnterLevel(true, true);
+//                         // }
+//                     }
+//                     else if(levelBelowOrEntering != null)
+//                     {
+//                         // for (int i = 0; i < levelBelowOrEntering.Count; i++)
+//                         // {                          
+//                             levelBelowOrEntering.EnterLevel(true, true);
+//                         // }
+//                     }
+//                 }
+//                 else if(levelAboveOrEntering != null)
+//                 {
+//                     // for (int i = 0; i < levelAboveOrEntering.Count; i++)
+//                     // {                      
+//                         levelAboveOrEntering.EnterLevel(false, true);
+//                     // }
+//                 }  
+//                 // }
 
-            }
-            else    // if player crossing down
-            {
-                if(this.transform.parent.GetComponentInChildren<BuildingThreshColliderScript>() != null && aboveCollider && cm.playerIsOutside) 
-                {
-                    // insert only the level you are going through my dog!
-                    if(levelBelowOrEntering != null)
-                    {
-                        // for (int i = 0; i < levelBelowOrEntering.Count; i++)
-                        // {      
-                            levelBelowOrEntering.ResetLevels();
-                        // }
-                    }        
-                    if(levelAboveOrEntering != null)
-                    {
-                        // for (int i = 0; i < levelAboveOrEntering.Count; i++)
-                        // {  
-                            levelAboveOrEntering.ResetLevels();
-                        // }
-                    }   
-                }
-                else if(this.transform.parent.GetComponentInChildren<BuildingThreshColliderScript>() != null && aboveCollider && !cm.playerIsOutside) 
-                {
-                    if(levelAboveOrEntering != null)
-                    {
-                        // for (int i = 0; i < levelAboveOrEntering.Count; i++)
-                        // {                      
-                            levelAboveOrEntering.EnterLevel(true, false);
-                        // }
-                    }   
-                    else if(levelBelowOrEntering != null)
-                    {
-                        // for (int i = 0; i < levelBelowOrEntering.Count; i++)
-                        // {                          
-                            levelBelowOrEntering.EnterLevel(true, false);
-                        // }
-                    }        
-                }
-                // else if(moveLevelsAbove && aboveCollider)
-                // {
-                else if(levelBelowOrEntering != null)
-                {
-                    // for (int i = 0; i < levelBelowOrEntering.Count; i++)
-                    // {                          
-                        levelBelowOrEntering.EnterLevel(false, false);
-                    // }
-                }       
-                // }
+//             }
+//             else    // if player crossing down
+//             {
+//                 if(this.transform.parent.GetComponentInChildren<BuildingThreshColliderScript>() != null && aboveCollider && cm.playerIsOutside) 
+//                 {
+//                     // insert only the level you are going through my dog!
+//                     if(levelBelowOrEntering != null)
+//                     {
+//                         // for (int i = 0; i < levelBelowOrEntering.Count; i++)
+//                         // {      
+//                             levelBelowOrEntering.ResetLevels();
+//                         // }
+//                     }        
+//                     if(levelAboveOrEntering != null)
+//                     {
+//                         // for (int i = 0; i < levelAboveOrEntering.Count; i++)
+//                         // {  
+//                             levelAboveOrEntering.ResetLevels();
+//                         // }
+//                     }   
+//                 }
+//                 else if(this.transform.parent.GetComponentInChildren<BuildingThreshColliderScript>() != null && aboveCollider && !cm.playerIsOutside) 
+//                 {
+//                     if(levelAboveOrEntering != null)
+//                     {
+//                         // for (int i = 0; i < levelAboveOrEntering.Count; i++)
+//                         // {                      
+//                             levelAboveOrEntering.EnterLevel(true, false);
+//                         // }
+//                     }   
+//                     else if(levelBelowOrEntering != null)
+//                     {
+//                         // for (int i = 0; i < levelBelowOrEntering.Count; i++)
+//                         // {                          
+//                             levelBelowOrEntering.EnterLevel(true, false);
+//                         // }
+//                     }        
+//                 }
+//                 // else if(moveLevelsAbove && aboveCollider)
+//                 // {
+//                 else if(levelBelowOrEntering != null)
+//                 {
+//                     // for (int i = 0; i < levelBelowOrEntering.Count; i++)
+//                     // {                          
+//                         levelBelowOrEntering.EnterLevel(false, false);
+//                     // }
+//                 }       
+//                 // }
 
 
-            }
-            if(this.transform.parent.GetComponentInChildren<BuildingThreshColliderScript>() == null)
-            {
-                thresholdSortingSequenceCoro = StartCoroutine(ThresholdLayerSortingSequence(0.3f, player, "ThresholdSequence"));
-            }
+//             }
+//             if(this.transform.parent.GetComponentInChildren<BuildingThreshColliderScript>() == null)
+//             {
+//                 thresholdSortingSequenceCoro = StartCoroutine(ThresholdLayerSortingSequence(0.3f, player, "ThresholdSequence"));
+//             }
 
-        }
-        else if(other.CompareTag("NPCCollider"))
-        {
-            GameObject character = other.transform.parent.gameObject;
+//         }
+//         else if(other.CompareTag("NPCCollider"))
+//         {
+//             GameObject character = other.transform.parent.gameObject;
 
-            CharacterMovement cm = other.transform.parent.GetComponent<CharacterMovement>();
-            cm.currentLevelThreshold = null;
+//             CharacterMovement cm = other.transform.parent.GetComponent<CharacterMovement>();
+//             cm.currentLevelThreshold = null;
 
-            bool aboveCollider = aboveColliderByCharacter.ContainsKey(other.gameObject) && aboveColliderByCharacter[other.gameObject];
+//             bool aboveCollider = aboveColliderByCharacter.ContainsKey(other.gameObject) && aboveColliderByCharacter[other.gameObject];
             
-            // un-fix the player in \/ left/right diag way upon collider exit. 
-            cm.ResetPlayerMovement(); 
+//             // un-fix the player in \/ left/right diag way upon collider exit. 
+//             cm.ResetPlayerMovement(); 
             
-            if(IsCrossingUp(cm)) //crossing up bro
-            {
-                if(this.transform.parent.GetComponentInChildren<BuildingThreshColliderScript>() != null && cm.playerIsOutside)
-                {
-                    if(levelAboveOrEntering != null)
-                    {
-                        // levelAboveOrEntering.NpcEnterLevel(character);
-                        // for (int i = 0; i < levelAboveOrEntering.Count; i++)
-                        // {                       
-                            // levelAboveOrEntering[i].ResetLevels();
-                        // }    
-                    }
-                    else if(levelBelowOrEntering != null)
-                    {
-                        // levelBelowOrEntering.NpcEnterLevel(character);
-                        // for (int i = 0; i < levelBelowOrEntering.Count; i++)
-                        // {                        
-                            // levelBelowOrEntering[i].ResetLevels();
-                        // }
-                    }
+//             if(IsCrossingUp(cm)) //crossing up bro
+//             {
+//                 if(this.transform.parent.GetComponentInChildren<BuildingThreshColliderScript>() != null && cm.playerIsOutside)
+//                 {
+//                     if(levelAboveOrEntering != null)
+//                     {
+//                         // levelAboveOrEntering.NpcEnterLevel(character);
+//                         // for (int i = 0; i < levelAboveOrEntering.Count; i++)
+//                         // {                       
+//                             // levelAboveOrEntering[i].ResetLevels();
+//                         // }    
+//                     }
+//                     else if(levelBelowOrEntering != null)
+//                     {
+//                         // levelBelowOrEntering.NpcEnterLevel(character);
+//                         // for (int i = 0; i < levelBelowOrEntering.Count; i++)
+//                         // {                        
+//                             // levelBelowOrEntering[i].ResetLevels();
+//                         // }
+//                     }
 
-                }
-                else if(this.transform.parent.GetComponentInChildren<BuildingThreshColliderScript>() != null && !cm.playerIsOutside)
-                {
-                    if(levelAboveOrEntering != null)
-                    {                     
-                        // levelAboveOrEntering.NpcEnterLevel(character);
-                    }
-                    else if(levelBelowOrEntering != null)
-                    {
-                        // levelBelowOrEntering.NpcEnterLevel(character);
-                    }
-                }
-                else if(levelAboveOrEntering != null)
-                {
-                    // levelAboveOrEntering.NpcEnterLevel(character);
-                }  
+//                 }
+//                 else if(this.transform.parent.GetComponentInChildren<BuildingThreshColliderScript>() != null && !cm.playerIsOutside)
+//                 {
+//                     if(levelAboveOrEntering != null)
+//                     {                     
+//                         // levelAboveOrEntering.NpcEnterLevel(character);
+//                     }
+//                     else if(levelBelowOrEntering != null)
+//                     {
+//                         // levelBelowOrEntering.NpcEnterLevel(character);
+//                     }
+//                 }
+//                 else if(levelAboveOrEntering != null)
+//                 {
+//                     // levelAboveOrEntering.NpcEnterLevel(character);
+//                 }  
 
-            }
-            else    // if player crossing down
-            {
-                if(this.transform.parent.GetComponentInChildren<BuildingThreshColliderScript>() != null && aboveCollider && cm.playerIsOutside) 
-                {
-                    // insert only the level you are going through my dog!
-                    if(levelBelowOrEntering != null)
-                    {
-                        // levelBelowOrEntering.NpcEnterLevel(character);
+//             }
+//             else    // if player crossing down
+//             {
+//                 if(this.transform.parent.GetComponentInChildren<BuildingThreshColliderScript>() != null && aboveCollider && cm.playerIsOutside) 
+//                 {
+//                     // insert only the level you are going through my dog!
+//                     if(levelBelowOrEntering != null)
+//                     {
+//                         // levelBelowOrEntering.NpcEnterLevel(character);
 
-                        // for (int i = 0; i < levelBelowOrEntering.Count; i++)
-                        // {      
-                        //     levelBelowOrEntering[i].ResetLevels();
-                        // }
-                    }        
-                    if(levelAboveOrEntering != null)
-                    {
-                        // levelAboveOrEntering.NpcEnterLevel(character);
+//                         // for (int i = 0; i < levelBelowOrEntering.Count; i++)
+//                         // {      
+//                         //     levelBelowOrEntering[i].ResetLevels();
+//                         // }
+//                     }        
+//                     if(levelAboveOrEntering != null)
+//                     {
+//                         // levelAboveOrEntering.NpcEnterLevel(character);
 
-                        // for (int i = 0; i < levelAboveOrEntering.Count; i++)
-                        // {  
-                        //     levelAboveOrEntering[i].ResetLevels();
-                        // }
-                    }   
-                }
-                else if(this.transform.parent.GetComponentInChildren<BuildingThreshColliderScript>() != null && aboveCollider && !cm.playerIsOutside) 
-                {
-                    if(levelAboveOrEntering != null)
-                    {
-                        // levelAboveOrEntering.NpcEnterLevel(character);
-                    }   
-                    else if(levelBelowOrEntering != null)
-                    {
-                        // levelBelowOrEntering.NpcEnterLevel(character);
-                    }        
-                }
-                else if(levelBelowOrEntering != null)
-                {
-                    // levelBelowOrEntering.NpcEnterLevel(character);
-                }       
+//                         // for (int i = 0; i < levelAboveOrEntering.Count; i++)
+//                         // {  
+//                         //     levelAboveOrEntering[i].ResetLevels();
+//                         // }
+//                     }   
+//                 }
+//                 else if(this.transform.parent.GetComponentInChildren<BuildingThreshColliderScript>() != null && aboveCollider && !cm.playerIsOutside) 
+//                 {
+//                     if(levelAboveOrEntering != null)
+//                     {
+//                         // levelAboveOrEntering.NpcEnterLevel(character);
+//                     }   
+//                     else if(levelBelowOrEntering != null)
+//                     {
+//                         // levelBelowOrEntering.NpcEnterLevel(character);
+//                     }        
+//                 }
+//                 else if(levelBelowOrEntering != null)
+//                 {
+//                     // levelBelowOrEntering.NpcEnterLevel(character);
+//                 }       
 
-            }
-            // if(this.transform.parent.GetComponentInChildren<BuildingThreshColliderScript>() == null)
-            // {
-            //     thresholdSortingSequenceCoro = StartCoroutine(ThresholdLayerSortingSequence(0.3f, player, "ThresholdSequence"));
-            // }
+//             }
+//             // if(this.transform.parent.GetComponentInChildren<BuildingThreshColliderScript>() == null)
+//             // {
+//             //     thresholdSortingSequenceCoro = StartCoroutine(ThresholdLayerSortingSequence(0.3f, player, "ThresholdSequence"));
+//             // }
            
-        }
-        aboveColliderByCharacter.Remove(other.gameObject); // bool logic
-    }
+//         }
+//         aboveColliderByCharacter.Remove(other.gameObject); // bool logic
+//     }
 
-    IEnumerator ThresholdLayerSortingSequence(
-    float waitTime,
-    GameObject gameObject,
-    string newSortingLayer) 
-    {  
-        initialSortingLayer = player.transform.Find("head").GetComponent<SpriteRenderer>().sortingLayerName; 
-        // initialSortingLayer = LayerMask.LayerToName(this.gameObject.layer);
+//     IEnumerator ThresholdLayerSortingSequence(
+//     float waitTime,
+//     GameObject gameObject,
+//     string newSortingLayer) 
+//     {  
+//         initialSortingLayer = player.transform.Find("head").GetComponent<SpriteRenderer>().sortingLayerName; 
+//         // initialSortingLayer = LayerMask.LayerToName(this.gameObject.layer);
 
-        SetTreeSortingLayer(gameObject, newSortingLayer);
+//         SetTreeSortingLayer(gameObject, newSortingLayer);
 
-        yield return new WaitForSeconds(waitTime);
+//         yield return new WaitForSeconds(waitTime);
 
-        if (player.transform.Find("head").GetComponent<SpriteRenderer>().sortingLayerName == newSortingLayer)
-        {
-            SetTreeSortingLayer(gameObject, initialSortingLayer);
-        }
+//         if (player.transform.Find("head").GetComponent<SpriteRenderer>().sortingLayerName == newSortingLayer)
+//         {
+//             SetTreeSortingLayer(gameObject, initialSortingLayer);
+//         }
 
-        yield return null;
-    }
+//         yield return null;
+//     }
 
 
-    static void SetTreeSortingLayer(GameObject gameObject, string sortingLayerName)
-    {
-        if(gameObject.GetComponent<SpriteRenderer>() != null) 
-        {
-            gameObject.GetComponent<SpriteRenderer>().sortingLayerName = sortingLayerName;
-        }
-        foreach (Transform child in gameObject.transform)
-        {
-            LevelThreshColliderScript.SetTreeSortingLayer(child.gameObject, sortingLayerName);
-        }
-    }  
+//     static void SetTreeSortingLayer(GameObject gameObject, string sortingLayerName)
+//     {
+//         if(gameObject.GetComponent<SpriteRenderer>() != null) 
+//         {
+//             gameObject.GetComponent<SpriteRenderer>().sortingLayerName = sortingLayerName;
+//         }
+//         foreach (Transform child in gameObject.transform)
+//         {
+//             LevelThreshColliderScript.SetTreeSortingLayer(child.gameObject, sortingLayerName);
+//         }
+//     }  
 
-    private bool IsCrossingUp(CharacterMovement cm)
-    {
-        return cm.change.y > 0;
-    }
-    private bool IsCrossingLeft(CharacterMovement cm)
-    {
-        return cm.change.x < 0;
-    }
-}
+//     private bool IsCrossingUp(CharacterMovement cm)
+//     {
+//         return cm.change.y > 0;
+//     }
+//     private bool IsCrossingLeft(CharacterMovement cm)
+//     {
+//         return cm.change.x < 0;
+//     }
+// }

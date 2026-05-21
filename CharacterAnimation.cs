@@ -7,793 +7,860 @@ using TMPro;  // This is necessary for using TMP_InputField
 
 public class CharacterAnimation : MonoBehaviour
 {
-  public enum CharacterType
-  {
-    Human,
-    Chicken,
-    Pony,
-    Cow,
-    Horse,
-    Pig,
-    Dog,
-    Cat
-  }
+    public enum CharacterType
+    {
+        Human,
+        Chicken,
+        Pony,
+        Cow,
+        Horse,
+        Pig,
+        Dog,
+        Commuter
+    }
 
-  public float xFlipOffset = 5f; //bounds width
-  [HideInInspector] public Bounds bounds; //bounds
-  [SerializeField] Transform visualRoot;
-  [SerializeField] GameObject bodyPartToAnimate;
-  [HideInInspector] public Transform bodyPartInitialState;
-  [HideInInspector] public Transform initialState;
-  public CharacterType characterType;
-  [HideInInspector] public float initialAnimationSpeed;
-  [HideInInspector] public float animationSpeed = 0.09f; // Time between frames
+    public float xFlipOffset = 5f; //bounds width
+    [HideInInspector] public Bounds bounds; //bounds
+    [SerializeField] Transform visualRoot;
+    [SerializeField] GameObject bodyPartToAnimate;
+    [HideInInspector] public Transform bodyPartInitialState;
+    [HideInInspector] public Transform initialState;
+    public CharacterType characterType;
+    [HideInInspector] public float initialAnimationSpeed;
+    public float animationSpeed = 0.08f; // Time between frames
 
-   public List<GameObject> characterSpriteList = new List<GameObject>();
-   public List<Vector3> initialChrctrSpriteTransformList = new List<Vector3>();
-  [HideInInspector] public List<GameObject> zeroInitialAlphaSpriteList = new List<GameObject>();
-  [HideInInspector] public List<Color> initialChrctrColorList = new List<Color>();
+    public List<GameObject> characterSpriteList = new List<GameObject>();
+    public List<Vector3> initialChrctrSpriteTransformList = new List<Vector3>();
+    [HideInInspector] public List<GameObject> zeroInitialAlphaSpriteList = new List<GameObject>();
+    [HideInInspector] public List<Color> initialChrctrColorList = new List<Color>();
 
-  public bool isFacingLeft;
- 
-
-  IsoSpriteSorting IsoSpriteSorting; 
-
-  [HideInInspector] public int animDirectionAdjustorInt = 26, rightDownAnim, leftDownAnim, rightAnim, leftAnim, 
-                          upRightAnim, upLeftAnim, ladderAnimDirectionIndex;
+    public bool isFacingLeft;
 
 
-  [HideInInspector] public int idle, walk, run, sit, climb, rideBike;
+    IsoSpriteSorting IsoSpriteSorting;
+
+    [HideInInspector]
+    public int animDirectionAdjustorInt = 26, rightDownAnim, leftDownAnim, rightAnim, leftAnim,
+                            upRightAnim, upLeftAnim, ladderAnimDirectionIndex;
+
+
+    [HideInInspector] public int idle, walk, run, sit, climb, rideBike;
 
 
 
 
-  [HideInInspector] public Sprite[] 
-                      //human
-                      allHeadSprites, allEyeSprites, allThroatSprites, allCollarSprites, allTorsoSprites, 
-                      allWaistSprites, allWaistShortsSprites, allKneesShinsSprites, allAnklesSprites, allFeetSprites, 
-                      allDressSprites, allJakettoSprites, allLongSleeveSprites, allHandSprites, allShortSleeveSprites, 
-                      allHat1TopSprites, allMohawk5TopSprites, allMohawk5BottomSprites, allHair0TopSprites, allHair0BottomSprites, 
-                      allHair1TopSprites, allHair7TopSprites, allHair8TopSprites, allHair1BottomSprites, 
-                      allHair2BottomSprites, allHair3BottomSprites, allHair4BottomSprites, allHair6BottomSprites, 
-                      allHair7BottomSprites, allHair8BottomSprites, allHairFringe1Sprites, allHairFringe2Sprites, 
-                      allBikeSprites, 
-                      //chicken
-                      chickenFeetSprites,
-                      //pony
-                      ponyEyesSprites, ponyFaceSprites, ponyShadowSprites, ponyHairSprites, ponyFeetSprites,
-                      //pony
-                      ponyEyesSprites, ponyFaceSprites, ponyShadowSprites, ponyHairSprites, ponyFeetSprites;
-
-  [HideInInspector] public SpriteRenderer 
+    [HideInInspector]
+    public Sprite[]
                         //human
-                        headSprite, eyeSprite, throatSprite, collarSprite, torsoSprite, waistSprite, 
-                        waistShortsSprite, kneesShinsSprite, anklesSprite, feetSprite, jakettoSprite, dressSprite, 
-                        longSleeveSprite, handSprite, shortSleeveSprite, hat1TopSprite, mohawk5TopSprite, mohawk5BottomSprite, 
-                        hair0TopSprite, hair0BottomSprite, hair1TopSprite, hair7TopSprite, hair8TopSprite, 
-                        hair1BottomSprite, hair2BottomSprite, hair3BottomSprite, hair4BottomSprite, hair6BottomSprite, 
-                        hair7BottomSprite, hair8BottomSprite, hairFringe1Sprite, hairFringe2Sprite, 
+                        allHeadSprites, allEyeSprites, allThroatSprites, allCollarSprites, allTorsoSprites,
+                        allWaistSprites, allWaistShortsSprites, allKneesShinsSprites, allAnklesSprites, allFeetSprites,
+                        allDressSprites, allJakettoSprites, allLongSleeveSprites, allHandSprites, allShortSleeveSprites,
+                        allHat1TopSprites, allMohawk5TopSprites, allMohawk5BottomSprites, allHair0TopSprites, allHair0BottomSprites,
+                        allHair1TopSprites, allHair7TopSprites, allHair8TopSprites, allHair1BottomSprites,
+                        allHair2BottomSprites, allHair3BottomSprites, allHair4BottomSprites, allHair6BottomSprites,
+                        allHair7BottomSprites, allHair8BottomSprites, allHairFringe1Sprites, allHairFringe2Sprites,
+                        allBikeSprites,
                         //chicken
-                        chickenFeetSprite,
+                        chickenFeetSprites,
                         //pony
-                        ponyEyesSprite, ponyFaceSprite, ponyShadowSprite, ponyHairSprite, ponyFeetSprite,
+                        ponyEyesSprites, ponyFaceSprites, ponyShadowSprites, ponyHairSprites, ponyFeetSprites,
                         //pig
-                        ponyEyesSprite, ponyFaceSprite, ponyShadowSprite, ponyHairSprite, ponyFeetSprite;
+                        pigEyesSprites, pigFaceSprites, pigNoseSprites, pigBodySprites, pigFeetSprites,
+                        //dog
+                        dogEyesSprites, dogNoseSprites, dogMain1Sprites, dogMain2Sprites, dogFeetSprites;
+
+    [HideInInspector]
+    public SpriteRenderer
+                          //human
+                          headSprite, eyeSprite, throatSprite, collarSprite, torsoSprite, waistSprite,
+                          waistShortsSprite, kneesShinsSprite, anklesSprite, feetSprite, jakettoSprite, dressSprite,
+                          longSleeveSprite, handSprite, shortSleeveSprite, hat1TopSprite, mohawk5TopSprite, mohawk5BottomSprite,
+                          hair0TopSprite, hair0BottomSprite, hair1TopSprite, hair7TopSprite, hair8TopSprite,
+                          hair1BottomSprite, hair2BottomSprite, hair3BottomSprite, hair4BottomSprite, hair6BottomSprite,
+                          hair7BottomSprite, hair8BottomSprite, hairFringe1Sprite, hairFringe2Sprite,
+                          //chicken
+                          chickenFeetSprite,
+                          //pony
+                          ponyEyesSprite, ponyFaceSprite, ponyShadowSprite, ponyHairSprite, ponyFeetSprite,
+                          //pig
+                          pigEyesSprite, pigFaceSprite, pigNoseSprite, pigBodySprite, pigFeetSprite,
+                          //dog
+                         dogEyesSprite, dogNoseSprite, dogMain1Sprite, dogMain2Sprite, dogFeetSprite;
 
 
 
-  BikeTransformAdjustment bikeTransformAdjustment;
-  BikeScript bikeScript;
+    BikeTransformAdjustment bikeTransformAdjustment;
+    BikeScript bikeScript;
 
-  [SerializeField] GameObject bikeStatic;
-  [HideInInspector] public SpriteRenderer bikeSprite;
-  [HideInInspector] public Color currentBikeColor, bikeInitialColor;
-
-
-  [HideInInspector] public Coroutine allowTimeForSpaceBarCoro;  
-  [HideInInspector] public Coroutine lateStartUpdateCharacterDataCoro;  
-  [HideInInspector] public Coroutine bodyPartMoveCoro;  
+    [SerializeField] GameObject bikeStatic;
+    [HideInInspector] public SpriteRenderer bikeSprite;
+    [HideInInspector] public Color currentBikeColor, bikeInitialColor;
 
 
-
-
-  [HideInInspector] public bool playerOnFurniture = false;
-
-
-  [HideInInspector] public float timer;
-  [HideInInspector] public int currentFrame, movementStartIndex, movementFrameCount, currentAnimationDirection = 0,
-                      // bodyTypeNumber, 
-                      bodyTypeIndexMultiplier = 156;
-
-                      public int bodyTypeNumber;
-
-  [HideInInspector] public int[] movementIndices;
-
-  private float idleHopTimer = 0f;
-  private float bodyPartMoveTimer = 0f;
-
-
-
-  CharacterCustomization characterCustomization;
-
-  CharacterMovement characterMovement;
-
-  [HideInInspector] public Color currentSkinColor, currentHairColor, currentHatColor, currentShirtColor, currentPantsColor, 
-                          currentShoeColor, currentJakettoColor;
-
-
-
-  [HideInInspector] public Coroutine characterCustomizationIdleCoro;
-
-
-  [HideInInspector] public TMP_InputField[] inputFields;
-  
-  
-  [HideInInspector] public FurnitureScript currentFurnitureScript;
-  [HideInInspector] public Vector3 initialWaistTransformPos;
+    [HideInInspector] public Coroutine allowTimeForSpaceBarCoro;
+    [HideInInspector] public Coroutine lateStartUpdateCharacterDataCoro;
+    [HideInInspector] public Coroutine bodyPartMoveCoro;
 
 
 
 
-  void Awake()    
-  {
-    characterMovement = GetComponent<CharacterMovement>();
-    IsoSpriteSorting = GetComponent<IsoSpriteSorting>();
-    
-    if(visualRoot != null)
-    initialState = visualRoot.transform;
-    
-    if(bodyPartToAnimate != null)
-    bodyPartInitialState = bodyPartToAnimate.transform;
+    [HideInInspector] public bool playerOnFurniture = false;
+
+
+    [HideInInspector] public float timer;
+    [HideInInspector]
+    public int currentFrame, movementStartIndex, movementFrameCount, currentAnimationDirection = 0,
+                        // bodyTypeNumber, 
+                        bodyTypeIndexMultiplier = 156;
+
+    public int bodyTypeNumber;
+
+    [HideInInspector] public int[] movementIndices;
+
+    private float idleHopTimer = 0f;
+    private float bodyPartMoveTimer = 0f;
 
 
 
-  switch (characterType)
+    CharacterCustomization characterCustomization;
+
+    CharacterMovement characterMovement;
+
+    [HideInInspector]
+    public Color currentSkinColor, currentHairColor, currentHatColor, currentShirtColor, currentPantsColor,
+                            currentShoeColor, currentJakettoColor;
+
+
+
+    [HideInInspector] public Coroutine characterCustomizationIdleCoro;
+
+
+    [HideInInspector] public TMP_InputField[] inputFields;
+
+
+    [HideInInspector] public FurnitureScript currentFurnitureScript;
+    [HideInInspector] public Vector3 initialWaistTransformPos;
+
+
+
+
+    void Awake()
     {
-      case CharacterType.Human:
-        LoadHuman();
-        break;
+        characterMovement = GetComponent<CharacterMovement>();
+        IsoSpriteSorting = GetComponent<IsoSpriteSorting>();
 
-      case CharacterType.Chicken:
-        LoadChicken();
-        break;
+        if (visualRoot != null)
+            initialState = visualRoot.transform;
 
-      case CharacterType.Pony:
-        LoadPony();
-        break;
+        if (bodyPartToAnimate != null)
+            bodyPartInitialState = bodyPartToAnimate.transform;
 
-      // case CharacterType.Cow:
-      //     sprites = Resources.LoadAll<Sprite>("head_cow");
-      //     break;
 
-      // case CharacterType.Horse:
-      //     sprites = Resources.LoadAll<Sprite>("head_horse");
-      //     break;
 
-      case CharacterType.Pig:
-        LoadPig();
-        break;
+        switch (characterType)
+        {
+            case CharacterType.Human:
+                LoadHuman();
+                break;
 
-      // case CharacterType.Dog:
-      //     sprites = Resources.LoadAll<Sprite>("head_dog");
-      //     break;
+            case CharacterType.Chicken:
+                LoadChicken();
+                break;
 
-      // case CharacterType.Cat:
-      //     sprites = Resources.LoadAll<Sprite>("head_cat");
-      //     break;
+            case CharacterType.Pony:
+                LoadPony();
+                break;
+
+            // case CharacterType.Cow:
+            //     sprites = Resources.LoadAll<Sprite>("head_cow");
+            //     break;
+
+            // case CharacterType.Horse:
+            //     sprites = Resources.LoadAll<Sprite>("head_horse");
+            //     break;
+
+            case CharacterType.Pig:
+                LoadPig();
+                break;
+
+            case CharacterType.Dog:
+                LoadDog();
+                break;
+
+                // case CharacterType.Cat:
+                //     sprites = Resources.LoadAll<Sprite>("head_cat");
+                //     break;
+        }
+
+        initialAnimationSpeed = animationSpeed;
+
+        movementFrameCount = 4;
     }
-    
-    initialAnimationSpeed = animationSpeed;
 
-    movementFrameCount = 4;
-  }
-
-  void Start()
-  {
-    lateStartUpdateCharacterDataCoro = StartCoroutine(LateStartUpdateCharacterData());
-  }
-
-  IEnumerator LateStartUpdateCharacterData()
-  {
-    yield return new WaitForEndOfFrame();
-    yield return new WaitForEndOfFrame();
-    GetSpritesAndAddToLists(this.gameObject, characterSpriteList, new List<GameObject>(), initialChrctrColorList, initialChrctrSpriteTransformList);
-    // GetBounds();
-  }
-
-
-  public void Animate(int movementStartIndex, int movementFrameCount, int animationDirection, int bodyTypeNumber)
-  {
-    if(this.gameObject.tag == "Player")
-    {        
-      bikeSprite.color = currentBikeColor;
-      
-      if (characterMovement.playerOnBike == true)
-      {
-      RideBike();
-      }
-      else if (characterMovement.motionDirection == "upDownLadder"|| characterMovement.motionDirection == "upLadder" || characterMovement.motionDirection == "downLadder")
-      {
-      ClimbLadder();
-      }
-      else if ((Input.GetKey(KeyCode.Space) || 
-      Input.GetKey(KeyCode.JoystickButton0) ||  // A button
-      Input.GetKey(KeyCode.JoystickButton1) ||  // B button
-      Input.GetKey(KeyCode.JoystickButton2) ||  // X button
-      Input.GetKey(KeyCode.JoystickButton3))  && 
-      // !characterMovement.playerOnThresh && 
-      characterMovement.playerIsOutside && characterMovement.change != Vector3.zero)
-      {
-      Run();
-      }
-      else 
-      {
-      Walk();
-      }
-
-      currentAnimationDirection = animationDirection; 
-
-      HandleGettingOffBikeOrSeat();
-
-    }
-    else if (this.gameObject.tag == "NPC")
+    void Start()
     {
-      if (characterMovement.change != Vector3.zero)
-      {
-        Walk();
-      }
+        lateStartUpdateCharacterDataCoro = StartCoroutine(LateStartUpdateCharacterData());
     }
-  
-    // Only idle-hop when not moving, or climbing
-    if (characterMovement.change == Vector3.zero)
+
+    IEnumerator LateStartUpdateCharacterData()
     {
-        // if(characterAnimation.characterType != 0) // if it's not a humannnnn
-        // return;
-      switch (characterType)
-      {
-        case CharacterType.Human:
-          bool isIdleLeft = animationDirection == leftAnim || animationDirection == leftDownAnim;
-          bool isIdleRight = animationDirection == rightAnim || animationDirection == rightDownAnim;
+        yield return new WaitForEndOfFrame();
+        yield return new WaitForEndOfFrame();
+        GetSpritesAndAddToLists(this.gameObject, characterSpriteList, new List<GameObject>(), initialChrctrColorList, initialChrctrSpriteTransformList);
+        // GetBounds();
+    }
 
-          if (isIdleLeft || isIdleRight)
-          {
-              idleHopTimer -= Time.deltaTime;
 
-              if (idleHopTimer <= 0f)
-              {
-                  if (isIdleLeft)
-                      animationDirection = (animationDirection == leftAnim) ? leftDownAnim : leftAnim;
-                  else if (isIdleRight)
-                      animationDirection = (animationDirection == rightAnim) ? rightDownAnim : rightAnim;
+    public void Animate(int movementStartIndex, int movementFrameCount, int animationDirection, int bodyTypeNumber)
+    {
+        if (this.gameObject.tag == "Player")
+        {
+            if(bikeSprite != null)
+            bikeSprite.color = currentBikeColor;
 
-                  currentAnimationDirection = animationDirection;
-                  
-                  idleHopTimer = Random.Range(Random.Range(0.5f, 6f), 15f);
-              }
-          }
-          else
-          {
-              idleHopTimer = 0f;
-          }
-        break;
-
-        case CharacterType.Chicken:
-          idleHopTimer -= Time.deltaTime;
-          bodyPartMoveTimer -= Time.deltaTime;
-
-          if (idleHopTimer <= 0f)
-          {
-            isFacingLeft = !isFacingLeft;
-            UpdateFlip();
-            idleHopTimer = Random.Range(Random.Range(0.5f, 6f), 15f);
-          }
-          
-          if(bodyPartToAnimate != null)
-          { 
-            if (bodyPartMoveTimer <= 0f)
+            if (characterMovement.playerOnBike == true)
             {
-              if (bodyPartMoveCoro == null)
-              bodyPartMoveCoro = StartCoroutine(MoveBodyPartAnimation());
-
-              bodyPartMoveTimer = Random.Range(Random.Range(0.5f, 5f), 10f);
-              bodyPartMoveCoro = null;
+                RideBike();
             }
-          }
-        break;
-
-        case CharacterType.Pony:
-          if(!characterMovement.facingUp)
-          {movementStartIndex = 0;}
-          else
-          {movementStartIndex = 1;}
-          
-          idleHopTimer -= Time.deltaTime;
-
-          if (idleHopTimer <= 0f)
-          {
-            isFacingLeft = !isFacingLeft;
-            UpdateFlip();
-            idleHopTimer = Random.Range(Random.Range(0.5f, 6f), 15f);
-          }
-        break;
-      }
-
-
-    }
-
-
-    movementIndices = Enumerable.Range(movementStartIndex + animationDirection + ((bodyTypeNumber - 1) * bodyTypeIndexMultiplier), movementFrameCount).ToArray();
-    // Timer to control the animation frame rate
-    timer += Time.deltaTime; 
-
-    // If enough time has passed, move to the next frame
-    if (timer >= animationSpeed)
-    {
-      timer = 0f; // Reset timer
-
-      // Update the current frame
-      if (characterMovement.change != Vector3.zero)
-      {
-        currentFrame++;
-      }
-
-      // If we've reached the end of the movementIndices array, loop back to the first sprite
-      if (currentFrame >= movementIndices.Length)
-      {
-          currentFrame = 0;
-      }
-      switch (characterType)
-      {
-          case CharacterType.Human:
-            // Set the sprite to the current frame in the movementIndices array
-            headSprite.sprite = allHeadSprites[movementIndices[currentFrame]];
-            eyeSprite.sprite = allEyeSprites[movementIndices[currentFrame]];
-            throatSprite.sprite = allThroatSprites[movementIndices[currentFrame]];
-            collarSprite.sprite = allCollarSprites[movementIndices[currentFrame]];
-            torsoSprite.sprite = allTorsoSprites[movementIndices[currentFrame]];
-            waistSprite.sprite = allWaistSprites[movementIndices[currentFrame]];
-            waistShortsSprite.sprite = allWaistShortsSprites[movementIndices[currentFrame]];
-            kneesShinsSprite.sprite = allKneesShinsSprites[movementIndices[currentFrame]];
-            anklesSprite.sprite = allAnklesSprites[movementIndices[currentFrame]];
-            feetSprite.sprite = allFeetSprites[movementIndices[currentFrame]];
-            jakettoSprite.sprite = allJakettoSprites[movementIndices[currentFrame]];
-            dressSprite.sprite = allDressSprites[movementIndices[currentFrame]];
-            longSleeveSprite.sprite = allLongSleeveSprites[movementIndices[currentFrame]];
-            handSprite.sprite = allHandSprites[movementIndices[currentFrame]];
-            shortSleeveSprite.sprite = allShortSleeveSprites[movementIndices[currentFrame]];
-            hat1TopSprite.sprite = allHat1TopSprites[movementIndices[currentFrame]];
-            mohawk5TopSprite.sprite = allMohawk5TopSprites[movementIndices[currentFrame]];
-            mohawk5BottomSprite.sprite = allMohawk5BottomSprites[movementIndices[currentFrame]];
-            hair0TopSprite.sprite = allHair0TopSprites[movementIndices[currentFrame]];
-            hair0BottomSprite.sprite = allHair0BottomSprites[movementIndices[currentFrame]];
-            hair1TopSprite.sprite = allHair1TopSprites[movementIndices[currentFrame]];
-            hair7TopSprite.sprite = allHair7TopSprites[movementIndices[currentFrame]];
-            hair8TopSprite.sprite = allHair8TopSprites[movementIndices[currentFrame]];
-            hair1BottomSprite.sprite = allHair1BottomSprites[movementIndices[currentFrame]];
-            hair2BottomSprite.sprite = allHair2BottomSprites[movementIndices[currentFrame]];
-            hair3BottomSprite.sprite = allHair3BottomSprites[movementIndices[currentFrame]];
-            hair4BottomSprite.sprite = allHair4BottomSprites[movementIndices[currentFrame]];
-            hair6BottomSprite.sprite = allHair6BottomSprites[movementIndices[currentFrame]];
-            hair7BottomSprite.sprite = allHair7BottomSprites[movementIndices[currentFrame]];
-            hair8BottomSprite.sprite = allHair8BottomSprites[movementIndices[currentFrame]];
-            hairFringe1Sprite.sprite = allHairFringe1Sprites[movementIndices[currentFrame]];
-            hairFringe2Sprite.sprite = allHairFringe2Sprites[movementIndices[currentFrame]];                
-          break;
-
-          case CharacterType.Chicken:
-            chickenFeetSprite.sprite = chickenFeetSprites[movementIndices[currentFrame]]; 
-            break;
-
-          case CharacterType.Pony:
-              ponyEyesSprite.sprite = ponyEyesSprites[movementIndices[currentFrame]];
-              ponyFaceSprite.sprite = ponyFaceSprites[movementIndices[currentFrame]];
-              ponyShadowSprite.sprite = ponyShadowSprites[movementIndices[currentFrame]];
-              ponyHairSprite.sprite = ponyHairSprites[movementIndices[currentFrame]];
-              ponyFeetSprite.sprite = ponyFeetSprites[movementIndices[currentFrame]];
-          break;
-
-          // case CharacterType.Cow:
-          //     sprites = Resources.LoadAll<Sprite>("head_cow");
-          //     break;
-
-          // case CharacterType.Horse:
-          //     sprites = Resources.LoadAll<Sprite>("head_horse");
-          //     break;
-
-          // case CharacterType.Pig:
-          //     sprites = Resources.LoadAll<Sprite>("head_pig");
-          //     break;
-
-          // case CharacterType.Dog:
-          //     sprites = Resources.LoadAll<Sprite>("head_dog");
-          //     break;
-
-          // case CharacterType.Cat:
-          //     sprites = Resources.LoadAll<Sprite>("head_cat");
-          //     break;
-      }
-      
-    }
-  }
-
-  public void RideBike()
-  {
-      bikeTransformAdjustment.SetBikeTransformPosition();
-
-      currentBikeColor.a = 1f;
-      movementStartIndex = rideBike;
-      movementFrameCount = 4;
-      characterMovement.movementSpeed = 80;
-      animationSpeed = 0.08f;      
-      if(characterMovement.change.x > 0)
-      {
-        bikeSprite.flipX = true;
-      }
-      else if (characterMovement.change.x < 0)
-      {
-        bikeSprite.flipX = false;
-      }
-
-      if(characterMovement.change.y > 0)
-      {
-        bikeSprite.sprite = allBikeSprites[0];
-      }
-      else if (characterMovement.change.y < 0)
-      {
-        bikeSprite.sprite = allBikeSprites[1];
-      }
-  }
-
-  public void Sit()
-  {
-    movementStartIndex = sit;
-    movementFrameCount = 1;
-  }
-
-  public void ClimbLadder()
-  {
-    movementStartIndex = climb;
-    movementFrameCount = 4;
-    animationSpeed = initialAnimationSpeed;
-    currentBikeColor.a = 0f;
-  }
-
-  public void Run()
-  {    
-    switch (characterType)
-    {
-        case CharacterType.Human:
-          movementStartIndex = run;
-          movementFrameCount = 4;
-          characterMovement.movementSpeed = 50;
-          animationSpeed = 0.11f;
-          currentBikeColor.a = 0f;
-          break;
-
-        case CharacterType.Chicken:
-          if (characterMovement.facingLeft != isFacingLeft)
-          {
-              isFacingLeft = characterMovement.facingLeft;
-              UpdateFlip();
-          }
-          characterMovement.movementSpeed = 35;
-          animationSpeed = 0.11f;
-          break;
-
-        case CharacterType.Pony:
-          if (characterMovement.facingLeft != isFacingLeft)
-          {
-              isFacingLeft = characterMovement.facingLeft;
-              UpdateFlip();
-          }
-          movementFrameCount = 4;
-          movementStartIndex = characterMovement.facingUp ? 30 : run;
-          characterMovement.movementSpeed = 35;
-          animationSpeed = 0.11f;
-          break;
-
-        // case CharacterType.Cow:
-        //     sprites = Resources.LoadAll<Sprite>("head_cow");
-        //     break;
-
-        // case CharacterType.Horse:
-        //     sprites = Resources.LoadAll<Sprite>("head_horse");
-        //     break;
-
-        case CharacterType.Pony:
-          if (characterMovement.facingLeft != isFacingLeft)
-          {
-              isFacingLeft = characterMovement.facingLeft;
-              UpdateFlip();
-          }
-          movementFrameCount = 4;
-          movementStartIndex = characterMovement.facingUp ? 30 : run;
-          characterMovement.movementSpeed = 35;
-          animationSpeed = 0.11f;
-          break;
-
-        // case CharacterType.Dog:
-        //     sprites = Resources.LoadAll<Sprite>("head_dog");
-        //     break;
-
-        // case CharacterType.Cat:
-        //     sprites = Resources.LoadAll<Sprite>("head_cat");
-        //     break;
-    }  } 
-
-  public void Walk()
-  {
-
-    animationSpeed = initialAnimationSpeed;
-    
-    switch (characterType)
-    {
-        case CharacterType.Human:
-            movementFrameCount = 4;
-            movementStartIndex = walk;
-            characterMovement.movementSpeed = 30;
-            break;
-
-        case CharacterType.Chicken:
-          if (characterMovement.facingLeft != isFacingLeft)
-          {
-              isFacingLeft = characterMovement.facingLeft;
-              UpdateFlip();
-          }
-          characterMovement.movementSpeed = 15;
-
-          break;
-
-        case CharacterType.Pony:
-          if (characterMovement.facingLeft != isFacingLeft)
-          {
-              isFacingLeft = characterMovement.facingLeft;
-              UpdateFlip();
-          }
-          movementFrameCount = 11;
-          movementStartIndex =  characterMovement.facingUp ? 15 : walk;
-          characterMovement.movementSpeed = 15;
-          break;
-
-        // case CharacterType.Cow:
-        //     sprites = Resources.LoadAll<Sprite>("head_cow");
-        //     break;
-
-        // case CharacterType.Horse:
-        //     sprites = Resources.LoadAll<Sprite>("head_horse");
-        //     break;
-
-        case CharacterType.Pig:
-          if (characterMovement.facingLeft != isFacingLeft)
-          {
-              isFacingLeft = characterMovement.facingLeft;
-              UpdateFlip();
-          }
-          movementFrameCount = 11;
-          movementStartIndex =  characterMovement.facingUp ? 15 : walk;
-          characterMovement.movementSpeed = 15;
-          break;
-        // case CharacterType.Dog:
-        //     sprites = Resources.LoadAll<Sprite>("head_dog");
-        //     break;
-
-        // case CharacterType.Cat:
-        //     sprites = Resources.LoadAll<Sprite>("head_cat");
-        //     break;
-    }
-  }
-
-  // public void GoInBed()
-  // {
-    
-  // }
-
-  public void HandleGettingOffBikeOrSeat()
-  {
-      // Check if space was released before this code
-      if(characterMovement.spaceBarDeactivated == false)
-      {
-          if (Input.GetKey(KeyCode.Space) || 
-      Input.GetKey(KeyCode.JoystickButton0) ||  // A button
-      Input.GetKey(KeyCode.JoystickButton1) ||  // B button
-      Input.GetKey(KeyCode.JoystickButton2)  // X button
-      // Input.GetKey(KeyCode.JoystickButton3)
-      )
-          {
-            if(characterMovement.playerOnBike)
+            else if (characterMovement.motionDirection == "upDownLadder" || characterMovement.motionDirection == "upLadder" || characterMovement.motionDirection == "downLadder")
             {
-              // StopBikeFunction
-              characterMovement.StartDeactivateSpaceBar();
-              characterMovement.playerOnBike = false;
-              bikeScript.GetOffBoike();
-              bikeStatic.transform.position = transform.position + new Vector3(8, -22, 0);
-              currentBikeColor.a = 0f;
+                ClimbLadder();
             }
-            else if(characterMovement.playerOnFurniture)
+            else if ((Input.GetKey(KeyCode.Space) ||
+            Input.GetKey(KeyCode.JoystickButton0) ||  // A button
+            Input.GetKey(KeyCode.JoystickButton1) ||  // B button
+            Input.GetKey(KeyCode.JoystickButton2) ||  // X button
+            Input.GetKey(KeyCode.JoystickButton3)) &&
+            // !characterMovement.characterOnThresh && 
+            characterMovement.playerIsOutside && characterMovement.change != Vector3.zero)
             {
-              if(currentFurnitureScript != null)
-              {
-                CheckFurnitureType();
-                characterMovement.StartDeactivateSpaceBar();
-
-                // if(currentFurnitureScript.currentFurnitureType == currentFurnitureScript.toilet)
-                // {
-                //   characterCustomization.UpdatePants();
-                //   characterCustomization.UpdateWaist();
-                // }
-                // else if (currentFurnitureScript.currentFurnitureType == bed)
-                // {
-
-                // }
-
-                currentFurnitureScript.StopEngaging();
-              }
-
+                Run();
             }
-          }
-      }
-      
-      //StopBikeFunctionWhile Entering Building 
-      if(characterMovement.playerOnThresh && characterMovement.playerOnBike == true)
-      {
-        if(characterMovement.change.x > 0 && characterMovement.change.y > 0)//up right
-        {  
-            bikeStatic.transform.position = transform.position + new Vector3(8,-22,0) + new Vector3(-16,-8,0);
+            else
+            {
+                Walk();
+            }
+
+            currentAnimationDirection = animationDirection;
+
+            HandleGettingOffBikeOrSeat();
+
         }
-        if(characterMovement.change.x < 0 && characterMovement.change.y < 0)//down left
-        {  
-            bikeStatic.transform.position = transform.position + new Vector3(8,-22,0) + new Vector3(16,8,0);
+        else if (this.gameObject.tag == "NPC")
+        {
+            if (characterMovement.change != Vector3.zero)
+            {
+                Walk();
+            }
         }
-        if(characterMovement.change.x < 0 && characterMovement.change.y > 0)//up left
-        {  
-            bikeStatic.transform.position = transform.position + new Vector3(8,-22,0) + new Vector3(16,-8,0);
+
+        // Only idle-hop when not moving, or climbing
+        if (characterMovement.change == Vector3.zero)
+        {
+            // Idle(movementStartIndex, animationDirection);
+            switch (characterType)
+            {
+                case CharacterType.Human:
+                    bool isIdleLeft = animationDirection == leftAnim || animationDirection == leftDownAnim;
+                    bool isIdleRight = animationDirection == rightAnim || animationDirection == rightDownAnim;
+
+                    if (isIdleLeft || isIdleRight)
+                    {
+                        idleHopTimer -= Time.deltaTime;
+
+                        if (idleHopTimer <= 0f)
+                        {
+                            if (isIdleLeft)
+                                animationDirection = (animationDirection == leftAnim) ? leftDownAnim : leftAnim;
+                            else if (isIdleRight)
+                                animationDirection = (animationDirection == rightAnim) ? rightDownAnim : rightAnim;
+
+                            currentAnimationDirection = animationDirection;
+
+                            idleHopTimer = Random.Range(Random.Range(0.5f, 6f), 15f);
+                        }
+                    }
+                    else
+                    {
+                        idleHopTimer = 0f;
+                    }
+                    break;
+
+                case CharacterType.Chicken:
+                    idleHopTimer -= Time.deltaTime;
+                    bodyPartMoveTimer -= Time.deltaTime;
+
+                    if (idleHopTimer <= 0f)
+                    {
+                        isFacingLeft = !isFacingLeft;
+                        UpdateFlip();
+                        idleHopTimer = Random.Range(Random.Range(0.5f, 6f), 15f);
+                    }
+
+                    if (bodyPartToAnimate != null)
+                    {
+                        if (bodyPartMoveTimer <= 0f)
+                        {
+                            if (bodyPartMoveCoro == null)
+                                bodyPartMoveCoro = StartCoroutine(MoveBodyPartAnimation());
+
+                            bodyPartMoveTimer = Random.Range(Random.Range(0.5f, 5f), 10f);
+                            bodyPartMoveCoro = null;
+                        }
+                    }
+                    break;
+
+                case CharacterType.Pony:
+                    movementStartIndex = characterMovement.facingUp ? 1 : 0;
+
+                    idleHopTimer -= Time.deltaTime;
+
+                    if (idleHopTimer <= 0f)
+                    {
+                        isFacingLeft = !isFacingLeft;
+                        UpdateFlip();
+                        idleHopTimer = Random.Range(Random.Range(0.5f, 6f), 15f);
+                    }
+                    break;
+
+
+                case CharacterType.Pig:
+
+                    movementStartIndex = characterMovement.facingUp ? 1 : 0;
+
+                    idleHopTimer -= Time.deltaTime;
+
+                    if (idleHopTimer <= 0f)
+                    {
+                        isFacingLeft = !isFacingLeft;
+                        UpdateFlip();
+                        idleHopTimer = Random.Range(Random.Range(0.5f, 6f), 15f);
+                    }
+                    break;
+
+                case CharacterType.Dog:
+
+                    movementStartIndex = characterMovement.facingUp ? 1 : 0;
+
+                    idleHopTimer -= Time.deltaTime;
+
+                    if (idleHopTimer <= 0f)
+                    {
+                        isFacingLeft = !isFacingLeft;
+                        UpdateFlip();
+                        idleHopTimer = Random.Range(Random.Range(0.5f, 6f), 15f);
+                    }
+                    break;
+            }
         }
-        if(characterMovement.change.x > 0 && characterMovement.change.y < 0)// down right
-        {  
-            bikeStatic.transform.position = transform.position + new Vector3(8,-22,0) + new Vector3(-16,8,0);
+
+
+        movementIndices = Enumerable.Range(movementStartIndex + animationDirection + ((bodyTypeNumber - 1) * bodyTypeIndexMultiplier), movementFrameCount).ToArray();
+        // Timer to control the animation frame rate
+        timer += Time.deltaTime;
+
+        // If enough time has passed, move to the next frame
+        if (timer >= animationSpeed)
+        {
+            timer = 0f; // Reset timer
+
+            // Update the current frame
+            if (characterMovement.change != Vector3.zero)
+            {
+                currentFrame++;
+            }
+
+            // If we've reached the end of the movementIndices array, loop back to the first sprite
+            if (currentFrame >= movementIndices.Length)
+            {
+                currentFrame = 0;
+            }
+            switch (characterType)
+            {
+                case CharacterType.Human:
+                    // Set the sprite to the current frame in the movementIndices array
+                    headSprite.sprite = allHeadSprites[movementIndices[currentFrame]];
+                    eyeSprite.sprite = allEyeSprites[movementIndices[currentFrame]];
+                    throatSprite.sprite = allThroatSprites[movementIndices[currentFrame]];
+                    collarSprite.sprite = allCollarSprites[movementIndices[currentFrame]];
+                    torsoSprite.sprite = allTorsoSprites[movementIndices[currentFrame]];
+                    waistSprite.sprite = allWaistSprites[movementIndices[currentFrame]];
+                    waistShortsSprite.sprite = allWaistShortsSprites[movementIndices[currentFrame]];
+                    kneesShinsSprite.sprite = allKneesShinsSprites[movementIndices[currentFrame]];
+                    anklesSprite.sprite = allAnklesSprites[movementIndices[currentFrame]];
+                    feetSprite.sprite = allFeetSprites[movementIndices[currentFrame]];
+                    jakettoSprite.sprite = allJakettoSprites[movementIndices[currentFrame]];
+                    dressSprite.sprite = allDressSprites[movementIndices[currentFrame]];
+                    longSleeveSprite.sprite = allLongSleeveSprites[movementIndices[currentFrame]];
+                    handSprite.sprite = allHandSprites[movementIndices[currentFrame]];
+                    shortSleeveSprite.sprite = allShortSleeveSprites[movementIndices[currentFrame]];
+                    hat1TopSprite.sprite = allHat1TopSprites[movementIndices[currentFrame]];
+                    mohawk5TopSprite.sprite = allMohawk5TopSprites[movementIndices[currentFrame]];
+                    mohawk5BottomSprite.sprite = allMohawk5BottomSprites[movementIndices[currentFrame]];
+                    hair0TopSprite.sprite = allHair0TopSprites[movementIndices[currentFrame]];
+                    hair0BottomSprite.sprite = allHair0BottomSprites[movementIndices[currentFrame]];
+                    hair1TopSprite.sprite = allHair1TopSprites[movementIndices[currentFrame]];
+                    hair7TopSprite.sprite = allHair7TopSprites[movementIndices[currentFrame]];
+                    hair8TopSprite.sprite = allHair8TopSprites[movementIndices[currentFrame]];
+                    hair1BottomSprite.sprite = allHair1BottomSprites[movementIndices[currentFrame]];
+                    hair2BottomSprite.sprite = allHair2BottomSprites[movementIndices[currentFrame]];
+                    hair3BottomSprite.sprite = allHair3BottomSprites[movementIndices[currentFrame]];
+                    hair4BottomSprite.sprite = allHair4BottomSprites[movementIndices[currentFrame]];
+                    hair6BottomSprite.sprite = allHair6BottomSprites[movementIndices[currentFrame]];
+                    hair7BottomSprite.sprite = allHair7BottomSprites[movementIndices[currentFrame]];
+                    hair8BottomSprite.sprite = allHair8BottomSprites[movementIndices[currentFrame]];
+                    hairFringe1Sprite.sprite = allHairFringe1Sprites[movementIndices[currentFrame]];
+                    hairFringe2Sprite.sprite = allHairFringe2Sprites[movementIndices[currentFrame]];
+                    break;
+
+                case CharacterType.Chicken:
+                    chickenFeetSprite.sprite = chickenFeetSprites[movementIndices[currentFrame]];
+                    break;
+
+                case CharacterType.Pony:
+                    ponyEyesSprite.sprite = ponyEyesSprites[movementIndices[currentFrame]];
+                    ponyFaceSprite.sprite = ponyFaceSprites[movementIndices[currentFrame]];
+                    ponyShadowSprite.sprite = ponyShadowSprites[movementIndices[currentFrame]];
+                    ponyHairSprite.sprite = ponyHairSprites[movementIndices[currentFrame]];
+                    ponyFeetSprite.sprite = ponyFeetSprites[movementIndices[currentFrame]];
+                    break;
+
+                // case CharacterType.Cow:
+                //     sprites = Resources.LoadAll<Sprite>("head_cow");
+                //     break;
+
+                // case CharacterType.Horse:
+                //     sprites = Resources.LoadAll<Sprite>("head_horse");
+                //     break;
+
+                case CharacterType.Pig:
+                    pigEyesSprite.sprite = pigEyesSprites[movementIndices[currentFrame]];
+                    pigFaceSprite.sprite = pigFaceSprites[movementIndices[currentFrame]];
+                    pigNoseSprite.sprite = pigNoseSprites[movementIndices[currentFrame]];
+                    pigBodySprite.sprite = pigBodySprites[movementIndices[currentFrame]];
+                    pigFeetSprite.sprite = pigFeetSprites[movementIndices[currentFrame]];
+                    break;
+
+                case CharacterType.Dog:
+                    dogEyesSprite.sprite = dogEyesSprites[movementIndices[currentFrame]];
+                    dogNoseSprite.sprite = dogNoseSprites[movementIndices[currentFrame]];
+                    dogMain1Sprite.sprite = dogMain1Sprites[movementIndices[currentFrame]];
+                    dogMain2Sprite.sprite = dogMain2Sprites[movementIndices[currentFrame]];
+                    dogFeetSprite.sprite = dogFeetSprites[movementIndices[currentFrame]];
+                    break;
+
+                    // case CharacterType.Cat:
+                    //     sprites = Resources.LoadAll<Sprite>("head_cat");
+                    //     break;
+            }
+
         }
+    }
+
+    public void RideBike()
+    {
+        bikeTransformAdjustment.SetBikeTransformPosition();
+
+        currentBikeColor.a = 1f;
+        movementStartIndex = rideBike;
+        movementFrameCount = 4;
+        //characterMovement.movementSpeed = 80;
+        animationSpeed = 0.08f;
+        if (characterMovement.change.x > 0)
+        {
+            bikeSprite.flipX = true;
+        }
+        else if (characterMovement.change.x < 0)
+        {
+            bikeSprite.flipX = false;
+        }
+
+        if (characterMovement.change.y > 0)
+        {
+            bikeSprite.sprite = allBikeSprites[0];
+        }
+        else if (characterMovement.change.y < 0)
+        {
+            bikeSprite.sprite = allBikeSprites[1];
+        }
+    }
+
+    // public void Idle(int movementStartIndex, int animationDirection)
+    // {
         
-        characterMovement.playerOnBike = false;
-        bikeScript.GetOffBoike();
-        currentBikeColor.a = 0f;
 
-        characterMovement.activeCollisions.Clear();
-      }
-      
-  }
-
-
-  Color HexToColor(string hex)
-  {
-      Color newCol;
-      if (ColorUtility.TryParseHtmlString(hex, out newCol))
-      {
-          return newCol;
-      }
-      else
-      {
-          Debug.LogError("Invalid hex color string: " + hex);
-          return Color.black; // Return black if conversion fails
-      }
-  } 
-
-
-  public static void SetTreeSortingLayer(GameObject gameObject, string sortingLayerName)
-  {
-      if(gameObject.GetComponent<SpriteRenderer>() != null) {
-        gameObject.GetComponent<SpriteRenderer>().sortingLayerName = sortingLayerName;
-      }
-      foreach (Transform child in gameObject.transform)
-      {
-          CharacterAnimation.SetTreeSortingLayer(child.gameObject, sortingLayerName);
-      }
-  } 
-
-  public void GetSpritesAndAddToLists(GameObject obj, List<GameObject> spriteList, List<GameObject> excludeList, List<Color> colorList, List<Vector3> transformList)
-  {
-    // Clear the lists before repopulating
-    spriteList.Clear();
-    colorList.Clear();
-
-    Stack<GameObject> stack = new Stack<GameObject>();
-    stack.Push(obj);
-
-    while (stack.Count > 0)
+    // }
+    public void Sit()
     {
-        GameObject currentNode = stack.Pop();
-        SpriteRenderer sr = currentNode.GetComponent<SpriteRenderer>();
-        Transform tr = currentNode.GetComponent<Transform>();
+        movementStartIndex = sit;
+        movementFrameCount = 1;
+    }
 
-        if(currentNode.CompareTag("VisualRoot")) 
+    public void ClimbLadder()
+    {
+        movementStartIndex = climb;
+        movementFrameCount = 4;
+        animationSpeed = initialAnimationSpeed;
+        currentBikeColor.a = 0f;
+    }
+
+    public void Run()
+    {
+        switch (characterType)
         {
-          tr = visualRoot;
-          initialState = visualRoot;
+            case CharacterType.Human:
+                movementStartIndex = run;
+                movementFrameCount = 4;
+                //characterMovement.movementSpeed = 60;
+                animationSpeed = 0.10f;
+                currentBikeColor.a = 0f;
+                break;
+
+            case CharacterType.Chicken:
+                if (characterMovement.facingLeft != isFacingLeft)
+                {
+                    isFacingLeft = characterMovement.facingLeft;
+                    UpdateFlip();
+                }
+                //characterMovement.movementSpeed = 60;
+                animationSpeed = 0.10f;
+                break;
+
+            case CharacterType.Pony:
+                if (characterMovement.facingLeft != isFacingLeft)
+                {
+                    isFacingLeft = characterMovement.facingLeft;
+                    UpdateFlip();
+                }
+                movementFrameCount = 4;
+                movementStartIndex = characterMovement.facingUp ? 30 : run;
+                //characterMovement.movementSpeed = 60;
+                animationSpeed = 0.10f;
+                break;
+
+            // case CharacterType.Cow:
+            //     sprites = Resources.LoadAll<Sprite>("head_cow");
+            //     break;
+
+            // case CharacterType.Horse:
+            //     sprites = Resources.LoadAll<Sprite>("head_horse");
+            //     break;
+
+            case CharacterType.Pig:
+                if (characterMovement.facingLeft != isFacingLeft)
+                {
+                    isFacingLeft = characterMovement.facingLeft;
+                    UpdateFlip();
+                }
+                movementFrameCount = 4;
+                movementStartIndex = characterMovement.facingUp ? 12 : 8;
+                //characterMovement.movementSpeed = 60;
+                animationSpeed = 0.10f;
+                break;
+
+            case CharacterType.Dog:
+                if (characterMovement.facingLeft != isFacingLeft)
+                {
+                    isFacingLeft = characterMovement.facingLeft;
+                    UpdateFlip();
+                }
+                movementFrameCount = 4;
+                movementStartIndex = characterMovement.facingUp ? 12 : 8;
+                //characterMovement.movementSpeed = 60;
+                animationSpeed = 0.10f;
+                break;
+
+
+
+                // case CharacterType.Cat:
+                //     sprites = Resources.LoadAll<Sprite>("head_cat");
+                //     break;
+        }
+    }
+
+    public void Walk()
+    {
+
+        // animationSpeed = initialAnimationSpeed;
+
+        switch (characterType)
+        {
+            case CharacterType.Human:
+                movementFrameCount = 4;
+                movementStartIndex = walk;
+                //characterMovement.movementSpeed = 60;
+                break;
+
+            case CharacterType.Chicken:
+                if (characterMovement.facingLeft != isFacingLeft)
+                {
+                    isFacingLeft = characterMovement.facingLeft;
+                    UpdateFlip();
+                }
+                //characterMovement.movementSpeed = 60;
+
+                break;
+
+            case CharacterType.Pony:
+                if (characterMovement.facingLeft != isFacingLeft)
+                {
+                    isFacingLeft = characterMovement.facingLeft;
+                    UpdateFlip();
+                }
+                movementFrameCount = 11;
+                movementStartIndex = characterMovement.facingUp ? 15 : walk;
+                //characterMovement.movementSpeed = 60;
+                break;
+
+            // case CharacterType.Cow:
+            //     sprites = Resources.LoadAll<Sprite>("head_cow");
+            //     break;
+
+            // case CharacterType.Horse:
+            //     sprites = Resources.LoadAll<Sprite>("head_horse");
+            //     break;
+
+            case CharacterType.Pig:
+                if (characterMovement.facingLeft != isFacingLeft)
+                {
+                    isFacingLeft = characterMovement.facingLeft;
+                    UpdateFlip();
+                }
+                movementFrameCount = 4;
+                movementStartIndex = characterMovement.facingUp ? 12 : 8;
+                //characterMovement.movementSpeed = 60;
+                break;
+
+            case CharacterType.Dog:
+                if (characterMovement.facingLeft != isFacingLeft)
+                {
+                    isFacingLeft = characterMovement.facingLeft;
+                    UpdateFlip();
+                }
+                movementFrameCount = 4;
+                movementStartIndex = characterMovement.facingUp ? 12 : 8;
+                //characterMovement.movementSpeed = 60;
+                break;
+
+                // case CharacterType.Cat:
+                //     sprites = Resources.LoadAll<Sprite>("head_cat");
+                //     break;
+        }
+    }
+
+    // public void GoInBed()
+    // {
+
+    // }
+
+    public void HandleGettingOffBikeOrSeat()
+    {
+        // Check if space was released before this code
+        if (characterMovement.spaceBarDeactivated == false)
+        {
+            if (Input.GetKey(KeyCode.Space) ||
+        Input.GetKey(KeyCode.JoystickButton0) ||  // A button
+        Input.GetKey(KeyCode.JoystickButton1) ||  // B button
+        Input.GetKey(KeyCode.JoystickButton2)  // X button
+                                               // Input.GetKey(KeyCode.JoystickButton3)
+        )
+            {
+                if (characterMovement.playerOnBike)
+                {
+                    // StopBikeFunction
+                    characterMovement.StartDeactivateSpaceBar();
+                    characterMovement.playerOnBike = false;
+                    bikeScript.GetOffBoike();
+                    bikeStatic.transform.position = transform.position + new Vector3(8, -22, 0);
+                    currentBikeColor.a = 0f;
+                }
+                else if (characterMovement.playerOnFurniture)
+                {
+                    if (currentFurnitureScript != null)
+                    {
+                        CheckFurnitureType();
+                        characterMovement.StartDeactivateSpaceBar();
+
+                        // if(currentFurnitureScript.currentFurnitureType == currentFurnitureScript.toilet)
+                        // {
+                        //   characterCustomization.UpdatePants();
+                        //   characterCustomization.UpdateWaist();
+                        // }
+                        // else if (currentFurnitureScript.currentFurnitureType == bed)
+                        // {
+
+                        // }
+
+                        currentFurnitureScript.StopEngaging();
+                    }
+
+                }
+            }
         }
 
-        if (sr != null)
+        //StopBikeFunctionWhile Entering Building 
+        if (characterMovement.characterOnThresh && characterMovement.playerOnBike == true)
         {
-            Color col = sr.color;
-            spriteList.Add(currentNode);
-            colorList.Add(col);
-            transformList.Add(tr.localPosition);
+            if (characterMovement.change.x > 0 && characterMovement.change.y > 0)//up right
+            {
+                bikeStatic.transform.position = transform.position + new Vector3(8, -22, 0) + new Vector3(-16, -8, 0);
+            }
+            if (characterMovement.change.x < 0 && characterMovement.change.y < 0)//down left
+            {
+                bikeStatic.transform.position = transform.position + new Vector3(8, -22, 0) + new Vector3(16, 8, 0);
+            }
+            if (characterMovement.change.x < 0 && characterMovement.change.y > 0)//up left
+            {
+                bikeStatic.transform.position = transform.position + new Vector3(8, -22, 0) + new Vector3(16, -8, 0);
+            }
+            if (characterMovement.change.x > 0 && characterMovement.change.y < 0)// down right
+            {
+                bikeStatic.transform.position = transform.position + new Vector3(8, -22, 0) + new Vector3(-16, 8, 0);
+            }
+
+            characterMovement.playerOnBike = false;
+            bikeScript.GetOffBoike();
+            currentBikeColor.a = 0f;
+
+            characterMovement.activeCollisions.Clear();
         }
 
-        foreach (Transform child in currentNode.transform)
+    }
+
+
+    Color HexToColor(string hex)
+    {
+        Color newCol;
+        if (ColorUtility.TryParseHtmlString(hex, out newCol))
         {
-            if (!excludeList.Contains(child.gameObject)){
-                stack.Push(child.gameObject);
+            return newCol;
+        }
+        else
+        {
+            Debug.LogError("Invalid hex color string: " + hex);
+            return Color.black; // Return black if conversion fails
+        }
+    }
+
+
+    public static void SetTreeSortingLayer(GameObject gameObject, string sortingLayerName)
+    {
+        if (gameObject.GetComponent<SpriteRenderer>() != null)
+        {
+            gameObject.GetComponent<SpriteRenderer>().sortingLayerName = sortingLayerName;
+        }
+        foreach (Transform child in gameObject.transform)
+        {
+            CharacterAnimation.SetTreeSortingLayer(child.gameObject, sortingLayerName);
+        }
+    }
+
+    public void GetSpritesAndAddToLists(GameObject obj, List<GameObject> spriteList, List<GameObject> excludeList, List<Color> colorList, List<Vector3> transformList)
+    {
+        // Clear the lists before repopulating
+        spriteList.Clear();
+        colorList.Clear();
+
+        Stack<GameObject> stack = new Stack<GameObject>();
+        stack.Push(obj);
+
+        while (stack.Count > 0)
+        {
+            GameObject currentNode = stack.Pop();
+            SpriteRenderer sr = currentNode.GetComponent<SpriteRenderer>();
+            Transform tr = currentNode.GetComponent<Transform>();
+
+            if (currentNode.CompareTag("VisualRoot"))
+            {
+                tr = visualRoot;
+                initialState = visualRoot;
+            }
+
+            if (sr != null)
+            {
+                Color col = sr.color;
+                spriteList.Add(currentNode);
+                colorList.Add(col);
+                transformList.Add(tr.localPosition);
+            }
+
+            foreach (Transform child in currentNode.transform)
+            {
+                if (!excludeList.Contains(child.gameObject))
+                {
+                    stack.Push(child.gameObject);
+                }
             }
         }
     }
-  }
 
-  public void initializeCharacterSprites()
-  {
-    for(int i = 0; i < characterSpriteList.Count; i++)
+    public void initializeCharacterSprites()
     {
-      characterSpriteList[i].GetComponent<SpriteRenderer>().color = initialChrctrColorList[i];
+        for (int i = 0; i < characterSpriteList.Count; i++)
+        {
+            characterSpriteList[i].GetComponent<SpriteRenderer>().color = initialChrctrColorList[i];
+        }
     }
-  }
 
 
-  public void SetAlpha(GameObject treeNode, float alpha) // opening cupboards
-  {
-    SpriteRenderer sr = treeNode.GetComponent<SpriteRenderer>();
-
-    if(treeNode != transform.Find("bike"))
+    public void SetAlpha(GameObject treeNode, float alpha) // opening cupboards
     {
-      if(sr.color.a != 0)
-      {
-        sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, alpha);
-      }
-    }
-  }  
-
-
-  public void SetTreeAlpha(GameObject treeNode, float alpha)
-  {
-      if (treeNode == null)
-      {
-          return; // TODO: remove this
-      }
-      else if(treeNode != transform.Find("bike"))
-      {
         SpriteRenderer sr = treeNode.GetComponent<SpriteRenderer>();
-        if (sr != null)
-        {
-            sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, alpha);
-        }
-        foreach (Transform child in treeNode.transform)
-        {
-            SetTreeAlpha(child.gameObject, alpha);
-        }
-      }
-  }
-  // public IEnumerator SetAlphaToZeroForAllSprites()
-  // {
-  //   yield return new WaitForEndOfFrame();
-  //   yield return new WaitForEndOfFrame();
-  //     // List all SpriteRenderer components you want to modify
-  //     SpriteRenderer[] spriteRenderers = new SpriteRenderer[] {
-  //         headSprite, eyeSprite, throatSprite, collarSprite, torsoSprite, waistSprite, waistShortsSprite, 
-  //         kneesShinsSprite, anklesSprite, feetSprite, jakettoSprite, dressSprite, longSleeveSprite, 
-  //         handSprite, shortSleeveSprite, mohawk5TopSprite, mohawk5BottomSprite, hair0TopSprite, 
-  //         hair0BottomSprite, hair1TopSprite, hair7TopSprite, hair8TopSprite, hair1BottomSprite, 
-  //         hair2BottomSprite, hair3BottomSprite, hair4BottomSprite, hair6BottomSprite, hair7BottomSprite, 
-  //         hair8BottomSprite, hairFringe1Sprite, hairFringe2Sprite
-  //     };
 
-  //     // Loop through each SpriteRenderer and set its alpha to zero
-  //     foreach (SpriteRenderer spriteRenderer in spriteRenderers)
-  //     {
-  //         if (spriteRenderer != null) // Check if SpriteRenderer is assigned
-  //         {
-  //             Color color = spriteRenderer.color;
-  //             color.a = 0f; // Set alpha to zero
-  //             spriteRenderer.color = color;
-  //         }
-  //     }
-  // }
+        if (treeNode != transform.Find("bike"))
+        {
+            if (sr.color.a != 0)
+            {
+                sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, alpha);
+            }
+        }
+    }
+
+
+    public void SetTreeAlpha(GameObject treeNode, float alpha)
+    {
+        if (treeNode == null)
+        {
+            return; // TODO: remove this
+        }
+        else if (treeNode != transform.Find("bike"))
+        {
+            SpriteRenderer sr = treeNode.GetComponent<SpriteRenderer>();
+            if (sr != null)
+            {
+                sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, alpha);
+            }
+            foreach (Transform child in treeNode.transform)
+            {
+                SetTreeAlpha(child.gameObject, alpha);
+            }
+        }
+    }
+    // public IEnumerator SetAlphaToZeroForAllSprites()
+    // {
+    //   yield return new WaitForEndOfFrame();
+    //   yield return new WaitForEndOfFrame();
+    //     // List all SpriteRenderer components you want to modify
+    //     SpriteRenderer[] spriteRenderers = new SpriteRenderer[] {
+    //         headSprite, eyeSprite, throatSprite, collarSprite, torsoSprite, waistSprite, waistShortsSprite, 
+    //         kneesShinsSprite, anklesSprite, feetSprite, jakettoSprite, dressSprite, longSleeveSprite, 
+    //         handSprite, shortSleeveSprite, mohawk5TopSprite, mohawk5BottomSprite, hair0TopSprite, 
+    //         hair0BottomSprite, hair1TopSprite, hair7TopSprite, hair8TopSprite, hair1BottomSprite, 
+    //         hair2BottomSprite, hair3BottomSprite, hair4BottomSprite, hair6BottomSprite, hair7BottomSprite, 
+    //         hair8BottomSprite, hairFringe1Sprite, hairFringe2Sprite
+    //     };
+
+    //     // Loop through each SpriteRenderer and set its alpha to zero
+    //     foreach (SpriteRenderer spriteRenderer in spriteRenderers)
+    //     {
+    //         if (spriteRenderer != null) // Check if SpriteRenderer is assigned
+    //         {
+    //             Color color = spriteRenderer.color;
+    //             color.a = 0f; // Set alpha to zero
+    //             spriteRenderer.color = color;
+    //         }
+    //     }
+    // }
 
     void CheckFurnitureType()
     {
@@ -801,8 +868,8 @@ public class CharacterAnimation : MonoBehaviour
         {
             case FurnitureScript.FurnitureType.chair:
                 characterCustomization.UpdatePants();
-                characterCustomization.UpdateWaist();                
-              break;
+                characterCustomization.UpdateWaist();
+                break;
 
             case FurnitureScript.FurnitureType.toilet:
                 characterCustomization.UpdatePants();
@@ -810,8 +877,8 @@ public class CharacterAnimation : MonoBehaviour
                 break;
 
             case FurnitureScript.FurnitureType.bed:
-                 currentFurnitureScript.HandlePlayerAlphaEngagement(false);
-                 currentFurnitureScript.SetBedCoverAlpha(false);
+                currentFurnitureScript.HandlePlayerAlphaEngagement(false);
+                currentFurnitureScript.SetBedCoverAlpha(false);
                 // Add your bed-specific logic here
                 break;
 
@@ -823,265 +890,293 @@ public class CharacterAnimation : MonoBehaviour
 
     void LoadHuman()
     {
-      animDirectionAdjustorInt = 26;
+        animDirectionAdjustorInt = 26;
 
-      rightDownAnim = 0 * animDirectionAdjustorInt;
-      leftDownAnim  = 1 * animDirectionAdjustorInt;
-      rightAnim     = 2 * animDirectionAdjustorInt;
-      leftAnim      = 3 * animDirectionAdjustorInt;
-      upRightAnim   = 4 * animDirectionAdjustorInt;
-      upLeftAnim    = 5 * animDirectionAdjustorInt;
+        rightDownAnim = 0 * animDirectionAdjustorInt;
+        leftDownAnim = 1 * animDirectionAdjustorInt;
+        rightAnim = 2 * animDirectionAdjustorInt;
+        leftAnim = 3 * animDirectionAdjustorInt;
+        upRightAnim = 4 * animDirectionAdjustorInt;
+        upLeftAnim = 5 * animDirectionAdjustorInt;
 
-      idle = 0; walk = 1; run = 5; sit = 10; climb = 11; rideBike = 15; 
+        idle = 0; walk = 1; run = 5; sit = 10; climb = 11; rideBike = 15;
 
-      characterCustomization = GetComponent<CharacterCustomization>();
-      bikeTransformAdjustment = GetComponent<BikeTransformAdjustment>();
+        characterCustomization = GetComponent<CharacterCustomization>();
+        bikeTransformAdjustment = GetComponent<BikeTransformAdjustment>();
 
-      // Find all input fields in the scene
-      inputFields = FindObjectsOfType<TMP_InputField>();
+        // Find all input fields in the scene
+        inputFields = FindObjectsOfType<TMP_InputField>();
 
-      bodyTypeNumber = 5;
-          
-      allHeadSprites = Resources.LoadAll<Sprite>("head");
-      allEyeSprites = Resources.LoadAll<Sprite>("eyes");
-      allThroatSprites = Resources.LoadAll<Sprite>("throat");
-      allCollarSprites = Resources.LoadAll<Sprite>("collar");
-      allTorsoSprites = Resources.LoadAll<Sprite>("torso");
-      allWaistSprites = Resources.LoadAll<Sprite>("waist");
-      allWaistShortsSprites = Resources.LoadAll<Sprite>("waistShorts");
-      allKneesShinsSprites = Resources.LoadAll<Sprite>("kneesShins");
-      allAnklesSprites = Resources.LoadAll<Sprite>("ankles");
-      allFeetSprites = Resources.LoadAll<Sprite>("feet");
-      allJakettoSprites = Resources.LoadAll<Sprite>("jaketto");
-      allDressSprites = Resources.LoadAll<Sprite>("dress");
-      allLongSleeveSprites = Resources.LoadAll<Sprite>("longSleeve");
-      allHandSprites = Resources.LoadAll<Sprite>("hands");
-      allShortSleeveSprites = Resources.LoadAll<Sprite>("shortSleeve");
-      allHat1TopSprites = Resources.LoadAll<Sprite>("waterOnHead");
-      allMohawk5TopSprites = Resources.LoadAll<Sprite>("mohawk5Top");
-      allMohawk5BottomSprites = Resources.LoadAll<Sprite>("mohawk5Bottom");
-      allHair0TopSprites = Resources.LoadAll<Sprite>("hair0Top");
-      allHair0BottomSprites = Resources.LoadAll<Sprite>("hair0Bottom");
-      allHair1TopSprites = Resources.LoadAll<Sprite>("hair1Top");
-      allHair7TopSprites = Resources.LoadAll<Sprite>("hair7Top");
-      allHair8TopSprites = Resources.LoadAll<Sprite>("hair8Top");
-      allHair1BottomSprites = Resources.LoadAll<Sprite>("hair1Bottom");
-      allHair2BottomSprites = Resources.LoadAll<Sprite>("hair2Bottom");
-      allHair3BottomSprites = Resources.LoadAll<Sprite>("hair3Bottom");
-      allHair4BottomSprites = Resources.LoadAll<Sprite>("hair4Bottom");
-      allHair6BottomSprites = Resources.LoadAll<Sprite>("hair6Bottom");
-      allHair7BottomSprites = Resources.LoadAll<Sprite>("hair7Bottom");
-      allHair8BottomSprites = Resources.LoadAll<Sprite>("hair8Bottom");
-      allHairFringe1Sprites = Resources.LoadAll<Sprite>("hairFringe1");
-      allHairFringe2Sprites = Resources.LoadAll<Sprite>("hairFringe2");
-      allBikeSprites = Resources.LoadAll<Sprite>("bike");
+        bodyTypeNumber = 5;
 
-
-      headSprite = transform.Find("headParent").transform.Find("head").GetComponent<SpriteRenderer>();
-      eyeSprite = transform.Find("headParent").transform.Find("eyes").GetComponent<SpriteRenderer>();
-      throatSprite = transform.Find("throat").GetComponent<SpriteRenderer>();
-      collarSprite = transform.Find("collar").GetComponent<SpriteRenderer>();
-      torsoSprite = transform.Find("torso").GetComponent<SpriteRenderer>();
-      waistSprite = transform.Find("waist").GetComponent<SpriteRenderer>();
-      waistShortsSprite = transform.Find("waistShorts").GetComponent<SpriteRenderer>();
-      kneesShinsSprite = transform.Find("kneesShins").GetComponent<SpriteRenderer>();
-      anklesSprite = transform.Find("ankles").GetComponent<SpriteRenderer>();
-      feetSprite = transform.Find("feet").GetComponent<SpriteRenderer>();
-      jakettoSprite = transform.Find("jaketto").GetComponent<SpriteRenderer>();
-      dressSprite = transform.Find("dress").GetComponent<SpriteRenderer>();
-      longSleeveSprite = transform.Find("longSleeve").GetComponent<SpriteRenderer>();
-      handSprite = transform.Find("hands").GetComponent<SpriteRenderer>();
-      shortSleeveSprite = transform.Find("shortSleeve").GetComponent<SpriteRenderer>();
-      hat1TopSprite = transform.Find("headParent").transform.Find("hair").transform.Find("hat1Top").GetComponent<SpriteRenderer>();
-      mohawk5TopSprite = transform.Find("headParent").transform.Find("hair").transform.Find("mohawk5Top").GetComponent<SpriteRenderer>();
-      mohawk5BottomSprite = transform.Find("headParent").transform.Find("hair").transform.Find("mohawk5Bottom").GetComponent<SpriteRenderer>();
-      hair0TopSprite = transform.Find("headParent").transform.Find("hair").transform.Find("hair0Top").GetComponent<SpriteRenderer>();
-      hair0BottomSprite = transform.Find("headParent").transform.Find("hair").transform.Find("hair0Bottom").GetComponent<SpriteRenderer>();
-      hair1TopSprite = transform.Find("headParent").transform.Find("hair").transform.Find("hair1Top").GetComponent<SpriteRenderer>();
-      hair7TopSprite = transform.Find("headParent").transform.Find("hair").transform.Find("hair7Top").GetComponent<SpriteRenderer>();
-      hair8TopSprite = transform.Find("headParent").transform.Find("hair").transform.Find("hair8Top").GetComponent<SpriteRenderer>();
-      hair1BottomSprite = transform.Find("headParent").transform.Find("hair").transform.Find("hair1Bottom").GetComponent<SpriteRenderer>();
-      hair2BottomSprite = transform.Find("headParent").transform.Find("hair").transform.Find("hair2Bottom").GetComponent<SpriteRenderer>();
-      hair3BottomSprite = transform.Find("headParent").transform.Find("hair").transform.Find("hair3Bottom").GetComponent<SpriteRenderer>();
-      hair4BottomSprite = transform.Find("headParent").transform.Find("hair").transform.Find("hair4Bottom").GetComponent<SpriteRenderer>();
-      hair6BottomSprite = transform.Find("headParent").transform.Find("hair").transform.Find("hair6Bottom").GetComponent<SpriteRenderer>();
-      hair7BottomSprite = transform.Find("headParent").transform.Find("hair").transform.Find("hair7Bottom").GetComponent<SpriteRenderer>();
-      hair8BottomSprite = transform.Find("headParent").transform.Find("hair").transform.Find("hair8Bottom").GetComponent<SpriteRenderer>();
-      hairFringe1Sprite = transform.Find("headParent").transform.Find("hair").transform.Find("hairFringe1").GetComponent<SpriteRenderer>();
-      hairFringe2Sprite = transform.Find("headParent").transform.Find("hair").transform.Find("hairFringe2").GetComponent<SpriteRenderer>();
-      bikeSprite = transform.Find("bike").GetComponent<SpriteRenderer>();
-  
-      bikeStatic = GameObject.FindGameObjectWithTag("Bike");
-      bikeScript = bikeStatic.transform.Find("bikeTrig").GetComponent<BikeScript>();
-      bikeInitialColor = bikeSprite.color;
-      currentBikeColor = bikeSprite.color;
-      currentBikeColor.a = 0f;
+        allHeadSprites = Resources.LoadAll<Sprite>("head");
+        allEyeSprites = Resources.LoadAll<Sprite>("eyes");
+        allThroatSprites = Resources.LoadAll<Sprite>("throat");
+        allCollarSprites = Resources.LoadAll<Sprite>("collar");
+        allTorsoSprites = Resources.LoadAll<Sprite>("torso");
+        allWaistSprites = Resources.LoadAll<Sprite>("waist");
+        allWaistShortsSprites = Resources.LoadAll<Sprite>("waistShorts");
+        allKneesShinsSprites = Resources.LoadAll<Sprite>("kneesShins");
+        allAnklesSprites = Resources.LoadAll<Sprite>("ankles");
+        allFeetSprites = Resources.LoadAll<Sprite>("feet");
+        allJakettoSprites = Resources.LoadAll<Sprite>("jaketto");
+        allDressSprites = Resources.LoadAll<Sprite>("dress");
+        allLongSleeveSprites = Resources.LoadAll<Sprite>("longSleeve");
+        allHandSprites = Resources.LoadAll<Sprite>("hands");
+        allShortSleeveSprites = Resources.LoadAll<Sprite>("shortSleeve");
+        allHat1TopSprites = Resources.LoadAll<Sprite>("waterOnHead");
+        allMohawk5TopSprites = Resources.LoadAll<Sprite>("mohawk5Top");
+        allMohawk5BottomSprites = Resources.LoadAll<Sprite>("mohawk5Bottom");
+        allHair0TopSprites = Resources.LoadAll<Sprite>("hair0Top");
+        allHair0BottomSprites = Resources.LoadAll<Sprite>("hair0Bottom");
+        allHair1TopSprites = Resources.LoadAll<Sprite>("hair1Top");
+        allHair7TopSprites = Resources.LoadAll<Sprite>("hair7Top");
+        allHair8TopSprites = Resources.LoadAll<Sprite>("hair8Top");
+        allHair1BottomSprites = Resources.LoadAll<Sprite>("hair1Bottom");
+        allHair2BottomSprites = Resources.LoadAll<Sprite>("hair2Bottom");
+        allHair3BottomSprites = Resources.LoadAll<Sprite>("hair3Bottom");
+        allHair4BottomSprites = Resources.LoadAll<Sprite>("hair4Bottom");
+        allHair6BottomSprites = Resources.LoadAll<Sprite>("hair6Bottom");
+        allHair7BottomSprites = Resources.LoadAll<Sprite>("hair7Bottom");
+        allHair8BottomSprites = Resources.LoadAll<Sprite>("hair8Bottom");
+        allHairFringe1Sprites = Resources.LoadAll<Sprite>("hairFringe1");
+        allHairFringe2Sprites = Resources.LoadAll<Sprite>("hairFringe2");
+        allBikeSprites = Resources.LoadAll<Sprite>("bike");
 
 
+        headSprite = transform.Find("headParent").transform.Find("head").GetComponent<SpriteRenderer>();
+        eyeSprite = transform.Find("headParent").transform.Find("eyes").GetComponent<SpriteRenderer>();
+        throatSprite = transform.Find("throat").GetComponent<SpriteRenderer>();
+        collarSprite = transform.Find("collar").GetComponent<SpriteRenderer>();
+        torsoSprite = transform.Find("torso").GetComponent<SpriteRenderer>();
+        waistSprite = transform.Find("waist").GetComponent<SpriteRenderer>();
+        waistShortsSprite = transform.Find("waistShorts").GetComponent<SpriteRenderer>();
+        kneesShinsSprite = transform.Find("kneesShins").GetComponent<SpriteRenderer>();
+        anklesSprite = transform.Find("ankles").GetComponent<SpriteRenderer>();
+        feetSprite = transform.Find("feet").GetComponent<SpriteRenderer>();
+        jakettoSprite = transform.Find("jaketto").GetComponent<SpriteRenderer>();
+        dressSprite = transform.Find("dress").GetComponent<SpriteRenderer>();
+        longSleeveSprite = transform.Find("longSleeve").GetComponent<SpriteRenderer>();
+        handSprite = transform.Find("hands").GetComponent<SpriteRenderer>();
+        shortSleeveSprite = transform.Find("shortSleeve").GetComponent<SpriteRenderer>();
+        hat1TopSprite = transform.Find("headParent").transform.Find("hair").transform.Find("hat1Top").GetComponent<SpriteRenderer>();
+        mohawk5TopSprite = transform.Find("headParent").transform.Find("hair").transform.Find("mohawk5Top").GetComponent<SpriteRenderer>();
+        mohawk5BottomSprite = transform.Find("headParent").transform.Find("hair").transform.Find("mohawk5Bottom").GetComponent<SpriteRenderer>();
+        hair0TopSprite = transform.Find("headParent").transform.Find("hair").transform.Find("hair0Top").GetComponent<SpriteRenderer>();
+        hair0BottomSprite = transform.Find("headParent").transform.Find("hair").transform.Find("hair0Bottom").GetComponent<SpriteRenderer>();
+        hair1TopSprite = transform.Find("headParent").transform.Find("hair").transform.Find("hair1Top").GetComponent<SpriteRenderer>();
+        hair7TopSprite = transform.Find("headParent").transform.Find("hair").transform.Find("hair7Top").GetComponent<SpriteRenderer>();
+        hair8TopSprite = transform.Find("headParent").transform.Find("hair").transform.Find("hair8Top").GetComponent<SpriteRenderer>();
+        hair1BottomSprite = transform.Find("headParent").transform.Find("hair").transform.Find("hair1Bottom").GetComponent<SpriteRenderer>();
+        hair2BottomSprite = transform.Find("headParent").transform.Find("hair").transform.Find("hair2Bottom").GetComponent<SpriteRenderer>();
+        hair3BottomSprite = transform.Find("headParent").transform.Find("hair").transform.Find("hair3Bottom").GetComponent<SpriteRenderer>();
+        hair4BottomSprite = transform.Find("headParent").transform.Find("hair").transform.Find("hair4Bottom").GetComponent<SpriteRenderer>();
+        hair6BottomSprite = transform.Find("headParent").transform.Find("hair").transform.Find("hair6Bottom").GetComponent<SpriteRenderer>();
+        hair7BottomSprite = transform.Find("headParent").transform.Find("hair").transform.Find("hair7Bottom").GetComponent<SpriteRenderer>();
+        hair8BottomSprite = transform.Find("headParent").transform.Find("hair").transform.Find("hair8Bottom").GetComponent<SpriteRenderer>();
+        hairFringe1Sprite = transform.Find("headParent").transform.Find("hair").transform.Find("hairFringe1").GetComponent<SpriteRenderer>();
+        hairFringe2Sprite = transform.Find("headParent").transform.Find("hair").transform.Find("hairFringe2").GetComponent<SpriteRenderer>();
+        bikeSprite = transform.Find("bike").GetComponent<SpriteRenderer>();
 
-      // Set the initial state to idle left using the idleLeftIndex
-      headSprite.sprite = allHeadSprites[bodyTypeNumber * bodyTypeIndexMultiplier];
-      eyeSprite.sprite = allEyeSprites[bodyTypeNumber * bodyTypeIndexMultiplier];
-      throatSprite.sprite = allThroatSprites[bodyTypeNumber * bodyTypeIndexMultiplier];
-      collarSprite.sprite = allCollarSprites[bodyTypeNumber * bodyTypeIndexMultiplier];
-      torsoSprite.sprite = allTorsoSprites[bodyTypeNumber * bodyTypeIndexMultiplier];
-      waistSprite.sprite = allWaistSprites[bodyTypeNumber * bodyTypeIndexMultiplier];
-      waistShortsSprite.sprite = allWaistShortsSprites[bodyTypeNumber * bodyTypeIndexMultiplier];
-      kneesShinsSprite.sprite = allKneesShinsSprites[bodyTypeNumber * bodyTypeIndexMultiplier];
-      anklesSprite.sprite = allAnklesSprites[bodyTypeNumber * bodyTypeIndexMultiplier];
-      feetSprite.sprite = allFeetSprites[bodyTypeNumber * bodyTypeIndexMultiplier];
-      jakettoSprite.sprite = allJakettoSprites[bodyTypeNumber * bodyTypeIndexMultiplier];
-      dressSprite.sprite = allDressSprites[bodyTypeNumber * bodyTypeIndexMultiplier];
-      longSleeveSprite.sprite = allLongSleeveSprites[bodyTypeNumber * bodyTypeIndexMultiplier];
-      handSprite.sprite = allHandSprites[bodyTypeNumber * bodyTypeIndexMultiplier];
-      shortSleeveSprite.sprite = allShortSleeveSprites[bodyTypeNumber * bodyTypeIndexMultiplier];      
-      hat1TopSprite.sprite = allHat1TopSprites[bodyTypeNumber * bodyTypeIndexMultiplier];      
-      mohawk5TopSprite.sprite = allMohawk5TopSprites[bodyTypeNumber * bodyTypeIndexMultiplier];      
-      mohawk5BottomSprite.sprite = allMohawk5BottomSprites[bodyTypeNumber * bodyTypeIndexMultiplier];      
-      hair0TopSprite.sprite = allHair0TopSprites[bodyTypeNumber * bodyTypeIndexMultiplier];      
-      hair0BottomSprite.sprite = allHair0BottomSprites[bodyTypeNumber * bodyTypeIndexMultiplier];      
-      hair1TopSprite.sprite = allHair1TopSprites[bodyTypeNumber * bodyTypeIndexMultiplier];      
-      hair7TopSprite.sprite = allHair7TopSprites[bodyTypeNumber * bodyTypeIndexMultiplier];      
-      hair8TopSprite.sprite = allHair8TopSprites[bodyTypeNumber * bodyTypeIndexMultiplier];      
-      hair1BottomSprite.sprite = allHair1BottomSprites[bodyTypeNumber * bodyTypeIndexMultiplier];      
-      hair2BottomSprite.sprite = allHair2BottomSprites[bodyTypeNumber * bodyTypeIndexMultiplier];      
-      hair3BottomSprite.sprite = allHair3BottomSprites[bodyTypeNumber * bodyTypeIndexMultiplier];      
-      hair4BottomSprite.sprite = allHair4BottomSprites[bodyTypeNumber * bodyTypeIndexMultiplier];      
-      hair6BottomSprite.sprite = allHair6BottomSprites[bodyTypeNumber * bodyTypeIndexMultiplier];      
-      hair7BottomSprite.sprite = allHair7BottomSprites[bodyTypeNumber * bodyTypeIndexMultiplier];      
-      hair8BottomSprite.sprite = allHair8BottomSprites[bodyTypeNumber * bodyTypeIndexMultiplier];      
-      hairFringe1Sprite.sprite = allHairFringe1Sprites[bodyTypeNumber * bodyTypeIndexMultiplier];  
-      hairFringe2Sprite.sprite = allHairFringe2Sprites[bodyTypeNumber * bodyTypeIndexMultiplier];  
+        bikeStatic = GameObject.FindGameObjectWithTag("Bike");
+        bikeScript = bikeStatic.transform.Find("bikeTrig").GetComponent<BikeScript>();
+        bikeInitialColor = bikeSprite.color;
+        currentBikeColor = bikeSprite.color;
+        currentBikeColor.a = 0f;
 
 
 
+        // Set the initial state to idle left using the idleLeftIndex
+        headSprite.sprite = allHeadSprites[bodyTypeNumber * bodyTypeIndexMultiplier];
+        eyeSprite.sprite = allEyeSprites[bodyTypeNumber * bodyTypeIndexMultiplier];
+        throatSprite.sprite = allThroatSprites[bodyTypeNumber * bodyTypeIndexMultiplier];
+        collarSprite.sprite = allCollarSprites[bodyTypeNumber * bodyTypeIndexMultiplier];
+        torsoSprite.sprite = allTorsoSprites[bodyTypeNumber * bodyTypeIndexMultiplier];
+        waistSprite.sprite = allWaistSprites[bodyTypeNumber * bodyTypeIndexMultiplier];
+        waistShortsSprite.sprite = allWaistShortsSprites[bodyTypeNumber * bodyTypeIndexMultiplier];
+        kneesShinsSprite.sprite = allKneesShinsSprites[bodyTypeNumber * bodyTypeIndexMultiplier];
+        anklesSprite.sprite = allAnklesSprites[bodyTypeNumber * bodyTypeIndexMultiplier];
+        feetSprite.sprite = allFeetSprites[bodyTypeNumber * bodyTypeIndexMultiplier];
+        jakettoSprite.sprite = allJakettoSprites[bodyTypeNumber * bodyTypeIndexMultiplier];
+        dressSprite.sprite = allDressSprites[bodyTypeNumber * bodyTypeIndexMultiplier];
+        longSleeveSprite.sprite = allLongSleeveSprites[bodyTypeNumber * bodyTypeIndexMultiplier];
+        handSprite.sprite = allHandSprites[bodyTypeNumber * bodyTypeIndexMultiplier];
+        shortSleeveSprite.sprite = allShortSleeveSprites[bodyTypeNumber * bodyTypeIndexMultiplier];
+        hat1TopSprite.sprite = allHat1TopSprites[bodyTypeNumber * bodyTypeIndexMultiplier];
+        mohawk5TopSprite.sprite = allMohawk5TopSprites[bodyTypeNumber * bodyTypeIndexMultiplier];
+        mohawk5BottomSprite.sprite = allMohawk5BottomSprites[bodyTypeNumber * bodyTypeIndexMultiplier];
+        hair0TopSprite.sprite = allHair0TopSprites[bodyTypeNumber * bodyTypeIndexMultiplier];
+        hair0BottomSprite.sprite = allHair0BottomSprites[bodyTypeNumber * bodyTypeIndexMultiplier];
+        hair1TopSprite.sprite = allHair1TopSprites[bodyTypeNumber * bodyTypeIndexMultiplier];
+        hair7TopSprite.sprite = allHair7TopSprites[bodyTypeNumber * bodyTypeIndexMultiplier];
+        hair8TopSprite.sprite = allHair8TopSprites[bodyTypeNumber * bodyTypeIndexMultiplier];
+        hair1BottomSprite.sprite = allHair1BottomSprites[bodyTypeNumber * bodyTypeIndexMultiplier];
+        hair2BottomSprite.sprite = allHair2BottomSprites[bodyTypeNumber * bodyTypeIndexMultiplier];
+        hair3BottomSprite.sprite = allHair3BottomSprites[bodyTypeNumber * bodyTypeIndexMultiplier];
+        hair4BottomSprite.sprite = allHair4BottomSprites[bodyTypeNumber * bodyTypeIndexMultiplier];
+        hair6BottomSprite.sprite = allHair6BottomSprites[bodyTypeNumber * bodyTypeIndexMultiplier];
+        hair7BottomSprite.sprite = allHair7BottomSprites[bodyTypeNumber * bodyTypeIndexMultiplier];
+        hair8BottomSprite.sprite = allHair8BottomSprites[bodyTypeNumber * bodyTypeIndexMultiplier];
+        hairFringe1Sprite.sprite = allHairFringe1Sprites[bodyTypeNumber * bodyTypeIndexMultiplier];
+        hairFringe2Sprite.sprite = allHairFringe2Sprites[bodyTypeNumber * bodyTypeIndexMultiplier];
 
-      currentSkinColor = (HexToColor("#000000"));
-      currentHairColor = (HexToColor("#000000"));
-      currentHatColor = (HexToColor("#000000"));
-      currentShirtColor = (HexToColor("#000000"));
-      currentPantsColor = (HexToColor("#000000"));
-      dressSprite.color = currentPantsColor;
-      currentShoeColor = (HexToColor("#000000"));
-      currentJakettoColor = (HexToColor("#000000"));
-      eyeSprite.color = HexToColor("#000000");
 
 
-      initialWaistTransformPos = waistSprite.transform.localPosition;
+
+        currentSkinColor = (HexToColor("#000000"));
+        currentHairColor = (HexToColor("#000000"));
+        currentHatColor = (HexToColor("#000000"));
+        currentShirtColor = (HexToColor("#000000"));
+        currentPantsColor = (HexToColor("#000000"));
+        dressSprite.color = currentPantsColor;
+        currentShoeColor = (HexToColor("#000000"));
+        currentJakettoColor = (HexToColor("#000000"));
+        eyeSprite.color = HexToColor("#000000");
+
+
+        initialWaistTransformPos = waistSprite.transform.localPosition;
     }
     void LoadChicken()
     {
-      idle = 0; walk = 1; 
+        idle = 0; walk = 1;
+        run = walk;
 
-      bodyTypeNumber = 1;
-      animDirectionAdjustorInt = 0;
-      bodyTypeIndexMultiplier = 1;
-      chickenFeetSprites = Resources.LoadAll<Sprite>("chickenFeet");
-      chickenFeetSprite = transform.Find("xFlip").transform.Find("chickenFeet").GetComponent<SpriteRenderer>();
-      chickenFeetSprite.sprite = chickenFeetSprites[0];
+        bodyTypeNumber = 1;
+        animDirectionAdjustorInt = 0;
+        bodyTypeIndexMultiplier = 1;
+        chickenFeetSprites = Resources.LoadAll<Sprite>("chickenFeet");
+        chickenFeetSprite = transform.Find("xFlip").transform.Find("chickenFeet").GetComponent<SpriteRenderer>();
+        chickenFeetSprite.sprite = chickenFeetSprites[0];
     }
 
     void LoadPony()
     {
-      idle = characterMovement.facingUp ? 1 : 0; walk = 4; run = 26; 
+        idle = characterMovement.facingUp ? 1 : 0; walk = 4; run = 26;
 
-      bodyTypeNumber = 1;
-      animDirectionAdjustorInt = 0;
-      bodyTypeIndexMultiplier = 1;
-      ponyEyesSprites = Resources.LoadAll<Sprite>("ponyEyes");
-      ponyFaceSprites = Resources.LoadAll<Sprite>("ponyFace");
-      ponyShadowSprites = Resources.LoadAll<Sprite>("ponyShadow");
-      ponyHairSprites = Resources.LoadAll<Sprite>("ponyHair");
-      ponyFeetSprites = Resources.LoadAll<Sprite>("ponyFeet");
+        bodyTypeNumber = 1;
+        animDirectionAdjustorInt = 0;
+        bodyTypeIndexMultiplier = 1;
+        ponyEyesSprites = Resources.LoadAll<Sprite>("ponyEyes");
+        ponyFaceSprites = Resources.LoadAll<Sprite>("ponyFace");
+        ponyShadowSprites = Resources.LoadAll<Sprite>("ponyShadow");
+        ponyHairSprites = Resources.LoadAll<Sprite>("ponyHair");
+        ponyFeetSprites = Resources.LoadAll<Sprite>("ponyFeet");
 
-      ponyEyesSprite = transform.Find("xFlip").transform.Find("ponyEyes").GetComponent<SpriteRenderer>();
-      ponyFaceSprite = transform.Find("xFlip").transform.Find("ponyFace").GetComponent<SpriteRenderer>();
-      ponyShadowSprite = transform.Find("xFlip").transform.Find("ponyShadow").GetComponent<SpriteRenderer>();
-      ponyHairSprite = transform.Find("xFlip").transform.Find("ponyHair").GetComponent<SpriteRenderer>();
-      ponyFeetSprite = transform.Find("xFlip").transform.Find("ponyFeet").GetComponent<SpriteRenderer>();
+        ponyEyesSprite = transform.Find("xFlip").transform.Find("ponyEyes").GetComponent<SpriteRenderer>();
+        ponyFaceSprite = transform.Find("xFlip").transform.Find("ponyFace").GetComponent<SpriteRenderer>();
+        ponyShadowSprite = transform.Find("xFlip").transform.Find("ponyShadow").GetComponent<SpriteRenderer>();
+        ponyHairSprite = transform.Find("xFlip").transform.Find("ponyHair").GetComponent<SpriteRenderer>();
+        ponyFeetSprite = transform.Find("xFlip").transform.Find("ponyFeet").GetComponent<SpriteRenderer>();
 
-      ponyEyesSprite.sprite = ponyEyesSprites[0];
-      ponyFaceSprite.sprite = ponyFaceSprites[0];
-      ponyShadowSprite.sprite = ponyShadowSprites[0];
-      ponyHairSprite.sprite = ponyHairSprites[0];
-      ponyFeetSprite.sprite = ponyFeetSprites[0];
+        ponyEyesSprite.sprite = ponyEyesSprites[0];
+        ponyFaceSprite.sprite = ponyFaceSprites[0];
+        ponyShadowSprite.sprite = ponyShadowSprites[0];
+        ponyHairSprite.sprite = ponyHairSprites[0];
+        ponyFeetSprite.sprite = ponyFeetSprites[0];
     }
     void LoadPig()
     {
-      idle = characterMovement.facingUp ? 1 : 0; walk = 4; run = 26; 
+        idle = characterMovement.facingUp ? 1 : 0; walk = characterMovement.facingUp ? 12 : 8;
+        run = characterMovement.facingUp ? 12 : 8;
 
-      bodyTypeNumber = 1;
-      animDirectionAdjustorInt = 0;
-      bodyTypeIndexMultiplier = 1;
-      pigEyesSprites = Resources.LoadAll<Sprite>("pigEyes");
-      pigFaceSprites = Resources.LoadAll<Sprite>("pigFace");
-      pigNoseSprites = Resources.LoadAll<Sprite>("pigNose");
-      pigBodySprites = Resources.LoadAll<Sprite>("pigHair");
-      pigFeetSprites = Resources.LoadAll<Sprite>("pigFeet");
+        bodyTypeNumber = 1;
+        animDirectionAdjustorInt = 0;
+        bodyTypeIndexMultiplier = 1;
+        pigEyesSprites = Resources.LoadAll<Sprite>("pigEyes");
+        pigFaceSprites = Resources.LoadAll<Sprite>("pigFace");
+        pigNoseSprites = Resources.LoadAll<Sprite>("pigNose");
+        pigBodySprites = Resources.LoadAll<Sprite>("pigBody");
+        pigFeetSprites = Resources.LoadAll<Sprite>("pigFeet");
 
-      pigEyesSprite = transform.Find("xFlip").transform.Find("pigEyes").GetComponent<SpriteRenderer>();
-      pigFaceSprite = transform.Find("xFlip").transform.Find("pigFace").GetComponent<SpriteRenderer>();
-      pigNoseSprite = transform.Find("xFlip").transform.Find("pigNose").GetComponent<SpriteRenderer>();
-      pigBodySprite = transform.Find("xFlip").transform.Find("pigBody").GetComponent<SpriteRenderer>();
-      pigFeetSprite = transform.Find("xFlip").transform.Find("pigFeet").GetComponent<SpriteRenderer>();
+        pigEyesSprite = transform.Find("xFlip").transform.Find("pigEyes").GetComponent<SpriteRenderer>();
+        pigFaceSprite = transform.Find("xFlip").transform.Find("pigFace").GetComponent<SpriteRenderer>();
+        pigNoseSprite = transform.Find("xFlip").transform.Find("pigNose").GetComponent<SpriteRenderer>();
+        pigBodySprite = transform.Find("xFlip").transform.Find("pigBody").GetComponent<SpriteRenderer>();
+        pigFeetSprite = transform.Find("xFlip").transform.Find("pigFeet").GetComponent<SpriteRenderer>();
 
-      pigEyesSprite.sprite = ponyEyesSprites[0];
-      pigFaceSprite.sprite = ponyFaceSprites[0];
-      pigNoseSprite.sprite = ponyNoseSprites[0];
-      pigBodySprite.sprite = ponyBodySprites[0];
-      pigFeetSprite.sprite = ponyFeetSprites[0];
+        pigEyesSprite.sprite = pigEyesSprites[0];
+        pigFaceSprite.sprite = pigFaceSprites[0];
+        pigNoseSprite.sprite = pigNoseSprites[0];
+        pigBodySprite.sprite = pigBodySprites[0];
+        pigFeetSprite.sprite = pigFeetSprites[0];
+    }
+    void LoadDog()
+    {
+        idle = characterMovement.facingUp ? 1 : 0; walk = characterMovement.facingUp ? 12 : 8;
+        run = characterMovement.facingUp ? 12 : 8;
+
+        bodyTypeNumber = 1;
+        animDirectionAdjustorInt = 0;
+        bodyTypeIndexMultiplier = 1;
+        dogEyesSprites = Resources.LoadAll<Sprite>("dogEyes");
+        dogNoseSprites = Resources.LoadAll<Sprite>("dogNose");
+        dogMain1Sprites = Resources.LoadAll<Sprite>("dogMain1");
+        dogMain2Sprites = Resources.LoadAll<Sprite>("dogMain2");
+        dogFeetSprites = Resources.LoadAll<Sprite>("dogFeet");
+
+        dogEyesSprite = transform.Find("xFlip").transform.Find("dogEyes").GetComponent<SpriteRenderer>();
+        dogNoseSprite = transform.Find("xFlip").transform.Find("dogNose").GetComponent<SpriteRenderer>();
+        dogMain1Sprite = transform.Find("xFlip").transform.Find("dogMain1").GetComponent<SpriteRenderer>();
+        dogMain2Sprite = transform.Find("xFlip").transform.Find("dogMain2").GetComponent<SpriteRenderer>();
+        dogFeetSprite = transform.Find("xFlip").transform.Find("dogFeet").GetComponent<SpriteRenderer>();
+
+        dogEyesSprite.sprite = dogEyesSprites[0];
+        dogNoseSprite.sprite = dogNoseSprites[0];
+        dogMain1Sprite.sprite = dogMain1Sprites[0];
+        dogMain2Sprite.sprite = dogMain2Sprites[0];
+        dogFeetSprite.sprite = dogFeetSprites[0];
     }
 
-  public void UpdateFlip()
-  {
-      float x = isFacingLeft ? -1 : 1;
-      float xOffset = isFacingLeft ? initialState.position.x + xFlipOffset : initialState.position.x - xFlipOffset;
-
-      visualRoot.localScale = new Vector3(
-        x,
-        visualRoot.localScale.y,
-        visualRoot.localScale.z
-      );
-      visualRoot.position = new Vector3(
-        xOffset, 
-        visualRoot.position.y,
-        visualRoot.position.z
-      );
-  }
-
-  IEnumerator MoveBodyPartAnimation()
-  {
-    float t = 0.1f;
-    Transform part = bodyPartToAnimate.transform;
-
-    Vector3 startPos = part.localPosition;
-
-    Vector3[][] patterns = new Vector3[][]
+    public void UpdateFlip()
     {
+        float x = isFacingLeft ? -1 : 1;
+        float xOffset = isFacingLeft ? initialState.position.x + xFlipOffset : initialState.position.x - xFlipOffset;
+
+        visualRoot.localScale = new Vector3(
+          x,
+          visualRoot.localScale.y,
+          visualRoot.localScale.z
+        );
+        visualRoot.position = new Vector3(
+          xOffset,
+          visualRoot.position.y,
+          visualRoot.position.z
+        );
+    }
+
+    IEnumerator MoveBodyPartAnimation()
+    {
+        float t = 0.1f;
+        Transform part = bodyPartToAnimate.transform;
+
+        Vector3 startPos = part.localPosition;
+
+        Vector3[][] patterns = new Vector3[][]
+        {
         new [] { Vector3.right, Vector3.left },
         new [] { Vector3.left, Vector3.right },
         new [] { Vector3.down, Vector3.up },
         new [] { Vector3.up, Vector3.down },
         new [] { Vector3.right, Vector3.down, Vector3.left, Vector3.up },
         new [] { Vector3.down, Vector3.right, Vector3.up, Vector3.left }
-    };
+        };
 
-    var pattern = patterns[Random.Range(0, patterns.Length)];
+        var pattern = patterns[Random.Range(0, patterns.Length)];
 
-    try
-    {
-        foreach (var dir in pattern)
+        try
         {
-            yield return new WaitForSeconds(t);
-            part.localPosition += dir;
+            foreach (var dir in pattern)
+            {
+                yield return new WaitForSeconds(t);
+                part.localPosition += dir;
+            }
+        }
+        finally
+        {
+            // always snap back to original
+            part.localPosition = startPos;
         }
     }
-    finally
-    {
-        // always snap back to original
-        part.localPosition = startPos;
-    }
-  }
 }
 
 

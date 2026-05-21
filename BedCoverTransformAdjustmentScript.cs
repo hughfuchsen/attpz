@@ -16,6 +16,8 @@ public class BedCoverTransformAdjustmentScript : MonoBehaviour
     public void Start()
     {
         Player = GameObject.FindGameObjectWithTag("Player");
+        
+        if(Player != null)
         characterAnimation = Player.GetComponent<CharacterAnimation>();  
     }
 

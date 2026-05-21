@@ -28,29 +28,6 @@ public class CharacterCustomization : MonoBehaviour
     [HideInInspector] public bool lockedJaketto = false;
     [HideInInspector] public bool lockedShoes = false;
 
-    // Declare Image components for each locked attribute
-    private Image lockBodyImgComponent;
-    private Image lockSkinImgComponent;
-    private Image lockHeightImgComponent;
-    private Image lockWidthImgComponent;
-    private Image lockHairImgComponent;
-    private Image lockHatImgComponent;
-    private Image lockShirtImgComponent;
-    private Image lockWaistImgComponent;
-    private Image lockPantsImgComponent;
-    private Image lockJakettoImgComponent;
-    private Image lockShoesImgComponent;
-
-     // Sprites for locked and unlocked states
-    private Sprite lockedImage;
-    private Sprite unlockedImage;
-
-    // public Image skinColorButton;
-    public Image skinColorButton2;
-    public Image hairColorButton;
-    public Image shirtColorButton;
-    public Image pantsColorButton;
-    public Image jackettoColorButton;
 
  
     [HideInInspector] public int currentBodyTypeIndex = 0; // Index to track current body type
@@ -89,36 +66,14 @@ public class CharacterCustomization : MonoBehaviour
 
         SetBodyType();
 
+    }
 
-        unlockedImage = Resources.Load<Sprite>("unlockedUI");
-        lockedImage = Resources.Load<Sprite>("lockedUI");
+    void Start()
+    {
+        if(characterAnimation.characterType != 0)
+        return;
 
-         // Find and assign all lock Image components by their tags
-
-        lockBodyImgComponent = GameObject.FindGameObjectWithTag("LockBodyUI").GetComponent<Image>();
-        lockSkinImgComponent = GameObject.FindGameObjectWithTag("LockSkinUI").GetComponent<Image>();
-        lockHeightImgComponent = GameObject.FindGameObjectWithTag("LockHeightUI").GetComponent<Image>();
-        lockWidthImgComponent = GameObject.FindGameObjectWithTag("LockWidthUI").GetComponent<Image>();
-        lockHairImgComponent = GameObject.FindGameObjectWithTag("LockHairUI").GetComponent<Image>();
-        lockHatImgComponent = GameObject.FindGameObjectWithTag("LockHatUI").GetComponent<Image>();
-        lockShirtImgComponent = GameObject.FindGameObjectWithTag("LockShirtUI").GetComponent<Image>();
-        lockWaistImgComponent = GameObject.FindGameObjectWithTag("LockWaistUI").GetComponent<Image>();
-        lockPantsImgComponent = GameObject.FindGameObjectWithTag("LockPantsUI").GetComponent<Image>();
-        lockJakettoImgComponent = GameObject.FindGameObjectWithTag("LockJackettoUI").GetComponent<Image>();
-        lockShoesImgComponent = GameObject.FindGameObjectWithTag("LockShoesUI").GetComponent<Image>();
-        // transform.Find("customiseButtons").gameObject.SetActive(false);
-
-        lockBodyImgComponent.sprite = unlockedImage;
-        lockSkinImgComponent.sprite = unlockedImage;
-        lockHeightImgComponent.sprite = unlockedImage;
-        lockWidthImgComponent.sprite = unlockedImage;
-        lockHairImgComponent.sprite = unlockedImage;
-        lockHatImgComponent.sprite = unlockedImage;
-        lockShirtImgComponent.sprite = unlockedImage;
-        lockWaistImgComponent.sprite = unlockedImage;
-        lockPantsImgComponent.sprite = unlockedImage;
-        lockJakettoImgComponent.sprite = unlockedImage;
-        lockShoesImgComponent.sprite = unlockedImage;
+        UpdateRandom();
     }
 
     // Body Type Selection
@@ -805,168 +760,7 @@ public class CharacterCustomization : MonoBehaviour
         }
     }
 
-private void UpdateLockImage()
-{
-    // thisButtonIsLocked = !thisButtonIsLocked;  // Example placeholder
 
-    // Check all locked states and update their images accordingly
-    
-    if (lockedSkinColor)
-    {
-        lockSkinImgComponent.sprite = lockedImage;
-    }
-    else
-    {
-        lockSkinImgComponent.sprite = unlockedImage;
-    }
-
-    if (lockedBodyType)
-    {
-        lockBodyImgComponent.sprite = lockedImage;
-    }
-    else
-    {
-        lockBodyImgComponent.sprite = unlockedImage;
-    }
-
-    if (lockedHeight)
-    {
-        lockHeightImgComponent.sprite = lockedImage;
-    }
-    else
-    {
-        lockHeightImgComponent.sprite = unlockedImage;
-    }
-
-    if (lockedWidth)
-    {
-        lockWidthImgComponent.sprite = lockedImage;
-    }
-    else
-    {
-        lockWidthImgComponent.sprite = unlockedImage;
-    }
-
-    if (lockedHat)
-    {
-        lockHatImgComponent.sprite = lockedImage;
-    }
-    else
-    {
-        lockHatImgComponent.sprite = unlockedImage;
-    }
-
-    if (lockedHair)
-    {
-        lockHairImgComponent.sprite = lockedImage;
-    }
-    else
-    {
-        lockHairImgComponent.sprite = unlockedImage;
-    }
-
-    if (lockedShirt)
-    {
-        lockShirtImgComponent.sprite = lockedImage;
-    }
-    else
-    {
-        lockShirtImgComponent.sprite = unlockedImage;
-    }
-
-    if (lockedWaist)
-    {
-        lockWaistImgComponent.sprite = lockedImage;
-    }
-    else
-    {
-        lockWaistImgComponent.sprite = unlockedImage;
-    }
-
-    if (lockedPants)
-    {
-        lockPantsImgComponent.sprite = lockedImage;
-    }
-    else
-    {
-        lockPantsImgComponent.sprite = unlockedImage;
-    }
-
-    if (lockedJaketto)
-    {
-        lockJakettoImgComponent.sprite = lockedImage;
-    }
-    else
-    {
-        lockJakettoImgComponent.sprite = unlockedImage;
-    }
-
-    if (lockedShoes)
-    {
-        lockShoesImgComponent.sprite = lockedImage;
-    }
-    else
-    {
-        lockShoesImgComponent.sprite = unlockedImage;
-    }
-}
-
-    public void SkinColorLock()
-    {
-        lockedSkinColor = !lockedSkinColor;
-        UpdateLockImage();
-    }
-
-    public void BodyTypeLock()
-    {
-        lockedBodyType = !lockedBodyType;
-        UpdateLockImage();
-    }
-    public void HeightLock()
-    {
-        lockedHeight = !lockedHeight;
-        UpdateLockImage();
-    }
-    public void WidthLock()
-    {
-        lockedWidth = !lockedWidth;
-        UpdateLockImage();
-    }
-    public void HairLock()
-    {
-        lockedHair = !lockedHair;
-        UpdateLockImage();
-    }
-    public void HatLock()
-    {
-        lockedHat = !lockedHat;
-        UpdateLockImage();
-    }
-    public void ShirtLock()
-    {
-        lockedShirt = !lockedShirt;
-        UpdateLockImage();
-    }
-    public void WaistLock()
-    {
-        lockedWaist = !lockedWaist;
-        UpdateLockImage();
-    }
-    public void PantsLock()
-    {
-        lockedPants = !lockedPants;
-        UpdateLockImage();
-    }
-    public void JakettoLock()
-    {
-        lockedJaketto = !lockedJaketto;
-        UpdateLockImage();
-    }
-    public void ShoesLock()
-    {
-        lockedShoes = !lockedShoes;
-        UpdateLockImage();
-    }
 
     public void UpdateRandom()
     {
@@ -1144,7 +938,6 @@ private void UpdateLockImage()
     {
         if(chrctrAppearance != null)
         {
-            Debug.Log("it exists");
             string[] intParams = chrctrAppearance.Split(',').Where(param => !string.IsNullOrWhiteSpace(param)).ToArray();
             if (intParams.Length == 15)
             {
@@ -1707,10 +1500,6 @@ private void UpdateLockImage()
             characterAnimation.shortSleeveSprite.color = HexToColor("#F5CBA7");
         }
         characterAnimation.currentSkinColor = HexToColor("#F5CBA7");
-        if(skinColorButton2 != null)
-        {
-            skinColorButton2.color = characterAnimation.currentSkinColor;
-        }
     }
 
     public void SetSkinColor2()
@@ -1764,10 +1553,6 @@ private void UpdateLockImage()
             characterAnimation.shortSleeveSprite.color = HexToColor("#F6B883");
         }
         characterAnimation.currentSkinColor = HexToColor("#F6B883");
-        if(skinColorButton2 != null)
-        {
-            skinColorButton2.color = characterAnimation.currentSkinColor;
-        }
     }
 
     public void SetSkinColor3()
@@ -1821,10 +1606,6 @@ private void UpdateLockImage()
             characterAnimation.shortSleeveSprite.color = HexToColor("#E1A95F");
         }
         characterAnimation.currentSkinColor = HexToColor("#E1A95F");
-        if(skinColorButton2 != null)
-        {
-            skinColorButton2.color = characterAnimation.currentSkinColor;
-        }
     }
 
     public void SetSkinColor4()
@@ -1878,10 +1659,6 @@ private void UpdateLockImage()
             characterAnimation.shortSleeveSprite.color = HexToColor("#C68642");
         }
         characterAnimation.currentSkinColor = HexToColor("#C68642");
-        if(skinColorButton2 != null)
-        {
-            skinColorButton2.color = characterAnimation.currentSkinColor;
-        }
     }
 
     public void SetSkinColor5()
@@ -1935,10 +1712,6 @@ private void UpdateLockImage()
             characterAnimation.shortSleeveSprite.color = HexToColor("#B57A3D");
         }
         characterAnimation.currentSkinColor = HexToColor("#B57A3D");
-        if(skinColorButton2 != null)
-        {
-            skinColorButton2.color = characterAnimation.currentSkinColor;
-        }
     }
 
     public void SetSkinColor6()
@@ -1992,10 +1765,6 @@ private void UpdateLockImage()
             characterAnimation.shortSleeveSprite.color = HexToColor("#DFA10B");
         }
         characterAnimation.currentSkinColor = HexToColor("#DFA10B");
-        if(skinColorButton2 != null)
-        {
-            skinColorButton2.color = characterAnimation.currentSkinColor;
-        }
     }
 //7d4e34
     public void SetSkinColor7()
@@ -2049,10 +1818,6 @@ private void UpdateLockImage()
             characterAnimation.shortSleeveSprite.color = HexToColor("#7d4e34");
         }
         characterAnimation.currentSkinColor = HexToColor("#7d4e34");
-        if(skinColorButton2 != null)
-        {
-            skinColorButton2.color = characterAnimation.currentSkinColor;
-        }
     }
 
 
@@ -2071,10 +1836,6 @@ private void UpdateLockImage()
                 }
             }
             characterAnimation.currentHairColor = HexToColor("#4E342E");
-            if(hairColorButton != null)
-            {
-                hairColorButton.color = characterAnimation.currentHairColor;
-            }
         }
     }
 
@@ -2093,10 +1854,6 @@ private void UpdateLockImage()
                 }
             }
             characterAnimation.currentHairColor = HexToColor("#1C1C1C");
-            if(hairColorButton != null)
-            {
-                hairColorButton.color = characterAnimation.currentHairColor;
-            }
         }
     }
 
@@ -2115,10 +1872,6 @@ private void UpdateLockImage()
                 }
             }
             characterAnimation.currentHairColor = HexToColor("#F5D76E");
-            if(hairColorButton != null)
-            {
-                hairColorButton.color = characterAnimation.currentHairColor;
-            }
         }
     }
 
@@ -2137,10 +1890,6 @@ private void UpdateLockImage()
                 }
             }
             characterAnimation.currentHairColor = HexToColor("#A52A2A");
-            if(hairColorButton != null)
-            {
-                hairColorButton.color = characterAnimation.currentHairColor;
-            }
         }
     }
 
@@ -2159,10 +1908,6 @@ private void UpdateLockImage()
                 }
             }
             characterAnimation.currentHairColor = HexToColor("#A9A9A9");
-            if(hairColorButton != null)
-            {
-                hairColorButton.color = characterAnimation.currentHairColor;
-            }
         }
     }
 
@@ -2181,10 +1926,6 @@ private void UpdateLockImage()
                 }
             }
             characterAnimation.currentHairColor = HexToColor("#00BFFF");
-            if(hairColorButton != null)
-            {
-                hairColorButton.color = characterAnimation.currentHairColor;
-            }
         }
     }
 
@@ -2203,10 +1944,6 @@ private void UpdateLockImage()
                 }
             }
             characterAnimation.currentHairColor = HexToColor("#FFB6C1");
-            if(hairColorButton != null)
-            {
-                hairColorButton.color = characterAnimation.currentHairColor;
-            }
         }
     }
 
@@ -2225,10 +1962,6 @@ private void UpdateLockImage()
                 }
             }
             characterAnimation.currentHairColor = HexToColor("#E6E6FA");
-            if(hairColorButton != null)
-            {
-                hairColorButton.color = characterAnimation.currentHairColor;
-            }
         }
     }
 
@@ -2247,10 +1980,6 @@ private void UpdateLockImage()
                 }
             }
             characterAnimation.currentHairColor = HexToColor("#98FF98");
-            if(hairColorButton != null)
-            {
-                hairColorButton.color = characterAnimation.currentHairColor;
-            }
         }
     }
 
@@ -2269,10 +1998,6 @@ private void UpdateLockImage()
                 }
             }
             characterAnimation.currentHairColor = HexToColor("#8A2BE2");
-            if(hairColorButton != null)
-            {
-                hairColorButton.color = characterAnimation.currentHairColor;
-            }
         }
     }
 
@@ -2718,10 +2443,6 @@ private void UpdateLockImage()
             characterAnimation.shortSleeveSprite.color = HexToColor("#FF6347");
         }
         characterAnimation.currentShirtColor = HexToColor("#FF6347");
-        if(shirtColorButton != null)
-        {
-            shirtColorButton.color = characterAnimation.currentShirtColor;
-        }
     }
 
     public void SetShirtColor2()
@@ -2751,10 +2472,6 @@ private void UpdateLockImage()
             characterAnimation.shortSleeveSprite.color = HexToColor("#4682B4");
         }
         characterAnimation.currentShirtColor = HexToColor("#4682B4");
-        if(shirtColorButton != null)
-        {
-            shirtColorButton.color = characterAnimation.currentShirtColor;
-        }
     }
 
     public void SetShirtColor3()
@@ -2783,11 +2500,7 @@ private void UpdateLockImage()
         {
             characterAnimation.shortSleeveSprite.color = HexToColor("#32CD32");
         }
-        characterAnimation.currentShirtColor = HexToColor("#32CD32");
-        if(shirtColorButton != null)
-        {
-            shirtColorButton.color = characterAnimation.currentShirtColor;
-        }   
+        characterAnimation.currentShirtColor = HexToColor("#32CD32");  
     }
 
     public void SetShirtColor4()
@@ -2817,10 +2530,6 @@ private void UpdateLockImage()
             characterAnimation.shortSleeveSprite.color = HexToColor("#FFD700");
         }
         characterAnimation.currentShirtColor = HexToColor("#FFD700");
-        if(shirtColorButton != null)
-        {
-            shirtColorButton.color = characterAnimation.currentShirtColor;
-        }
     }
 
     public void SetShirtColor5()
@@ -2850,10 +2559,6 @@ private void UpdateLockImage()
             characterAnimation.shortSleeveSprite.color = HexToColor("#8A2BE2");
         }
         characterAnimation.currentShirtColor = HexToColor("#8A2BE2");
-        if(shirtColorButton != null)
-        {
-            shirtColorButton.color = characterAnimation.currentShirtColor;
-        }
     }
 
     public void SetShirtColor6()
@@ -2883,10 +2588,6 @@ private void UpdateLockImage()
             characterAnimation.shortSleeveSprite.color = HexToColor("#DC143C");
         }
         characterAnimation.currentShirtColor = HexToColor("#DC143C");
-        if(shirtColorButton != null)
-        {
-            shirtColorButton.color = characterAnimation.currentShirtColor;
-        }
     }
 
     public void SetShirtColor7()
@@ -2916,10 +2617,6 @@ private void UpdateLockImage()
             characterAnimation.shortSleeveSprite.color = HexToColor("#20B2AA");
         }
         characterAnimation.currentShirtColor = HexToColor("#20B2AA");
-        if(shirtColorButton != null)
-        {
-            shirtColorButton.color = characterAnimation.currentShirtColor;
-        }
     }
 
     public void SetShirtColor8()
@@ -2949,10 +2646,6 @@ private void UpdateLockImage()
             characterAnimation.shortSleeveSprite.color = HexToColor("#D3D3D3");
         };
         characterAnimation.currentShirtColor = HexToColor("#D3D3D3");
-        if(shirtColorButton != null)
-        {
-            shirtColorButton.color = characterAnimation.currentShirtColor;
-        }
     }
 
     public void SetShirtColor9()
@@ -2982,10 +2675,6 @@ private void UpdateLockImage()
             characterAnimation.shortSleeveSprite.color = HexToColor("#F08080");
         };
         characterAnimation.currentShirtColor = HexToColor("#F08080");
-        if(shirtColorButton != null)
-        {
-            shirtColorButton.color = characterAnimation.currentShirtColor;
-        }
     }
 
     public void SetShirtColor10()
@@ -3015,10 +2704,6 @@ private void UpdateLockImage()
             characterAnimation.shortSleeveSprite.color = HexToColor("#2F4F4F");
         };
         characterAnimation.currentShirtColor = HexToColor("#2F4F4F");
-        if(shirtColorButton != null)
-        {
-            shirtColorButton.color = characterAnimation.currentShirtColor;
-        }
     }
 
     public void SetShirtColor11()
@@ -3048,10 +2733,6 @@ private void UpdateLockImage()
             characterAnimation.shortSleeveSprite.color = HexToColor("#FF34F4");
         };
         characterAnimation.currentShirtColor = HexToColor("#FF34F4");
-        if(shirtColorButton != null)
-        {
-            shirtColorButton.color = characterAnimation.currentShirtColor;
-        }
     }
 
 
@@ -3080,10 +2761,6 @@ private void UpdateLockImage()
             characterAnimation.anklesSprite.color = HexToColor("#2C3E50");
         }
         characterAnimation.currentPantsColor = HexToColor("#2C3E50");
-        if(pantsColorButton != null)
-        {
-            pantsColorButton.color = characterAnimation.currentPantsColor;
-        }
     }
 
     public void SetPantsColor2()
@@ -3109,10 +2786,6 @@ private void UpdateLockImage()
             characterAnimation.anklesSprite.color = HexToColor("#A0522D");
         }
         characterAnimation.currentPantsColor = HexToColor("#A0522D");
-        if(pantsColorButton != null)
-        {
-            pantsColorButton.color = characterAnimation.currentPantsColor;
-        }
     }
 
     public void SetPantsColor3()
@@ -3138,10 +2811,6 @@ private void UpdateLockImage()
             characterAnimation.anklesSprite.color = HexToColor("#808080");
         }
         characterAnimation.currentPantsColor = HexToColor("#808080");
-        if(pantsColorButton != null)
-        {
-            pantsColorButton.color = characterAnimation.currentPantsColor;
-        }
     }
 
     public void SetPantsColor4()
@@ -3167,10 +2836,6 @@ private void UpdateLockImage()
             characterAnimation.anklesSprite.color = HexToColor("#556B2F");
         }
         characterAnimation.currentPantsColor = HexToColor("#556B2F");
-        if(pantsColorButton != null)
-        {
-            pantsColorButton.color = characterAnimation.currentPantsColor;
-        }
     }
 
     public void SetPantsColor5()
@@ -3196,10 +2861,6 @@ private void UpdateLockImage()
             characterAnimation.anklesSprite.color = HexToColor("#B0C4DE");
         }
         characterAnimation.currentPantsColor = HexToColor("#B0C4DE");
-        if(pantsColorButton != null)
-        {
-            pantsColorButton.color = characterAnimation.currentPantsColor;
-        }
     }
 
     public void SetPantsColor6()
@@ -3226,10 +2887,6 @@ private void UpdateLockImage()
             characterAnimation.anklesSprite.color = HexToColor("#4B0082");
         }
         characterAnimation.currentPantsColor = HexToColor("#4B0082");
-        if(pantsColorButton != null)
-        {
-            pantsColorButton.color = characterAnimation.currentPantsColor;
-        }
     }
 
     public void SetPantsColor7()
@@ -3255,10 +2912,6 @@ private void UpdateLockImage()
             characterAnimation.anklesSprite.color = HexToColor("#8B4513");
         }
         characterAnimation.currentPantsColor = HexToColor("#8B4513");
-        if(pantsColorButton != null)
-        {
-            pantsColorButton.color = characterAnimation.currentPantsColor;
-        }
     }
 
     public void SetPantsColor8()
@@ -3284,10 +2937,6 @@ private void UpdateLockImage()
             characterAnimation.anklesSprite.color = HexToColor("#696969");
         }
         characterAnimation.currentPantsColor = HexToColor("#696969");
-        if(pantsColorButton != null)
-        {
-            pantsColorButton.color = characterAnimation.currentPantsColor;
-        }
     }
 
     public void SetPantsColor9()
@@ -3313,10 +2962,6 @@ private void UpdateLockImage()
             characterAnimation.anklesSprite.color = HexToColor("#4682B4");
         }
         characterAnimation.currentPantsColor = HexToColor("#4682B4");
-        if(pantsColorButton != null)
-        {
-            pantsColorButton.color = characterAnimation.currentPantsColor;
-        }
     }
 
     public void SetPantsColor10()
@@ -3342,110 +2987,66 @@ private void UpdateLockImage()
             characterAnimation.anklesSprite.color = HexToColor("#000000");
         }
         characterAnimation.currentPantsColor = HexToColor("#000000");
-        if(pantsColorButton != null)
-        {
-            pantsColorButton.color = characterAnimation.currentPantsColor;
-        }
     }
 
 
     public void SetJakettoColor1()
     {
         characterAnimation.currentJakettoColor = HexToColor("#556B2F");  // Dark Olive
-        if(jackettoColorButton != null)
-        {
-            jackettoColorButton.color = characterAnimation.currentJakettoColor;
-        }
         UpdateJaketto();
     }
 
     public void SetJakettoColor2()
     {
         characterAnimation.currentJakettoColor = HexToColor("#800020");  // Deep Burgundy
-        if(jackettoColorButton != null)
-        {
-            jackettoColorButton.color = characterAnimation.currentJakettoColor;
-        }
         UpdateJaketto();
     }
 
     public void SetJakettoColor3()
     {
         characterAnimation.currentJakettoColor = HexToColor("#6A5ACD");  // Slate Blue
-        if(jackettoColorButton != null)
-        {
-            jackettoColorButton.color = characterAnimation.currentJakettoColor;
-        }
         UpdateJaketto();
     }
 
     public void SetJakettoColor4()
     {
         characterAnimation.currentJakettoColor = HexToColor("#FFDB58");  // Mustard Yellow
-        if(jackettoColorButton != null)
-        {
-            jackettoColorButton.color = characterAnimation.currentJakettoColor;
-        }
         UpdateJaketto();
     }
 
     public void SetJakettoColor5()
     {
         characterAnimation.currentJakettoColor = HexToColor("#36454F");  // Charcoal
-        if(jackettoColorButton != null)
-        {
-            jackettoColorButton.color = characterAnimation.currentJakettoColor;
-        }
         UpdateJaketto();
     }
 
     public void SetJakettoColor6()
     {
         characterAnimation.currentJakettoColor = HexToColor("#228B22");  // Forest Green
-        if(jackettoColorButton != null)
-        {
-            jackettoColorButton.color = characterAnimation.currentJakettoColor;
-        }
         UpdateJaketto();
     }
 
     public void SetJakettoColor7()
     {
         characterAnimation.currentJakettoColor = HexToColor("#000080");  // Navy Blue
-        if(jackettoColorButton != null)
-        {
-            jackettoColorButton.color = characterAnimation.currentJakettoColor;
-        }
         UpdateJaketto();
     }
 
     public void SetJakettoColor8()
     {
         characterAnimation.currentJakettoColor = HexToColor("#8B4513");  // Chocolate Brown
-        if(jackettoColorButton != null)
-        {
-            jackettoColorButton.color = characterAnimation.currentJakettoColor;
-        }
         UpdateJaketto();
     }
 
     public void SetJakettoColor9()
     {
         characterAnimation.currentJakettoColor = HexToColor("#008080");  // Teal
-        if(jackettoColorButton != null)
-        {
-            jackettoColorButton.color = characterAnimation.currentJakettoColor;
-        }
         UpdateJaketto();
     }
 
     public void SetJakettoColor10()
     {
         characterAnimation.currentJakettoColor = HexToColor("#800000");  // Maroon
-        if(jackettoColorButton != null)
-        {
-            jackettoColorButton.color = characterAnimation.currentJakettoColor;
-        }
         UpdateJaketto();
     }
 
@@ -3504,70 +3105,7 @@ private void UpdateLockImage()
       }
     }  
 
- 
-    // public void StopDeactivateSpaceBar()
-    // {
-    //     if (allowTimeForSpaceBarCoro != null)
-    //     {
-    //         StopCoroutine(allowTimeForSpaceBarCoro);
-    //         allowTimeForSpaceBarCoro = null;
-    //         spaceBarDeactivated = false;
-    //     }
-    // }
 
 
-    // Check if any input field is focused
-    // public void NextPants()
-    // {
-    //     currentPantsIndex++;
-    //     if (currentPantsIndex >= 3)
-    //     {
-    //         currentPantsIndex = 0; // Wrap around to the first currentWidthIndex option
-    //     }
-    //     UpdatePants();
-    // }
-
-    // public void UpdatePants()
-    // {
-    //     if(currentPantsIndex == 0)
-    //     {
-    //         SetPantsToShorts();
-    //     }
-    //     else if(currentPantsIndex == 1)
-    //     {
-    //         SetPantsTo3QuarterPants();
-    //     }
-    //     else if(currentPantsIndex == 2)
-    //     {
-    //         SetPantsToPants();
-    //     }
-    // }
-
-
-
-
-    public void ToggleCustomizeUI()
-    {
-        GameObject customizeButtons = transform.Find("customiseButtons").gameObject;
-        bool isActive = customizeButtons.activeSelf;
-        customizeButtons.SetActive(!isActive);  // Toggles the active state
-    }
-
-
-
-
-
-    // Color HexToColor(string hex)
-    // {
-    //     Color newCol;
-    //     if (ColorUtility.TryParseHtmlString(hex, out newCol))
-    //     {
-    //         return newCol;
-    //     }
-    //     else
-    //     {
-    //         Debug.LogError("Invalid hex color string: " + hex);
-    //         return Color.black; // Return black if conversion fails
-    //     }
-    // }
 }
+

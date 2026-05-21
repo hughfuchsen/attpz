@@ -3,7 +3,7 @@ using UnityEngine;
 
 public static class Pathfinding
 {
-    const int MAX_SEARCH_RADIUS = 80;
+    const int MAX_SEARCH_RADIUS = 8000;
 
     private class PathNode
     {
@@ -36,11 +36,12 @@ public static class Pathfinding
 
         if (manhattan > MAX_SEARCH_RADIUS)
         {
-            // Scale dx/dy proportionally
-            float scale = (float)MAX_SEARCH_RADIUS / manhattan;
-            int clampedX = Mathf.RoundToInt(diff.x * scale);
-            int clampedY = Mathf.RoundToInt(diff.y * scale);
-            goal = start + new Vector2Int(clampedX, clampedY);
+            return null;
+            // // Scale dx/dy proportionally
+            // float scale = (float)MAX_SEARCH_RADIUS / manhattan;
+            // int clampedX = Mathf.RoundToInt(diff.x * scale);
+            // int clampedY = Mathf.RoundToInt(diff.y * scale);
+            // goal = start + new Vector2Int(clampedX, clampedY);
         }
 
 
